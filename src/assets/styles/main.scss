@@ -1,0 +1,42 @@
+/**
+ * Website Style
+ *
+ * @package     MHW Calculator
+ * @author      Scar Wu
+ * @copyright   Copyright (c) Scar Wu (http://scar.tw)
+ * @link        https://github.com/scarwu/MHRCalculator
+ */
+
+/**
+ * Reset Bootstrap
+ */
+$grid-gutter-width: 0;
+
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+@import "../../../node_modules/font-awesome/scss/font-awesome";
+
+/**
+ * Load Specify Styles
+ */
+@import "core/global";
+@import "core/desktop";
+@import "core/mobile";
+
+/**
+ * Module & Option Style
+ */
+#mhwc {
+    position: relative;
+    height: 100vh;
+
+    @include font-size(1.4);
+
+    // Variables
+    $header-height: 60px;
+    $footer-height: 50px;
+    $panel-height: 40px;
+
+    @import "modules/common";
+    @import "modules/app";
+    @import "modules/modal";
+}

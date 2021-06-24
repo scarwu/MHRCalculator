@@ -7,7 +7,7 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Store from './store';
+import Store from './store'
 
 export default {
     showChangelog: () => {
@@ -16,7 +16,7 @@ export default {
             payload: {
                 isShow: true
             }
-        });
+        })
     },
     hideChangelog: () => {
         Store.dispatch({
@@ -24,7 +24,7 @@ export default {
             payload: {
                 isShow: false
             }
-        });
+        })
     },
     showAlgorithmSetting: (bypassData = null) => {
         Store.dispatch({
@@ -33,7 +33,7 @@ export default {
                 isShow: true,
                 bypassData: bypassData
             }
-        });
+        })
     },
     hideAlgorithmSetting: () => {
         Store.dispatch({
@@ -42,7 +42,7 @@ export default {
                 isShow: false,
                 bypassData: null
             }
-        });
+        })
     },
     showBundleItemSelector: () => {
         Store.dispatch({
@@ -50,7 +50,7 @@ export default {
             payload: {
                 isShow: true
             }
-        });
+        })
     },
     hideBundleItemSelector: () => {
         Store.dispatch({
@@ -58,7 +58,7 @@ export default {
             payload: {
                 isShow: false
             }
-        });
+        })
     },
     showConditionItemSelector: (bypassData = null) => {
         Store.dispatch({
@@ -67,7 +67,7 @@ export default {
                 isShow: true,
                 bypassData: bypassData
             }
-        });
+        })
     },
     hideConditionItemSelector: () => {
         Store.dispatch({
@@ -76,7 +76,7 @@ export default {
                 isShow: false,
                 bypassData: null
             }
-        });
+        })
     },
     showEquipItemSelector: (bypassData = null) => {
         Store.dispatch({
@@ -85,7 +85,7 @@ export default {
                 isShow: true,
                 bypassData: bypassData
             }
-        });
+        })
     },
     hideEquipItemSelector: () => {
         Store.dispatch({
@@ -94,6 +94,6 @@ export default {
                 isShow: false,
                 bypassData: null
             }
-        });
+        })
     }
-};
+}

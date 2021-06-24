@@ -7,34 +7,34 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Store from './store';
+import Store from './store'
 
 export default {
     getTempData: () => {
-        return Store.getState().tempData;
+        return Store.getState().tempData
     },
     getRequiredSets: () => {
-        return Store.getState().requiredSets;
+        return Store.getState().requiredSets
     },
     getRequiredSkills: () => {
-        return Store.getState().requiredSkills;
+        return Store.getState().requiredSkills
     },
     getRequiredEquips: () => {
-        return Store.getState().requiredEquips;
+        return Store.getState().requiredEquips
     },
     getCurrentEquips: () => {
-        return Store.getState().currentEquips;
+        return Store.getState().currentEquips
     },
     getAlgorithmParams: () => {
-        return Store.getState().algorithmParams;
+        return Store.getState().algorithmParams
     },
     getComputedResult: () => {
-        return Store.getState().computedResult;
+        return Store.getState().computedResult
     },
     getReservedBundles: () => {
-        return Store.getState().reservedBundles;
+        return Store.getState().reservedBundles
     },
     getCustomWeapon: () => {
-        return Store.getState().customWeapon;
+        return Store.getState().customWeapon
     }
-};
+}

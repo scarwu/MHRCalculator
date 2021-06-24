@@ -7,31 +7,31 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Store from './store';
+import Store from './store'
 
 export default {
     isShowChangelog: () => {
-        return Store.getState().changelog.isShow;
+        return Store.getState().changelog.isShow
     },
     isShowAlgorithmSetting: () => {
-        return Store.getState().algorithmSetting.isShow;
+        return Store.getState().algorithmSetting.isShow
     },
     getAlgorithmSettingBypassData: () => {
-        return Store.getState().algorithmSetting.bypassData;
+        return Store.getState().algorithmSetting.bypassData
     },
     isShowBundleItemSelector: () => {
-        return Store.getState().bundleItemSelector.isShow;
+        return Store.getState().bundleItemSelector.isShow
     },
     isShowConditionItemSelector: () => {
-        return Store.getState().conditionItemSelector.isShow;
+        return Store.getState().conditionItemSelector.isShow
     },
     getConditionItemSelectorBypassData: () => {
-        return Store.getState().conditionItemSelector.bypassData;
+        return Store.getState().conditionItemSelector.bypassData
     },
     isShowEquipItemSelector: () => {
-        return Store.getState().equipItemSelector.isShow;
+        return Store.getState().equipItemSelector.isShow
     },
     getEquipItemSelectorBypassData: () => {
-        return Store.getState().equipItemSelector.bypassData;
+        return Store.getState().equipItemSelector.bypassData
     }
-};
+}

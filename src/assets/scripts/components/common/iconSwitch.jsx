@@ -8,46 +8,46 @@
  */
 
 // Load Libraries
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 
 // Load Core Libraries
-import Helper from 'core/helper';
+import Helper from 'core/helper'
 
 export default function IconSwitch(props) {
-    const {defaultValue, options, onChange} = props;
+    const {defaultValue, options, onChange} = props
 
     return useMemo(() => {
-        Helper.debug('Component: Common -> IconSwitch');
+        Helper.debug('Component: Common -> IconSwitch')
 
-        let currentIndex = null;
+        let currentIndex = null
 
         options.forEach((option, optionIndex) => {
             if (defaultValue !== option.key) {
-                return;
+                return
             }
 
-            currentIndex = optionIndex;
-        });
+            currentIndex = optionIndex
+        })
 
         const handlePrev = () => {
             if (Helper.isEmpty(options[currentIndex - 1])) {
-                return;
+                return
             }
 
-            onChange(options[currentIndex - 1].key);
-        };
+            onChange(options[currentIndex - 1].key)
+        }
 
         const handleNext = () => {
             if (Helper.isEmpty(options[currentIndex + 1])) {
-                return;
+                return
             }
 
-            onChange(options[currentIndex + 1].key);
-        };
+            onChange(options[currentIndex + 1].key)
+        }
 
         const handleChange = (event) => {
-            onChange(event.target.value);
-        };
+            onChange(event.target.value)
+        }
 
         return (
             <div className="mhwc-icon_switch">
@@ -59,7 +59,7 @@ export default function IconSwitch(props) {
                         {options.map((option) => {
                             return (
                                 <option key={option.key} value={option.key}>{option.value}</option>
-                            );
+                            )
                         })}
                     </select>
                     <a className="mhwc-icon" onClick={handleNext}>
@@ -67,6 +67,6 @@ export default function IconSwitch(props) {
                     </a>
                 </div>
             </div>
-        );
-    }, [defaultValue, options, onChange]);
-};
+        )
+    }, [defaultValue, options, onChange])
+}

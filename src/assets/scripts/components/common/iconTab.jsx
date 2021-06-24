@@ -8,23 +8,23 @@
  */
 
 // Load Libraries
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 
 // Load Core Libraries
-import Helper from 'core/helper';
+import Helper from 'core/helper'
 
 export default function IconTab(props) {
-    const {iconName, altName, isActive, onClick} = props;
+    const {iconName, altName, isActive, onClick} = props
 
     return useMemo(() => {
-        Helper.debug('Component: Common -> IconTab');
+        Helper.debug('Component: Common -> IconTab')
 
         let className = [
             'mhwc-body'
-        ];
+        ]
 
         if (isActive) {
-            className.push('is-active');
+            className.push('is-active')
         }
 
         return (
@@ -40,5 +40,5 @@ export default function IconTab(props) {
                 </div>
             </div>
         )
-    }, [iconName, altName, isActive, onClick]);
-};
+    }, [iconName, altName, isActive, onClick])
+}

@@ -8,33 +8,33 @@
  */
 
 // Load Libraries
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { HashRouter as Router, Route } from 'react-router-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { HashRouter as Router, Route } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
 
 // Load Config
-import Config from 'config';
+import Config from 'config'
 
 // Load App
-import App from 'app';
+import App from 'app'
 
 // Load Components
-import Changelog from 'components/modal/changelog';
-import AlgorithmSetting from 'components/modal/algorithmSetting';
-import ConditionItemSelector from 'components/modal/conditionItemSelector';
-import EquipItemSelector from 'components/modal/equipItemSelector';
-import BundleItemSelector from 'components/modal/bundleItemSelector';
+import Changelog from 'components/modal/changelog'
+import AlgorithmSetting from 'components/modal/algorithmSetting'
+import ConditionItemSelector from 'components/modal/conditionItemSelector'
+import EquipItemSelector from 'components/modal/equipItemSelector'
+import BundleItemSelector from 'components/modal/bundleItemSelector'
 
 // Set Sentry Endpoint
 if ('production' === Config.env) {
     Sentry.configureScope((scope) => {
-        scope.setLevel('error');
-    });
+        scope.setLevel('error')
+    })
     Sentry.init({
         dsn: 'https://000580e8cc8a4f3bbf668d4acfc90da2@sentry.io/1400031',
         release: Config.buildTime
-    });
+    })
 }
 
 // Mounting
@@ -48,4 +48,4 @@ ReactDOM.render((
         <EquipItemSelector />
         <BundleItemSelector />
     </Router>
-), document.getElementById('mhwc'));
+), document.getElementById('mhwc'))

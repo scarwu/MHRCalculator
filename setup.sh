@@ -2,5 +2,4 @@
 
 cd `dirname $0`
 
-composer install
 yarn install

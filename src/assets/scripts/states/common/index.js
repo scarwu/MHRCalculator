@@ -7,12 +7,12 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Store from './store';
-import Setter from './setter';
-import Getter from './getter';
+import Store from './store'
+import Setter from './setter'
+import Getter from './getter'
 
 export default {
     store: Store,
     setter: Setter,
     getter: Getter
-};
+}

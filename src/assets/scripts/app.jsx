@@ -8,70 +8,70 @@
  */
 
 // Load Libraries
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'
 
 // Load Core Libraries
-import Status from 'core/status';
-import Helper from 'core/helper';
+import Status from 'core/status'
+import Helper from 'core/helper'
 
 // Load Custom Libraries
-import _ from 'libraries/lang';
+import _ from 'libraries/lang'
 
 // Load Components
-import IconButton from 'components/common/iconButton';
-import IconSelector from 'components/common/iconSelector';
-import ConditionOptions from 'components/conditionOptions';
-import CandidateBundles from 'components/candidateBundles';
-import EquipsDisplayer from 'components/equipsDisplayer';
-import CharacterStatus from 'components/characterStatus';
+import IconButton from 'components/common/iconButton'
+import IconSelector from 'components/common/iconSelector'
+import ConditionOptions from 'components/conditionOptions'
+import CandidateBundles from 'components/candidateBundles'
+import EquipsDisplayer from 'components/equipsDisplayer'
+import CharacterStatus from 'components/characterStatus'
 
 // Load State Control
-import CommonState from 'states/common';
-import ModalState from 'states/modal';
+import CommonState from 'states/common'
+import ModalState from 'states/modal'
 
 // Load Config & Constant
-import Config from 'config';
-import Constant from 'constant';
+import Config from 'config'
+import Constant from 'constant'
 
 if ('production' === Config.env) {
     if (Config.buildTime !== Status.get('sys:buildTime')) {
-        ModalState.setter.showChangelog();
+        ModalState.setter.showChangelog()
     }
 
-    Status.set('sys:buildTime', Config.buildTime);
+    Status.set('sys:buildTime', Config.buildTime)
 }
 
 /**
  * Variables
  */
 const langList = Object.keys(Constant.langs).map((lang) => {
-    return { key: lang, value: Constant.langs[lang] };
-});
+    return { key: lang, value: Constant.langs[lang] }
+})
 
 /**
  * Handle Functions
  */
 const handleBundleExport = () => {
-    let equips = Helper.deepCopy(CommonState.getter.getCurrentEquips());
-    let hash = Helper.base64Encode(JSON.stringify(equips));
+    let equips = Helper.deepCopy(CommonState.getter.getCurrentEquips())
+    let hash = Helper.base64Encode(JSON.stringify(equips))
 
-    let protocol = window.location.protocol;
-    let hostname = window.location.hostname;
-    let pathname = window.location.pathname;
+    let protocol = window.location.protocol
+    let hostname = window.location.hostname
+    let pathname = window.location.pathname
 
-    window.open(`${protocol}//${hostname}${pathname}#/${hash}`, '_blank');
-};
+    window.open(`${protocol}//${hostname}${pathname}#/${hash}`, '_blank')
+}
 
 const handleOpenReadme = () => {
-    window.open('https://scar.tw/article/2018/05/02/mhw-calculator-readme/','_blank');
-};
+    window.open('https://scar.tw/article/2018/05/02/mhw-calculator-readme/','_blank')
+}
 
 export default function App(props) {
 
     /**
      * Hooks
      */
-    const [stateLang, setLang] = useState(Status.get('sys:lang'));
+    const [stateLang, setLang] = useState(Status.get('sys:lang'))
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -80,17 +80,17 @@ export default function App(props) {
         if (Helper.isNotEmpty(props.match.params.hash)) {
             CommonState.setter.replaceCurrentEquips(
                 JSON.parse(Helper.base64Decode(props.match.params.hash))
-            );
+            )
         }
-    }, []);
+    }, [])
 
     /**
      * Handle Functions
      */
     const handleLangChange = useCallback((event) => {
-        Status.set('sys:lang', event.target.value);
-        setLang(event.target.value);
-    }, []);
+        Status.set('sys:lang', event.target.value)
+        setLang(event.target.value)
+    }, [])
 
     /**
      * Render Functions
@@ -142,5 +142,5 @@ export default function App(props) {
                 </div>
             </div>
         </div>
-    );
+    )
 }

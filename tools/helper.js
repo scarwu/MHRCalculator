@@ -9,21 +9,8 @@
 
 // Load Libraries
 import MD5 from 'md5'
-
-// Load Config
-import Config from 'config'
-
-function log(...params) {
-    if ('production' !== Config.env) {
-        console.log.apply(this, params)
-    }
-}
-
-function debug(...params) {
-    if ('production' !== Config.env) {
-        console.debug.apply(this, params)
-    }
-}
+import * as fs from 'fs'
+import * as http from 'http'
 
 function isEmpty(variable) {
     return (undefined === variable || null === variable)
@@ -41,29 +28,38 @@ function jsonHash(data) {
     return MD5(JSON.stringify(data))
 }
 
-function base64Encode(text) {
-    text = window.btoa(text)
-
-    return text
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
+function jsonHash(data) {
+    return MD5(JSON.stringify(data))
 }
 
-function base64Decode(text) {
-    text = text
-        .replace(/\-/g, '+')
-        .replace(/\_/g, '/')
+function loadJSON(path) {
+    return JSON.parse(fs.readFileSync(path))
+}
 
-    return window.atob(text)
+function saveJSON(path, data) {
+    return fs.writeFileSync(path, JSON.stringify(data))
+}
+
+function fetchHtml(url) {
+    let html = http.request(url)
+
+    return html
+}
+
+function loadJSON(path) {
+    return null
+}
+
+function saveJSON(path, data) {
+    return null
 }
 
 export default {
-    log,
-    debug,
     isEmpty,
     isNotEmpty,
     deepCopy,
     jsonHash,
-    base64Encode,
-    base64Decode
+    fetchHtml,
+    loadJSON,
+    saveJSON
 }

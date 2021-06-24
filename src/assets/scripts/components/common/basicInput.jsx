@@ -8,16 +8,16 @@
  */
 
 // Load Libraries
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 
 // Load Core Libraries
-import Helper from 'core/helper';
+import Helper from 'core/helper'
 
 export default function BasicInput(props) {
-    const {defaultValue, placeholder, onChange, bypassRef} = props;
+    const {defaultValue, placeholder, onChange, bypassRef} = props
 
     return useMemo(() => {
-        Helper.debug('Component: Common -> BasicInput');
+        Helper.debug('Component: Common -> BasicInput')
 
         return (
             <div className="mhwc-basic_input">
@@ -27,10 +27,10 @@ export default function BasicInput(props) {
                     onBlur={onChange}
                     onKeyPress={(event) => {
                         if (13 === event.charCode) {
-                            onChange(event);
+                            onChange(event)
                         }
                     }} />
             </div>
-        );
-    }, [defaultValue, placeholder, onChange, bypassRef]);
-};
+        )
+    }, [defaultValue, placeholder, onChange, bypassRef])
+}

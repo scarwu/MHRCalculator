@@ -8,16 +8,16 @@
  */
 
 // Load Libraries
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 
 // Load Core Libraries
-import Helper from 'core/helper';
+import Helper from 'core/helper'
 
 export default function SharpnessBar(props) {
-    const {data} = props;
+    const {data} = props
 
     return useMemo(() => {
-        Helper.debug('Component: Common -> SharpnessBar');
+        Helper.debug('Component: Common -> SharpnessBar')
 
         return (
             <div className="mhwc-sharpness_bar">
@@ -27,7 +27,7 @@ export default function SharpnessBar(props) {
                             <div key={step} className="mhwc-step" style={{
                                 width: (data.steps[step] / 4) + '%'
                             }}></div>
-                        );
+                        )
                     })}
                 </div>
 
@@ -35,6 +35,6 @@ export default function SharpnessBar(props) {
                     width: ((400 - data.value) / 4) + '%'
                 }}></div>
             </div>
-        );
-    }, [data]);
-};
+        )
+    }, [data])
+}

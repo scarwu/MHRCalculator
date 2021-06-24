@@ -8,16 +8,16 @@
  */
 
 // Load Libraries
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 
 // Load Core Libraries
-import Helper from 'core/helper';
+import Helper from 'core/helper'
 
 export default function IconButton(props) {
-    const {iconName, altName, onClick} = props;
+    const {iconName, altName, onClick} = props
 
     return useMemo(() => {
-        Helper.debug('Component: Common -> IconButton');
+        Helper.debug('Component: Common -> IconButton')
 
         return (
             <div className="mhwc-icon_button">
@@ -32,5 +32,5 @@ export default function IconButton(props) {
                 </div>
             </div>
         )
-    }, [iconName, altName, onClick]);
-};
+    }, [iconName, altName, onClick])
+}

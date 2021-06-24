@@ -7,7 +7,7 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Store from './store';
+import Store from './store'
 
 export default {
 
@@ -19,7 +19,7 @@ export default {
                 target: target,
                 index: index
             }
-        });
+        })
     },
 
     // Required Sets
@@ -29,7 +29,7 @@ export default {
             payload: {
                 setId: setId
             }
-        });
+        })
     },
     removeRequiredSet: (setId) => {
         Store.dispatch({
@@ -37,7 +37,7 @@ export default {
             payload: {
                 setId: setId
             }
-        });
+        })
     },
     increaseRequiredSetStep: (setId) => {
         Store.dispatch({
@@ -45,7 +45,7 @@ export default {
             payload: {
                 setId: setId
             }
-        });
+        })
     },
     decreaseRequiredSetStep: (setId) => {
         Store.dispatch({
@@ -53,12 +53,12 @@ export default {
             payload: {
                 setId: setId
             }
-        });
+        })
     },
     cleanRequiredSets: () => {
         Store.dispatch({
             type: 'CLEAN_REQUIRED_SETS'
-        });
+        })
     },
 
     // Required Skills
@@ -68,7 +68,7 @@ export default {
             payload: {
                 skillId: skillId
             }
-        });
+        })
     },
     removeRequiredSkill: (skillId) => {
         Store.dispatch({
@@ -76,7 +76,7 @@ export default {
             payload: {
                 skillId: skillId
             }
-        });
+        })
     },
     increaseRequiredSkillLevel: (skillId) => {
         Store.dispatch({
@@ -84,7 +84,7 @@ export default {
             payload: {
                 skillId: skillId
             }
-        });
+        })
     },
     decreaseRequiredSkillLevel: (skillId) => {
         Store.dispatch({
@@ -92,12 +92,12 @@ export default {
             payload: {
                 skillId: skillId
             }
-        });
+        })
     },
     cleanRequiredSkills: () => {
         Store.dispatch({
             type: 'CLEAN_REQUIRED_SKILLS'
-        });
+        })
     },
 
     // Required Equips
@@ -108,12 +108,12 @@ export default {
                 equipType: equipType,
                 currentEquip: currentEquip
             }
-        });
+        })
     },
     cleanRequiredEquips: () => {
         Store.dispatch({
             type: 'CLEAN_REQUIRED_EQUIPS'
-        });
+        })
     },
 
     // CurrentEquips
@@ -123,7 +123,7 @@ export default {
             payload: {
                 data: data
             }
-        });
+        })
     },
     replaceCurrentEquips: (data) => {
         Store.dispatch({
@@ -131,12 +131,12 @@ export default {
             payload: {
                 data: data
             }
-        });
+        })
     },
     cleanCurrentEquips: () => {
         Store.dispatch({
             type: 'CLEAN_CURRENT_EQUIPS'
-        });
+        })
     },
 
     // Algorithm Params
@@ -146,7 +146,7 @@ export default {
             payload: {
                 limit: limit
             }
-        });
+        })
     },
     setAlgorithmParamsSort: (sort) => {
         Store.dispatch({
@@ -154,7 +154,7 @@ export default {
             payload: {
                 sort: sort
             }
-        });
+        })
     },
     setAlgorithmParamsOrder: (order) => {
         Store.dispatch({
@@ -162,7 +162,7 @@ export default {
             payload: {
                 order: order
             }
-        });
+        })
     },
     toggleAlgorithmParamsFlag: (target) => {
         Store.dispatch({
@@ -170,7 +170,7 @@ export default {
             payload: {
                 target: target
             }
-        });
+        })
     },
     setAlgorithmParamsUsingFactor: (target, flag, value) => {
         Store.dispatch({
@@ -180,7 +180,7 @@ export default {
                 flag: flag,
                 value: value
             }
-        });
+        })
     },
 
     // Computed Result
@@ -190,7 +190,7 @@ export default {
             payload: {
                 data: data
             }
-        });
+        })
     },
     cleanComputedResult: () => {
         Store.dispatch({
@@ -198,7 +198,7 @@ export default {
             payload: {
                 data: null
             }
-        });
+        })
     },
 
     // Reserved Bundles
@@ -208,7 +208,7 @@ export default {
             payload: {
                 data: data
             }
-        });
+        })
     },
     updateReservedBundleName: (index, name) => {
         Store.dispatch({
@@ -217,7 +217,7 @@ export default {
                 index: index,
                 name: name
             }
-        });
+        })
     },
     removeReservedBundle: (index) => {
         Store.dispatch({
@@ -225,7 +225,7 @@ export default {
             payload: {
                 index: index
             }
-        });
+        })
     },
 
     // Custom Weapon
@@ -235,7 +235,7 @@ export default {
             payload: {
                 data: data
             }
-        });
+        })
     },
     setCustomWeaponValue: (target, value) => {
         Store.dispatch({
@@ -244,7 +244,7 @@ export default {
                 target: target,
                 value: value
             }
-        });
+        })
     },
     setCustomWeaponElderseal: (affinity) => {
         Store.dispatch({
@@ -252,7 +252,7 @@ export default {
             payload: {
                 affinity: affinity
             }
-        });
+        })
     },
     setCustomWeaponSharpness: (step) => {
         Store.dispatch({
@@ -260,7 +260,7 @@ export default {
             payload: {
                 step: step
             }
-        });
+        })
     },
     setCustomWeaponElementType: (target, type) => {
         Store.dispatch({
@@ -269,7 +269,7 @@ export default {
                 target: target,
                 type: type
             }
-        });
+        })
     },
     setCustomWeaponElementValue: (target, value) => {
         Store.dispatch({
@@ -278,7 +278,7 @@ export default {
                 target: target,
                 value: value
             }
-        });
+        })
     },
     setCustomWeaponSlot: (index, size) => {
         Store.dispatch({
@@ -287,7 +287,7 @@ export default {
                 index: index,
                 size: size
             }
-        });
+        })
     },
     setCustomWeaponSkill: (index, id) => {
         Store.dispatch({
@@ -296,7 +296,7 @@ export default {
                 index: index,
                 id: id
             }
-        });
+        })
     },
     setCustomWeaponSet: (id) => {
         Store.dispatch({
@@ -304,6 +304,6 @@ export default {
             payload: {
                 id: id
             }
-        });
+        })
     }
-};
+}

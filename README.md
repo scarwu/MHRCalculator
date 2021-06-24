@@ -34,6 +34,7 @@ gulp release # and commit to github
 
 ## Reference Website (Information Source)
 
+* https://game.capcom.com/manual/MHRISE/zh-hant/switch/top
 * https://mhr.gameqb.net
 * https://game8.jp/mhrise
 * https://monsterhunterrise.wiki.fextralife.com

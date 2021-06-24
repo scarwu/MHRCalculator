@@ -8,16 +8,16 @@
  */
 
 // Load Libraries
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 
 // Load Core Libraries
-import Helper from 'core/helper';
+import Helper from 'core/helper'
 
 export default function BasicSelector(props) {
-    const {defaultValue, options, onChange} = props;
+    const {defaultValue, options, onChange} = props
 
     return useMemo(() => {
-        Helper.debug('Component: Common -> BasicSelector');
+        Helper.debug('Component: Common -> BasicSelector')
 
         return (
             <div className="mhwc-basic_selector">
@@ -25,10 +25,10 @@ export default function BasicSelector(props) {
                     {options.map((option) => {
                         return (
                             <option key={option.key} value={option.key}>{option.value}</option>
-                        );
+                        )
                     })}
                 </select>
             </div>
-        );
-    }, [defaultValue, options, onChange]);
-};
+        )
+    }, [defaultValue, options, onChange])
+}

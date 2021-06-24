@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * @package     MHW Calculator
  * @author      Scar Wu
@@ -5,4 +6,4 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Helper from './helper'
+import Helper from '../../helper.mjs'

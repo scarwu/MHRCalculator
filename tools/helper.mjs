@@ -8,12 +8,11 @@
  */
 
 // Load Libraries
-import MD5 from 'md5'
+import md5 from 'md5'
 import * as fs from 'fs'
 import * as http from 'http'
 import * as https from 'https'
 import * as cheerio  from 'cheerio'
-import { resolve } from 'path'
 
 function isEmpty(variable) {
     return (undefined === variable || null === variable)
@@ -28,10 +27,25 @@ function deepCopy(data) {
 }
 
 function jsonHash(data) {
-    return MD5(JSON.stringify(data))
+    return md5(JSON.stringify(data))
 }
 
 function fetchHtmlAsDom(url) {
+    let cacheRoot = `${global.root}/temp/htmlCache`
+    let cacheName = md5(url)
+    let cachePath = `${cacheRoot}/${cacheName}`
+
+    if (false === fs.existsSync(cacheRoot)) {
+        fs.mkdirSync(cacheRoot, {
+            recursive: true
+        })
+    }
+
+    // Load From Cache
+    if (true === fs.existsSync(cachePath)) {
+        return cheerio.load(fs.readFileSync(cachePath))
+    }
+
     let urlObject = new URL(url)
 
     return new Promise((resolve, reject) => {
@@ -51,6 +65,10 @@ function fetchHtmlAsDom(url) {
             })
 
             res.on('end', () => {
+
+                // Save To Cache
+                fs.writeFileSync(cachePath, html)
+
                 resolve(cheerio.load(html))
             })
         }
@@ -76,6 +94,8 @@ function saveJSON(path, data) {
 }
 
 function loadCSV(path) {
+
+
     return null
 }
 

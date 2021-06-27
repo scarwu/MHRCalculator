@@ -22,6 +22,60 @@ function isNotEmpty(variable) {
     return (undefined !== variable && null !== variable)
 }
 
+function isObject(value) {
+    return 'object' === typeof value && false === Array.isArray(value)
+}
+
+function isArray(value) {
+    return 'object' === typeof value && true === Array.isArray(value)
+}
+
+function isFunction(value) {
+    return 'function' === typeof value
+}
+
+function isString(value) {
+    return 'string' === typeof value
+}
+
+function isNumber(value) {
+    return 'number' === typeof value
+}
+
+function isBool(value) {
+    return 'boolean' === typeof value
+}
+
+function checkType(value) {
+    if (true === isEmpty(value)) {
+        return null
+    }
+
+    if (true === isObject(value)) {
+        return 'object'
+    }
+
+    if (true === isArray(value)) {
+        return 'array'
+    }
+
+    if (true === isFunction(value)) {
+        return 'function'
+    }
+
+    if (true === isString(value)) {
+        return 'string'
+    }
+
+    if (true === isNumber(value)) {
+        return 'number'
+    }
+
+    if (true === isBool(value)) {
+        return 'boolean'
+    }
+}
+
 function deepCopy(data) {
     return JSON.parse(JSON.stringify(data))
 }
@@ -84,31 +138,23 @@ function fetchHtmlAsDom(url) {
 }
 
 function loadJSON(path) {
-    let root = `${global.root}/temp`
-
-    return JSON.parse(fs.readFileSync(path))
+    return JSON.parse(fs.readFileSync(`${global.root}/${path}`))
 }
 
 function saveJSON(path, data) {
-    let root = `${global.root}/temp`
-
-    fs.writeFileSync(`${root}/${path}`, JSON.stringify(data))
+    fs.writeFileSync(`${global.root}/${path}`, JSON.stringify(data))
 
     return true
 }
 
 function loadCSV(path) {
-    let root = `${global.root}/temp`
-
-    return fs.readFileSync(`${root}/${path}`).split('\n').map((row) => {
+    return fs.readFileSync(`${global.root}/${path}`).split('\n').map((row) => {
         return row.split(',')
     })
 }
 
 function saveCSV(path, data) {
-    let root = `${global.root}/temp`
-
-    fs.writeFileSync(`${root}/${path}`, data.map((row) => {
+    fs.writeFileSync(`${global.root}/${path}`, data.map((row) => {
         return row.join(',')
     }).join('\n'))
 
@@ -116,17 +162,13 @@ function saveCSV(path, data) {
 }
 
 function loadCSVAsJSON(path) {
-    let root = `${global.root}/temp`
-
-    let data = loadCSV(`${root}/${path}`)
+    let data = loadCSV(`${global.root}/${path}`)
 
     return data
 }
 
 function saveJSONAsCSV(path, data) {
-    let root = `${global.root}/temp`
-
-    saveCSV(`${root}/${path}`, data)
+    saveCSV(`${global.root}/${path}`, data)
 
     return true
 }
@@ -134,6 +176,13 @@ function saveJSONAsCSV(path, data) {
 export default {
     isEmpty,
     isNotEmpty,
+    isObject,
+    isArray,
+    isFunction,
+    isString,
+    isNumber,
+    isBool,
+    checkType,
     deepCopy,
     jsonHash,
     fetchHtmlAsDom,

@@ -1,0 +1,131 @@
+/**
+ * Main Module
+ *
+ * @package     MHW Calculator
+ * @author      Scar Wu
+ * @copyright   Copyright (c) Scar Wu (https://scar.tw)
+ * @link        https://github.com/scarwu/MHRCalculator
+ */
+
+.mhwc-header
+    position: relative
+    padding: 0 10px
+    height: $header-height
+    background-color: #333
+    text-align: center
+
+    .mhwc-title
+        display: inline-block
+        color: #ccc
+
+        &:hover
+            color: #fff
+
+        h1
+            margin: 0
+            padding: 0
+            line-height: $header-height
+            font-weight: bold
+            +font-size(2.4)
+
+    .mhwc-icons_bundle
+        position: absolute
+        top: 0
+        right: 10px
+        padding-top: 20px
+        height: $header-height
+
+        .mhwc-icon_selector,
+        .mhwc-icon_button
+            margin-left: 2px
+            vertical-align: top
+
+            .mhwc-body
+                background-color: #999
+
+            &:hover
+                .mhwc-body
+                    background-color: #666
+
+.mhwc-container
+    height: calc(100vh - (#{$header-height} + #{$footer-height}))
+
+    > .mhwc-conditions,
+    > .mhwc-bundles,
+    > .mhwc-equips,
+    > .mhwc-status
+        position: relative
+        height: calc(100vh - (#{$header-height} + #{$footer-height} + #{$panel-height}))
+
+        .mhwc-panel
+            position: relative
+            height: $panel-height
+            line-height: $panel-height
+            text-align: center
+            background-color: #666
+            color: #fff
+
+            .mhwc-title
+                +font-size(1.6)
+
+            .mhwc-icons_bundle-left,
+            .mhwc-icons_bundle-right
+                position: absolute
+                top: 0
+                padding-top: 10px
+                height: $panel-height
+
+                .mhwc-icon_tab,
+                .mhwc-icon_button
+                    vertical-align: top
+
+                    .mhwc-body
+                        background-color: #999
+
+                    &:hover
+                        .mhwc-body
+                            background-color: #333
+
+            .mhwc-icons_bundle-left
+                left: 10px
+
+                .mhwc-icon_tab
+                    margin-right: 2px
+
+                    .mhwc-label
+                        left: 22px
+                        right: initial
+
+            .mhwc-icons_bundle-right
+                right: 10px
+
+                .mhwc-icon_button
+                    margin-left: 2px
+
+        .mhwc-list
+            height: calc(100vh - (#{$header-height} + #{$footer-height} + #{$panel-height}))
+            padding-top: 5px
+
+.mhwc-footer
+    padding: 0 10px
+    height: $footer-height
+    background-color: #333
+    color: #ccc
+
+    > div:nth-child(1)
+        margin: 0 auto
+        padding-top: 5px
+        text-align: center
+        +font-size(1.4)
+
+    > div:nth-child(2)
+        margin: 0 auto
+        padding-bottom: 5px
+        text-align: center
+        +font-size(1.2)
+
+        a
+            color: #ccc
+
+            &:hover
+                color: #fff

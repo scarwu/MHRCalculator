@@ -114,7 +114,7 @@ const fetchArmors = async () => {
         })
     }
 
-    Helper.saveJSONAsCSV('', Object.values(mapping))
+    Helper.saveJSONAsCSV('gameqb/armor.csv', Object.values(mapping))
 }
 
 const fetchSkills = async () => {

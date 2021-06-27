@@ -86,7 +86,7 @@ function jsonHash(data) {
 }
 
 function fetchHtmlAsDom(url) {
-    let cacheRoot = `${global.root}/temp/htmlCache`
+    let cacheRoot = `${global.root}/temp/cache/html`
     let cacheName = md5(url)
     let cachePath = `${cacheRoot}/${cacheName}`
 
@@ -189,7 +189,7 @@ function loadCSVAsJSON(subPath) {
 }
 
 function saveJSONAsCSV(subPath, data) {
-    let recursive = (headers, row, key, value) => {
+    let recursive = (key, value, headers, row) => {
         if (true === isFunction(value)) {
             throw 'is not allowed type'
         }
@@ -203,7 +203,7 @@ function saveJSONAsCSV(subPath, data) {
                     subKey = `${key}:${subKey}`
                 }
 
-                let result = recursive(headers, row, subKey, subValue)
+                let result = recursive(subKey, subValue, headers, row)
 
                 headers = result.headers
                 row = result.row
@@ -221,7 +221,7 @@ function saveJSONAsCSV(subPath, data) {
                     subIndex = `${key}[]:${subIndex}`
                 }
 
-                let result = recursive(headers, row, subIndex, subValue)
+                let result = recursive(subIndex, subValue, headers, row)
 
                 headers = result.headers
                 row = result.row
@@ -242,12 +242,13 @@ function saveJSONAsCSV(subPath, data) {
         }
     }
 
+    // Flat Nested Format as XY Dimension
     let headers = {}
     let rows = []
 
     data.forEach((item) => {
         let row = {}
-        let result = recursive(headers, row, '', item)
+        let result = recursive('', item, headers, row)
 
         headers = result.headers
         row = result.row
@@ -255,6 +256,7 @@ function saveJSONAsCSV(subPath, data) {
         rows.push(row)
     })
 
+    // Convert XY Dimension for CSV Format
     let csv = []
 
     headers = Object.keys(headers)

@@ -20,8 +20,8 @@ let taskMapping = {
     gameqb: GameqbTask
 }
 
+// Check Task
 let taskName = process.argv[2]
-let actionName = process.argv[3]
 
 if (Helper.isEmpty(taskName)) {
     console.log('Tasks:')
@@ -31,24 +31,28 @@ if (Helper.isEmpty(taskName)) {
     })
 
     process.exit()
-}
-
-if (Helper.isEmpty(taskMapping[taskName])) {
+} else if (Helper.isEmpty(taskMapping[taskName])) {
     console.log(`Task "${taskName}" not found`)
 
     process.exit()
 }
 
+// Check Action
+let actionName = process.argv[3]
+
 if (Helper.isEmpty(actionName)) {
-    taskMapping[taskName].index()
+    console.log('Actions:')
+
+    Object.keys(taskMapping[taskName]).forEach((actionName) => {
+        console.log(`    ${actionName}`)
+    })
 
     process.exit()
-}
-
-if (Helper.isEmpty(taskMapping[taskName][actionName])) {
+} else if (Helper.isEmpty(taskMapping[taskName][actionName])) {
     console.log(`Task "${taskName}" Action "${actionName}" not found`)
 
     process.exit()
 }
 
+// Run CLI
 taskMapping[taskName][actionName]()

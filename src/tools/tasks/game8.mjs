@@ -18,14 +18,7 @@ let urls = {
     enhances:   null
 }
 
-function index　() {
-    console.log('Actions:')
-    console.log('   run')
-}
-
-async function run　() {
-
-    // Skills
+async function fetchSkills() {
     let $ = await Helper.fetchHtmlAsDom(urls.skills)
 
     $('.a-table').each((index, table) => {
@@ -42,10 +35,8 @@ async function run　() {
             )
         })
     })
-
 }
 
 export default {
-    index,
-    run
+    fetchSkills
 }

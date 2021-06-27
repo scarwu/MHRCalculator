@@ -84,22 +84,49 @@ function fetchHtmlAsDom(url) {
 }
 
 function loadJSON(path) {
+    let root = `${global.root}/temp`
+
     return JSON.parse(fs.readFileSync(path))
 }
 
 function saveJSON(path, data) {
-    fs.writeFileSync(path, JSON.stringify(data))
+    let root = `${global.root}/temp`
+
+    fs.writeFileSync(`${root}/${path}`, JSON.stringify(data))
 
     return true
 }
 
 function loadCSV(path) {
+    let root = `${global.root}/temp`
 
-
-    return null
+    return fs.readFileSync(`${root}/${path}`).split('\n').map((row) => {
+        return row.split(',')
+    })
 }
 
 function saveCSV(path, data) {
+    let root = `${global.root}/temp`
+
+    fs.writeFileSync(`${root}/${path}`, data.map((row) => {
+        return row.join(',')
+    }).join('\n'))
+
+    return true
+}
+
+function loadCSVAsJSON(path) {
+    let root = `${global.root}/temp`
+
+    let data = loadCSV(`${root}/${path}`)
+
+    return data
+}
+
+function saveJSONAsCSV(path, data) {
+    let root = `${global.root}/temp`
+
+    saveCSV(`${root}/${path}`, data)
 
     return true
 }
@@ -113,5 +140,7 @@ export default {
     loadJSON,
     saveJSON,
     loadCSV,
-    saveCSV
+    saveCSV,
+    loadCSVAsJSON,
+    saveJSONAsCSV
 }

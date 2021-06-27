@@ -10,6 +10,7 @@
 // Load Libraries
 import md5 from 'md5'
 import * as fs from 'fs'
+import * as path from 'path'
 import * as http from 'http'
 import * as https from 'https'
 import * as cheerio  from 'cheerio'
@@ -89,12 +90,6 @@ function fetchHtmlAsDom(url) {
     let cacheName = md5(url)
     let cachePath = `${cacheRoot}/${cacheName}`
 
-    if (false === fs.existsSync(cacheRoot)) {
-        fs.mkdirSync(cacheRoot, {
-            recursive: true
-        })
-    }
-
     // Load From Cache
     if (true === fs.existsSync(cachePath)) {
         return cheerio.load(fs.readFileSync(cachePath))
@@ -121,6 +116,12 @@ function fetchHtmlAsDom(url) {
             res.on('end', () => {
 
                 // Save To Cache
+                if (false === fs.existsSync(path.dirname(cachePath))) {
+                    fs.mkdirSync(path.dirname(cachePath), {
+                        recursive: true
+                    })
+                }
+
                 fs.writeFileSync(cachePath, html)
 
                 resolve(cheerio.load(html))
@@ -137,38 +138,136 @@ function fetchHtmlAsDom(url) {
     })
 }
 
-function loadJSON(path) {
-    return JSON.parse(fs.readFileSync(`${global.root}/${path}`))
+function loadJSON(subPath) {
+    let filePath = `${global.root}/${subPath}`
+
+    return JSON.parse(fs.readFileSync(filePath))
 }
 
-function saveJSON(path, data) {
-    fs.writeFileSync(`${global.root}/${path}`, JSON.stringify(data))
+function saveJSON(subPath, data) {
+    let filePath = `${global.root}/${subPath}`
+
+    if (false === fs.existsSync(path.dirname(filePath))) {
+        fs.mkdirSync(path.dirname(filePath), {
+            recursive: true
+        })
+    }
+
+    fs.writeFileSync(filePath, JSON.stringify(data))
 
     return true
 }
 
-function loadCSV(path) {
-    return fs.readFileSync(`${global.root}/${path}`).split('\n').map((row) => {
+function loadCSV(subPath) {
+    let filePath = `${global.root}/${subPath}`
+
+    return fs.readFileSync(filePath).split('\n').map((row) => {
         return row.split(',')
     })
 }
 
-function saveCSV(path, data) {
-    fs.writeFileSync(`${global.root}/${path}`, data.map((row) => {
+function saveCSV(subPath, data) {
+    let filePath = `${global.root}/${subPath}`
+
+    if (false === fs.existsSync(path.dirname(filePath))) {
+        fs.mkdirSync(path.dirname(filePath), {
+            recursive: true
+        })
+    }
+
+    fs.writeFileSync(filePath, data.map((row) => {
         return row.join(',')
     }).join('\n'))
 
     return true
 }
 
-function loadCSVAsJSON(path) {
-    let data = loadCSV(`${global.root}/${path}`)
+function loadCSVAsJSON(subPath) {
+    let data = loadCSV(subPath)
 
     return data
 }
 
-function saveJSONAsCSV(path, data) {
-    saveCSV(`${global.root}/${path}`, data)
+function saveJSONAsCSV(subPath, data) {
+    let recursive = (headers, row, key, value) => {
+        if (true === isFunction(value)) {
+            throw 'is not allowed type'
+        }
+
+        if (true === isObject(value)) {
+            for (let entry of Object.entries(value)) {
+                let subKey = entry[0]
+                let subValue = entry[1]
+
+                if ('' !== key) {
+                    subKey = `${key}:${subKey}`
+                }
+
+                let result = recursive(headers, row, subKey, subValue)
+
+                headers = result.headers
+                row = result.row
+            }
+
+            return { headers, row }
+        }
+
+        if (true === isArray(value)) {
+            for (let entry of Object.entries(value)) {
+                let subIndex = entry[0]
+                let subValue = entry[1]
+
+                if ('' !== key) {
+                    subIndex = `${key}[]:${subIndex}`
+                }
+
+                let result = recursive(headers, row, subIndex, subValue)
+
+                headers = result.headers
+                row = result.row
+            }
+
+            return { headers, row }
+        }
+
+        if (true === isEmpty(value)
+            || true === isString(value)
+            || true === isNumber(value)
+            || true === isBool(value)
+        ) {
+            headers[key] = true
+            row[key] = value
+
+            return { headers, row }
+        }
+    }
+
+    let headers = {}
+    let rows = []
+
+    data.forEach((item) => {
+        let row = {}
+        let result = recursive(headers, row, '', item)
+
+        headers = result.headers
+        row = result.row
+
+        rows.push(row)
+    })
+
+    let csv = []
+
+    headers = Object.keys(headers)
+
+    csv.push(headers)
+
+    rows.forEach((row) => {
+        csv.push(headers.map((header) => {
+            return isNotEmpty(row[header]) ? row[header] : ''
+        }))
+    })
+
+    saveCSV(subPath, csv)
 
     return true
 }

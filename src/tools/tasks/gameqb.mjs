@@ -144,22 +144,34 @@ const defaultPetalace = {
     }
 }
 
+const weaponTypeList = [
+    'greatSword', 'longSword', 'swordAndShield', 'dualBlades',
+    'hammer', 'huntingHorn', 'lance', 'gunlance',
+    'chargeBlade', 'switchAxe', 'insectGlaive',
+    'bow', 'lightBowgun', 'heavyBowgun'
+]
+
 const fetchWeapons = async () => {
-    for (let target of [
-        'greatSword', 'longSword', 'swordAndShield', 'dualBlades',
-        'hammer', 'huntingHorn', 'lance', 'gunlance',
-        'chargeBlade', 'switchAxe', 'insectGlaive',
-        'bow', 'lightBowgun', 'heavyBowgun'
-    ]) {
+    let targetWeaponType = null
+
+    if (Helper.isNotEmpty(process.argv[4]) && -1 !== weaponTypeList.indexOf(process.argv[4])) {
+        targetWeaponType = process.argv[4]
+    }
+
+    for (let weaponType of weaponTypeList) {
+        if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
+            continue
+        }
+
         let mapping = {}
 
         // Fetch List Page
-        console.log(urls.weapons[target], `weapons:${target}`)
+        console.log(urls.weapons[weaponType], `weapons:${weaponType}`)
 
-        let listDom = await Helper.fetchHtmlAsDom(urls.weapons[target])
+        let listDom = await Helper.fetchHtmlAsDom(urls.weapons[weaponType])
 
         if (Helper.isEmpty(listDom)) {
-            console.log(urls.weapons[target], `weapons:${target}`, 'Err')
+            console.log(urls.weapons[weaponType], `weapons:${weaponType}`, 'Err')
 
             return
         }
@@ -178,7 +190,7 @@ const fetchWeapons = async () => {
 
             mapping[name].serial = serial
             mapping[name].name = name
-            mapping[name].type = target
+            mapping[name].type = weaponType
 
             itemNode.find('td').eq(2).html().split('<br>').forEach((property) => {
                 if ('' === property) {
@@ -278,7 +290,10 @@ const fetchWeapons = async () => {
                 })
             }
 
-            if ('bow' !== target && 'lightBowgun' !== target && 'heavyBowgun' !== target) {
+            if ('bow' !== weaponType
+                && 'lightBowgun' !== weaponType
+                && 'heavyBowgun' !== weaponType
+            ) {
                 let sharpnessMapping = {
                     '.kr0': 'red',
                     '.kr1': 'orange',
@@ -327,12 +342,12 @@ const fetchWeapons = async () => {
                 // Enhance
                 let enhanceTableIndex = 0
 
-                if ('chargeBlade' === target) {
+                if ('chargeBlade' === weaponType) {
                     enhanceTableIndex = 1
                 }
 
                 itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').each((index, node) => {
-                    let subName = itemDom(node).find('td').eq(enhanceTableIndex).text().trim()
+                    let subName = itemDom(node).find('td').eq(0).text().trim()
                         .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
 
                     if (name !== subName) {
@@ -352,16 +367,21 @@ const fetchWeapons = async () => {
                 // Rare
                 let rareTableIndex = 1
 
-                if ('lightBowgun' === target
-                    || 'heavyBowgun' === target
-                    || 'huntingHorn' === target
-                    || 'chargeBlade' === target
+                if ('huntingHorn' === weaponType
+                    || 'chargeBlade' === weaponType
+                    || 'switchAxe' === weaponType
                 ) {
                     rareTableIndex = 2
                 }
 
+                if ('lightBowgun' === weaponType
+                    || 'heavyBowgun' === weaponType
+                ) {
+                    rareTableIndex = itemDom('.wp-block-table').eq(0).find('tbody tr').length + 1
+                }
+
                 itemDom('.wp-block-table').eq(rareTableIndex).find('tbody tr').each((index, node) => {
-                    let subName = itemDom(node).find('td').eq(rareTableIndex).text().trim()
+                    let subName = itemDom(node).find('td').eq(1).text().trim()
                         .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
 
                     if (name !== subName) {
@@ -375,7 +395,7 @@ const fetchWeapons = async () => {
             }
         }
 
-        Helper.saveJSONAsCSV(`temp/crawler/gameqb/weapons/${target}.csv`, Object.values(mapping))
+        Helper.saveJSONAsCSV(`temp/crawler/gameqb/weapons/${weaponType}.csv`, Object.values(mapping))
     }
 }
 

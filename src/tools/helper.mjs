@@ -102,7 +102,13 @@ function fetchHtmlAsDom(url) {
             const { statusCode } = res
 
             if (statusCode !== 200) {
-                reject()
+                if (301 === statusCode || 302 === statusCode) {
+                    resolve(fetchHtmlAsDom(res.headers.location))
+                } else {
+                    reject()
+                }
+
+                return
             }
 
             res.setEncoding('utf8')

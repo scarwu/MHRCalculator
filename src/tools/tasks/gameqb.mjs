@@ -35,8 +35,8 @@ const urls = {
 
 const defaultWeapon = {
     serial: null,
-    rare: null,
     name: null,
+    rare: null,
     type: null,
     attack: null,
     criticalRate: null,
@@ -76,9 +76,9 @@ const defaultWeapon = {
 
 const defaultArmor = {
     serial: null,
+    name: null,
     rare: null,
     gender: null,
-    name: null,
     defense: null,
     resistence: {
         fire: null,
@@ -102,6 +102,7 @@ const defaultArmor = {
 
 const defaultJewel = {
     name: null,
+    rare: null,
     slot: {
         size: null
     },
@@ -150,12 +151,18 @@ const fetchWeapons = async () => {
         'chargeBlade', 'switchAxe', 'insectGlaive',
         'bow', 'lightBowgun', 'heavyBowgun'
     ]) {
-        console.log(urls.weapons[target], `weapons:${target}`)
-
         let mapping = {}
 
         // Fetch List Page
+        console.log(urls.weapons[target], `weapons:${target}`)
+
         let listDom = await Helper.fetchHtmlAsDom(urls.weapons[target])
+
+        if (Helper.isEmpty(listDom)) {
+            console.log(urls.weapons[target], `weapons:${target}`, 'Err')
+
+            return
+        }
 
         for (let itemIndex = 0; itemIndex < listDom('.wp-block-table tbody tr').length; itemIndex++) {
             let itemNode = listDom('.wp-block-table tbody tr').eq(itemIndex)
@@ -169,9 +176,9 @@ const fetchWeapons = async () => {
                 mapping[name] = Helper.deepCopy(defaultWeapon)
             }
 
-            mapping[name].type = target
             mapping[name].serial = serial
             mapping[name].name = name
+            mapping[name].type = target
 
             itemNode.find('td').eq(2).html().split('<br>').forEach((property) => {
                 if ('' === property) {
@@ -181,6 +188,10 @@ const fetchWeapons = async () => {
                 property = property.replace(':', '').replace('%', '')
 
                 let match = property.match(/^(.+?)((?:\-|\+)?\d+)/)
+
+                if (Helper.isEmpty(match)) {
+                    return
+                }
 
                 switch (match[1]) {
                 case '攻擊力':
@@ -226,6 +237,7 @@ const fetchWeapons = async () => {
                     mapping[name].element.status.minValue = parseInt(match[2], 10)
 
                     break
+                case '麻痹':
                 case '麻痺':
                     mapping[name].element.status.type = 'paralysis'
                     mapping[name].element.status.minValue = parseInt(match[2], 10)
@@ -300,43 +312,67 @@ const fetchWeapons = async () => {
                 }
             }
 
-            console.log(itemNode.find('td').eq(1).find('a').attr('href'), itemNode.find('td').eq(1).text())
-
             // Fetch Detail Page
-            let itemDom = await Helper.fetchHtmlAsDom(itemNode.find('td').eq(1).find('a').attr('href'))
+            if (Helper.isNotEmpty(itemNode.find('td').eq(1).find('a').attr('href'))) {
+                console.log(itemNode.find('td').eq(1).find('a').attr('href'), itemNode.find('td').eq(1).text())
 
-            itemDom('.wp-block-table').eq(0).find('tbody tr').each((index, node) => {
-                let subName = itemDom(node).find('td').eq(0).text().trim()
-                    .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+                let itemDom = await Helper.fetchHtmlAsDom(itemNode.find('td').eq(1).find('a').attr('href'))
 
-                if (name !== subName) {
-                    return
+                if (Helper.isEmpty(itemDom)) {
+                    console.log(itemNode.find('td').eq(1).find('a').attr('href'), itemNode.find('td').eq(1).text(), 'Err')
+
+                    continue
                 }
 
-                itemDom(node).find('td').eq(3).find('a').each((index, node) => {
-                    let enhanceName = itemDom(node).text()
+                // Enhance
+                let enhanceTableIndex = 0
+
+                if ('chargeBlade' === target) {
+                    enhanceTableIndex = 1
+                }
+
+                itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').each((index, node) => {
+                    let subName = itemDom(node).find('td').eq(enhanceTableIndex).text().trim()
                         .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
 
-                    mapping[name].enhances.push({
-                        name: enhanceName
+                    if (name !== subName) {
+                        return
+                    }
+
+                    itemDom(node).find('td').eq(3).find('a').each((index, node) => {
+                        let enhanceName = itemDom(node).text()
+                            .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+
+                        mapping[name].enhances.push({
+                            name: enhanceName
+                        })
                     })
                 })
-            })
 
-            let rareTableIndex = ('lightBowgun' === target || 'heavyBowgun' === target) ? 2 : 1
+                // Rare
+                let rareTableIndex = 1
 
-            itemDom('.wp-block-table').eq(rareTableIndex).find('tbody tr').each((index, node) => {
-                let subName = itemDom(node).find('td').eq(rareTableIndex).text().trim()
-                    .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
-
-                if (name !== subName) {
-                    return
+                if ('lightBowgun' === target
+                    || 'heavyBowgun' === target
+                    || 'huntingHorn' === target
+                    || 'chargeBlade' === target
+                ) {
+                    rareTableIndex = 2
                 }
 
-                let rare = itemDom(node).find('td').eq(0).text()
+                itemDom('.wp-block-table').eq(rareTableIndex).find('tbody tr').each((index, node) => {
+                    let subName = itemDom(node).find('td').eq(rareTableIndex).text().trim()
+                        .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
 
-                mapping[name].rare = parseInt(rare, 10)
-            })
+                    if (name !== subName) {
+                        return
+                    }
+
+                    let rare = itemDom(node).find('td').eq(0).text()
+
+                    mapping[name].rare = parseInt(rare, 10)
+                })
+            }
         }
 
         Helper.saveJSONAsCSV(`temp/crawler/gameqb/weapons/${target}.csv`, Object.values(mapping))
@@ -344,20 +380,32 @@ const fetchWeapons = async () => {
 }
 
 const fetchArmors = async () => {
-    console.log(urls.armors, 'armors')
-
     let mapping = {}
 
     // Fetch List Page
+    console.log(urls.armors, 'armors')
+
     let listDom = await Helper.fetchHtmlAsDom(urls.armors)
+
+    if (Helper.isEmpty(listDom)) {
+        console.log(urls.armors, 'armors', 'Err')
+
+        return
+    }
 
     for (let itemIndex = 0; itemIndex < listDom('.entry-content a').length; itemIndex++) {
         let itemNode = listDom('.entry-content a').eq(itemIndex)
 
+        // Fetch Detail Page
         console.log(itemNode.attr('href'), itemNode.text())
 
-        // Fetch Detail Page
         let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+
+        if (Helper.isEmpty(itemDom)) {
+            console.log(itemNode.attr('href'), itemNode.text(), 'Err')
+
+            continue
+        }
 
         let tempNode = null
 
@@ -391,9 +439,9 @@ const fetchArmors = async () => {
             let resistenceDragon = itemDom(node).find('td').eq(6).text().trim()
 
             mapping[name].serial = serial
+            mapping[name].name = name
             mapping[name].rare = rare
             mapping[name].gender = gender
-            mapping[name].name = name
             mapping[name].defense = parseInt(defense, 10)
             mapping[name].resistence.fire = parseInt(resistenceFire, 10)
             mapping[name].resistence.water = parseInt(resistenceWater, 10)
@@ -410,9 +458,6 @@ const fetchArmors = async () => {
             if ('合計' === name) {
                 return
             }
-
-            let slots = []
-            let skills = []
 
             if ('-' !== itemDom(node).find('td').eq(1).text().trim()) {
                 itemDom(node).find('td').eq(1).text().trim().split('').forEach((slotSize, slotIndex) => {
@@ -448,12 +493,18 @@ const fetchArmors = async () => {
 }
 
 const fetchJewels = async () => {
-    console.log(urls.jewels, 'jewels')
-
     let mapping = {}
 
     // Fetch List Page
+    console.log(urls.jewels, 'jewels')
+
     let listDom = await Helper.fetchHtmlAsDom(urls.jewels)
+
+    if (Helper.isEmpty(listDom)) {
+        console.log(urls.jewels, 'jewels', 'Err')
+
+        return
+    }
 
     for (let itemIndex = 0; itemIndex < listDom('.has-fixed-layout tbody tr').length; itemIndex++) {
         let itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td').eq(0).find('a').eq(0)
@@ -462,7 +513,26 @@ const fetchJewels = async () => {
         let slotSize = null
         let skillName = null
 
-        if (Helper.isEmpty(itemNode.attr('href'))) {
+        // Fetch Detail Page
+        let hasDetailPage = false
+
+        if (Helper.isNotEmpty(itemNode.attr('href'))) {
+            console.log(itemNode.attr('href'), itemNode.text().trim())
+
+            let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+
+            if (Helper.isNotEmpty(itemDom)) {
+                name = itemDom('.has-fixed-layout tbody tr').eq(0).find('td').eq(1).text().trim()
+                slotSize = itemDom('.has-fixed-layout tbody tr').eq(1).find('td').eq(1).text().trim()
+                skillName = itemDom('.has-fixed-layout tbody tr').eq(2).find('td').eq(1).text().trim()
+
+                hasDetailPage = true
+            } else {
+                console.log(itemNode.attr('href'), itemNode.text().trim(), 'Err')
+            }
+        }
+
+        if (false === hasDetailPage) {
             itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td')
 
             name = itemNode.eq(0).text().trim()
@@ -470,15 +540,6 @@ const fetchJewels = async () => {
             skillName = itemNode.eq(2).text().trim()
 
             console.log('no page', name)
-        } else {
-            console.log(itemNode.attr('href'), itemNode.text().trim())
-
-            // Fetch Detail Page
-            let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
-
-            name = itemDom('.has-fixed-layout tbody tr').eq(0).find('td').eq(1).text().trim()
-            slotSize = itemDom('.has-fixed-layout tbody tr').eq(1).find('td').eq(1).text().trim()
-            skillName = itemDom('.has-fixed-layout tbody tr').eq(2).find('td').eq(1).text().trim()
         }
 
         if (Helper.isEmpty(mapping[name])) {
@@ -495,20 +556,32 @@ const fetchJewels = async () => {
 }
 
 const fetchSkills = async () => {
-    console.log(urls.skills, 'skills')
-
     let mapping = {}
 
     // Fetch List Page
+    console.log(urls.skills, 'skills')
+
     let listDom = await Helper.fetchHtmlAsDom(urls.skills)
+
+    if (Helper.isEmpty(listDom)) {
+        console.log(urls.skills, 'skills', 'Err')
+
+        return
+    }
 
     for (let itemIndex = 0; itemIndex < listDom('.has-fixed-layout tbody tr').length; itemIndex++) {
         let itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td').eq(0).find('a').eq(0)
 
+        // Fetch Detail Page
         console.log(itemNode.attr('href'), itemNode.text().trim())
 
-        // Fetch Detail Page
         let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+
+        if (Helper.isEmpty(itemDom)) {
+            console.log(itemNode.attr('href'), itemNode.text().trim(), 'Err')
+
+            continue
+        }
 
         let name = itemDom('.post-title-single').text().trim()
         let description = itemDom('.entry-content p').text().trim()
@@ -516,6 +589,9 @@ const fetchSkills = async () => {
         if (Helper.isEmpty(mapping[name])) {
             mapping[name] = Helper.deepCopy(defaultSkill)
         }
+
+        mapping[name].name = name
+        mapping[name].description = description
 
         // Table 1
         let tempNode = itemDom('.wp-block-table .has-fixed-layout').eq(0).find('tbody tr')
@@ -539,12 +615,18 @@ const fetchSkills = async () => {
 }
 
 const fetchPetalaces = async () => {
-    console.log(urls.petalaces, 'petalaces')
-
     let mapping = {}
 
     // Fetch List Page
+    console.log(urls.petalaces, 'petalaces')
+
     let listDom = await Helper.fetchHtmlAsDom(urls.petalaces)
+
+    if (Helper.isEmpty(listDom)) {
+        console.log(urls.petalaces, 'petalaces', 'Err')
+
+        return
+    }
 
     for (let itemIndex = 0; itemIndex < listDom('.has-fixed-layout tbody tr').length; itemIndex++) {
         let itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td').eq(0).find('a').eq(0)
@@ -560,7 +642,34 @@ const fetchPetalaces = async () => {
         let defenseIncrement = null
         let defenseObtain = null
 
-        if (Helper.isEmpty(itemNode.attr('href'))) {
+        // Fetch Detail Page
+        let hasDetailPage = false
+
+        if (Helper.isNotEmpty(itemNode.attr('href'))) {
+            console.log(itemNode.attr('href'), itemNode.text().trim())
+
+            let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+
+            if (Helper.isNotEmpty(itemDom)) {
+
+                name = itemDom('.post-title-single').text().trim()
+                rare = itemDom('.wp-block-table tbody tr').eq(0).find('td').eq(1).text().trim()
+                healthIncrement = itemDom('.wp-block-table tbody tr').eq(1).find('td').eq(1).text().trim()
+                healthObtain = itemDom('.wp-block-table tbody tr').eq(2).find('td').eq(1).text().trim()
+                staminaIncrement = itemDom('.wp-block-table tbody tr').eq(3).find('td').eq(1).text().trim()
+                staminaObtain = itemDom('.wp-block-table tbody tr').eq(4).find('td').eq(1).text().trim()
+                attackIncrement = itemDom('.wp-block-table tbody tr').eq(5).find('td').eq(1).text().trim()
+                attackObtain = itemDom('.wp-block-table tbody tr').eq(6).find('td').eq(1).text().trim()
+                defenseIncrement = itemDom('.wp-block-table tbody tr').eq(7).find('td').eq(1).text().trim()
+                defenseObtain = itemDom('.wp-block-table tbody tr').eq(8).find('td').eq(1).text().trim()
+
+                hasDetailPage = true
+            } else {
+                console.log(itemNode.attr('href'), itemNode.text().trim(), 'Err')
+            }
+        }
+
+        if (false === hasDetailPage) {
             itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td')
 
             name = itemNode.eq(0).text().trim()
@@ -575,22 +684,6 @@ const fetchPetalaces = async () => {
             defenseObtain = itemNode.eq(5).text().trim().split('/')[1]
 
             console.log('no page', name)
-        } else {
-            console.log(itemNode.attr('href'), itemNode.text().trim())
-
-            // Fetch Detail Page
-            let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
-
-            name = itemDom('.post-title-single').text().trim()
-            rare = itemDom('.wp-block-table tbody tr').eq(0).find('td').eq(1).text().trim()
-            healthIncrement = itemDom('.wp-block-table tbody tr').eq(1).find('td').eq(1).text().trim()
-            healthObtain = itemDom('.wp-block-table tbody tr').eq(2).find('td').eq(1).text().trim()
-            staminaIncrement = itemDom('.wp-block-table tbody tr').eq(3).find('td').eq(1).text().trim()
-            staminaObtain = itemDom('.wp-block-table tbody tr').eq(4).find('td').eq(1).text().trim()
-            attackIncrement = itemDom('.wp-block-table tbody tr').eq(5).find('td').eq(1).text().trim()
-            attackObtain = itemDom('.wp-block-table tbody tr').eq(6).find('td').eq(1).text().trim()
-            defenseIncrement = itemDom('.wp-block-table tbody tr').eq(7).find('td').eq(1).text().trim()
-            defenseObtain = itemDom('.wp-block-table tbody tr').eq(8).find('td').eq(1).text().trim()
         }
 
         if (Helper.isEmpty(mapping[name])) {

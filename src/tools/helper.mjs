@@ -109,27 +109,47 @@ function jsonHash(data) {
     return md5(JSON.stringify(data))
 }
 
-function fetchHtmlAsDom(url) {
+function fetchHtml(url) {
+    if (isEmpty(url)) {
+        return null
+    }
+
     let cacheRoot = `${global.root}/temp/cache/html`
     let cacheName = md5(url)
     let cachePath = `${cacheRoot}/${cacheName}`
 
     // Load From Cache
     if (true === fs.existsSync(cachePath)) {
-        return cheerio.load(fs.readFileSync(cachePath))
+        return fs.readFileSync(cachePath)
+    }
+
+    // Save To Cache
+    function saveCache(html) {
+        if (false === fs.existsSync(path.dirname(cachePath))) {
+            fs.mkdirSync(path.dirname(cachePath), {
+                recursive: true
+            })
+        }
+
+        fs.writeFileSync(cachePath, html)
     }
 
     let urlObject = new URL(url)
 
     return new Promise((resolve, reject) => {
-        let handleResponse = (res) => {
+        let handler = ('https:' === urlObject.protocol) ? https : http
+
+        handler.get(url, async (res) => {
             const { statusCode } = res
 
             if (statusCode !== 200) {
                 if (301 === statusCode || 302 === statusCode) {
-                    resolve(fetchHtmlAsDom(res.headers.location))
+                    let html = await fetchHtml(res.headers.location)
+
+                    saveCache(html)
+                    resolve(html)
                 } else {
-                    reject()
+                    resolve(null)
                 }
 
                 return
@@ -144,28 +164,23 @@ function fetchHtmlAsDom(url) {
             })
 
             res.on('end', () => {
-
-                // Save To Cache
-                if (false === fs.existsSync(path.dirname(cachePath))) {
-                    fs.mkdirSync(path.dirname(cachePath), {
-                        recursive: true
-                    })
-                }
-
-                fs.writeFileSync(cachePath, html)
-
-                resolve(cheerio.load(html))
+                saveCache(html)
+                resolve(html)
             })
-        }
-
-        let handleError = (err) => {
+        }).on('error', (err) => {
             reject(err)
-        }
-
-        let handler = ('https:' === urlObject.protocol) ? https : http
-
-        handler.get(url, handleResponse).on('error', handleError)
+        })
     })
+}
+
+async function fetchHtmlAsDom(url) {
+    let html = await fetchHtml(url)
+
+    if (null === html) {
+        return null
+    }
+
+    return cheerio.load(html)
 }
 
 function loadJSON(subPath) {
@@ -316,6 +331,7 @@ export default {
     checkType,
     deepCopy,
     jsonHash,
+    fetchHtml,
     fetchHtmlAsDom,
     loadJSON,
     saveJSON,

@@ -115,12 +115,8 @@ const defaultJewel = {
 const defaultSkill = {
     name: null,
     description: null,
-    list: [
-        // {
-        //     level: null,
-        //     description: null
-        // }
-    ]
+    level: null,
+    effect: null
 }
 
 const defaultPetalace = {
@@ -151,6 +147,67 @@ const weaponTypeList = [
     'bow', 'lightBowgun', 'heavyBowgun'
 ]
 
+const autoExtendCols = (list) => {
+    let slotCount = 0
+    let skillCount = 0
+    let enhanceCount = 0
+
+    list.forEach((row) => {
+        if (Helper.isNotEmpty(row.slots) && slotCount < row.slots.length) {
+            slotCount = row.slots.length
+        }
+
+        if (Helper.isNotEmpty(row.skills) && skillCount < row.skills.length) {
+            skillCount = row.skills.length
+        }
+
+        if (Helper.isNotEmpty(row.enhances) && enhanceCount < row.enhances.length) {
+            enhanceCount = row.enhances.length
+        }
+    })
+
+    return list.map((row) => {
+        if (Helper.isNotEmpty(row.slots)) {
+            for (let index = 0; index < slotCount; index++) {
+                if (Helper.isNotEmpty(row.slots[index])) {
+                    continue
+                }
+
+                row.slots[index] = {
+                    size: null
+                }
+            }
+        }
+
+        if (Helper.isNotEmpty(row.skills)) {
+            for (let index = 0; index < skillCount; index++) {
+                if (Helper.isNotEmpty(row.skills[index])) {
+                    continue
+                }
+
+                row.skills[index] = {
+                    name: null,
+                    level: null
+                }
+            }
+        }
+
+        if (Helper.isNotEmpty(row.enhances)) {
+            for (let index = 0; index < enhanceCount; index++) {
+                if (Helper.isNotEmpty(row.enhances[index])) {
+                    continue
+                }
+
+                row.enhances[index] = {
+                    name: null
+                }
+            }
+        }
+
+        return row
+    })
+}
+
 const fetchWeapons = async () => {
     let targetWeaponType = null
 
@@ -164,6 +221,7 @@ const fetchWeapons = async () => {
         }
 
         let mapping = {}
+        let mappingKey = null
 
         // Fetch List Page
         console.log(urls.weapons[weaponType], `weapons:${weaponType}`)
@@ -184,13 +242,15 @@ const fetchWeapons = async () => {
                 .replace(/(│|├|└)*/g, '')
                 .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
 
-            if (Helper.isEmpty(mapping[name])) {
-                mapping[name] = Helper.deepCopy(defaultWeapon)
+            mappingKey = `${serial}:${name}`
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
             }
 
-            mapping[name].serial = serial
-            mapping[name].name = name
-            mapping[name].type = weaponType
+            mapping[mappingKey].serial = serial
+            mapping[mappingKey].name = name
+            mapping[mappingKey].type = weaponType
 
             itemNode.find('td').eq(2).html().split('<br>').forEach((property) => {
                 if ('' === property) {
@@ -207,62 +267,62 @@ const fetchWeapons = async () => {
 
                 switch (match[1]) {
                 case '攻擊力':
-                    mapping[name].attack = parseInt(match[2], 10)
+                    mapping[mappingKey].attack = parseInt(match[2], 10)
 
                     break
                 case '防御':
                 case '防禦力':
-                    mapping[name].defense = parseInt(match[2], 10)
+                    mapping[mappingKey].defense = parseInt(match[2], 10)
 
                     break
                 case '會心':
-                    mapping[name].criticalRate = parseInt(match[2], 10)
+                    mapping[mappingKey].criticalRate = parseInt(match[2], 10)
 
                     break
                 case '火':
-                    mapping[name].element.attack.type = 'fire'
-                    mapping[name].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.type = 'fire'
+                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
 
                     break
                 case '水':
-                    mapping[name].element.attack.type = 'water'
-                    mapping[name].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.type = 'water'
+                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
 
                     break
                 case '雷':
-                    mapping[name].element.attack.type = 'thunder'
-                    mapping[name].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.type = 'thunder'
+                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
 
                     break
                 case '冰':
-                    mapping[name].element.attack.type = 'ice'
-                    mapping[name].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.type = 'ice'
+                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
 
                     break
                 case '龍':
-                    mapping[name].element.attack.type = 'dragon'
-                    mapping[name].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.type = 'dragon'
+                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
 
                     break
                 case '睡眠':
-                    mapping[name].element.status.type = 'sleep'
-                    mapping[name].element.status.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.status.type = 'sleep'
+                    mapping[mappingKey].element.status.minValue = parseInt(match[2], 10)
 
                     break
                 case '麻痹':
                 case '麻痺':
-                    mapping[name].element.status.type = 'paralysis'
-                    mapping[name].element.status.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.status.type = 'paralysis'
+                    mapping[mappingKey].element.status.minValue = parseInt(match[2], 10)
 
                     break
                 case '爆破':
-                    mapping[name].element.status.type = 'blast'
-                    mapping[name].element.status.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.status.type = 'blast'
+                    mapping[mappingKey].element.status.minValue = parseInt(match[2], 10)
 
                     break
                 case '毒':
-                    mapping[name].element.status.type = 'poison'
-                    mapping[name].element.status.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.status.type = 'poison'
+                    mapping[mappingKey].element.status.minValue = parseInt(match[2], 10)
 
                     break
                 default:
@@ -275,15 +335,15 @@ const fetchWeapons = async () => {
             if ('—' !== itemNode.find('td').eq(3).text().trim()) {
                 itemNode.find('td').eq(3).text().trim().split('').forEach((slotSize, slotIndex) => {
                     if ('③' === slotSize) {
-                        mapping[name].slots.push({
+                        mapping[mappingKey].slots.push({
                             size: 3
                         })
                     } else if ('②' === slotSize) {
-                        mapping[name].slots.push({
+                        mapping[mappingKey].slots.push({
                             size: 2
                         })
                     } else if ('①' === slotSize) {
-                        mapping[name].slots.push({
+                        mapping[mappingKey].slots.push({
                             size: 1
                         })
                     }
@@ -309,19 +369,19 @@ const fetchWeapons = async () => {
                         break
                     }
 
-                    if (Helper.isEmpty(mapping[name].sharpness[sharpnessMapping[kr]])) {
-                        mapping[name].sharpness[sharpnessMapping[kr]] = 0
+                    if (Helper.isEmpty(mapping[mappingKey].sharpness[sharpnessMapping[kr]])) {
+                        mapping[mappingKey].sharpness[sharpnessMapping[kr]] = 0
                     }
 
                     let krIndex = itemNode.find('td').eq(4).find(kr).length - 1
 
                     itemNode.find('td').eq(4).find(kr).eq(krIndex).text().split('').forEach((step) => {
                         if ('…' === step) {
-                            mapping[name].sharpness[sharpnessMapping[kr]] += 30
+                            mapping[mappingKey].sharpness[sharpnessMapping[kr]] += 30
                         }
 
                         if ('.' === step) {
-                            mapping[name].sharpness[sharpnessMapping[kr]] += 10
+                            mapping[mappingKey].sharpness[sharpnessMapping[kr]] += 10
                         }
                     })
                 }
@@ -342,7 +402,9 @@ const fetchWeapons = async () => {
                 // Enhance
                 let enhanceTableIndex = 0
 
-                if ('chargeBlade' === weaponType) {
+                if ('chargeBlade' === weaponType
+                    || 'switchAxe' === weaponType
+                ) {
                     enhanceTableIndex = 1
                 }
 
@@ -358,7 +420,7 @@ const fetchWeapons = async () => {
                         let enhanceName = itemDom(node).text()
                             .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
 
-                        mapping[name].enhances.push({
+                        mapping[mappingKey].enhances.push({
                             name: enhanceName
                         })
                     })
@@ -390,17 +452,20 @@ const fetchWeapons = async () => {
 
                     let rare = itemDom(node).find('td').eq(0).text()
 
-                    mapping[name].rare = parseInt(rare, 10)
+                    mapping[mappingKey].rare = parseInt(rare, 10)
                 })
             }
         }
 
-        Helper.saveJSONAsCSV(`temp/crawler/gameqb/weapons/${weaponType}.csv`, Object.values(mapping))
+        let list = autoExtendCols(Object.values(mapping))
+
+        Helper.saveJSONAsCSV(`temp/crawler/gameqb/weapons/${weaponType}.csv`, list)
     }
 }
 
 const fetchArmors = async () => {
     let mapping = {}
+    let mappingKey = null
 
     // Fetch List Page
     console.log(urls.armors, 'armors')
@@ -447,8 +512,10 @@ const fetchArmors = async () => {
                 return
             }
 
-            if (Helper.isEmpty(mapping[name])) {
-                mapping[name] = Helper.deepCopy(defaultArmor)
+            mappingKey = `${serial}:${name}`
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultArmor)
             }
 
             let defense = itemDom(node).find('td').eq(1).text().trim()
@@ -458,16 +525,16 @@ const fetchArmors = async () => {
             let resistenceIce = itemDom(node).find('td').eq(5).text().trim()
             let resistenceDragon = itemDom(node).find('td').eq(6).text().trim()
 
-            mapping[name].serial = serial
-            mapping[name].name = name
-            mapping[name].rare = rare
-            mapping[name].gender = gender
-            mapping[name].defense = parseInt(defense, 10)
-            mapping[name].resistence.fire = parseInt(resistenceFire, 10)
-            mapping[name].resistence.water = parseInt(resistenceWater, 10)
-            mapping[name].resistence.tunder = parseInt(resistenceTunder, 10)
-            mapping[name].resistence.ice = parseInt(resistenceIce, 10)
-            mapping[name].resistence.dragon = parseInt(resistenceDragon, 10)
+            mapping[mappingKey].serial = serial
+            mapping[mappingKey].name = name
+            mapping[mappingKey].rare = rare
+            mapping[mappingKey].gender = gender
+            mapping[mappingKey].defense = parseInt(defense, 10)
+            mapping[mappingKey].resistence.fire = parseInt(resistenceFire, 10)
+            mapping[mappingKey].resistence.water = parseInt(resistenceWater, 10)
+            mapping[mappingKey].resistence.tunder = parseInt(resistenceTunder, 10)
+            mapping[mappingKey].resistence.ice = parseInt(resistenceIce, 10)
+            mapping[mappingKey].resistence.dragon = parseInt(resistenceDragon, 10)
         })
 
         // Table 3
@@ -479,18 +546,24 @@ const fetchArmors = async () => {
                 return
             }
 
+            mappingKey = `${serial}:${name}`
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultArmor)
+            }
+
             if ('-' !== itemDom(node).find('td').eq(1).text().trim()) {
                 itemDom(node).find('td').eq(1).text().trim().split('').forEach((slotSize, slotIndex) => {
                     if ('③' === slotSize) {
-                        mapping[name].slots.push({
+                        mapping[mappingKey].slots.push({
                             size: 3
                         })
                     } else if ('②' === slotSize) {
-                        mapping[name].slots.push({
+                        mapping[mappingKey].slots.push({
                             size: 2
                         })
                     } else if ('①' === slotSize) {
-                        mapping[name].slots.push({
+                        mapping[mappingKey].slots.push({
                             size: 1
                         })
                     }
@@ -501,7 +574,7 @@ const fetchArmors = async () => {
                 let skillName = itemDom(node).text()
                 let skillLevel = itemDom(node)[0].next.data.replace('+', '')
 
-                mapping[name].skills.push({
+                mapping[mappingKey].skills.push({
                     name: skillName,
                     level: parseInt(skillLevel, 10)
                 })
@@ -509,11 +582,14 @@ const fetchArmors = async () => {
         })
     }
 
-    Helper.saveJSONAsCSV('temp/crawler/gameqb/armors.csv', Object.values(mapping))
+    let list = autoExtendCols(Object.values(mapping))
+
+    Helper.saveJSONAsCSV('temp/crawler/gameqb/armors.csv', list)
 }
 
 const fetchJewels = async () => {
     let mapping = {}
+    let mappingKey = null
 
     // Fetch List Page
     console.log(urls.jewels, 'jewels')
@@ -562,14 +638,16 @@ const fetchJewels = async () => {
             console.log('no page', name)
         }
 
-        if (Helper.isEmpty(mapping[name])) {
-            mapping[name] = Helper.deepCopy(defaultJewel)
+        mappingKey = name
+
+        if (Helper.isEmpty(mapping[mappingKey])) {
+            mapping[mappingKey] = Helper.deepCopy(defaultJewel)
         }
 
-        mapping[name].name = name
-        mapping[name].slot.size = parseInt(slotSize, 10)
-        mapping[name].skill.name = skillName
-        mapping[name].skill.level = 1
+        mapping[mappingKey].name = name
+        mapping[mappingKey].slot.size = parseInt(slotSize, 10)
+        mapping[mappingKey].skill.name = skillName
+        mapping[mappingKey].skill.level = 1
     }
 
     Helper.saveJSONAsCSV('temp/crawler/gameqb/jewels.csv', Object.values(mapping))
@@ -577,6 +655,7 @@ const fetchJewels = async () => {
 
 const fetchSkills = async () => {
     let mapping = {}
+    let mappingKey = null
 
     // Fetch List Page
     console.log(urls.skills, 'skills')
@@ -606,28 +685,23 @@ const fetchSkills = async () => {
         let name = itemDom('.post-title-single').text().trim()
         let description = itemDom('.entry-content p').text().trim()
 
-        if (Helper.isEmpty(mapping[name])) {
-            mapping[name] = Helper.deepCopy(defaultSkill)
-        }
-
-        mapping[name].name = name
-        mapping[name].description = description
-
         // Table 1
         let tempNode = itemDom('.wp-block-table .has-fixed-layout').eq(0).find('tbody tr')
 
         tempNode.each((index, node) => {
             let level = itemDom(node).find('td').eq(0).text().trim()
-            let description = itemDom(node).find('td').eq(1).text().trim()
+            let effect = itemDom(node).find('td').eq(1).text().trim()
 
-            if (Helper.isEmpty(mapping[name].list)) {
-                mapping[name].list = []
+            mappingKey = `${name}:${level}`
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultSkill)
             }
 
-            mapping[name].list.push({
-                level: parseInt(level, 10),
-                description: description
-            })
+            mapping[mappingKey].name = name
+            mapping[mappingKey].description = description
+            mapping[mappingKey].level = parseInt(level, 10),
+            mapping[mappingKey].effect = effect
         })
     }
 
@@ -636,6 +710,7 @@ const fetchSkills = async () => {
 
 const fetchPetalaces = async () => {
     let mapping = {}
+    let mappingKey = null
 
     // Fetch List Page
     console.log(urls.petalaces, 'petalaces')
@@ -706,20 +781,22 @@ const fetchPetalaces = async () => {
             console.log('no page', name)
         }
 
-        if (Helper.isEmpty(mapping[name])) {
-            mapping[name] = Helper.deepCopy(defaultPetalace)
+        mappingKey = name
+
+        if (Helper.isEmpty(mapping[mappingKey])) {
+            mapping[mappingKey] = Helper.deepCopy(defaultPetalace)
         }
 
-        mapping[name].name = name
-        mapping[name].rare = Helper.isNotEmpty(rare) ? parseInt(rare, 10) : null
-        mapping[name].health.increment = parseInt(healthIncrement, 10)
-        mapping[name].health.obtain = parseInt(healthObtain, 10)
-        mapping[name].stamina.increment = parseInt(staminaIncrement, 10)
-        mapping[name].stamina.obtain = parseInt(staminaObtain, 10)
-        mapping[name].attack.increment = parseInt(attackIncrement, 10)
-        mapping[name].attack.obtain = parseInt(attackObtain, 10)
-        mapping[name].defense.increment = parseInt(defenseIncrement, 10)
-        mapping[name].defense.obtain = parseInt(defenseObtain, 10)
+        mapping[mappingKey].name = name
+        mapping[mappingKey].rare = Helper.isNotEmpty(rare) ? parseInt(rare, 10) : null
+        mapping[mappingKey].health.increment = parseInt(healthIncrement, 10)
+        mapping[mappingKey].health.obtain = parseInt(healthObtain, 10)
+        mapping[mappingKey].stamina.increment = parseInt(staminaIncrement, 10)
+        mapping[mappingKey].stamina.obtain = parseInt(staminaObtain, 10)
+        mapping[mappingKey].attack.increment = parseInt(attackIncrement, 10)
+        mapping[mappingKey].attack.obtain = parseInt(attackObtain, 10)
+        mapping[mappingKey].defense.increment = parseInt(defenseIncrement, 10)
+        mapping[mappingKey].defense.obtain = parseInt(defenseObtain, 10)
     }
 
     Helper.saveJSONAsCSV('temp/crawler/gameqb/petalaces.csv', Object.values(mapping))

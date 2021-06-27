@@ -18,6 +18,10 @@ const urls = {
     enhances:   null,
 }
 
+const fetchWeapons = async () => {
+
+}
+
 const fetchArmors = async () => {
     console.log(urls.armors, 'armors')
 
@@ -155,9 +159,12 @@ const fetchArmors = async () => {
 }
 
 const fetchJewels = async () => {
-    let listDom = await Helper.fetchHtmlAsDom(urls.jewels)
+    console.log(urls.jewels, 'jewels')
 
     let mapping = {}
+
+    // Fetch List Page
+    let listDom = await Helper.fetchHtmlAsDom(urls.jewels)
 
     for (let itemIndex = 0; itemIndex < listDom('.has-fixed-layout tbody tr').length; itemIndex++) {
         let itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td').eq(0).find('a').eq(0)
@@ -201,9 +208,12 @@ const fetchJewels = async () => {
 }
 
 const fetchSkills = async () => {
-    let listDom = await Helper.fetchHtmlAsDom(urls.skills)
+    console.log(urls.skills, 'skills')
 
     let mapping = {}
+
+    // Fetch List Page
+    let listDom = await Helper.fetchHtmlAsDom(urls.skills)
 
     for (let itemIndex = 0; itemIndex < listDom('.has-fixed-layout tbody tr').length; itemIndex++) {
         let itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td').eq(0).find('a').eq(0)
@@ -239,8 +249,90 @@ const fetchSkills = async () => {
     Helper.saveJSONAsCSV('temp/crawler/gameqb/skills.csv', Object.values(mapping))
 }
 
+const fetchPetalaces = async () => {
+    console.log(urls.petalaces, 'petalaces')
+
+    let mapping = {}
+
+    // Fetch List Page
+    let listDom = await Helper.fetchHtmlAsDom(urls.petalaces)
+
+    for (let itemIndex = 0; itemIndex < listDom('.has-fixed-layout tbody tr').length; itemIndex++) {
+        let itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td').eq(0).find('a').eq(0)
+
+        let name = null
+        let rare = null
+        let healthIncrement = null
+        let healthObtain = null
+        let staminaIncrement = null
+        let staminaObtain = null
+        let attackIncrement = null
+        let attackObtain = null
+        let defenseIncrement = null
+        let defenseObtain = null
+
+        if (Helper.isEmpty(itemNode.attr('href'))) {
+            itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td')
+
+            name = itemNode.eq(0).text().trim()
+            rare = null
+            healthIncrement = itemNode.eq(2).text().trim().split('/')[0]
+            healthObtain = itemNode.eq(2).text().trim().split('/')[1]
+            staminaIncrement = itemNode.eq(3).text().trim().split('/')[0]
+            staminaObtain = itemNode.eq(3).text().trim().split('/')[1]
+            attackIncrement = itemNode.eq(4).text().trim().split('/')[0]
+            attackObtain = itemNode.eq(4).text().trim().split('/')[1]
+            defenseIncrement = itemNode.eq(5).text().trim().split('/')[0]
+            defenseObtain = itemNode.eq(5).text().trim().split('/')[1]
+
+            console.log('no page', name)
+        } else {
+            console.log(itemNode.attr('href'), itemNode.text().trim())
+
+            // Fetch Detail Page
+            let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+
+            name = itemDom('.post-title-single').text().trim()
+            rare = itemDom('.wp-block-table tbody tr').eq(0).find('td').eq(1).text().trim()
+            healthIncrement = itemDom('.wp-block-table tbody tr').eq(1).find('td').eq(1).text().trim()
+            healthObtain = itemDom('.wp-block-table tbody tr').eq(2).find('td').eq(1).text().trim()
+            staminaIncrement = itemDom('.wp-block-table tbody tr').eq(3).find('td').eq(1).text().trim()
+            staminaObtain = itemDom('.wp-block-table tbody tr').eq(4).find('td').eq(1).text().trim()
+            attackIncrement = itemDom('.wp-block-table tbody tr').eq(5).find('td').eq(1).text().trim()
+            attackObtain = itemDom('.wp-block-table tbody tr').eq(6).find('td').eq(1).text().trim()
+            defenseIncrement = itemDom('.wp-block-table tbody tr').eq(7).find('td').eq(1).text().trim()
+            defenseObtain = itemDom('.wp-block-table tbody tr').eq(8).find('td').eq(1).text().trim()
+        }
+
+        mapping[name] = {
+            name: name,
+            rare: Helper.isNotEmpty(rare) ? parseInt(rare, 10) : null,
+            health: {
+                increment: parseInt(healthIncrement, 10),
+                obtain: parseInt(healthObtain, 10)
+            },
+            stamina: {
+                increment: parseInt(staminaIncrement, 10),
+                obtain: parseInt(staminaObtain, 10)
+            },
+            attack: {
+                increment: parseInt(attackIncrement, 10),
+                obtain: parseInt(attackObtain, 10)
+            },
+            defense: {
+                increment: parseInt(defenseIncrement, 10),
+                obtain: parseInt(defenseObtain, 10)
+            }
+        }
+    }
+
+    Helper.saveJSONAsCSV('temp/crawler/gameqb/petalaces.csv', Object.values(mapping))
+}
+
 export default {
+    fetchWeapons,
     fetchArmors,
     fetchJewels,
-    fetchSkills
+    fetchSkills,
+    fetchPetalaces
 }

@@ -24,26 +24,50 @@ function isNotEmpty(variable) {
 }
 
 function isObject(value) {
+    if (true === isEmpty(value)) {
+        return false
+    }
+
     return 'object' === typeof value && false === Array.isArray(value)
 }
 
 function isArray(value) {
+    if (true === isEmpty(value)) {
+        return false
+    }
+
     return 'object' === typeof value && true === Array.isArray(value)
 }
 
 function isFunction(value) {
+    if (true === isEmpty(value)) {
+        return false
+    }
+
     return 'function' === typeof value
 }
 
 function isString(value) {
+    if (true === isEmpty(value)) {
+        return false
+    }
+
     return 'string' === typeof value
 }
 
 function isNumber(value) {
+    if (true === isEmpty(value)) {
+        return false
+    }
+
     return 'number' === typeof value
 }
 
 function isBool(value) {
+    if (true === isEmpty(value)) {
+        return false
+    }
+
     return 'boolean' === typeof value
 }
 

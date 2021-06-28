@@ -481,7 +481,7 @@ const fetchArmors = async () => {
             let defense = itemDom(node).find('td').eq(1).text().trim()
             let resistenceFire = itemDom(node).find('td').eq(2).text().trim()
             let resistenceWater = itemDom(node).find('td').eq(3).text().trim()
-            let resistenceTunder = itemDom(node).find('td').eq(4).text().trim()
+            let resistenceThunder = itemDom(node).find('td').eq(4).text().trim()
             let resistenceIce = itemDom(node).find('td').eq(5).text().trim()
             let resistenceDragon = itemDom(node).find('td').eq(6).text().trim()
 
@@ -535,10 +535,11 @@ const fetchArmors = async () => {
             mapping[mappingKey].rare = rare
             mapping[mappingKey].type = type
             mapping[mappingKey].gender = gender
-            mapping[mappingKey].defense = parseInt(defense, 10)
+            mapping[mappingKey].minDefense = parseInt(defense, 10)
+            mapping[mappingKey].maxDefense = null
             mapping[mappingKey].resistence.fire = parseInt(resistenceFire, 10)
             mapping[mappingKey].resistence.water = parseInt(resistenceWater, 10)
-            mapping[mappingKey].resistence.tunder = parseInt(resistenceTunder, 10)
+            mapping[mappingKey].resistence.thunder = parseInt(resistenceThunder, 10)
             mapping[mappingKey].resistence.ice = parseInt(resistenceIce, 10)
             mapping[mappingKey].resistence.dragon = parseInt(resistenceDragon, 10)
         })
@@ -657,6 +658,7 @@ const fetchJewels = async () => {
         }
 
         mapping[mappingKey].name = name
+        mapping[mappingKey].rare = null
         mapping[mappingKey].slot.size = parseInt(slotSize, 10)
         mapping[mappingKey].skill.name = skillName
         mapping[mappingKey].skill.level = 1
@@ -718,7 +720,7 @@ const fetchSkills = async () => {
 
             mapping[mappingKey].name = name
             mapping[mappingKey].description = description
-            mapping[mappingKey].level = parseInt(level, 10),
+            mapping[mappingKey].level = parseInt(level, 10)
             mapping[mappingKey].effect = effect
         })
     }

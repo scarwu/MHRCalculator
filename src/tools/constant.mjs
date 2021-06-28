@@ -54,11 +54,12 @@ export const defaultArmor = {
     rare: null,
     type: null,
     gender: null,
-    defense: null,
+    minDefense: null,
+    maxDefense: null,
     resistence: {
         fire: null,
         water: null,
-        tunder: null,
+        thunder: null,
         ice: null,
         dragon: null
     },

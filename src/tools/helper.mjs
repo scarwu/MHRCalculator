@@ -109,6 +109,20 @@ function jsonHash(data) {
     return md5(JSON.stringify(data))
 }
 
+const userAgentList = [
+    'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; fr; rv:1.9.2.8) Gecko/20100722 Firefox/3.6.8',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/42.0',
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 11_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Mobile/15E148 Safari/604.1',
+    'Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:47.0) Gecko/20100101 Firefox/47.0',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.13'
+]
+
 function fetchHtml(url) {
     if (isEmpty(url)) {
         return null
@@ -138,8 +152,16 @@ function fetchHtml(url) {
 
     return new Promise((resolve, reject) => {
         let handler = ('https:' === urlObject.protocol) ? https : http
+        let userAgent = userAgentList[parseInt(Math.floor(Math.random() * userAgentList.length), 10)] // Random UA
 
-        handler.get(url, async (res) => {
+        handler.get({
+            protocol: urlObject.protocol,
+            hostname: urlObject.hostname,
+            path: urlObject.pathname,
+            headers: {
+                'User-Agent': userAgent
+            }
+        }, async (res) => {
             const { statusCode } = res
 
             if (statusCode !== 200) {

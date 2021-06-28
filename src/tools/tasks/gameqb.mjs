@@ -120,6 +120,7 @@ const fetchWeapons = async () => {
     if (Helper.isNotEmpty(process.argv[4]) && -1 !== weaponTypeList.indexOf(process.argv[4])) {
         targetWeaponType = process.argv[4]
     }
+
     for (let weaponType of weaponTypeList) {
         if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
             continue

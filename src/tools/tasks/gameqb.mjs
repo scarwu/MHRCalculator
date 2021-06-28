@@ -6,6 +6,17 @@
  */
 
 import Helper from '../helper.mjs'
+import {
+    defaultWeapon,
+    defaultArmor,
+    defaultJewel,
+    defaultPetalace,
+    defaultEnhance,
+    defaultSkill,
+    weaponTypeList
+} from '../constant.mjs'
+
+const crawlerRoot = 'temp/crawler/gameqb'
 
 const urls = {
     weapons: { // 'https://mhr.gameqb.net/%e6%ad%a6%e5%99%a8/'
@@ -22,7 +33,7 @@ const urls = {
         lightBowgun: 'https://mhr.gameqb.net/%e6%ad%a6%e5%99%a8/%e8%bc%95%e5%bc%a9/',
         longSword: 'https://mhr.gameqb.net/%e6%ad%a6%e5%99%a8/%e5%a4%aa%e5%88%80/',
         switchAxe: 'https://mhr.gameqb.net/%e6%ad%a6%e5%99%a8/%e6%96%ac%e6%93%8a%e6%96%a7/',
-        swordAndShield: 'https://mhr.gameqb.net/%e6%ad%a6%e5%99%a8/%e5%96%ae%e6%89%8b%e5%8a%8d/',
+        swordAndShield: 'https://mhr.gameqb.net/%e6%ad%a6%e5%99%a8/%e5%96%ae%e6%89%8b%e5%8a%8d/'
     },
     armors: 'https://mhr.gameqb.net/3748/',
     skills: 'https://mhr.gameqb.net/1830/',
@@ -32,120 +43,6 @@ const urls = {
     petalaces: 'https://mhr.gameqb.net/%e7%b5%90%e8%8a%b1%e7%92%b0/',
     enhances: null,
 }
-
-const defaultWeapon = {
-    serial: null,
-    name: null,
-    rare: null,
-    type: null,
-    attack: null,
-    criticalRate: null,
-    defense: null,
-    element: {
-        attack: {
-            type: null,
-            minValue: null,
-            maxValue: null
-        },
-        status: {
-            type: null,
-            minValue: null,
-            maxValue: null
-        }
-    },
-    sharpness: {
-        red: null,
-        orange: null,
-        yellow: null,
-        green: null,
-        blue: null,
-        white: null,
-        purple: null
-    },
-    slots: [
-        // {
-        //     size: null
-        // }
-    ],
-    enhances: [
-        // {
-        //     name: null
-        // }
-    ]
-}
-
-const defaultArmor = {
-    serial: null,
-    name: null,
-    rare: null,
-    gender: null,
-    defense: null,
-    resistence: {
-        fire: null,
-        water: null,
-        tunder: null,
-        ice: null,
-        dragon: null
-    },
-    slots: [
-        // {
-        //     size: null
-        // }
-    ],
-    skills: [
-        // {
-        //     name: null,
-        //     level: null
-        // }
-    ]
-}
-
-const defaultJewel = {
-    name: null,
-    rare: null,
-    slot: {
-        size: null
-    },
-    skill: {
-        name: null,
-        level: null
-    }
-}
-
-const defaultSkill = {
-    name: null,
-    description: null,
-    level: null,
-    effect: null
-}
-
-const defaultPetalace = {
-    name: null,
-    rare: null,
-    health: {
-        increment: null,
-        obtain: null
-    },
-    stamina: {
-        increment: null,
-        obtain: null
-    },
-    attack: {
-        increment: null,
-            obtain: null
-    },
-    defense: {
-        increment: null,
-        obtain: null
-    }
-}
-
-const weaponTypeList = [
-    'greatSword', 'longSword', 'swordAndShield', 'dualBlades',
-    'hammer', 'huntingHorn', 'lance', 'gunlance',
-    'chargeBlade', 'switchAxe', 'insectGlaive',
-    'bow', 'lightBowgun', 'heavyBowgun'
-]
 
 const autoExtendCols = (list) => {
     let slotCount = 0
@@ -208,13 +105,21 @@ const autoExtendCols = (list) => {
     })
 }
 
+const cleanName = (text) => {
+    return text
+        .replace(/(│|├|└)*/g, '')
+        .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+}
+
+let fetchPageUrl = null
+let fetchPageName = null
+
 const fetchWeapons = async () => {
     let targetWeaponType = null
 
     if (Helper.isNotEmpty(process.argv[4]) && -1 !== weaponTypeList.indexOf(process.argv[4])) {
         targetWeaponType = process.argv[4]
     }
-
     for (let weaponType of weaponTypeList) {
         if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
             continue
@@ -222,14 +127,19 @@ const fetchWeapons = async () => {
 
         let mapping = {}
         let mappingKey = null
+        let enhanceMapping = {}
+        let enhanceMappingKey = null
 
         // Fetch List Page
-        console.log(urls.weapons[weaponType], `weapons:${weaponType}`)
+        fetchPageUrl = urls.weapons[weaponType]
+        fetchPageName = `weapons:${weaponType}`
 
-        let listDom = await Helper.fetchHtmlAsDom(urls.weapons[weaponType])
+        console.log(fetchPageUrl, fetchPageName)
+
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
         if (Helper.isEmpty(listDom)) {
-            console.log(urls.weapons[weaponType], `weapons:${weaponType}`, 'Err')
+            console.log(fetchPageUrl, fetchPageName, 'Err')
 
             return
         }
@@ -238,9 +148,7 @@ const fetchWeapons = async () => {
             let itemNode = listDom('.wp-block-table tbody tr').eq(itemIndex)
 
             let serial = itemNode.find('td').eq(0).text()
-            let name = itemNode.find('td').eq(1).text()
-                .replace(/(│|├|└)*/g, '')
-                .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+            let name = cleanName(itemNode.find('td').eq(1).text())
 
             mappingKey = `${serial}:${name}`
 
@@ -388,13 +296,16 @@ const fetchWeapons = async () => {
             }
 
             // Fetch Detail Page
-            if (Helper.isNotEmpty(itemNode.find('td').eq(1).find('a').attr('href'))) {
-                console.log(itemNode.find('td').eq(1).find('a').attr('href'), itemNode.find('td').eq(1).text())
+            fetchPageUrl = itemNode.find('td').eq(1).find('a').attr('href')
+            fetchPageName = `weapon:${weaponType}:${name}`
 
-                let itemDom = await Helper.fetchHtmlAsDom(itemNode.find('td').eq(1).find('a').attr('href'))
+            if (Helper.isNotEmpty(fetchPageUrl)) {
+                console.log(fetchPageUrl, fetchPageName)
+
+                let itemDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
                 if (Helper.isEmpty(itemDom)) {
-                    console.log(itemNode.find('td').eq(1).find('a').attr('href'), itemNode.find('td').eq(1).text(), 'Err')
+                    console.log(fetchPageUrl, fetchPageName, 'Err')
 
                     continue
                 }
@@ -408,23 +319,51 @@ const fetchWeapons = async () => {
                     enhanceTableIndex = 1
                 }
 
-                itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').each((index, node) => {
-                    let subName = itemDom(node).find('td').eq(0).text().trim()
-                        .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+                for (let itemIndex = 0; itemIndex < itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').length; itemIndex++) {
+                    let rowNode = itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').eq(itemIndex)
+
+                    let subName = cleanName(rowNode.find('td').eq(0).text().trim())
 
                     if (name !== subName) {
-                        return
+                        continue
                     }
 
-                    itemDom(node).find('td').eq(3).find('a').each((index, node) => {
-                        let enhanceName = itemDom(node).text()
-                            .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+                    for (let enhanceIndex = 0; enhanceIndex < rowNode.find('td').eq(3).find('a').length; enhanceIndex++) {
+                        let enhanceNode = rowNode.find('td').eq(3).find('a').eq(enhanceIndex)
+
+                        let enhanceName = cleanName(enhanceNode.text())
 
                         mapping[mappingKey].enhances.push({
                             name: enhanceName
                         })
-                    })
-                })
+
+                        if (Helper.isEmpty(targetWeaponType)) {
+                            enhanceMappingKey = enhanceName
+
+                            if (Helper.isEmpty(enhanceMapping[enhanceMappingKey])) {
+                                enhanceMapping[enhanceMappingKey] = Helper.deepCopy(defaultEnhance)
+                            }
+
+                            enhanceMapping[enhanceMappingKey].name = enhanceName
+
+                            // Fetch Enhance Page
+                            fetchPageUrl = enhanceNode.attr('href')
+                            fetchPageName = `enhances:${enhanceName}`
+
+                            if (Helper.isNotEmpty(fetchPageUrl)) {
+                                console.log(fetchPageUrl, fetchPageName)
+
+                                let enhanceDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+                                if (Helper.isNotEmpty(enhanceDom)) {
+                                    enhanceMapping[enhanceMappingKey].description = enhanceDom('p').eq(0).text()
+                                } else {
+                                    console.log(fetchPageUrl, fetchPageName, 'Err')
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Rare
                 let rareTableIndex = 1
@@ -443,8 +382,7 @@ const fetchWeapons = async () => {
                 }
 
                 itemDom('.wp-block-table').eq(rareTableIndex).find('tbody tr').each((index, node) => {
-                    let subName = itemDom(node).find('td').eq(1).text().trim()
-                        .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+                    let subName = cleanName(itemDom(node).find('td').eq(1).text().trim())
 
                     if (name !== subName) {
                         return
@@ -459,7 +397,13 @@ const fetchWeapons = async () => {
 
         let list = autoExtendCols(Object.values(mapping))
 
-        Helper.saveJSONAsCSV(`temp/crawler/gameqb/weapons/${weaponType}.csv`, list)
+        Helper.saveJSONAsCSV(`${crawlerRoot}/weapons/${weaponType}.csv`, list)
+
+        if (Helper.isEmpty(targetWeaponType)) {
+            let enhanceList = autoExtendCols(Object.values(enhanceMapping))
+
+            Helper.saveJSONAsCSV(`${crawlerRoot}/enhances.csv`, enhanceList)
+        }
     }
 }
 
@@ -468,12 +412,15 @@ const fetchArmors = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    console.log(urls.armors, 'armors')
+    fetchPageUrl = urls.armors
+    fetchPageName = 'armors'
 
-    let listDom = await Helper.fetchHtmlAsDom(urls.armors)
+    console.log(fetchPageUrl, fetchPageName)
+
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
     if (Helper.isEmpty(listDom)) {
-        console.log(urls.armors, 'armors', 'Err')
+        console.log(fetchPageUrl, fetchPageName, 'Err')
 
         return
     }
@@ -482,12 +429,15 @@ const fetchArmors = async () => {
         let itemNode = listDom('.entry-content a').eq(itemIndex)
 
         // Fetch Detail Page
-        console.log(itemNode.attr('href'), itemNode.text())
+        fetchPageUrl = itemNode.attr('href')
+        fetchPageName = `armors:${itemNode.text()}`
 
-        let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+        console.log(fetchPageUrl, fetchPageName)
+
+        let itemDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
         if (Helper.isEmpty(itemDom)) {
-            console.log(itemNode.attr('href'), itemNode.text(), 'Err')
+            console.log(fetchPageUrl, fetchPageName, 'Err')
 
             continue
         }
@@ -502,6 +452,16 @@ const fetchArmors = async () => {
 
         let rare = parseInt(tempNode.eq(0).find('td').eq(0).text().trim())
         let gender = tempNode.eq(0).find('td').eq(1).text().trim()
+
+        if ('男女共用' === gender) {
+            gender = 'general'
+        } else if ('女性専用' === gender) {
+            gender = 'female'
+        } else if ('男性専用' === gender) {
+            gender = 'male'
+        } else {
+            gender = null
+        }
 
         // Table 2
         tempNode = itemDom('.wp-block-table .has-fixed-layout').eq(1).find('tbody tr')
@@ -525,9 +485,55 @@ const fetchArmors = async () => {
             let resistenceIce = itemDom(node).find('td').eq(5).text().trim()
             let resistenceDragon = itemDom(node).find('td').eq(6).text().trim()
 
+            let type = null
+            let typeKeywordMapping = {
+                helm: [
+                    '頭盔', '頭部', '【蒙面】', '綻放', '頭飾', '【頭巾】', '【武士盔】', '【元結】', '首腦',
+                    '毛髮', '護頭', '帽', '兜帽', '之首', '禮帽',
+                    '包頭', '偽裝', '羽飾'
+                ],
+                chest: [
+                    '鎧甲', '服飾', '【上衣】', '枝幹', '衣裝', '【上衣】', '【胸甲】', '【白衣】', '肌肉',
+                    '羽織', '上身', '戰衣', '洋裝', '胸甲', '服裝',
+                    '鎧', '披風'
+                ],
+                arm: [
+                    '腕甲', '拳套', '【手甲】', '枝葉', '手套', '【手甲】', '【臂甲】', '【花袖】', '雙手',
+                    '臂甲', '護袖', '腕甲', '袖', '之臂', '護手'
+                ],
+                waist: [
+                    '腰甲', '纏腰布', '【腰卷】', '葉片', '腰帶', '【腰卷】', '【腰具】', '【腰卷】', '臍帶',
+                    '帶', '護腰具', '腰甲', '腰甲', '之腰', '腰甲'
+                ],
+                leg: [
+                    '護腿', '涼鞋', '【綁腿】', '紮根', '鞋子', '【綁腿】', '【腿甲】', '【緋袴】', '腳跟',
+                    '下裳', '腳', '靴', '長褲', '之足', '靴'
+                ]
+            }
+
+            for (let entry of Object.entries(typeKeywordMapping)) {
+                let typeName = entry[0]
+                let keywords = entry[1]
+
+                for (let keyword of keywords) {
+                    if (-1 === name.indexOf(keyword)) {
+                        continue
+                    }
+
+                    type = typeName
+
+                    break
+                }
+
+                if (Helper.isNotEmpty(type)) {
+                    break
+                }
+            }
+
             mapping[mappingKey].serial = serial
             mapping[mappingKey].name = name
             mapping[mappingKey].rare = rare
+            mapping[mappingKey].type = type
             mapping[mappingKey].gender = gender
             mapping[mappingKey].defense = parseInt(defense, 10)
             mapping[mappingKey].resistence.fire = parseInt(resistenceFire, 10)
@@ -584,7 +590,7 @@ const fetchArmors = async () => {
 
     let list = autoExtendCols(Object.values(mapping))
 
-    Helper.saveJSONAsCSV('temp/crawler/gameqb/armors.csv', list)
+    Helper.saveJSONAsCSV(`${crawlerRoot}/armors.csv`, list)
 }
 
 const fetchJewels = async () => {
@@ -592,12 +598,15 @@ const fetchJewels = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    console.log(urls.jewels, 'jewels')
+    fetchPageUrl = urls.jewels
+    fetchPageName = 'jewels'
 
-    let listDom = await Helper.fetchHtmlAsDom(urls.jewels)
+    console.log(fetchPageUrl, fetchPageName)
+
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
     if (Helper.isEmpty(listDom)) {
-        console.log(urls.jewels, 'jewels', 'Err')
+        console.log(fetchPageUrl, fetchPageName, 'Err')
 
         return
     }
@@ -612,10 +621,13 @@ const fetchJewels = async () => {
         // Fetch Detail Page
         let hasDetailPage = false
 
-        if (Helper.isNotEmpty(itemNode.attr('href'))) {
-            console.log(itemNode.attr('href'), itemNode.text().trim())
+        fetchPageUrl = itemNode.attr('href')
+        fetchPageName = `jewels:${itemNode.text().trim()}`
 
-            let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+        if (Helper.isNotEmpty(fetchPageUrl)) {
+            console.log(fetchPageUrl, fetchPageName)
+
+            let itemDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
             if (Helper.isNotEmpty(itemDom)) {
                 name = itemDom('.has-fixed-layout tbody tr').eq(0).find('td').eq(1).text().trim()
@@ -624,7 +636,7 @@ const fetchJewels = async () => {
 
                 hasDetailPage = true
             } else {
-                console.log(itemNode.attr('href'), itemNode.text().trim(), 'Err')
+                console.log(fetchPageUrl, fetchPageName, 'Err')
             }
         }
 
@@ -650,7 +662,7 @@ const fetchJewels = async () => {
         mapping[mappingKey].skill.level = 1
     }
 
-    Helper.saveJSONAsCSV('temp/crawler/gameqb/jewels.csv', Object.values(mapping))
+    Helper.saveJSONAsCSV(`${crawlerRoot}/jewels.csv`, Object.values(mapping))
 }
 
 const fetchSkills = async () => {
@@ -658,12 +670,15 @@ const fetchSkills = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    console.log(urls.skills, 'skills')
+    fetchPageUrl = urls.skills
+    fetchPageName = 'skills'
 
-    let listDom = await Helper.fetchHtmlAsDom(urls.skills)
+    console.log(fetchPageUrl, fetchPageName)
+
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
     if (Helper.isEmpty(listDom)) {
-        console.log(urls.skills, 'skills', 'Err')
+        console.log(fetchPageUrl, fetchPageName, 'Err')
 
         return
     }
@@ -672,12 +687,15 @@ const fetchSkills = async () => {
         let itemNode = listDom('.has-fixed-layout tbody tr').eq(itemIndex).find('td').eq(0).find('a').eq(0)
 
         // Fetch Detail Page
-        console.log(itemNode.attr('href'), itemNode.text().trim())
+        fetchPageUrl = itemNode.attr('href')
+        fetchPageName = `skills:${itemNode.text().trim()}`
 
-        let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+        console.log(fetchPageUrl, fetchPageName)
+
+        let itemDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
         if (Helper.isEmpty(itemDom)) {
-            console.log(itemNode.attr('href'), itemNode.text().trim(), 'Err')
+            console.log(fetchPageUrl, fetchPageName, 'Err')
 
             continue
         }
@@ -705,7 +723,7 @@ const fetchSkills = async () => {
         })
     }
 
-    Helper.saveJSONAsCSV('temp/crawler/gameqb/skills.csv', Object.values(mapping))
+    Helper.saveJSONAsCSV(`${crawlerRoot}/skills.csv`, Object.values(mapping))
 }
 
 const fetchPetalaces = async () => {
@@ -713,12 +731,15 @@ const fetchPetalaces = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    console.log(urls.petalaces, 'petalaces')
+    fetchPageUrl = urls.petalaces
+    fetchPageName = 'petalaces'
 
-    let listDom = await Helper.fetchHtmlAsDom(urls.petalaces)
+    console.log(fetchPageUrl, fetchPageName)
+
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
     if (Helper.isEmpty(listDom)) {
-        console.log(urls.petalaces, 'petalaces', 'Err')
+        console.log(fetchPageUrl, fetchPageName, 'Err')
 
         return
     }
@@ -740,10 +761,13 @@ const fetchPetalaces = async () => {
         // Fetch Detail Page
         let hasDetailPage = false
 
-        if (Helper.isNotEmpty(itemNode.attr('href'))) {
-            console.log(itemNode.attr('href'), itemNode.text().trim())
+        fetchPageUrl = itemNode.attr('href')
+        fetchPageName = `petalaces:${itemNode.text().trim()}`
 
-            let itemDom = await Helper.fetchHtmlAsDom(itemNode.attr('href'))
+        if (Helper.isNotEmpty(fetchPageUrl)) {
+            console.log(fetchPageUrl, fetchPageName)
+
+            let itemDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
             if (Helper.isNotEmpty(itemDom)) {
 
@@ -760,7 +784,7 @@ const fetchPetalaces = async () => {
 
                 hasDetailPage = true
             } else {
-                console.log(itemNode.attr('href'), itemNode.text().trim(), 'Err')
+                console.log(fetchPageUrl, fetchPageName, 'Err')
             }
         }
 
@@ -799,7 +823,7 @@ const fetchPetalaces = async () => {
         mapping[mappingKey].defense.obtain = parseInt(defenseObtain, 10)
     }
 
-    Helper.saveJSONAsCSV('temp/crawler/gameqb/petalaces.csv', Object.values(mapping))
+    Helper.saveJSONAsCSV(`${crawlerRoot}/petalaces.csv`, Object.values(mapping))
 }
 
 function fetchAll() {

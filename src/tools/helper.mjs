@@ -13,7 +13,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as http from 'http'
 import * as https from 'https'
-import * as cheerio  from 'cheerio'
+import * as cheerio from 'cheerio'
 
 function isEmpty(variable) {
     return (undefined === variable || null === variable)
@@ -234,45 +234,41 @@ function loadCSVAsJSON(subPath) {
 }
 
 function saveJSONAsCSV(subPath, data) {
-    let recursive = (key, value, headers, row) => {
+    let recursive = (key, value, allKeys, keyTypeMapping, keyDataMapping) => {
         if (true === isFunction(value)) {
             throw 'is not allowed type'
         }
 
+        allKeys = deepCopy(allKeys)
+
         if (true === isObject(value)) {
-            for (let entry of Object.entries(value)) {
-                let subKey = entry[0]
-                let subValue = entry[1]
-
-                if ('' !== key) {
-                    subKey = `${key}:${subKey}`
-                }
-
-                let result = recursive(subKey, subValue, headers, row)
-
-                headers = result.headers
-                row = result.row
+            if (true === isNotEmpty(key)) {
+                allKeys.push(`{${key}}`)
             }
 
-            return { headers, row }
+            for (let entry of Object.entries(value)) {
+                let result = recursive(entry[0], entry[1], allKeys, keyTypeMapping, keyDataMapping)
+
+                keyTypeMapping = result.keyTypeMapping
+                keyDataMapping = result.keyDataMapping
+            }
+
+            return { keyTypeMapping, keyDataMapping }
         }
 
         if (true === isArray(value)) {
-            for (let entry of Object.entries(value)) {
-                let subIndex = entry[0]
-                let subValue = entry[1]
-
-                if ('' !== key) {
-                    subIndex = `${key}[]:${subIndex}`
-                }
-
-                let result = recursive(subIndex, subValue, headers, row)
-
-                headers = result.headers
-                row = result.row
+            if (true === isNotEmpty(key)) {
+                allKeys.push(`[${key}]`)
             }
 
-            return { headers, row }
+            for (let entry of Object.entries(value)) {
+                let result = recursive(entry[0], entry[1], allKeys, keyTypeMapping, keyDataMapping)
+
+                keyTypeMapping = result.keyTypeMapping
+                keyDataMapping = result.keyDataMapping
+            }
+
+            return { keyTypeMapping, keyDataMapping }
         }
 
         if (true === isEmpty(value)
@@ -280,41 +276,50 @@ function saveJSONAsCSV(subPath, data) {
             || true === isNumber(value)
             || true === isBool(value)
         ) {
-            headers[key] = true
-            row[key] = value
+            if (true === isNotEmpty(key)) {
+                allKeys.push(key)
+            }
 
-            return { headers, row }
+            let currentKey = allKeys.join(':')
+
+            if (isEmpty(keyTypeMapping[currentKey])) {
+                keyTypeMapping[currentKey] = checkType(value)
+            }
+
+            keyDataMapping[currentKey] = value
+
+            return { keyTypeMapping, keyDataMapping }
         }
     }
 
     // Flat Nested Format as XY Dimension
-    let headers = {}
-    let rows = []
+    let keyTypeMapping = {}
+    let keyDataMappings = []
 
     data.forEach((item) => {
-        let row = {}
-        let result = recursive('', item, headers, row)
+        let keyDataMapping = {}
+        let result = recursive(null, item, [], keyTypeMapping, keyDataMapping)
 
-        headers = result.headers
-        row = result.row
+        keyTypeMapping = result.keyTypeMapping
+        keyDataMapping = result.keyDataMapping
 
-        rows.push(row)
+        keyDataMappings.push(keyDataMapping)
     })
 
     // Convert XY Dimension for CSV Format
-    let csv = []
+    let structuredCSV = []
 
-    headers = Object.keys(headers)
+    structuredCSV.push(Object.entries(keyTypeMapping).map((entry) => {
+        return `<${entry[1]}>:${entry[0]}`
+    }))
 
-    csv.push(headers)
-
-    rows.forEach((row) => {
-        csv.push(headers.map((header) => {
-            return isNotEmpty(row[header]) ? row[header] : ''
+    keyDataMappings.forEach((keyDataMapping) => {
+        structuredCSV.push(Object.keys(keyTypeMapping).map((key) => {
+            return isNotEmpty(keyDataMapping[key]) ? keyDataMapping[key] : ''
         }))
     })
 
-    saveCSV(subPath, csv)
+    saveCSV(subPath, structuredCSV)
 
     return true
 }

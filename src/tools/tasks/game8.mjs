@@ -6,16 +6,40 @@
  */
 
 import Helper from '../helper.mjs'
+import {
+    defaultWeapon,
+    defaultArmor,
+    defaultJewel,
+    defaultPetalace,
+    defaultEnhance,
+    defaultSkill,
+    weaponTypeList
+} from '../constant.mjs'
 
-let urls = {
-    weapons:    null,
-    armors:     'https://game8.jp/mhrise/363845',
-    skills:     'https://game8.jp/mhrise/363848',
-    sets:       null,
-    jewels:     'https://game8.jp/mhrise/363846',
-    charms:     null,
-    petalaces:  null,
-    enhances:   null
+const urls = {
+    weapons: {
+        bow: null,
+        chargeBlade: null,
+        dualBlades: null,
+        greatSword: null,
+        gunlance: null,
+        hammer: null,
+        heavyBowgun: null,
+        huntingHorn: null,
+        insectGlaive: null,
+        lance: null,
+        lightBowgun: null,
+        longSword: null,
+        switchAxe: null,
+        swordAndShield: null
+    },
+    armors: 'https://game8.jp/mhrise/363845',
+    skills: 'https://game8.jp/mhrise/363848',
+    sets: null,
+    jewels: 'https://game8.jp/mhrise/363846',
+    charms: null,
+    petalaces: null,
+    enhances: null
 }
 
 async function fetchSkills() {

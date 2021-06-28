@@ -134,7 +134,7 @@ function fetchHtml(url) {
 
     // Load From Cache
     if (true === fs.existsSync(cachePath)) {
-        return fs.readFileSync(cachePath)
+        return fs.readFileSync(cachePath, 'utf8')
     }
 
     // Save To Cache
@@ -208,7 +208,7 @@ async function fetchHtmlAsDom(url) {
 function loadJSON(subPath) {
     let filePath = `${global.root}/${subPath}`
 
-    return JSON.parse(fs.readFileSync(filePath))
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'))
 }
 
 function saveJSON(subPath, data) {
@@ -228,7 +228,7 @@ function saveJSON(subPath, data) {
 function loadCSV(subPath) {
     let filePath = `${global.root}/${subPath}`
 
-    return fs.readFileSync(filePath).split('\n').map((row) => {
+    return fs.readFileSync(filePath, 'utf8').split('\n').map((row) => {
         return row.split(',')
     })
 }

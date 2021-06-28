@@ -829,6 +829,20 @@ const fetchPetalaces = async () => {
     Helper.saveJSONAsCSV(`${crawlerRoot}/petalaces.csv`, Object.values(mapping))
 }
 
+function statistics() {
+    for (let weaponType of weaponTypeList) {
+        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/weapons/${weaponType}.csv`)
+
+        console.log(`weapons:${weaponType} (${list.length})`)
+    }
+
+    for (let target of ['armors', 'jewels', 'skills', 'enhances', 'petalaces']) {
+        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/${target}.csv`)
+
+        console.log(`${target} (${list.length})`)
+    }
+}
+
 function fetchAll() {
     fetchWeapons()
     fetchArmors()
@@ -843,5 +857,6 @@ export default {
     fetchArmors,
     fetchJewels,
     fetchSkills,
-    fetchPetalaces
+    fetchPetalaces,
+    statistics
 }

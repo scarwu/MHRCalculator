@@ -187,8 +187,13 @@ async function fetchWeapons() {
 
                 let serial = weaponDom('h3#hm_1').text().replace('の性能まとめ', '')
 
-                for (let subIndex = 0; subIndex < weaponDom('.a-table + .a-table').length; subIndex++) {
-                    let subNode = weaponDom('.a-table + .a-table').eq(subIndex)
+                for (let subIndex = 0; subIndex < weaponDom('.a-table').length; subIndex++) {
+                    let subNode = weaponDom('.a-table').eq(subIndex)
+
+                    if ('レア度' !== subNode.find('tbody tr').eq(0).find('th').eq(0).text()) {
+                        continue
+                    }
+
                     let subName = cleanName(subNode.find('b.a-bold').text())
 
                     if (name !== subName) {
@@ -748,6 +753,20 @@ async function fetchEnhances() {
     Helper.saveJSONAsCSV(`${crawlerRoot}/enhances.csv`, Object.values(mapping))
 }
 
+function statistics() {
+    for (let weaponType of weaponTypeList) {
+        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/weapons/${weaponType}.csv`)
+
+        console.log(`weapons:${weaponType} (${list.length})`)
+    }
+
+    for (let target of ['armors', 'jewels', 'skills', 'enhances']) {
+        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/${target}.csv`)
+
+        console.log(`${target} (${list.length})`)
+    }
+}
+
 function fetchAll() {
     fetchWeapons()
     fetchArmors()
@@ -762,5 +781,6 @@ export default {
     fetchArmors,
     fetchJewels,
     fetchSkills,
-    fetchEnhances
+    fetchEnhances,
+    statistics
 }

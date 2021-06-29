@@ -63,7 +63,7 @@ function isNumber(value) {
     return 'number' === typeof value
 }
 
-function isBool(value) {
+function isBoolean(value) {
     if (true === isEmpty(value)) {
         return false
     }
@@ -96,7 +96,7 @@ function checkType(value) {
         return 'number'
     }
 
-    if (true === isBool(value)) {
+    if (true === isBoolean(value)) {
         return 'boolean'
     }
 }
@@ -250,13 +250,118 @@ function saveCSV(subPath, data) {
 }
 
 function loadCSVAsJSON(subPath) {
-    let data = loadCSV(subPath)
+    const recursive = (segments, value, lastType, mapping) => {
+        segments = deepCopy(segments)
 
-    return data
+        let segment = segments.shift()
+
+        if ('array' === lastType) {
+            segment.name = parseInt(segment.name, 10)
+        }
+
+        if ('object' === segment.type) {
+            if (isEmpty(mapping[segment.name])) {
+                mapping[segment.name] = {}
+            }
+
+            mapping[segment.name] = recursive(segments, value, 'object', mapping[segment.name])
+
+            return mapping
+        }
+
+        if ('array' === segment.type) {
+            if (isEmpty(mapping[segment.name])) {
+                mapping[segment.name] = []
+            }
+
+            mapping[segment.name] = recursive(segments, value, 'array', mapping[segment.name])
+
+            return mapping
+        }
+
+        if ('null' === segment.type || 'string' === segment.type) {
+            mapping[segment.name] = (null !== value && '' !== value)
+                ? value : null
+
+            return mapping
+        }
+
+        if ('number' === segment.type) {
+            mapping[segment.name] = (null !== value && '' !== value)
+                ? parseFloat(value) : null
+
+            return mapping
+        }
+
+        if ('boolean' === segment.type) {
+            mapping[segment.name] = (null !== value && '' !== value)
+                ? ('true' === value) : null
+
+            return mapping
+        }
+    }
+
+    // Load File
+    let structuredCSV = loadCSV(subPath)
+
+    // Parse Header Keys
+    let header = structuredCSV.shift()
+
+    header = header.map((head) => {
+        if (false === /^\<\w+\>(?:\:(?:\{\w+\}|\[\w+\]|\w+))+$/.test(head)) {
+            throw 'Head is Illegal'
+        }
+
+        let segments = head.split(':')
+        let type = segments.shift().match(/^\<(\w+)\>$/)[1]
+
+        return segments.map((key) => {
+            let match = null
+
+            match = key.match(/^\{(\w+)\}$/)
+
+            if (isNotEmpty(match)) {
+                return {
+                    type: 'object',
+                    name: match[1]
+                }
+            }
+
+            match = key.match(/^\[(\w+)\]$/)
+
+            if (isNotEmpty(match)) {
+                return {
+                    type: 'array',
+                    name: match[1]
+                }
+            }
+
+            match = key.match(/^(\w+)$/)
+
+            if (isNotEmpty(match)) {
+                return {
+                    type: type,
+                    name: match[1]
+                }
+            }
+
+            throw 'Key is Illegal'
+        })
+    })
+
+    return structuredCSV.map((data) => {
+        let mapping = {}
+
+        data.forEach((value, index) => {
+            mapping = recursive(header[index], value, 'object', mapping)
+        })
+
+        return mapping
+    })
 }
 
 function saveJSONAsCSV(subPath, data) {
-    let recursive = (key, value, allKeys, keyTypeMapping, keyDataMapping) => {
+    const recursive = (key, value, allKeys, keyTypeMapping, keyDataMapping) => {
         if (true === isFunction(value)) {
             throw 'is not allowed type'
         }
@@ -296,7 +401,6 @@ function saveJSONAsCSV(subPath, data) {
         if (true === isEmpty(value)
             || true === isString(value)
             || true === isNumber(value)
-            || true === isBool(value)
         ) {
             if (true === isNotEmpty(key)) {
                 allKeys.push(key)
@@ -309,6 +413,22 @@ function saveJSONAsCSV(subPath, data) {
             }
 
             keyDataMapping[currentKey] = value
+
+            return { keyTypeMapping, keyDataMapping }
+        }
+
+        if (true === isBoolean(value)) {
+            if (true === isNotEmpty(key)) {
+                allKeys.push(key)
+            }
+
+            let currentKey = allKeys.join(':')
+
+            if (isEmpty(keyTypeMapping[currentKey])) {
+                keyTypeMapping[currentKey] = checkType(value)
+            }
+
+            keyDataMapping[currentKey] = value ? 'true' : 'false'
 
             return { keyTypeMapping, keyDataMapping }
         }
@@ -341,6 +461,7 @@ function saveJSONAsCSV(subPath, data) {
         }))
     })
 
+    // Save File
     saveCSV(subPath, structuredCSV)
 
     return true
@@ -354,7 +475,7 @@ export default {
     isFunction,
     isString,
     isNumber,
-    isBool,
+    isBoolean,
     checkType,
     deepCopy,
     jsonHash,

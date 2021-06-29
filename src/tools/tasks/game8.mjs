@@ -5,7 +5,7 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Helper from '../helper.mjs'
+import Helper from '../liberaries/helper.mjs'
 import {
     defaultWeapon,
     defaultArmor,
@@ -13,8 +13,10 @@ import {
     defaultPetalace,
     defaultEnhance,
     defaultSkill,
-    weaponTypeList
-} from '../constant.mjs'
+    weaponTypeList,
+    autoExtendCols,
+    formatName
+} from '../liberaries/mh.mjs'
 
 const crawlerRoot = 'temp/crawler/game8'
 
@@ -37,78 +39,10 @@ const urls = {
     },
     armors: 'https://game8.jp/mhrise/363845',
     skills: 'https://game8.jp/mhrise/363848',
-    sets: null,
     jewels: 'https://game8.jp/mhrise/363846',
     charms: null,
     petalaces: null,
     enhances: 'https://game8.jp/mhrise/382391'
-}
-
-const autoExtendCols = (list) => {
-    let slotCount = 0
-    let skillCount = 0
-    let enhanceCount = 0
-
-    list.forEach((row) => {
-        if (Helper.isNotEmpty(row.slots) && slotCount < row.slots.length) {
-            slotCount = row.slots.length
-        }
-
-        if (Helper.isNotEmpty(row.skills) && skillCount < row.skills.length) {
-            skillCount = row.skills.length
-        }
-
-        if (Helper.isNotEmpty(row.enhances) && enhanceCount < row.enhances.length) {
-            enhanceCount = row.enhances.length
-        }
-    })
-
-    return list.map((row) => {
-        if (Helper.isNotEmpty(row.slots)) {
-            for (let index = 0; index < slotCount; index++) {
-                if (Helper.isNotEmpty(row.slots[index])) {
-                    continue
-                }
-
-                row.slots[index] = {
-                    size: null
-                }
-            }
-        }
-
-        if (Helper.isNotEmpty(row.skills)) {
-            for (let index = 0; index < skillCount; index++) {
-                if (Helper.isNotEmpty(row.skills[index])) {
-                    continue
-                }
-
-                row.skills[index] = {
-                    name: null,
-                    level: null
-                }
-            }
-        }
-
-        if (Helper.isNotEmpty(row.enhances)) {
-            for (let index = 0; index < enhanceCount; index++) {
-                if (Helper.isNotEmpty(row.enhances[index])) {
-                    continue
-                }
-
-                row.enhances[index] = {
-                    name: null
-                }
-            }
-        }
-
-        return row
-    })
-}
-
-const cleanName = (text) => {
-    return text
-        .replace(/(│|├|└)*/g, '').replace(/(┃|┣|┗|　)*/g, '')
-        .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
 }
 
 let fetchPageUrl = null
@@ -160,7 +94,7 @@ async function fetchWeapons() {
             for (let itemIndex = 0; itemIndex < listDom(`#${mdId} + table tbody tr`).find('.a-link').length; itemIndex++) {
                 let itemNode = listDom(`#${mdId} + table tbody tr`).find('.a-link').eq(itemIndex)
 
-                let name = cleanName(itemNode.text().trim())
+                let name = formatName(itemNode.text().trim())
 
                 // Fetch Detail Page
                 fetchPageUrl = itemNode.attr('href')
@@ -194,7 +128,7 @@ async function fetchWeapons() {
                         continue
                     }
 
-                    let subName = cleanName(subNode.find('b.a-bold').text())
+                    let subName = formatName(subNode.find('b.a-bold').text())
 
                     if (name !== subName) {
                         continue
@@ -247,48 +181,48 @@ async function fetchWeapons() {
                             switch (element.type) {
                             case '火':
                                 mapping[mappingKey].element.attack.type = 'fire'
-                                mapping[mappingKey].element.attack.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
                                 break
                             case '水':
                                 mapping[mappingKey].element.attack.type = 'water'
-                                mapping[mappingKey].element.attack.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
                                 break
                             case '雷':
                                 mapping[mappingKey].element.attack.type = 'thunder'
-                                mapping[mappingKey].element.attack.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
                                 break
                             case '氷':
                                 mapping[mappingKey].element.attack.type = 'ice'
-                                mapping[mappingKey].element.attack.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
                                 break
                             case '龍':
                                 mapping[mappingKey].element.attack.type = 'dragon'
-                                mapping[mappingKey].element.attack.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
                                 break
                             case '睡眠':
                                 mapping[mappingKey].element.status.type = 'sleep'
-                                mapping[mappingKey].element.status.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.status.minValue = parseFloat(element.value)
 
                                 break
                             case '麻痹':
                             case '麻痺':
                                 mapping[mappingKey].element.status.type = 'paralysis'
-                                mapping[mappingKey].element.status.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.status.minValue = parseFloat(element.value)
 
                                 break
                             case '爆破':
                                 mapping[mappingKey].element.status.type = 'blast'
-                                mapping[mappingKey].element.status.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.status.minValue = parseFloat(element.value)
 
                                 break
                             case '毒':
                                 mapping[mappingKey].element.status.type = 'poison'
-                                mapping[mappingKey].element.status.minValue = parseInt(element.value, 10)
+                                mapping[mappingKey].element.status.minValue = parseFloat(element.value)
 
                                 break
                             default:
@@ -325,19 +259,19 @@ async function fetchWeapons() {
 
                     subNode.find('tbody tr').eq(enhanceRowIndex).find('a').each((index, node) => {
                         mapping[mappingKey].enhances.push({
-                            name: cleanName(weaponDom(node).text())
+                            name: formatName(weaponDom(node).text())
                         })
                     })
 
                     mapping[mappingKey].serial = serial
                     mapping[mappingKey].name = name
                     mapping[mappingKey].type = weaponType
-                    mapping[mappingKey].rare = parseInt(rare, 10)
-                    mapping[mappingKey].attack = parseInt(attack, 10)
+                    mapping[mappingKey].rare = parseFloat(rare)
+                    mapping[mappingKey].attack = parseFloat(attack)
                     mapping[mappingKey].defense = ('-' !== defense)
-                        ? parseInt(defense, 10) : null
-                    mapping[mappingKey].criticalRate = (0 !== parseInt(criticalRate, 10))
-                        ? parseInt(criticalRate, 10) : null
+                        ? parseFloat(defense) : null
+                    mapping[mappingKey].criticalRate = (0 !== parseFloat(criticalRate))
+                        ? parseFloat(criticalRate) : null
                 }
             }
         }
@@ -391,7 +325,7 @@ async function fetchArmors() {
             let serials = replaceName(rowNode.eq(0).find('a').text().trim()).split('/')
 
             for (let entry of Object.entries(serials)) {
-                let serialIndex = parseInt(entry[0])
+                let serialIndex = parseFloat(entry[0])
                 let serial = entry[1]
                 let gender = 'general'
 
@@ -450,7 +384,7 @@ async function fetchArmors() {
 
                                 mapping[mappingKey].skills.push({
                                     name: skillName,
-                                    level: parseInt(skillLevel, 10)
+                                    level: parseFloat(skillLevel)
                                 })
                             })
 
@@ -518,9 +452,9 @@ async function fetchArmors() {
                             }
 
                             mapping[mappingKey].type = type
-                            mapping[mappingKey].minDefense = parseInt(minDefense, 10)
+                            mapping[mappingKey].minDefense = parseFloat(minDefense)
                             mapping[mappingKey].maxDefense = Helper.isNotEmpty(maxDefense)
-                                ? parseInt(maxDefense, 10) : null
+                                ? parseFloat(maxDefense) : null
                         }
                     }
 
@@ -571,11 +505,11 @@ async function fetchArmors() {
                             }
 
                             mapping[mappingKey].type = type
-                            mapping[mappingKey].resistence.fire = parseInt(resistenceFire, 10)
-                            mapping[mappingKey].resistence.water = parseInt(resistenceWater, 10)
-                            mapping[mappingKey].resistence.thunder = parseInt(resistenceThunder, 10)
-                            mapping[mappingKey].resistence.ice = parseInt(resistenceIce, 10)
-                            mapping[mappingKey].resistence.dragon = parseInt(resistenceDragon, 10)
+                            mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
+                            mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
+                            mapping[mappingKey].resistence.thunder = parseFloat(resistenceThunder)
+                            mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
+                            mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
                         }
                     }
                 }
@@ -640,7 +574,7 @@ async function fetchJewels() {
 
             mapping[mappingKey].name = name
             mapping[mappingKey].rare = rare
-            mapping[mappingKey].slot.size = parseInt(slotSize, 10)
+            mapping[mappingKey].slot.size = parseFloat(slotSize)
             mapping[mappingKey].skill.name = skillName
             mapping[mappingKey].skill.level = 1
         }
@@ -704,7 +638,7 @@ async function fetchSkills() {
 
                 mapping[mappingKey].name = name
                 mapping[mappingKey].description = description
-                mapping[mappingKey].level = parseInt(level, 10)
+                mapping[mappingKey].level = parseFloat(level)
                 mapping[mappingKey].effect = effect
             }
         }
@@ -736,7 +670,7 @@ async function fetchEnhances() {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
 
             // Get Data
-            let name = cleanName(rowNode.find('td').eq(0).text().trim())
+            let name = formatName(rowNode.find('td').eq(0).text().trim())
             let description = rowNode.find('td').eq(1).text().trim()
 
             mappingKey = name

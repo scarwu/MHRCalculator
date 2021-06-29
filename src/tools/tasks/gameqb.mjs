@@ -5,7 +5,7 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Helper from '../helper.mjs'
+import Helper from '../liberaries/helper.mjs'
 import {
     defaultWeapon,
     defaultArmor,
@@ -13,8 +13,10 @@ import {
     defaultPetalace,
     defaultEnhance,
     defaultSkill,
-    weaponTypeList
-} from '../constant.mjs'
+    weaponTypeList,
+    autoExtendCols,
+    formatName
+} from '../liberaries/mh.mjs'
 
 const crawlerRoot = 'temp/crawler/gameqb'
 
@@ -37,78 +39,10 @@ const urls = {
     },
     armors: 'https://mhr.gameqb.net/3748/',
     skills: 'https://mhr.gameqb.net/1830/',
-    sets: null,
     jewels: 'https://mhr.gameqb.net/1839/',
     charms: null,
     petalaces: 'https://mhr.gameqb.net/%e7%b5%90%e8%8a%b1%e7%92%b0/',
     enhances: null,
-}
-
-const autoExtendCols = (list) => {
-    let slotCount = 0
-    let skillCount = 0
-    let enhanceCount = 0
-
-    list.forEach((row) => {
-        if (Helper.isNotEmpty(row.slots) && slotCount < row.slots.length) {
-            slotCount = row.slots.length
-        }
-
-        if (Helper.isNotEmpty(row.skills) && skillCount < row.skills.length) {
-            skillCount = row.skills.length
-        }
-
-        if (Helper.isNotEmpty(row.enhances) && enhanceCount < row.enhances.length) {
-            enhanceCount = row.enhances.length
-        }
-    })
-
-    return list.map((row) => {
-        if (Helper.isNotEmpty(row.slots)) {
-            for (let index = 0; index < slotCount; index++) {
-                if (Helper.isNotEmpty(row.slots[index])) {
-                    continue
-                }
-
-                row.slots[index] = {
-                    size: null
-                }
-            }
-        }
-
-        if (Helper.isNotEmpty(row.skills)) {
-            for (let index = 0; index < skillCount; index++) {
-                if (Helper.isNotEmpty(row.skills[index])) {
-                    continue
-                }
-
-                row.skills[index] = {
-                    name: null,
-                    level: null
-                }
-            }
-        }
-
-        if (Helper.isNotEmpty(row.enhances)) {
-            for (let index = 0; index < enhanceCount; index++) {
-                if (Helper.isNotEmpty(row.enhances[index])) {
-                    continue
-                }
-
-                row.enhances[index] = {
-                    name: null
-                }
-            }
-        }
-
-        return row
-    })
-}
-
-const cleanName = (text) => {
-    return text
-        .replace(/(│|├|└)*/g, '')
-        .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
 }
 
 let fetchPageUrl = null
@@ -149,7 +83,7 @@ const fetchWeapons = async () => {
             let itemNode = listDom('.wp-block-table tbody tr').eq(itemIndex)
 
             let serial = itemNode.find('td').eq(0).text()
-            let name = cleanName(itemNode.find('td').eq(1).text())
+            let name = formatName(itemNode.find('td').eq(1).text())
 
             mappingKey = `${serial}:${name}`
 
@@ -176,62 +110,62 @@ const fetchWeapons = async () => {
 
                 switch (match[1]) {
                 case '攻擊力':
-                    mapping[mappingKey].attack = parseInt(match[2], 10)
+                    mapping[mappingKey].attack = parseFloat(match[2])
 
                     break
                 case '防御':
                 case '防禦力':
-                    mapping[mappingKey].defense = parseInt(match[2], 10)
+                    mapping[mappingKey].defense = parseFloat(match[2])
 
                     break
                 case '會心':
-                    mapping[mappingKey].criticalRate = parseInt(match[2], 10)
+                    mapping[mappingKey].criticalRate = parseFloat(match[2])
 
                     break
                 case '火':
                     mapping[mappingKey].element.attack.type = 'fire'
-                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.minValue = parseFloat(match[2])
 
                     break
                 case '水':
                     mapping[mappingKey].element.attack.type = 'water'
-                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.minValue = parseFloat(match[2])
 
                     break
                 case '雷':
                     mapping[mappingKey].element.attack.type = 'thunder'
-                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.minValue = parseFloat(match[2])
 
                     break
                 case '冰':
                     mapping[mappingKey].element.attack.type = 'ice'
-                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.minValue = parseFloat(match[2])
 
                     break
                 case '龍':
                     mapping[mappingKey].element.attack.type = 'dragon'
-                    mapping[mappingKey].element.attack.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.attack.minValue = parseFloat(match[2])
 
                     break
                 case '睡眠':
                     mapping[mappingKey].element.status.type = 'sleep'
-                    mapping[mappingKey].element.status.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.status.minValue = parseFloat(match[2])
 
                     break
                 case '麻痹':
                 case '麻痺':
                     mapping[mappingKey].element.status.type = 'paralysis'
-                    mapping[mappingKey].element.status.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.status.minValue = parseFloat(match[2])
 
                     break
                 case '爆破':
                     mapping[mappingKey].element.status.type = 'blast'
-                    mapping[mappingKey].element.status.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.status.minValue = parseFloat(match[2])
 
                     break
                 case '毒':
                     mapping[mappingKey].element.status.type = 'poison'
-                    mapping[mappingKey].element.status.minValue = parseInt(match[2], 10)
+                    mapping[mappingKey].element.status.minValue = parseFloat(match[2])
 
                     break
                 default:
@@ -323,7 +257,7 @@ const fetchWeapons = async () => {
                 for (let itemIndex = 0; itemIndex < itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').length; itemIndex++) {
                     let rowNode = itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').eq(itemIndex)
 
-                    let subName = cleanName(rowNode.find('td').eq(0).text().trim())
+                    let subName = formatName(rowNode.find('td').eq(0).text().trim())
 
                     if (name !== subName) {
                         continue
@@ -332,7 +266,7 @@ const fetchWeapons = async () => {
                     for (let enhanceIndex = 0; enhanceIndex < rowNode.find('td').eq(3).find('a').length; enhanceIndex++) {
                         let enhanceNode = rowNode.find('td').eq(3).find('a').eq(enhanceIndex)
 
-                        let enhanceName = cleanName(enhanceNode.text())
+                        let enhanceName = formatName(enhanceNode.text())
 
                         mapping[mappingKey].enhances.push({
                             name: enhanceName
@@ -383,7 +317,7 @@ const fetchWeapons = async () => {
                 }
 
                 itemDom('.wp-block-table').eq(rareTableIndex).find('tbody tr').each((index, node) => {
-                    let subName = cleanName(itemDom(node).find('td').eq(1).text().trim())
+                    let subName = formatName(itemDom(node).find('td').eq(1).text().trim())
 
                     if (name !== subName) {
                         return
@@ -391,7 +325,7 @@ const fetchWeapons = async () => {
 
                     let rare = itemDom(node).find('td').eq(0).text()
 
-                    mapping[mappingKey].rare = parseInt(rare, 10)
+                    mapping[mappingKey].rare = parseFloat(rare)
                 })
             }
         }
@@ -451,7 +385,7 @@ const fetchArmors = async () => {
         // Table 1
         tempNode = itemDom('.wp-block-table .has-fixed-layout').eq(0).find('tbody tr')
 
-        let rare = parseInt(tempNode.eq(0).find('td').eq(0).text().trim())
+        let rare = parseFloat(tempNode.eq(0).find('td').eq(0).text().trim())
         let gender = tempNode.eq(0).find('td').eq(1).text().trim()
 
         if ('男女共用' === gender) {
@@ -536,13 +470,13 @@ const fetchArmors = async () => {
             mapping[mappingKey].rare = rare
             mapping[mappingKey].type = type
             mapping[mappingKey].gender = gender
-            mapping[mappingKey].minDefense = parseInt(defense, 10)
+            mapping[mappingKey].minDefense = parseFloat(defense)
             mapping[mappingKey].maxDefense = null
-            mapping[mappingKey].resistence.fire = parseInt(resistenceFire, 10)
-            mapping[mappingKey].resistence.water = parseInt(resistenceWater, 10)
-            mapping[mappingKey].resistence.thunder = parseInt(resistenceThunder, 10)
-            mapping[mappingKey].resistence.ice = parseInt(resistenceIce, 10)
-            mapping[mappingKey].resistence.dragon = parseInt(resistenceDragon, 10)
+            mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
+            mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
+            mapping[mappingKey].resistence.thunder = parseFloat(resistenceThunder)
+            mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
+            mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
         })
 
         // Table 3
@@ -584,7 +518,7 @@ const fetchArmors = async () => {
 
                 mapping[mappingKey].skills.push({
                     name: skillName,
-                    level: parseInt(skillLevel, 10)
+                    level: parseFloat(skillLevel)
                 })
             })
         })
@@ -660,7 +594,7 @@ const fetchJewels = async () => {
 
         mapping[mappingKey].name = name
         mapping[mappingKey].rare = null
-        mapping[mappingKey].slot.size = parseInt(slotSize, 10)
+        mapping[mappingKey].slot.size = parseFloat(slotSize)
         mapping[mappingKey].skill.name = skillName
         mapping[mappingKey].skill.level = 1
     }
@@ -721,7 +655,7 @@ const fetchSkills = async () => {
 
             mapping[mappingKey].name = name
             mapping[mappingKey].description = description
-            mapping[mappingKey].level = parseInt(level, 10)
+            mapping[mappingKey].level = parseFloat(level)
             mapping[mappingKey].effect = effect
         })
     }
@@ -815,15 +749,15 @@ const fetchPetalaces = async () => {
         }
 
         mapping[mappingKey].name = name
-        mapping[mappingKey].rare = Helper.isNotEmpty(rare) ? parseInt(rare, 10) : null
-        mapping[mappingKey].health.increment = parseInt(healthIncrement, 10)
-        mapping[mappingKey].health.obtain = parseInt(healthObtain, 10)
-        mapping[mappingKey].stamina.increment = parseInt(staminaIncrement, 10)
-        mapping[mappingKey].stamina.obtain = parseInt(staminaObtain, 10)
-        mapping[mappingKey].attack.increment = parseInt(attackIncrement, 10)
-        mapping[mappingKey].attack.obtain = parseInt(attackObtain, 10)
-        mapping[mappingKey].defense.increment = parseInt(defenseIncrement, 10)
-        mapping[mappingKey].defense.obtain = parseInt(defenseObtain, 10)
+        mapping[mappingKey].rare = Helper.isNotEmpty(rare) ? parseFloat(rare) : null
+        mapping[mappingKey].health.increment = parseFloat(healthIncrement)
+        mapping[mappingKey].health.obtain = parseFloat(healthObtain)
+        mapping[mappingKey].stamina.increment = parseFloat(staminaIncrement)
+        mapping[mappingKey].stamina.obtain = parseFloat(staminaObtain)
+        mapping[mappingKey].attack.increment = parseFloat(attackIncrement)
+        mapping[mappingKey].attack.obtain = parseFloat(attackObtain)
+        mapping[mappingKey].defense.increment = parseFloat(defenseIncrement)
+        mapping[mappingKey].defense.obtain = parseFloat(defenseObtain)
     }
 
     Helper.saveJSONAsCSV(`${crawlerRoot}/petalaces.csv`, Object.values(mapping))

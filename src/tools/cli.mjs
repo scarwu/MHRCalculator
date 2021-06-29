@@ -11,13 +11,15 @@ import * as path from 'path'
 // Set Root to Global
 global.root = path.dirname(process.argv[1])
 
-import Helper from './helper.mjs'
+import Helper from './liberaries/helper.mjs'
 import Game8Task from './tasks/game8.mjs'
 import GameqbTask from './tasks/gameqb.mjs'
+import KiranicobTask from './tasks/kiranico.mjs'
 
 let taskMapping = {
     game8: Game8Task,
-    gameqb: GameqbTask
+    gameqb: GameqbTask,
+    kiranico: KiranicobTask
 }
 
 // Check Task

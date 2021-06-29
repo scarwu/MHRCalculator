@@ -44,10 +44,10 @@ const urls = {
     enhances: null,
 }
 
-let fetchPageUrl = null
-let fetchPageName = null
-
 const fetchWeapons = async () => {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let targetWeaponType = null
 
     if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
@@ -342,6 +342,9 @@ const fetchWeapons = async () => {
 }
 
 const fetchArmors = async () => {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -529,6 +532,9 @@ const fetchArmors = async () => {
 }
 
 const fetchJewels = async () => {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -602,6 +608,9 @@ const fetchJewels = async () => {
 }
 
 const fetchSkills = async () => {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -663,6 +672,9 @@ const fetchSkills = async () => {
 }
 
 const fetchPetalaces = async () => {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -777,12 +789,15 @@ function statistics() {
 }
 
 function fetchAll() {
-    fetchWeapons()
-    fetchArmors()
-    fetchJewels()
-    fetchSkills()
-    fetchPetalaces()
-    statistics()
+    Promise.all([
+        fetchWeapons(),
+        fetchArmors(),
+        fetchJewels(),
+        fetchSkills(),
+        fetchPetalaces()
+    ]).then(() => {
+        statistics()
+    })
 }
 
 export default {

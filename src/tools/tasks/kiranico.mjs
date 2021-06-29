@@ -43,8 +43,7 @@ const urls = {
         rare4: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=3',
         rare5: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=4',
         rare6: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=5',
-        rare7: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=6',
-        rare8: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=7',
+        rare7: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=6'
     },
     skills: 'https://mhrise.kiranico.com/zh-Hant/data/skills',
     jewels: 'https://mhrise.kiranico.com/zh-Hant/data/decorations',
@@ -53,10 +52,10 @@ const urls = {
     enhances: 'https://mhrise.kiranico.com/zh-Hant/data/rampage-skills'
 }
 
-let fetchPageUrl = null
-let fetchPageName = null
-
 async function fetchWeapons() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let targetWeaponType = null
 
     if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
@@ -164,6 +163,9 @@ async function fetchWeapons() {
 }
 
 async function fetchArmors() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let targetArmorRare = null
 
     if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.armors[process.argv[4]])) {
@@ -315,6 +317,9 @@ async function fetchArmors() {
 }
 
 async function fetchJewels() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -357,6 +362,9 @@ async function fetchJewels() {
 }
 
 async function fetchSkills() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -408,6 +416,9 @@ async function fetchSkills() {
 }
 
 async function fetchEnhances() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -466,12 +477,15 @@ function statistics() {
 }
 
 function fetchAll() {
-    fetchWeapons()
-    fetchArmors()
-    fetchJewels()
-    fetchSkills()
-    fetchEnhances()
-    statistics()
+    Promise.all([
+        fetchWeapons(),
+        fetchArmors(),
+        fetchJewels(),
+        fetchSkills(),
+        fetchEnhances()
+    ]).then(() => {
+        statistics()
+    })
 }
 
 export default {

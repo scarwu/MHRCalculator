@@ -44,10 +44,10 @@ const urls = {
     enhances: 'https://game8.jp/mhrise/382391'
 }
 
-let fetchPageUrl = null
-let fetchPageName = null
-
 async function fetchWeapons() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let targetWeaponType = null
 
     if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
@@ -282,6 +282,9 @@ async function fetchWeapons() {
 }
 
 async function fetchArmors() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -340,7 +343,7 @@ async function fetchArmors() {
 
                 // Fetch Detail Page
                 fetchPageUrl = rowNode.eq(0).find('a').attr('href')
-                fetchPageName = series
+                fetchPageName = `armors:${series}`
 
                 console.log(fetchPageUrl, fetchPageName)
 
@@ -522,6 +525,9 @@ async function fetchArmors() {
 }
 
 async function fetchJewels() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -549,7 +555,7 @@ async function fetchJewels() {
 
             // Fetch Detail Page
             fetchPageUrl = rowNode.find('td').eq(0).find('a').attr('href')
-            fetchPageName = rowNode.find('td').eq(0).find('a').text().trim()
+            fetchPageName = `jewels:${name}`
 
             console.log(fetchPageUrl, fetchPageName)
 
@@ -583,6 +589,9 @@ async function fetchJewels() {
 }
 
 async function fetchSkills() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -610,7 +619,7 @@ async function fetchSkills() {
 
             // Fetch Detail Page
             fetchPageUrl = rowNode.find('td').eq(0).find('a').attr('href')
-            fetchPageName = rowNode.find('td').eq(0).find('a').text().trim()
+            fetchPageName = `skills:${name}`
 
             console.log(fetchPageUrl, fetchPageName)
 
@@ -647,6 +656,9 @@ async function fetchSkills() {
 }
 
 async function fetchEnhances() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
     let mapping = {}
     let mappingKey = null
 
@@ -701,12 +713,15 @@ function statistics() {
 }
 
 function fetchAll() {
-    fetchWeapons()
-    fetchArmors()
-    fetchJewels()
-    fetchSkills()
-    fetchEnhances()
-    statistics()
+    Promise.all([
+        fetchWeapons(),
+        fetchArmors(),
+        fetchJewels(),
+        fetchSkills(),
+        fetchEnhances()
+    ]).then(() => {
+        statistics()
+    })
 }
 
 export default {

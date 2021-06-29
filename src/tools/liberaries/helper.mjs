@@ -226,7 +226,25 @@ function loadCSV(subPath) {
     let filePath = `${global.root}/${subPath}`
 
     return fs.readFileSync(filePath, 'utf8').split('\n').map((row) => {
-        return row.split(',')
+        let newRow = []
+
+        while (true) {
+            let match = row.match(/^\"(.*?)\"(?:\,(\".*?\"(?:\,\".*?\")*))?$/)
+
+            if (isEmpty(match)) {
+                break
+            }
+
+            newRow.push(match[1])
+
+            if ('' === match[2] || isEmpty(match[2])) {
+                break
+            }
+
+            row = match[2]
+        }
+
+        return newRow
     })
 }
 
@@ -240,7 +258,9 @@ function saveCSV(subPath, data) {
     }
 
     fs.writeFileSync(filePath, data.map((row) => {
-        return row.join(',')
+        return row.map((col) => {
+            return `"${col}"`
+        }).join(',')
     }).join('\n'))
 
     return true

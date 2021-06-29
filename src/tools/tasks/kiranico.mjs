@@ -593,7 +593,7 @@ async function fetchSkills() {
         let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
         // Get Data
-        let name = rowNode.find('td').eq(0).text().trim()
+        let name = rowNode.find('td').eq(0).find('a').text().trim()
         let description = null
 
         rowNode.find('td').eq(2).find('div').each((index, node) => {
@@ -654,7 +654,7 @@ async function fetchSkills() {
             let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
             // Get Data
-            let name = rowNode.find('td').eq(0).text().trim()
+            let name = rowNode.find('td').eq(0).find('a').text().trim()
             let description = null
 
             rowNode.find('td').eq(2).find('div').each((index, node) => {

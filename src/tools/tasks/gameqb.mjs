@@ -13,7 +13,6 @@ import {
     defaultPetalace,
     defaultEnhance,
     defaultSkill,
-    weaponTypeList,
     autoExtendCols,
     formatName
 } from '../liberaries/mh.mjs'
@@ -51,11 +50,11 @@ let fetchPageName = null
 const fetchWeapons = async () => {
     let targetWeaponType = null
 
-    if (Helper.isNotEmpty(process.argv[4]) && -1 !== weaponTypeList.indexOf(process.argv[4])) {
+    if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
         targetWeaponType = process.argv[4]
     }
 
-    for (let weaponType of weaponTypeList) {
+    for (let weaponType of Object.keys(urls.weapons)) {
         if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
             continue
         }
@@ -764,7 +763,7 @@ const fetchPetalaces = async () => {
 }
 
 function statistics() {
-    for (let weaponType of weaponTypeList) {
+    for (let weaponType of Object.keys(urls.weapons)) {
         let list = Helper.loadCSVAsJSON(`${crawlerRoot}/weapons/${weaponType}.csv`)
 
         console.log(`weapons:${weaponType} (${list.length})`)

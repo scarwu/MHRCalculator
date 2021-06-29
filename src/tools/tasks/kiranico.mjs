@@ -13,7 +13,6 @@ import {
     defaultPetalace,
     defaultEnhance,
     defaultSkill,
-    weaponTypeList,
     autoExtendCols,
     formatName
 } from '../liberaries/mh.mjs'
@@ -38,14 +37,14 @@ const urls = {
         lightBowgun: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=13'
     },
     armors: {
-        r1: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=0',
-        r1: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=1',
-        r3: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=2',
-        r4: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=3',
-        r5: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=4',
-        r6: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=5',
-        r7: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=6',
-        r8: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=7',
+        rare1: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=0',
+        rare2: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=1',
+        rare3: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=2',
+        rare4: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=3',
+        rare5: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=4',
+        rare6: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=5',
+        rare7: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=6',
+        rare8: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=7',
     },
     skills: 'https://mhrise.kiranico.com/zh-Hant/data/skills',
     jewels: 'https://mhrise.kiranico.com/zh-Hant/data/decorations',
@@ -60,11 +59,11 @@ let fetchPageName = null
 // async function fetchWeapons() {
 //     let targetWeaponType = null
 
-//     if (Helper.isNotEmpty(process.argv[4]) && -1 !== weaponTypeList.indexOf(process.argv[4])) {
+//     if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
 //         targetWeaponType = process.argv[4]
 //     }
 
-//     for (let weaponType of weaponTypeList) {
+//     for (let weaponType of Object.keys(urls.weapons)) {
 //         if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
 //             continue
 //         }
@@ -531,130 +530,98 @@ let fetchPageName = null
 //     Helper.saveJSONAsCSV(`${crawlerRoot}/armors.csv`, list)
 // }
 
-// async function fetchJewels() {
-//     let mapping = {}
-//     let mappingKey = null
+async function fetchJewels() {
+    let mapping = {}
+    let mappingKey = null
 
-//     // Fetch List Page
-//     fetchPageUrl = urls.jewels
-//     fetchPageName = 'jewels'
+    // Fetch List Page
+    fetchPageUrl = urls.jewels
+    fetchPageName = 'jewels'
 
-//     console.log(fetchPageUrl, fetchPageName)
+    console.log(fetchPageUrl, fetchPageName)
 
-//     let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//     if (Helper.isEmpty(listDom)) {
-//         console.log(fetchPageUrl, fetchPageName, 'Err')
+    if (Helper.isEmpty(listDom)) {
+        console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//         return
-//     }
+        return
+    }
 
-//     for (let tableIndex = 1; tableIndex <= 3; tableIndex++) {
-//         for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
-//             let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
+    for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
+        let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
-//             // Get Data
-//             let name = rowNode.find('td').eq(0).find('a').text().trim()
-//             let skillName = rowNode.find('td').eq(1).text().trim()
+        // Get Data
+        let name = rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(\d+)】$/)[1]
+        let slotSize = rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(\d+)】$/)[2]
+        let skillName = rowNode.find('td').eq(1).find('a').text().trim()
 
-//             // Fetch Detail Page
-//             fetchPageUrl = rowNode.find('td').eq(0).find('a').attr('href')
-//             fetchPageName = rowNode.find('td').eq(0).find('a').text().trim()
+        mappingKey = name
 
-//             console.log(fetchPageUrl, fetchPageName)
+        if (Helper.isEmpty(mapping[mappingKey])) {
+            mapping[mappingKey] = Helper.deepCopy(defaultJewel)
+        }
 
-//             let jewelDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+        mapping[mappingKey].name = name
+        mapping[mappingKey].rare = null
+        mapping[mappingKey].slot.size = parseFloat(slotSize)
+        mapping[mappingKey].skill.name = skillName
+        mapping[mappingKey].skill.level = 1
+    }
 
-//             if (Helper.isEmpty(jewelDom)) {
-//                 console.log(fetchPageUrl, fetchPageName, 'Err')
+    Helper.saveJSONAsCSV(`${crawlerRoot}/jewels.csv`, Object.values(mapping))
+}
 
-//                 return
-//             }
+async function fetchSkills() {
+    let mapping = {}
+    let mappingKey = null
 
-//             // Get Data
-//             let rare = jewelDom(`#hm_1 + table tbody tr`).eq(1).find('td').eq(0).text().trim()
-//             let slotSize = jewelDom(`#hm_1 + table tbody tr`).eq(1).find('td').eq(1).text().trim()
+    // Fetch List Page
+    fetchPageUrl = urls.skills
+    fetchPageName = 'skills'
 
-//             mappingKey = name
+    console.log(fetchPageUrl, fetchPageName)
 
-//             if (Helper.isEmpty(mapping[mappingKey])) {
-//                 mapping[mappingKey] = Helper.deepCopy(defaultJewel)
-//             }
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//             mapping[mappingKey].name = name
-//             mapping[mappingKey].rare = rare
-//             mapping[mappingKey].slot.size = parseFloat(slotSize)
-//             mapping[mappingKey].skill.name = skillName
-//             mapping[mappingKey].skill.level = 1
-//         }
-//     }
+    if (Helper.isEmpty(listDom)) {
+        console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//     Helper.saveJSONAsCSV(`${crawlerRoot}/jewels.csv`, Object.values(mapping))
-// }
+        return
+    }
 
-// async function fetchSkills() {
-//     let mapping = {}
-//     let mappingKey = null
+    for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
+        let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
-//     // Fetch List Page
-//     fetchPageUrl = urls.skills
-//     fetchPageName = 'skills'
+        // Get Data
+        let name = rowNode.find('td').eq(0).text().trim()
+        let description = null
 
-//     console.log(fetchPageUrl, fetchPageName)
+        rowNode.find('td').eq(2).find('div').each((index, node) => {
+            if (0 === index) {
+                description = listDom(node).text()
 
-//     let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+                return
+            }
 
-//     if (Helper.isEmpty(listDom)) {
-//         console.log(fetchPageUrl, fetchPageName, 'Err')
+            let level = listDom(node).text().split(' ')[0].trim()
+            let effect = listDom(node).text().split(' ')[1].trim()
 
-//         return
-//     }
+            mappingKey = `${name}:${level}`
 
-//     for (let tableIndex = 1; tableIndex <= 10; tableIndex++) {
-//         for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
-//             let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultSkill)
+            }
 
-//             // Get Data
-//             let name = rowNode.find('td').eq(0).find('a').text().trim()
-//             let description = rowNode.find('td').eq(1).text().trim()
+            mapping[mappingKey].name = name
+            mapping[mappingKey].description = description
+            mapping[mappingKey].level = parseFloat(level)
+            mapping[mappingKey].effect = effect
+        })
+    }
 
-//             // Fetch Detail Page
-//             fetchPageUrl = rowNode.find('td').eq(0).find('a').attr('href')
-//             fetchPageName = rowNode.find('td').eq(0).find('a').text().trim()
-
-//             console.log(fetchPageUrl, fetchPageName)
-
-//             let skillDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-//             if (Helper.isEmpty(skillDom)) {
-//                 console.log(fetchPageUrl, fetchPageName, 'Err')
-
-//                 return
-//             }
-
-//             for (let skillIndex = 3; skillIndex < skillDom(`#hm_1 + table tbody tr`).length; skillIndex++) {
-//                 let skillNode = skillDom(`#hm_1 + table tbody tr`).eq(skillIndex)
-
-//                 // Get Data
-//                 let level = skillNode.find('td').eq(0).text().trim()
-//                 let effect = skillNode.find('td').eq(1).text().trim()
-
-//                 mappingKey = `${name}:${level}`
-
-//                 if (Helper.isEmpty(mapping[mappingKey])) {
-//                     mapping[mappingKey] = Helper.deepCopy(defaultSkill)
-//                 }
-
-//                 mapping[mappingKey].name = name
-//                 mapping[mappingKey].description = description
-//                 mapping[mappingKey].level = parseFloat(level)
-//                 mapping[mappingKey].effect = effect
-//             }
-//         }
-//     }
-
-//     Helper.saveJSONAsCSV(`${crawlerRoot}/skills.csv`, Object.values(mapping))
-// }
+    Helper.saveJSONAsCSV(`${crawlerRoot}/skills.csv`, Object.values(mapping))
+}
 
 async function fetchEnhances() {
     let mapping = {}
@@ -674,47 +641,45 @@ async function fetchEnhances() {
         return
     }
 
-    for (let tableIndex = 1; tableIndex <= 10; tableIndex++) {
-        for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
-            let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
+    for (let rowIndex = 0; rowIndex < listDom('ul.relative li.bg-white').length; rowIndex++) {
+        let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
 
-            // Get Data
-            let name = formatName(rowNode.find('td').eq(0).text().trim())
-            let description = rowNode.find('td').eq(1).text().trim()
+        // Get Data
+        let name = formatName(rowNode.find('a p').eq(0).text().trim())
+        let description = rowNode.find('a p').eq(1).text().trim()
 
-            mappingKey = name
+        mappingKey = name
 
-            if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
-            }
-
-            mapping[mappingKey].name = name
-            mapping[mappingKey].description = description
+        if (Helper.isEmpty(mapping[mappingKey])) {
+            mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
         }
+
+        mapping[mappingKey].name = name
+        mapping[mappingKey].description = description
     }
 
     Helper.saveJSONAsCSV(`${crawlerRoot}/enhances.csv`, Object.values(mapping))
 }
 
-// function statistics() {
-//     for (let weaponType of weaponTypeList) {
-//         let list = Helper.loadCSVAsJSON(`${crawlerRoot}/weapons/${weaponType}.csv`)
+function statistics() {
+    for (let weaponType of Object.keys(urls.weapons)) {
+        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/weapons/${weaponType}.csv`)
 
-//         console.log(`weapons:${weaponType} (${list.length})`)
-//     }
+        console.log(`weapons:${weaponType} (${list.length})`)
+    }
 
-//     for (let target of ['armors', 'jewels', 'skills', 'enhances']) {
-//         let list = Helper.loadCSVAsJSON(`${crawlerRoot}/${target}.csv`)
+    for (let target of ['armors', 'jewels', 'skills', 'enhances']) {
+        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/${target}.csv`)
 
-//         console.log(`${target} (${list.length})`)
-//     }
-// }
+        console.log(`${target} (${list.length})`)
+    }
+}
 
 function fetchAll() {
     // fetchWeapons()
     // fetchArmors()
-    // fetchJewels()
-    // fetchSkills()
+    fetchJewels()
+    fetchSkills()
     fetchEnhances()
 }
 
@@ -722,8 +687,8 @@ export default {
     fetchAll,
     // fetchWeapons,
     // fetchArmors,
-    // fetchJewels,
-    // fetchSkills,
+    fetchJewels,
+    fetchSkills,
     fetchEnhances,
-    // statistics
+    statistics
 }

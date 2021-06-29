@@ -123,13 +123,6 @@ export const defaultSkill = {
     effect: null
 }
 
-export const weaponTypeList = [
-    'greatSword', 'longSword', 'swordAndShield', 'dualBlades',
-    'hammer', 'huntingHorn', 'lance', 'gunlance',
-    'chargeBlade', 'switchAxe', 'insectGlaive',
-    'bow', 'lightBowgun', 'heavyBowgun'
-]
-
 export const autoExtendCols = (list) => {
     let slotCount = 0
     let skillCount = 0

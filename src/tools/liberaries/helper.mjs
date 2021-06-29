@@ -154,10 +154,7 @@ function fetchHtml(url) {
         let handler = ('https:' === urlObject.protocol) ? https : http
         let userAgent = userAgentList[parseInt(Math.floor(Math.random() * userAgentList.length), 10)] // Random UA
 
-        handler.get({
-            protocol: urlObject.protocol,
-            hostname: urlObject.hostname,
-            path: urlObject.pathname,
+        handler.get(url, {
             headers: {
                 'User-Agent': userAgent
             }

@@ -56,239 +56,112 @@ const urls = {
 let fetchPageUrl = null
 let fetchPageName = null
 
-// async function fetchWeapons() {
-//     let targetWeaponType = null
+async function fetchWeapons() {
+    let targetWeaponType = null
 
-//     if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
-//         targetWeaponType = process.argv[4]
-//     }
+    if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
+        targetWeaponType = process.argv[4]
+    }
 
-//     for (let weaponType of Object.keys(urls.weapons)) {
-//         if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
-//             continue
-//         }
+    for (let weaponType of Object.keys(urls.weapons)) {
+        if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
+            continue
+        }
 
-//         let mapping = {}
-//         let mappingKey = null
+        let mapping = {}
+        let mappingKey = null
 
-//         // Fetch List Page
-//         fetchPageUrl = urls.weapons[weaponType]
-//         fetchPageName = `weapons:${weaponType}`
+        // Fetch List Page
+        fetchPageUrl = urls.weapons[weaponType]
+        fetchPageName = `weapons:${weaponType}`
 
-//         console.log(fetchPageUrl, fetchPageName)
+        console.log(fetchPageUrl, fetchPageName)
 
-//         let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//         if (Helper.isEmpty(listDom)) {
-//             console.log(fetchPageUrl, fetchPageName, 'Err')
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//             return
-//         }
+            return
+        }
 
-//         // Get Exists Header Ids
-//         let mhIds = []
+        for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
+            let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
-//         listDom('h3.a-header--3').each((index, node) => {
-//             let mhId = listDom(node).attr('id')
+            // Get Data
+            let name = formatName(rowNode.find('td').eq(1).find('a').text().trim())
 
-//             if (Helper.isNotEmpty(mhId) && '' !== mhId) {
-//                 mhIds.push(mhId)
-//             }
-//         })
+            // Fetch Detail Page
+            fetchPageUrl = rowNode.find('td').eq(1).find('a').attr('href')
+            fetchPageName = `weapons:${weaponType}:${name}`
 
-//         for (let mdId of mhIds) {
-//             console.log(listDom(`#${mdId}`).text())
+            console.log(fetchPageUrl, fetchPageName)
 
-//             for (let itemIndex = 0; itemIndex < listDom(`#${mdId} + table tbody tr`).find('.a-link').length; itemIndex++) {
-//                 let itemNode = listDom(`#${mdId} + table tbody tr`).find('.a-link').eq(itemIndex)
+            let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//                 let name = formatName(itemNode.text().trim())
+            if (Helper.isEmpty(weaponDom)) {
+                console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//                 // Fetch Detail Page
-//                 fetchPageUrl = itemNode.attr('href')
-//                 fetchPageName = `weapons:${weaponType}:${name}`
+                return
+            }
 
-//                 // Fix Path Url
-//                 if (/^\/mhrise\d+$/.test(fetchPageUrl)) {
-//                     fetchPageUrl = fetchPageUrl.replace('/mhrise', '/mhrise/')
-//                 }
+            mappingKey = `${weaponType}:${name}`
 
-//                 if (/^\/mhrise\/\d+$/.test(fetchPageUrl)) {
-//                     fetchPageUrl = `https://game8.jp${fetchPageUrl}`
-//                 }
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
+            }
 
-//                 console.log(fetchPageUrl, fetchPageName)
+            mapping[mappingKey].series = null
+            mapping[mappingKey].name = name
+            mapping[mappingKey].type = weaponType
 
-//                 let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+            let rare = weaponDom('dl.grid dd').eq(2).text().trim()
+            let attack = weaponDom('dl.grid dd').eq(6).text().trim()
+            let criticalRate = weaponDom('dl.grid dd').eq(7).text().trim()
+            let defense = weaponDom('dl.grid dd').eq(8).text().trim()
 
-//                 if (Helper.isEmpty(weaponDom)) {
-//                     console.log(fetchPageUrl, fetchPageName, 'Err')
+            mapping[mappingKey].rare = parseFloat(rare) + 1 // special fix
+            mapping[mappingKey].attack = parseFloat(attack)
+            mapping[mappingKey].criticalRate = (0 !== parseFloat(criticalRate))
+                ? parseFloat(criticalRate) : null
+            mapping[mappingKey].defense = (0 !== parseFloat(defense))
+                ? parseFloat(defense) : null
 
-//                     return
-//                 }
+            // Enhances
+            weaponDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
+                let enhanceName = formatName(weaponDom(node).find('td').eq(1).find('a').text())
 
-//                 let series = weaponDom('h3#hm_1').text().replace('の性能まとめ', '')
+                mapping[mappingKey].enhances.push({
+                    name: enhanceName
+                })
+            })
 
-//                 for (let subIndex = 0; subIndex < weaponDom('.a-table').length; subIndex++) {
-//                     let subNode = weaponDom('.a-table').eq(subIndex)
+            let slotNode = rowNode.find('td').eq(1).find('img')
 
-//                     if ('レア度' !== subNode.find('tbody tr').eq(0).find('th').eq(0).text()) {
-//                         continue
-//                     }
+            if (0 !== slotNode.length) {
+                slotNode.each((index, node) => {
+                    if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco3.png' === listDom(node).attr('src')) {
+                        mapping[mappingKey].slots.push({
+                            size: 3
+                        })
+                    } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco2.png' === listDom(node).attr('src')) {
+                        mapping[mappingKey].slots.push({
+                            size: 2
+                        })
+                    } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco1.png' === listDom(node).attr('src')) {
+                        mapping[mappingKey].slots.push({
+                            size: 1
+                        })
+                    }
+                })
+            }
+        }
 
-//                     let subName = formatName(subNode.find('b.a-bold').text())
+        let list = autoExtendCols(Object.values(mapping))
 
-//                     if (name !== subName) {
-//                         continue
-//                     }
-
-//                     mappingKey = `${series}:${name}`
-
-//                     if (Helper.isEmpty(mapping[mappingKey])) {
-//                         mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
-//                     }
-
-//                     let rare = subNode.find('tbody tr').eq(1).find('td').eq(0).text()
-//                     let attack = subNode.find('tbody tr').eq(1).find('td').eq(1).text()
-//                     let criticalRate = subNode.find('tbody tr').eq(1).find('td').eq(2).text()
-//                     let element = subNode.find('tbody tr').eq(3).find('td').eq(0).text()
-//                     let defense = subNode.find('tbody tr').eq(3).find('td').eq(2).text()
-
-//                     // Element
-//                     if ('--' !== element) {
-//                         let elements = []
-//                         let match = null
-
-//                         match = element.match(/^(.+?)\/(.+?)(\d+)\/(\d+)/)
-
-//                         if (Helper.isNotEmpty(match)) {
-//                             elements.push({
-//                                 type: match[1],
-//                                 value: match[3],
-//                                 match: match
-//                             })
-
-//                             elements.push({
-//                                 type: match[2],
-//                                 value: match[4],
-//                                 match: match
-//                             })
-//                         } else {
-//                             match = element.match(/^(.+?)((?:\-|\+)?\d+)/)
-
-//                             if (Helper.isNotEmpty(match)) {
-//                                 elements.push({
-//                                     type: match[1],
-//                                     value: match[2],
-//                                     match: match
-//                                 })
-//                             }
-//                         }
-
-//                         elements.forEach((element) => {
-//                             switch (element.type) {
-//                             case '火':
-//                                 mapping[mappingKey].element.attack.type = 'fire'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
-
-//                                 break
-//                             case '水':
-//                                 mapping[mappingKey].element.attack.type = 'water'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
-
-//                                 break
-//                             case '雷':
-//                                 mapping[mappingKey].element.attack.type = 'thunder'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
-
-//                                 break
-//                             case '氷':
-//                                 mapping[mappingKey].element.attack.type = 'ice'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
-
-//                                 break
-//                             case '龍':
-//                                 mapping[mappingKey].element.attack.type = 'dragon'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
-
-//                                 break
-//                             case '睡眠':
-//                                 mapping[mappingKey].element.status.type = 'sleep'
-//                                 mapping[mappingKey].element.status.minValue = parseFloat(element.value)
-
-//                                 break
-//                             case '麻痹':
-//                             case '麻痺':
-//                                 mapping[mappingKey].element.status.type = 'paralysis'
-//                                 mapping[mappingKey].element.status.minValue = parseFloat(element.value)
-
-//                                 break
-//                             case '爆破':
-//                                 mapping[mappingKey].element.status.type = 'blast'
-//                                 mapping[mappingKey].element.status.minValue = parseFloat(element.value)
-
-//                                 break
-//                             case '毒':
-//                                 mapping[mappingKey].element.status.type = 'poison'
-//                                 mapping[mappingKey].element.status.minValue = parseFloat(element.value)
-
-//                                 break
-//                             default:
-//                                 console.log('no match property', match)
-
-//                                 break
-//                             }
-//                         })
-//                     }
-
-//                     // Slot
-//                     subNode.find('tbody tr').eq(3).find('td').eq(1).text().split('').forEach((slotSize) => {
-//                         if ('③' === slotSize) {
-//                             mapping[mappingKey].slots.push({
-//                                 size: 3
-//                             })
-//                         } else if ('②' === slotSize) {
-//                             mapping[mappingKey].slots.push({
-//                                 size: 2
-//                             })
-//                         } else if ('①' === slotSize) {
-//                             mapping[mappingKey].slots.push({
-//                                 size: 1
-//                             })
-//                         }
-//                     })
-
-//                     // Enhances
-//                     let enhanceRowIndex = 4
-
-//                     if ('lightBowgun' === weaponType || 'heavyBowgun' === weaponType) {
-//                         enhanceRowIndex = 7
-//                     }
-
-//                     subNode.find('tbody tr').eq(enhanceRowIndex).find('a').each((index, node) => {
-//                         mapping[mappingKey].enhances.push({
-//                             name: formatName(weaponDom(node).text())
-//                         })
-//                     })
-
-//                     mapping[mappingKey].series = series
-//                     mapping[mappingKey].name = name
-//                     mapping[mappingKey].type = weaponType
-//                     mapping[mappingKey].rare = parseFloat(rare)
-//                     mapping[mappingKey].attack = parseFloat(attack)
-//                     mapping[mappingKey].defense = ('-' !== defense)
-//                         ? parseFloat(defense) : null
-//                     mapping[mappingKey].criticalRate = (0 !== parseFloat(criticalRate))
-//                         ? parseFloat(criticalRate) : null
-//                 }
-//             }
-//         }
-
-//         let list = autoExtendCols(Object.values(mapping))
-
-//         Helper.saveJSONAsCSV(`${crawlerRoot}/weapons/${weaponType}.csv`, list)
-//     }
-// }
+        Helper.saveJSONAsCSV(`${crawlerRoot}/weapons/${weaponType}.csv`, list)
+    }
+}
 
 async function fetchArmors() {
     let targetArmorRare = null
@@ -323,7 +196,7 @@ async function fetchArmors() {
             let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
             // Get Data
-            let name = rowNode.find('td').eq(2).text().trim()
+            let name = rowNode.find('td').eq(2).find('a').text().trim()
 
             // Fetch Detail Page
             fetchPageUrl = rowNode.find('td').eq(2).find('a').attr('href')
@@ -359,7 +232,53 @@ async function fetchArmors() {
             let resistenceIce = armorDom('dl.grid dd').eq(15).text().trim()
             let resistenceDragon = armorDom('dl.grid dd').eq(16).text().trim()
 
-            mapping[mappingKey].rare = rare
+            let type = null
+            let typeKeywordMapping = {
+                helm: [
+                    '頭盔', '頭部', '【蒙面】', '綻放', '頭飾', '【頭巾】', '【武士盔】', '【元結】', '首腦',
+                    '毛髮', '護頭', '帽', '兜帽', '之首', '禮帽',
+                    '包頭', '偽裝', '羽飾'
+                ],
+                chest: [
+                    '鎧甲', '服飾', '【上衣】', '枝幹', '衣裝', '【上衣】', '【胸甲】', '【白衣】', '肌肉',
+                    '羽織', '上身', '戰衣', '洋裝', '胸甲', '服裝',
+                    '鎧', '披風'
+                ],
+                arm: [
+                    '腕甲', '拳套', '【手甲】', '枝葉', '手套', '【手甲】', '【臂甲】', '【花袖】', '雙手',
+                    '臂甲', '護袖', '腕甲', '袖', '之臂', '護手'
+                ],
+                waist: [
+                    '腰甲', '纏腰布', '【腰卷】', '葉片', '腰帶', '【腰卷】', '【腰具】', '【腰卷】', '臍帶',
+                    '帶', '護腰具', '腰甲', '腰甲', '之腰', '腰甲'
+                ],
+                leg: [
+                    '護腿', '涼鞋', '【綁腿】', '紮根', '鞋子', '【綁腿】', '【腿甲】', '【緋袴】', '腳跟',
+                    '下裳', '腳', '靴', '長褲', '之足', '靴'
+                ]
+            }
+
+            for (let entry of Object.entries(typeKeywordMapping)) {
+                let typeName = entry[0]
+                let keywords = entry[1]
+
+                for (let keyword of keywords) {
+                    if (-1 === name.indexOf(keyword)) {
+                        continue
+                    }
+
+                    type = typeName
+
+                    break
+                }
+
+                if (Helper.isNotEmpty(type)) {
+                    break
+                }
+            }
+
+            mapping[mappingKey].type = type // special fix
+            mapping[mappingKey].rare = parseFloat(rare) + 1 // special fix
             mapping[mappingKey].minDefense = parseFloat(minDefense)
             mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
             mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
@@ -367,6 +286,7 @@ async function fetchArmors() {
             mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
             mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
 
+            // Slots
             JSON.parse(armorDom('dl.grid dd').eq(19).text()).forEach((slotSize) => {
                 if (0 === slotSize) {
                     return
@@ -377,7 +297,8 @@ async function fetchArmors() {
                 })
             })
 
-            armorDom('table.min-w-full tbody.bg-white tr.bg-white').each((index, node) => {
+            // Skills
+            armorDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
                 let skillName = armorDom(node).find('td').eq(0).find('a').text()
 
                 mapping[mappingKey].skills.push({
@@ -389,7 +310,7 @@ async function fetchArmors() {
 
         let list = autoExtendCols(Object.values(mapping))
 
-        Helper.saveJSONAsCSV(`${crawlerRoot}/armors.csv`, list)
+        Helper.saveJSONAsCSV(`${crawlerRoot}/armors/${armorRare}.csv`, list)
     }
 }
 
@@ -539,7 +460,7 @@ function statistics() {
 }
 
 function fetchAll() {
-    // fetchWeapons()
+    fetchWeapons()
     fetchArmors()
     fetchJewels()
     fetchSkills()
@@ -548,7 +469,7 @@ function fetchAll() {
 
 export default {
     fetchAll,
-    // fetchWeapons,
+    fetchWeapons,
     fetchArmors,
     fetchJewels,
     fetchSkills,

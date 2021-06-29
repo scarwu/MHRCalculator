@@ -81,16 +81,16 @@ const fetchWeapons = async () => {
         for (let itemIndex = 0; itemIndex < listDom('.wp-block-table tbody tr').length; itemIndex++) {
             let itemNode = listDom('.wp-block-table tbody tr').eq(itemIndex)
 
-            let serial = itemNode.find('td').eq(0).text()
+            let series = itemNode.find('td').eq(0).text()
             let name = formatName(itemNode.find('td').eq(1).text())
 
-            mappingKey = `${serial}:${name}`
+            mappingKey = `${series}:${name}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
                 mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
             }
 
-            mapping[mappingKey].serial = serial
+            mapping[mappingKey].series = series
             mapping[mappingKey].name = name
             mapping[mappingKey].type = weaponType
 
@@ -379,7 +379,7 @@ const fetchArmors = async () => {
         let tempNode = null
 
         // Title
-        let serial = itemDom('.post-title-single').text().trim()
+        let series = itemDom('.post-title-single').text().trim()
 
         // Table 1
         tempNode = itemDom('.wp-block-table .has-fixed-layout').eq(0).find('tbody tr')
@@ -406,7 +406,7 @@ const fetchArmors = async () => {
                 return
             }
 
-            mappingKey = `${serial}:${name}`
+            mappingKey = `${series}:${name}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
@@ -464,7 +464,7 @@ const fetchArmors = async () => {
                 }
             }
 
-            mapping[mappingKey].serial = serial
+            mapping[mappingKey].series = series
             mapping[mappingKey].name = name
             mapping[mappingKey].rare = rare
             mapping[mappingKey].type = type
@@ -487,7 +487,7 @@ const fetchArmors = async () => {
                 return
             }
 
-            mappingKey = `${serial}:${name}`
+            mappingKey = `${series}:${name}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)

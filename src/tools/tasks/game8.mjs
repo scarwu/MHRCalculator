@@ -118,7 +118,7 @@ async function fetchWeapons() {
                     return
                 }
 
-                let serial = weaponDom('h3#hm_1').text().replace('の性能まとめ', '')
+                let series = weaponDom('h3#hm_1').text().replace('の性能まとめ', '')
 
                 for (let subIndex = 0; subIndex < weaponDom('.a-table').length; subIndex++) {
                     let subNode = weaponDom('.a-table').eq(subIndex)
@@ -133,7 +133,7 @@ async function fetchWeapons() {
                         continue
                     }
 
-                    mappingKey = `${serial}:${name}`
+                    mappingKey = `${series}:${name}`
 
                     if (Helper.isEmpty(mapping[mappingKey])) {
                         mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
@@ -262,7 +262,7 @@ async function fetchWeapons() {
                         })
                     })
 
-                    mapping[mappingKey].serial = serial
+                    mapping[mappingKey].series = series
                     mapping[mappingKey].name = name
                     mapping[mappingKey].type = weaponType
                     mapping[mappingKey].rare = parseFloat(rare)
@@ -321,26 +321,26 @@ async function fetchArmors() {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody td`).eq(rowIndex)
 
             // Get Data
-            let serials = replaceName(rowNode.eq(0).find('a').text().trim()).split('/')
+            let seriesList = replaceName(rowNode.eq(0).find('a').text().trim()).split('/')
 
-            for (let entry of Object.entries(serials)) {
-                let serialIndex = parseFloat(entry[0])
-                let serial = entry[1]
+            for (let entry of Object.entries(seriesList)) {
+                let seriesIndex = parseFloat(entry[0])
+                let series = entry[1]
                 let gender = 'general'
 
-                if (2 === serials.length) {
-                    if (0 === serialIndex) {
+                if (2 === seriesList.length) {
+                    if (0 === seriesIndex) {
                         gender = 'male'
                     }
 
-                    if (1 === serialIndex) {
+                    if (1 === seriesIndex) {
                         gender = 'female'
                     }
                 }
 
                 // Fetch Detail Page
                 fetchPageUrl = rowNode.eq(0).find('a').attr('href')
-                fetchPageName = serial
+                fetchPageName = series
 
                 console.log(fetchPageUrl, fetchPageName)
 
@@ -363,17 +363,17 @@ async function fetchArmors() {
                             // Get Data
                             let name = replaceName(armorNode.find('td').eq(0).text().trim())
 
-                            if (2 === serials.length) {
-                                name = name.split('/')[serialIndex]
+                            if (2 === seriesList.length) {
+                                name = name.split('/')[seriesIndex]
                             }
 
-                            mappingKey = `${serial}:${name}`
+                            mappingKey = `${series}:${name}`
 
                             if (Helper.isEmpty(mapping[mappingKey])) {
                                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
                             }
 
-                            mapping[mappingKey].serial = serial
+                            mapping[mappingKey].series = series
                             mapping[mappingKey].name = name
                             mapping[mappingKey].gender = gender
 
@@ -417,8 +417,8 @@ async function fetchArmors() {
                             let maxDefense = (3 === armorNode.find('td').length)
                                 ? armorNode.find('td').eq(2).text().trim() : null
 
-                            if (2 === serials.length) {
-                                name = name.split('/')[serialIndex]
+                            if (2 === seriesList.length) {
+                                name = name.split('/')[seriesIndex]
                             }
 
                             switch (type) {
@@ -444,7 +444,7 @@ async function fetchArmors() {
                                 break
                             }
 
-                            mappingKey = `${serial}:${name}`
+                            mappingKey = `${series}:${name}`
 
                             if (Helper.isEmpty(mapping[mappingKey])) {
                                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
@@ -470,8 +470,8 @@ async function fetchArmors() {
                             let resistenceIce = armorNode.find('td').eq(4).text().trim()
                             let resistenceDragon = armorNode.find('td').eq(5).text().trim()
 
-                            if (2 === serials.length) {
-                                name = name.split('/')[serialIndex]
+                            if (2 === seriesList.length) {
+                                name = name.split('/')[seriesIndex]
                             }
 
                             switch (type) {
@@ -497,7 +497,7 @@ async function fetchArmors() {
                                 break
                             }
 
-                            mappingKey = `${serial}:${name}`
+                            mappingKey = `${series}:${name}`
 
                             if (Helper.isEmpty(mapping[mappingKey])) {
                                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)

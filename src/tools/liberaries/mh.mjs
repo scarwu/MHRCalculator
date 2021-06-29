@@ -10,7 +10,7 @@
 import Helper from './helper.mjs'
 
 export const defaultWeapon = {
-    serial: null,
+    series: null,
     name: null,
     rare: null,
     type: null,
@@ -51,7 +51,7 @@ export const defaultWeapon = {
 }
 
 export const defaultArmor = {
-    serial: null,
+    series: null,
     name: null,
     rare: null,
     type: null,

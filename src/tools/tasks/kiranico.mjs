@@ -127,7 +127,7 @@ let fetchPageName = null
 //                     return
 //                 }
 
-//                 let serial = weaponDom('h3#hm_1').text().replace('の性能まとめ', '')
+//                 let series = weaponDom('h3#hm_1').text().replace('の性能まとめ', '')
 
 //                 for (let subIndex = 0; subIndex < weaponDom('.a-table').length; subIndex++) {
 //                     let subNode = weaponDom('.a-table').eq(subIndex)
@@ -142,7 +142,7 @@ let fetchPageName = null
 //                         continue
 //                     }
 
-//                     mappingKey = `${serial}:${name}`
+//                     mappingKey = `${series}:${name}`
 
 //                     if (Helper.isEmpty(mapping[mappingKey])) {
 //                         mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
@@ -271,7 +271,7 @@ let fetchPageName = null
 //                         })
 //                     })
 
-//                     mapping[mappingKey].serial = serial
+//                     mapping[mappingKey].series = series
 //                     mapping[mappingKey].name = name
 //                     mapping[mappingKey].type = weaponType
 //                     mapping[mappingKey].rare = parseFloat(rare)
@@ -290,245 +290,108 @@ let fetchPageName = null
 //     }
 // }
 
-// async function fetchArmors() {
-//     let mapping = {}
-//     let mappingKey = null
+async function fetchArmors() {
+    let targetArmorRare = null
 
-//     // Fetch List Page
-//     fetchPageUrl = urls.armors
-//     fetchPageName = 'armors'
+    if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.armors[process.argv[4]])) {
+        targetArmorRare = process.argv[4]
+    }
 
-//     console.log(fetchPageUrl, fetchPageName)
+    for (let armorRare of Object.keys(urls.armors)) {
+        if (Helper.isNotEmpty(targetArmorRare) && targetArmorRare !== armorRare) {
+            continue
+        }
 
-//     let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+        let mapping = {}
+        let mappingKey = null
 
-//     if (Helper.isEmpty(listDom)) {
-//         console.log(fetchPageUrl, fetchPageName, 'Err')
+        // Fetch List Page
+        fetchPageUrl = urls.armors[armorRare]
+        fetchPageName = `armors:${armorRare}`
 
-//         return
-//     }
+        console.log(fetchPageUrl, fetchPageName)
 
-//     const replaceName = (text) => {
-//         let specialWordMapping = {
-//             'スカルダ/スパイオS': 'スカルダS/スパイオS',
-//             'スカルダ/スパイオSテスタ': 'スカルダSテスタ/スパイオSテスタ',
-//             'スカルダ/スパイオSペット': 'スカルダSペット/スパイオSペット',
-//             'スカルダ/スパイオSマーノ': 'スカルダSマーノ/スパイオSマーノ',
-//             'スカルダ/スパイオSアンカ': 'スカルダSアンカ/スパイオSアンカ',
-//             'スカルダ/スパイオSガンバ': 'スカルダSガンバ/スパイオSガンバ',
-//         }
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//         if (Helper.isNotEmpty(specialWordMapping[text])) {
-//             text = specialWordMapping[text]
-//         }
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//         return text.replace('デスタ', 'テスタ')
-//     }
+            return
+        }
 
-//     for (let tableIndex = 1; tableIndex <= 2; tableIndex++) {
-//         for (let rowIndex = 0; rowIndex < listDom(`#hm_${tableIndex} + table tbody td`).length; rowIndex++) {
-//             let rowNode = listDom(`#hm_${tableIndex} + table tbody td`).eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
+            let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
-//             // Get Data
-//             let serials = replaceName(rowNode.eq(0).find('a').text().trim()).split('/')
+            // Get Data
+            let name = rowNode.find('td').eq(2).text().trim()
 
-//             for (let entry of Object.entries(serials)) {
-//                 let serialIndex = parseFloat(entry[0])
-//                 let serial = entry[1]
-//                 let gender = 'general'
+            // Fetch Detail Page
+            fetchPageUrl = rowNode.find('td').eq(2).find('a').attr('href')
+            fetchPageName = `armors:${armorRare}:${name}`
 
-//                 if (2 === serials.length) {
-//                     if (0 === serialIndex) {
-//                         gender = 'male'
-//                     }
+            console.log(fetchPageUrl, fetchPageName)
 
-//                     if (1 === serialIndex) {
-//                         gender = 'female'
-//                     }
-//                 }
+            let armorDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//                 // Fetch Detail Page
-//                 fetchPageUrl = rowNode.eq(0).find('a').attr('href')
-//                 fetchPageName = serial
+            if (Helper.isEmpty(armorDom)) {
+                console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//                 console.log(fetchPageUrl, fetchPageName)
+                return
+            }
 
-//                 let armorDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+            let series = armorDom('dl.grid dd').eq(2).text().trim()
 
-//                 if (Helper.isEmpty(armorDom)) {
-//                     console.log(fetchPageUrl, fetchPageName, 'Err')
+            mappingKey = `${series}:${name}`
 
-//                     return
-//                 }
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultArmor)
+            }
 
-//                 for (let h3Index = 0; h3Index < armorDom('h3.a-header--3').length; h3Index++) {
-//                     let header = armorDom('h3.a-header--3').eq(h3Index).text().trim()
-//                     let hmId = armorDom('h3.a-header--3').eq(h3Index).attr('id')
+            mapping[mappingKey].series = null
+            mapping[mappingKey].name = name
+            mapping[mappingKey].gender = null
 
-//                     if ('スキル・スロット' === header) {
-//                         for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length; armorIndex++) {
-//                             let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
+            let rare = armorDom('dl.grid dd').eq(5).text().trim()
+            let minDefense = armorDom('dl.grid dd').eq(11).text().trim()
+            let resistenceFire = armorDom('dl.grid dd').eq(12).text().trim()
+            let resistenceWater = armorDom('dl.grid dd').eq(13).text().trim()
+            let resistenceThunder = armorDom('dl.grid dd').eq(14).text().trim()
+            let resistenceIce = armorDom('dl.grid dd').eq(15).text().trim()
+            let resistenceDragon = armorDom('dl.grid dd').eq(16).text().trim()
 
-//                             // Get Data
-//                             let name = replaceName(armorNode.find('td').eq(0).text().trim())
+            mapping[mappingKey].rare = rare
+            mapping[mappingKey].minDefense = parseFloat(minDefense)
+            mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
+            mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
+            mapping[mappingKey].resistence.thunder = parseFloat(resistenceThunder)
+            mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
+            mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
 
-//                             if (2 === serials.length) {
-//                                 name = name.split('/')[serialIndex]
-//                             }
+            JSON.parse(armorDom('dl.grid dd').eq(19).text()).forEach((slotSize) => {
+                if (0 === slotSize) {
+                    return
+                }
 
-//                             mappingKey = `${serial}:${name}`
+                mapping[mappingKey].slots.push({
+                    size: slotSize
+                })
+            })
 
-//                             if (Helper.isEmpty(mapping[mappingKey])) {
-//                                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
-//                             }
+            armorDom('table.min-w-full tbody.bg-white tr.bg-white').each((index, node) => {
+                let skillName = armorDom(node).find('td').eq(0).find('a').text()
 
-//                             mapping[mappingKey].serial = serial
-//                             mapping[mappingKey].name = name
-//                             mapping[mappingKey].gender = gender
+                mapping[mappingKey].skills.push({
+                    name: skillName,
+                    level: null
+                })
+            })
+        }
 
-//                             armorNode.find('td').eq(1).find('a').each((index, node) => {
-//                                 let skillName = armorDom(node).text()
-//                                 let skillLevel = armorDom(node)[0].next.data.replace('Lv.', '')
+        let list = autoExtendCols(Object.values(mapping))
 
-//                                 mapping[mappingKey].skills.push({
-//                                     name: skillName,
-//                                     level: parseFloat(skillLevel)
-//                                 })
-//                             })
-
-//                             // Slots
-//                             armorNode.find('td').eq(2).text().trim().split('').forEach((slotSize) => {
-//                                 if ('③' === slotSize) {
-//                                     mapping[mappingKey].slots.push({
-//                                         size: 3
-//                                     })
-//                                 } else if ('②' === slotSize) {
-//                                     mapping[mappingKey].slots.push({
-//                                         size: 2
-//                                     })
-//                                 } else if ('①' === slotSize) {
-//                                     mapping[mappingKey].slots.push({
-//                                         size: 1
-//                                     })
-//                                 }
-//                             })
-//                         }
-//                     }
-
-//                     if ('防御力' === header) {
-//                         for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length - 1; armorIndex++) {
-//                             let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
-
-//                             // Get Data
-//                             let type = armorNode.find('td').eq(0).find('.align').text().trim()
-//                             let name = replaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim())
-//                             let minDefense = armorNode.find('td').eq(1).text().trim()
-//                             let maxDefense = (3 === armorNode.find('td').length)
-//                                 ? armorNode.find('td').eq(2).text().trim() : null
-
-//                             if (2 === serials.length) {
-//                                 name = name.split('/')[serialIndex]
-//                             }
-
-//                             switch (type) {
-//                             case '頭':
-//                                 type = 'helm'
-
-//                                 break
-//                             case '胴':
-//                                 type = 'chest'
-
-//                                 break
-//                             case '腕':
-//                                 type = 'arm'
-
-//                                 break
-//                             case '腰':
-//                                 type = 'waist'
-
-//                                 break
-//                             case '脚':
-//                                 type = 'leg'
-
-//                                 break
-//                             }
-
-//                             mappingKey = `${serial}:${name}`
-
-//                             if (Helper.isEmpty(mapping[mappingKey])) {
-//                                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
-//                             }
-
-//                             mapping[mappingKey].type = type
-//                             mapping[mappingKey].minDefense = parseFloat(minDefense)
-//                             mapping[mappingKey].maxDefense = Helper.isNotEmpty(maxDefense)
-//                                 ? parseFloat(maxDefense) : null
-//                         }
-//                     }
-
-//                     if ('属性耐性' === header) {
-//                         for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length - 1; armorIndex++) {
-//                             let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
-
-//                             // Get Data
-//                             let type = armorNode.find('td').eq(0).find('.align').text().trim()
-//                             let name = replaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim())
-//                             let resistenceFire = armorNode.find('td').eq(1).text().trim()
-//                             let resistenceWater = armorNode.find('td').eq(2).text().trim()
-//                             let resistenceThunder = armorNode.find('td').eq(3).text().trim()
-//                             let resistenceIce = armorNode.find('td').eq(4).text().trim()
-//                             let resistenceDragon = armorNode.find('td').eq(5).text().trim()
-
-//                             if (2 === serials.length) {
-//                                 name = name.split('/')[serialIndex]
-//                             }
-
-//                             switch (type) {
-//                             case '頭':
-//                                 type = 'helm'
-
-//                                 break
-//                             case '胴':
-//                                 type = 'chest'
-
-//                                 break
-//                             case '腕':
-//                                 type = 'arm'
-
-//                                 break
-//                             case '腰':
-//                                 type = 'waist'
-
-//                                 break
-//                             case '脚':
-//                                 type = 'leg'
-
-//                                 break
-//                             }
-
-//                             mappingKey = `${serial}:${name}`
-
-//                             if (Helper.isEmpty(mapping[mappingKey])) {
-//                                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
-//                             }
-
-//                             mapping[mappingKey].type = type
-//                             mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
-//                             mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
-//                             mapping[mappingKey].resistence.thunder = parseFloat(resistenceThunder)
-//                             mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
-//                             mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-
-//     let list = autoExtendCols(Object.values(mapping))
-
-//     Helper.saveJSONAsCSV(`${crawlerRoot}/armors.csv`, list)
-// }
+        Helper.saveJSONAsCSV(`${crawlerRoot}/armors.csv`, list)
+    }
+}
 
 async function fetchJewels() {
     let mapping = {}
@@ -677,7 +540,7 @@ function statistics() {
 
 function fetchAll() {
     // fetchWeapons()
-    // fetchArmors()
+    fetchArmors()
     fetchJewels()
     fetchSkills()
     fetchEnhances()
@@ -686,7 +549,7 @@ function fetchAll() {
 export default {
     fetchAll,
     // fetchWeapons,
-    // fetchArmors,
+    fetchArmors,
     fetchJewels,
     fetchSkills,
     fetchEnhances,

@@ -452,7 +452,13 @@ function statistics() {
         console.log(`weapons:${weaponType} (${list.length})`)
     }
 
-    for (let target of ['armors', 'jewels', 'skills', 'enhances']) {
+    for (let armorRare of Object.keys(urls.armors)) {
+        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/armors/${armorRare}.csv`)
+
+        console.log(`armors:${armorRare} (${list.length})`)
+    }
+
+    for (let target of ['jewels', 'skills', 'enhances']) {
         let list = Helper.loadCSVAsJSON(`${crawlerRoot}/${target}.csv`)
 
         console.log(`${target} (${list.length})`)
@@ -465,6 +471,7 @@ function fetchAll() {
     fetchJewels()
     fetchSkills()
     fetchEnhances()
+    statistics()
 }
 
 export default {

@@ -706,6 +706,7 @@ function fetchAll() {
     fetchJewels()
     fetchSkills()
     fetchEnhances()
+    statistics()
 }
 
 export default {

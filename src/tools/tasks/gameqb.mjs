@@ -782,6 +782,7 @@ function fetchAll() {
     fetchJewels()
     fetchSkills()
     fetchPetalaces()
+    statistics()
 }
 
 export default {

@@ -79,6 +79,8 @@ async function fetchWeapons() {
         let mapping = {}
         let mappingKey = null
 
+        let langKeyMapping = {}
+
         // Fetch List Page
         fetchPageUrl = getFullUrl('zhTW', urls.weapons[weaponType])
         fetchPageName = `weapons:${weaponType}`
@@ -107,7 +109,9 @@ async function fetchWeapons() {
 
             mapping[mappingKey].series = null
             mapping[mappingKey].name = {
-                zhTW: name
+                zhTW: name,
+                jaJP: null,
+                enUS: null
             }
             mapping[mappingKey].type = weaponType
 
@@ -228,6 +232,10 @@ async function fetchWeapons() {
                 return
             }
 
+            // Set Lang Mapping
+            let uniqueKey = fetchPageUrl.split('/').pop()
+            langKeyMapping[uniqueKey] = mappingKey
+
             let rare = weaponDom('dl.grid dd').eq(2).text().trim()
             let attack = weaponDom('dl.grid dd').eq(6).text().trim()
             let criticalRate = weaponDom('dl.grid dd').eq(7).text().trim()
@@ -248,6 +256,32 @@ async function fetchWeapons() {
                     name: enhanceName
                 })
             })
+        }
+
+        // Get Other Lang
+        for (let lang of ['jaJP', 'enUS']) {
+            fetchPageUrl = getFullUrl(lang, urls.weapons[weaponType])
+            fetchPageName = `weapons:${weaponType}:${lang}`
+
+            console.log(fetchPageUrl, fetchPageName)
+
+            listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+            if (Helper.isEmpty(listDom)) {
+                console.log(fetchPageUrl, fetchPageName, 'Err')
+
+                return
+            }
+
+            for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
+                let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+
+                // Set Lang Mapping
+                let uniqueKey = rowNode.find('td').eq(1).find('a').attr('href').split('/').pop()
+                let mappingKey = langKeyMapping[uniqueKey]
+
+                mapping[mappingKey].name[lang] = formatName(rowNode.find('td').eq(1).find('a').text().trim())
+            }
         }
 
         let list = autoExtendCols(Object.values(mapping))
@@ -273,6 +307,8 @@ async function fetchArmors() {
 
         let mapping = {}
         let mappingKey = null
+
+        let langKeyMapping = {}
 
         // Fetch List Page
         fetchPageUrl = getFullUrl('zhTW', urls.armors[armorRare])
@@ -312,13 +348,19 @@ async function fetchArmors() {
 
             mappingKey = `${series}:${name}`
 
+            // Set Lang Mapping
+            let uniqueKey = fetchPageUrl.split('/').pop()
+            langKeyMapping[uniqueKey] = mappingKey
+
             if (Helper.isEmpty(mapping[mappingKey])) {
                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
             }
 
             mapping[mappingKey].series = null
             mapping[mappingKey].name = {
-                zhTW: name
+                zhTW: name,
+                jaJP: null,
+                enUS: null
             }
             mapping[mappingKey].gender = null
 
@@ -406,6 +448,32 @@ async function fetchArmors() {
             })
         }
 
+        // Get Other Lang
+        for (let lang of ['jaJP', 'enUS']) {
+            fetchPageUrl = getFullUrl(lang, urls.armors[armorRare])
+            fetchPageName = `armors:${armorRare}:${lang}`
+
+            console.log(fetchPageUrl, fetchPageName)
+
+            listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+            if (Helper.isEmpty(listDom)) {
+                console.log(fetchPageUrl, fetchPageName, 'Err')
+
+                return
+            }
+
+            for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
+                let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+
+                // Set Lang Mapping
+                let uniqueKey = rowNode.find('td').eq(2).find('a').attr('href').split('/').pop()
+                let mappingKey = langKeyMapping[uniqueKey]
+
+                mapping[mappingKey].name[lang] = formatName(rowNode.find('td').eq(2).find('a').text().trim())
+            }
+        }
+
         let list = autoExtendCols(Object.values(mapping))
 
         Helper.saveJSONAsCSV(`${crawlerRoot}/armors/${armorRare}.csv`, list)
@@ -418,6 +486,8 @@ async function fetchJewels() {
 
     let mapping = {}
     let mappingKey = null
+
+    let langKeyMapping = {}
 
     // Fetch List Page
     fetchPageUrl = getFullUrl('zhTW', urls.jewels)
@@ -447,13 +517,50 @@ async function fetchJewels() {
             mapping[mappingKey] = Helper.deepCopy(defaultJewel)
         }
 
+        // Set Lang Mapping
+        let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+        langKeyMapping[uniqueKey] = mappingKey
+
         mapping[mappingKey].name = {
-            zhTW: name
+            zhTW: name,
+            jaJP: null,
+            enUS: null
         }
         mapping[mappingKey].rare = null
         mapping[mappingKey].slot.size = parseFloat(slotSize)
         mapping[mappingKey].skill.name = skillName
         mapping[mappingKey].skill.level = 1
+    }
+
+    // Get Other Lang
+    for (let lang of ['jaJP', 'enUS']) {
+        fetchPageUrl = getFullUrl(lang, urls.jewels)
+        fetchPageName = `jewels:${lang}`
+
+        console.log(fetchPageUrl, fetchPageName)
+
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
+
+            return
+        }
+
+        for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
+            let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+
+            // Get Data
+            let name = ('enUS' === lang)
+                ? rowNode.find('td').eq(0).text().trim().match(/^(.*?)( \d+)$/)[1]
+                : rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(.+)】$/)[1]
+
+            // Set Lang Mapping
+            let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+            let mappingKey = langKeyMapping[uniqueKey]
+
+            mapping[mappingKey].name[lang] = name
+        }
     }
 
     Helper.saveJSONAsCSV(`${crawlerRoot}/jewels.csv`, Object.values(mapping))
@@ -465,6 +572,8 @@ async function fetchSkills() {
 
     let mapping = {}
     let mappingKey = null
+
+    let langKeyMapping = {}
 
     // Fetch List Page
     fetchPageUrl = getFullUrl('zhTW', urls.skills)
@@ -494,8 +603,8 @@ async function fetchSkills() {
                 return
             }
 
-            let level = listDom(node).text().split(' ')[0].trim()
-            let effect = listDom(node).text().split(' ')[1].trim()
+            let level = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[1]
+            let effect = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[2]
 
             mappingKey = `${name}:${level}`
 
@@ -503,13 +612,69 @@ async function fetchSkills() {
                 mapping[mappingKey] = Helper.deepCopy(defaultSkill)
             }
 
+            // Set Lang Mapping
+            let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+            langKeyMapping[`${uniqueKey}:${level}`] = mappingKey
+
             mapping[mappingKey].name = {
-                zhTW: name
+                zhTW: name,
+                jaJP: null,
+                enUS: null
             }
-            mapping[mappingKey].description = description
+            mapping[mappingKey].description = {
+                zhTW: description,
+                jaJP: null,
+                enUS: null
+            }
             mapping[mappingKey].level = parseFloat(level)
-            mapping[mappingKey].effect = effect
+            mapping[mappingKey].effect = {
+                zhTW: effect,
+                jaJP: null,
+                enUS: null
+            }
         })
+    }
+
+    // Get Other Lang
+    for (let lang of ['jaJP', 'enUS']) {
+        fetchPageUrl = getFullUrl(lang, urls.skills)
+        fetchPageName = `skills:${lang}`
+
+        console.log(fetchPageUrl, fetchPageName)
+
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
+
+            return
+        }
+
+        for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
+            let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+
+            // Get Data
+            let name = rowNode.find('td').eq(0).text().trim()
+            let description = null
+
+            rowNode.find('td').eq(2).find('div').each((index, node) => {
+                if (0 === index) {
+                    description = listDom(node).text()
+
+                    return
+                }
+
+                let level = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[1]
+                let effect = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[2]
+
+                let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+                let mappingKey = langKeyMapping[`${uniqueKey}:${level}`]
+
+                mapping[mappingKey].name[lang] = name
+                mapping[mappingKey].description[lang] = description
+                mapping[mappingKey].effect[lang] = effect
+            })
+        }
     }
 
     Helper.saveJSONAsCSV(`${crawlerRoot}/skills.csv`, Object.values(mapping))
@@ -521,6 +686,8 @@ async function fetchEnhances() {
 
     let mapping = {}
     let mappingKey = null
+
+    let langKeyMapping = {}
 
     // Fetch List Page
     fetchPageUrl = getFullUrl('zhTW', urls.enhances)
@@ -549,10 +716,51 @@ async function fetchEnhances() {
             mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
         }
 
+        // Set Lang Mapping
+        let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
+        langKeyMapping[uniqueKey] = mappingKey
+
         mapping[mappingKey].name = {
-            zhTW: name
+            zhTW: name,
+            jaJP: null,
+            enUS: null
         }
-        mapping[mappingKey].description = description
+        mapping[mappingKey].description = {
+            zhTW: description,
+            jaJP: null,
+            enUS: null
+        }
+    }
+
+    // Get Other Lang
+    for (let lang of ['jaJP', 'enUS']) {
+        fetchPageUrl = getFullUrl(lang, urls.enhances)
+        fetchPageName = `enhances:${lang}`
+
+        console.log(fetchPageUrl, fetchPageName)
+
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
+
+            return
+        }
+
+        for (let rowIndex = 0; rowIndex < listDom('ul.relative li.bg-white').length; rowIndex++) {
+            let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
+
+            // Get Data
+            let name = formatName(rowNode.find('a p').eq(0).text().trim())
+            let description = rowNode.find('a p').eq(1).text().trim()
+
+            // Set Lang Mapping
+            let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
+            let mappingKey = langKeyMapping[uniqueKey]
+
+            mapping[mappingKey].name[lang] = name
+            mapping[mappingKey].description[lang] = description
+        }
     }
 
     Helper.saveJSONAsCSV(`${crawlerRoot}/enhances.csv`, Object.values(mapping))

@@ -20,36 +20,45 @@ import {
 const crawlerRoot = 'temp/crawler/kiranico'
 
 const urls = {
+    langs: {
+        zhTW: 'https://mhrise.kiranico.com/zh-Hant',
+        jaJP: 'https://mhrise.kiranico.com/ja',
+        enUS: 'https://mhrise.kiranico.com'
+    },
     weapons: {
-        greatSword: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=0',
-        swordAndShield: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=1',
-        dualBlades: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=2',
-        longSword: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=3',
-        hammer: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=4',
-        huntingHorn: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=5',
-        lance: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=6',
-        gunlance: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=7',
-        switchAxe: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=8',
-        chargeBlade: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=9',
-        insectGlaive: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=10',
-        bow: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=11',
-        heavyBowgun: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=12',
-        lightBowgun: 'https://mhrise.kiranico.com/zh-Hant/data/weapons?scope=wp&value=13'
+        greatSword: 'data/weapons?scope=wp&value=0',
+        swordAndShield: 'data/weapons?scope=wp&value=1',
+        dualBlades: 'data/weapons?scope=wp&value=2',
+        longSword: 'data/weapons?scope=wp&value=3',
+        hammer: 'data/weapons?scope=wp&value=4',
+        huntingHorn: 'data/weapons?scope=wp&value=5',
+        lance: 'data/weapons?scope=wp&value=6',
+        gunlance: 'data/weapons?scope=wp&value=7',
+        switchAxe: 'data/weapons?scope=wp&value=8',
+        chargeBlade: 'data/weapons?scope=wp&value=9',
+        insectGlaive: 'data/weapons?scope=wp&value=10',
+        bow: 'data/weapons?scope=wp&value=11',
+        heavyBowgun: 'data/weapons?scope=wp&value=12',
+        lightBowgun: 'data/weapons?scope=wp&value=13'
     },
     armors: {
-        rare1: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=0',
-        rare2: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=1',
-        rare3: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=2',
-        rare4: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=3',
-        rare5: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=4',
-        rare6: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=5',
-        rare7: 'https://mhrise.kiranico.com/zh-Hant/data/armors?scope=rarity&value=6'
+        rare1: 'data/armors?scope=rarity&value=0',
+        rare2: 'data/armors?scope=rarity&value=1',
+        rare3: 'data/armors?scope=rarity&value=2',
+        rare4: 'data/armors?scope=rarity&value=3',
+        rare5: 'data/armors?scope=rarity&value=4',
+        rare6: 'data/armors?scope=rarity&value=5',
+        rare7: 'data/armors?scope=rarity&value=6'
     },
-    skills: 'https://mhrise.kiranico.com/zh-Hant/data/skills',
-    jewels: 'https://mhrise.kiranico.com/zh-Hant/data/decorations',
+    skills: 'data/skills',
+    jewels: 'data/decorations',
     charms: null,
     petalaces: null,
-    enhances: 'https://mhrise.kiranico.com/zh-Hant/data/rampage-skills'
+    enhances: 'data/rampage-skills'
+}
+
+const getFullUrl = (lang, url) => {
+    return `${urls.langs[lang]}/${url}`
 }
 
 async function fetchWeapons() {
@@ -71,7 +80,7 @@ async function fetchWeapons() {
         let mappingKey = null
 
         // Fetch List Page
-        fetchPageUrl = urls.weapons[weaponType]
+        fetchPageUrl = getFullUrl('zhTW', urls.weapons[weaponType])
         fetchPageName = `weapons:${weaponType}`
 
         console.log(fetchPageUrl, fetchPageName)
@@ -90,6 +99,121 @@ async function fetchWeapons() {
             // Get Data
             let name = formatName(rowNode.find('td').eq(1).find('a').text().trim())
 
+            mappingKey = `${weaponType}:${name}`
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
+            }
+
+            mapping[mappingKey].series = null
+            mapping[mappingKey].name = {
+                zhTW: name
+            }
+            mapping[mappingKey].type = weaponType
+
+            // Slots
+            let slotNode = rowNode.find('td').eq(1).find('img')
+
+            if (0 !== slotNode.length) {
+                slotNode.each((index, node) => {
+                    if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco3.png' === listDom(node).attr('src')) {
+                        mapping[mappingKey].slots.push({
+                            size: 3
+                        })
+                    } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco2.png' === listDom(node).attr('src')) {
+                        mapping[mappingKey].slots.push({
+                            size: 2
+                        })
+                    } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco1.png' === listDom(node).attr('src')) {
+                        mapping[mappingKey].slots.push({
+                            size: 1
+                        })
+                    }
+                })
+            }
+
+            // Element
+            if ('heavyBowgun' !== weaponType
+                && 'lightBowgun' !== weaponType
+                && 0 !== rowNode.find('td').eq(4).find('img').length
+            ) {
+                rowNode.find('td').eq(4).find('img').each((index, node) => {
+                    switch (listDom(node).attr('src')) {
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType1.png':
+                        mapping[mappingKey].element.attack.type = 'fire'
+                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType2.png':
+                        mapping[mappingKey].element.attack.type = 'water'
+                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType3.png':
+                        mapping[mappingKey].element.attack.type = 'thunder'
+                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType4.png':
+                        mapping[mappingKey].element.attack.type = 'ice'
+                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType5.png':
+                        mapping[mappingKey].element.attack.type = 'dragon'
+                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType6.png':
+                        mapping[mappingKey].element.status.type = 'poison'
+                        mapping[mappingKey].element.status.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType7.png':
+                        mapping[mappingKey].element.status.type = 'sleep'
+                        mapping[mappingKey].element.status.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType8.png':
+                        mapping[mappingKey].element.status.type = 'paralysis'
+                        mapping[mappingKey].element.status.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType9.png':
+                        mapping[mappingKey].element.status.type = 'blast'
+                        mapping[mappingKey].element.status.minValue = parseFloat(listDom(node)[0].next.data.trim())
+
+                        break
+                    }
+                })
+            }
+
+            // Sharpness
+            if ('bow' !== weaponType
+                && 'heavyBowgun' !== weaponType
+                && 'lightBowgun' !== weaponType
+            ) {
+                let sharpnessList = [
+                    'red',
+                    'orange',
+                    'yellow',
+                    'green',
+                    'blue',
+                    'white',
+                    'purple'
+                ]
+
+                rowNode.find('td').eq(5).find('div.flex div.flex').eq(1).find('div').each((index, node) => {
+                    let value = parseFloat(listDom(node).css('width').replace('px', '')) * 5
+
+                    if (0 === value) {
+                        return
+                    }
+
+                    mapping[mappingKey].sharpness[sharpnessList[index]] = value
+                })
+            }
+
             // Fetch Detail Page
             fetchPageUrl = rowNode.find('td').eq(1).find('a').attr('href')
             fetchPageName = `weapons:${weaponType}:${name}`
@@ -103,16 +227,6 @@ async function fetchWeapons() {
 
                 return
             }
-
-            mappingKey = `${weaponType}:${name}`
-
-            if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
-            }
-
-            mapping[mappingKey].series = null
-            mapping[mappingKey].name = name
-            mapping[mappingKey].type = weaponType
 
             let rare = weaponDom('dl.grid dd').eq(2).text().trim()
             let attack = weaponDom('dl.grid dd').eq(6).text().trim()
@@ -134,26 +248,6 @@ async function fetchWeapons() {
                     name: enhanceName
                 })
             })
-
-            let slotNode = rowNode.find('td').eq(1).find('img')
-
-            if (0 !== slotNode.length) {
-                slotNode.each((index, node) => {
-                    if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco3.png' === listDom(node).attr('src')) {
-                        mapping[mappingKey].slots.push({
-                            size: 3
-                        })
-                    } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco2.png' === listDom(node).attr('src')) {
-                        mapping[mappingKey].slots.push({
-                            size: 2
-                        })
-                    } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco1.png' === listDom(node).attr('src')) {
-                        mapping[mappingKey].slots.push({
-                            size: 1
-                        })
-                    }
-                })
-            }
         }
 
         let list = autoExtendCols(Object.values(mapping))
@@ -181,7 +275,7 @@ async function fetchArmors() {
         let mappingKey = null
 
         // Fetch List Page
-        fetchPageUrl = urls.armors[armorRare]
+        fetchPageUrl = getFullUrl('zhTW', urls.armors[armorRare])
         fetchPageName = `armors:${armorRare}`
 
         console.log(fetchPageUrl, fetchPageName)
@@ -223,7 +317,9 @@ async function fetchArmors() {
             }
 
             mapping[mappingKey].series = null
-            mapping[mappingKey].name = name
+            mapping[mappingKey].name = {
+                zhTW: name
+            }
             mapping[mappingKey].gender = null
 
             let rare = armorDom('dl.grid dd').eq(5).text().trim()
@@ -324,7 +420,7 @@ async function fetchJewels() {
     let mappingKey = null
 
     // Fetch List Page
-    fetchPageUrl = urls.jewels
+    fetchPageUrl = getFullUrl('zhTW', urls.jewels)
     fetchPageName = 'jewels'
 
     console.log(fetchPageUrl, fetchPageName)
@@ -351,7 +447,9 @@ async function fetchJewels() {
             mapping[mappingKey] = Helper.deepCopy(defaultJewel)
         }
 
-        mapping[mappingKey].name = name
+        mapping[mappingKey].name = {
+            zhTW: name
+        }
         mapping[mappingKey].rare = null
         mapping[mappingKey].slot.size = parseFloat(slotSize)
         mapping[mappingKey].skill.name = skillName
@@ -369,7 +467,7 @@ async function fetchSkills() {
     let mappingKey = null
 
     // Fetch List Page
-    fetchPageUrl = urls.skills
+    fetchPageUrl = getFullUrl('zhTW', urls.skills)
     fetchPageName = 'skills'
 
     console.log(fetchPageUrl, fetchPageName)
@@ -405,7 +503,9 @@ async function fetchSkills() {
                 mapping[mappingKey] = Helper.deepCopy(defaultSkill)
             }
 
-            mapping[mappingKey].name = name
+            mapping[mappingKey].name = {
+                zhTW: name
+            }
             mapping[mappingKey].description = description
             mapping[mappingKey].level = parseFloat(level)
             mapping[mappingKey].effect = effect
@@ -423,7 +523,7 @@ async function fetchEnhances() {
     let mappingKey = null
 
     // Fetch List Page
-    fetchPageUrl = urls.enhances
+    fetchPageUrl = getFullUrl('zhTW', urls.enhances)
     fetchPageName = 'enhances'
 
     console.log(fetchPageUrl, fetchPageName)
@@ -449,7 +549,9 @@ async function fetchEnhances() {
             mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
         }
 
-        mapping[mappingKey].name = name
+        mapping[mappingKey].name = {
+            zhTW: name
+        }
         mapping[mappingKey].description = description
     }
 

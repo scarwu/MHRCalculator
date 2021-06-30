@@ -394,7 +394,7 @@ const fetchArmors = async () => {
         // Table 1
         tempNode = itemDom('.wp-block-table .has-fixed-layout').eq(0).find('tbody tr')
 
-        let rare = parseFloat(tempNode.eq(0).find('td').eq(0).text().trim())
+        let rare = tempNode.eq(0).find('td').eq(0).text().trim()
         let gender = tempNode.eq(0).find('td').eq(1).text().trim()
 
         if ('男女共用' === gender) {
@@ -480,7 +480,7 @@ const fetchArmors = async () => {
             mapping[mappingKey].name = {
                 zhTW: name
             }
-            mapping[mappingKey].rare = rare
+            mapping[mappingKey].rare = parseFloat(rare)
             mapping[mappingKey].type = type
             mapping[mappingKey].gender = gender
             mapping[mappingKey].minDefense = parseFloat(defense)
@@ -798,10 +798,11 @@ const fetchSkills = async () => {
 }
 
 function statistics() {
+
+    // Generate Result Format
     let result = {
         weapons: {},
         armors: {},
-        // charms: {},
         petalaces: {},
         jewels: {},
         enhances: {},
@@ -830,7 +831,6 @@ function statistics() {
     }
 
     // Weapons
-    let weaponAllCount = 0
     let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons.csv`)
 
     if (Helper.isNotEmpty(weaponList)) {

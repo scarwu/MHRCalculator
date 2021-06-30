@@ -591,7 +591,7 @@ async function fetchJewels() {
             mapping[mappingKey].name = {
                 jaJP: name
             }
-            mapping[mappingKey].rare = rare
+            mapping[mappingKey].rare = parseFloat(rare)
             mapping[mappingKey].size = parseFloat(size)
             mapping[mappingKey].skills.push({
                 name: skillName,
@@ -724,10 +724,11 @@ async function fetchSkills() {
 }
 
 function statistics() {
+
+    // Generate Result Format
     let result = {
         weapons: {},
         armors: {},
-        // charms: {},
         petalaces: {},
         jewels: {},
         enhances: {},
@@ -756,7 +757,6 @@ function statistics() {
     }
 
     // Weapons
-    let weaponAllCount = 0
     let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons.csv`)
 
     if (Helper.isNotEmpty(weaponList)) {

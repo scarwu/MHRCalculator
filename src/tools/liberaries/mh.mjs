@@ -81,13 +81,13 @@ export const defaultArmor = {
 export const defaultJewel = {
     name: null,
     rare: null,
-    slot: {
-        size: null
-    },
-    skill: {
-        name: null,
-        level: null
-    }
+    size: null,
+    skills: [
+        // {
+        //     name: null,
+        //     level: null
+        // }
+    ]
 }
 
 export const defaultPetalace = {
@@ -194,3 +194,21 @@ export const formatName = (text) => {
         .replace('Ⅳ', 'IV')
         .replace('Ⅴ', 'V')
 }
+
+export const weaponTypeList = [
+    'greatSword', 'swordAndShield', 'dualBlades', 'longSword',
+    'hammer', 'huntingHorn', 'lance', 'gunlance', 'switchAxe', 'chargeBlade',
+    'insectGlaive', 'bow', 'heavyBowgun', 'lightBowgun'
+]
+
+export const rareList = [
+    'rare1', 'rare2', 'rare3', 'rare4', 'rare5', 'rare6', 'rare7'
+]
+
+export const sizeList = [
+    'size1', 'size2', 'size3'
+]
+
+export const crawlerNameList = [
+    'gameqb', 'game8', 'kiranico'
+]

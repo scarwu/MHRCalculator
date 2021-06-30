@@ -12,11 +12,13 @@ import * as path from 'path'
 global.root = path.dirname(process.argv[1])
 
 import Helper from './liberaries/helper.mjs'
+import ConverterTask from './tasks/converter.mjs'
 import Game8Task from './tasks/game8.mjs'
 import GameqbTask from './tasks/gameqb.mjs'
 import KiranicobTask from './tasks/kiranico.mjs'
 
 let taskMapping = {
+    converter: ConverterTask,
     game8: Game8Task,
     gameqb: GameqbTask,
     kiranico: KiranicobTask

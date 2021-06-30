@@ -205,6 +205,10 @@ async function fetchHtmlAsDom(url) {
 function loadJSON(subPath) {
     let filePath = `${global.root}/${subPath}`
 
+    if (false === fs.existsSync(filePath)) {
+        return null
+    }
+
     return JSON.parse(fs.readFileSync(filePath, 'utf8'))
 }
 
@@ -224,6 +228,10 @@ function saveJSON(subPath, data) {
 
 function loadCSV(subPath) {
     let filePath = `${global.root}/${subPath}`
+
+    if (false === fs.existsSync(filePath)) {
+        return null
+    }
 
     return fs.readFileSync(filePath, 'utf8').split('\n').map((row) => {
         let newRow = []
@@ -320,6 +328,10 @@ function loadCSVAsJSON(subPath) {
 
     // Load File
     let structuredCSV = loadCSV(subPath)
+
+    if (isEmpty(structuredCSV)) {
+        return null
+    }
 
     // Parse Header Keys
     let header = structuredCSV.shift()

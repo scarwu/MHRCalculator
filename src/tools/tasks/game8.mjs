@@ -9,39 +9,39 @@ import Helper from '../liberaries/helper.mjs'
 import {
     defaultWeapon,
     defaultArmor,
-    defaultJewel,
     defaultPetalace,
+    defaultJewel,
     defaultEnhance,
     defaultSkill,
     autoExtendCols,
     formatName
 } from '../liberaries/mh.mjs'
 
-const crawlerRoot = 'temp/crawler/game8'
+const fileRoot = 'temp/crawler/game8'
 
 const urls = {
     weapons: {
-        bow: 'https://game8.jp/mhrise/369836',
-        chargeBlade: 'https://game8.jp/mhrise/369832',
-        dualBlades: 'https://game8.jp/mhrise/369826',
         greatSword: 'https://game8.jp/mhrise/369823',
-        gunlance: 'https://game8.jp/mhrise/369830',
-        hammer: 'https://game8.jp/mhrise/369827',
-        heavyBowgun: 'https://game8.jp/mhrise/369835',
-        huntingHorn: 'https://game8.jp/mhrise/369828',
-        insectGlaive: 'https://game8.jp/mhrise/369833',
-        lance: 'https://game8.jp/mhrise/369829',
-        lightBowgun: 'https://game8.jp/mhrise/369834',
+        swordAndShield: 'https://game8.jp/mhrise/369825',
+        dualBlades: 'https://game8.jp/mhrise/369826',
         longSword: 'https://game8.jp/mhrise/369824',
+        hammer: 'https://game8.jp/mhrise/369827',
+        huntingHorn: 'https://game8.jp/mhrise/369828',
+        lance: 'https://game8.jp/mhrise/369829',
+        gunlance: 'https://game8.jp/mhrise/369830',
         switchAxe: 'https://game8.jp/mhrise/369831',
-        swordAndShield: 'https://game8.jp/mhrise/369825'
+        chargeBlade: 'https://game8.jp/mhrise/369832',
+        insectGlaive: 'https://game8.jp/mhrise/369833',
+        bow: 'https://game8.jp/mhrise/369836',
+        heavyBowgun: 'https://game8.jp/mhrise/369835',
+        lightBowgun: 'https://game8.jp/mhrise/369834'
     },
     armors: 'https://game8.jp/mhrise/363845',
-    skills: 'https://game8.jp/mhrise/363848',
-    jewels: 'https://game8.jp/mhrise/363846',
     charms: null,
     petalaces: null,
-    enhances: 'https://game8.jp/mhrise/382391'
+    jewels: 'https://game8.jp/mhrise/363846',
+    enhances: 'https://game8.jp/mhrise/382391',
+    skills: 'https://game8.jp/mhrise/363848'
 }
 
 async function fetchWeapons() {
@@ -262,8 +262,12 @@ async function fetchWeapons() {
                         })
                     })
 
-                    mapping[mappingKey].series = series
-                    mapping[mappingKey].name = name
+                    mapping[mappingKey].series = {
+                        jaJP: series
+                    }
+                    mapping[mappingKey].name = {
+                        jaJP: name
+                    }
                     mapping[mappingKey].type = weaponType
                     mapping[mappingKey].rare = parseFloat(rare)
                     mapping[mappingKey].attack = parseFloat(attack)
@@ -277,7 +281,7 @@ async function fetchWeapons() {
 
         let list = autoExtendCols(Object.values(mapping))
 
-        Helper.saveJSONAsCSV(`${crawlerRoot}/weapons/${weaponType}.csv`, list)
+        Helper.saveJSONAsCSV(`${fileRoot}/weapons/${weaponType}.csv`, list)
     }
 }
 
@@ -376,8 +380,12 @@ async function fetchArmors() {
                                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
                             }
 
-                            mapping[mappingKey].series = series
-                            mapping[mappingKey].name = name
+                            mapping[mappingKey].series = {
+                                jaJP: series
+                            }
+                            mapping[mappingKey].name = {
+                                jaJP: name
+                            }
                             mapping[mappingKey].gender = gender
 
                             armorNode.find('td').eq(1).find('a').each((index, node) => {
@@ -521,7 +529,7 @@ async function fetchArmors() {
 
     let list = autoExtendCols(Object.values(mapping))
 
-    Helper.saveJSONAsCSV(`${crawlerRoot}/armors.csv`, list)
+    Helper.saveJSONAsCSV(`${fileRoot}/armors.csv`, list)
 }
 
 async function fetchJewels() {
@@ -577,7 +585,9 @@ async function fetchJewels() {
                 mapping[mappingKey] = Helper.deepCopy(defaultJewel)
             }
 
-            mapping[mappingKey].name = name
+            mapping[mappingKey].name = {
+                jaJP: name
+            }
             mapping[mappingKey].rare = rare
             mapping[mappingKey].slot.size = parseFloat(slotSize)
             mapping[mappingKey].skill.name = skillName
@@ -585,7 +595,54 @@ async function fetchJewels() {
         }
     }
 
-    Helper.saveJSONAsCSV(`${crawlerRoot}/jewels.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${fileRoot}/jewels.csv`, Object.values(mapping))
+}
+
+async function fetchEnhances() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
+    let mapping = {}
+    let mappingKey = null
+
+    // Fetch List Page
+    fetchPageUrl = urls.enhances
+    fetchPageName = 'enhances'
+
+    console.log(fetchPageUrl, fetchPageName)
+
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+    if (Helper.isEmpty(listDom)) {
+        console.log(fetchPageUrl, fetchPageName, 'Err')
+
+        return
+    }
+
+    for (let tableIndex = 1; tableIndex <= 10; tableIndex++) {
+        for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
+            let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
+
+            // Get Data
+            let name = formatName(rowNode.find('td').eq(0).text().trim())
+            let description = rowNode.find('td').eq(1).text().trim()
+
+            mappingKey = name
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
+            }
+
+            mapping[mappingKey].name = {
+                jaJP: name
+            }
+            mapping[mappingKey].description = {
+                jaJP: description
+            }
+        }
+    }
+
+    Helper.saveJSONAsCSV(`${fileRoot}/enhances.csv`, Object.values(mapping))
 }
 
 async function fetchSkills() {
@@ -644,69 +701,32 @@ async function fetchSkills() {
                     mapping[mappingKey] = Helper.deepCopy(defaultSkill)
                 }
 
-                mapping[mappingKey].name = name
-                mapping[mappingKey].description = description
+                mapping[mappingKey].name = {
+                    jaJP: name
+                }
+                mapping[mappingKey].description = {
+                    jaJP: description
+                }
                 mapping[mappingKey].level = parseFloat(level)
-                mapping[mappingKey].effect = effect
+                mapping[mappingKey].effect = {
+                    jaJP: effect
+                }
             }
         }
     }
 
-    Helper.saveJSONAsCSV(`${crawlerRoot}/skills.csv`, Object.values(mapping))
-}
-
-async function fetchEnhances() {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
-    let mapping = {}
-    let mappingKey = null
-
-    // Fetch List Page
-    fetchPageUrl = urls.enhances
-    fetchPageName = 'enhances'
-
-    console.log(fetchPageUrl, fetchPageName)
-
-    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-    if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
-
-        return
-    }
-
-    for (let tableIndex = 1; tableIndex <= 10; tableIndex++) {
-        for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
-            let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
-
-            // Get Data
-            let name = formatName(rowNode.find('td').eq(0).text().trim())
-            let description = rowNode.find('td').eq(1).text().trim()
-
-            mappingKey = name
-
-            if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
-            }
-
-            mapping[mappingKey].name = name
-            mapping[mappingKey].description = description
-        }
-    }
-
-    Helper.saveJSONAsCSV(`${crawlerRoot}/enhances.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${fileRoot}/skills.csv`, Object.values(mapping))
 }
 
 function statistics() {
     for (let weaponType of Object.keys(urls.weapons)) {
-        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/weapons/${weaponType}.csv`)
+        let list = Helper.loadCSVAsJSON(`${fileRoot}/weapons/${weaponType}.csv`)
 
         console.log(`weapons:${weaponType} (${list.length})`)
     }
 
-    for (let target of ['armors', 'jewels', 'skills', 'enhances']) {
-        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/${target}.csv`)
+    for (let target of ['armors', 'jewels', 'enhances', 'skills']) {
+        let list = Helper.loadCSVAsJSON(`${fileRoot}/${target}.csv`)
 
         console.log(`${target} (${list.length})`)
     }
@@ -717,8 +737,8 @@ function fetchAll() {
         fetchWeapons(),
         fetchArmors(),
         fetchJewels(),
-        fetchSkills(),
-        fetchEnhances()
+        fetchEnhances(),
+        fetchSkills()
     ]).then(() => {
         statistics()
     })
@@ -729,7 +749,7 @@ export default {
     fetchWeapons,
     fetchArmors,
     fetchJewels,
-    fetchSkills,
     fetchEnhances,
+    fetchSkills,
     statistics
 }

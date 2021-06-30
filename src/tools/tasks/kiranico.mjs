@@ -9,15 +9,15 @@ import Helper from '../liberaries/helper.mjs'
 import {
     defaultWeapon,
     defaultArmor,
-    defaultJewel,
     defaultPetalace,
+    defaultJewel,
     defaultEnhance,
     defaultSkill,
     autoExtendCols,
     formatName
 } from '../liberaries/mh.mjs'
 
-const crawlerRoot = 'temp/crawler/kiranico'
+const fileRoot = 'temp/crawler/kiranico'
 
 const urls = {
     langs: {
@@ -50,11 +50,11 @@ const urls = {
         rare6: 'data/armors?scope=rarity&value=5',
         rare7: 'data/armors?scope=rarity&value=6'
     },
-    skills: 'data/skills',
-    jewels: 'data/decorations',
     charms: null,
     petalaces: null,
-    enhances: 'data/rampage-skills'
+    jewels: 'data/decorations',
+    enhances: 'data/rampage-skills',
+    skills: 'data/skills'
 }
 
 const getFullUrl = (lang, url) => {
@@ -286,7 +286,7 @@ async function fetchWeapons() {
 
         let list = autoExtendCols(Object.values(mapping))
 
-        Helper.saveJSONAsCSV(`${crawlerRoot}/weapons/${weaponType}.csv`, list)
+        Helper.saveJSONAsCSV(`${fileRoot}/weapons/${weaponType}.csv`, list)
     }
 }
 
@@ -476,7 +476,7 @@ async function fetchArmors() {
 
         let list = autoExtendCols(Object.values(mapping))
 
-        Helper.saveJSONAsCSV(`${crawlerRoot}/armors/${armorRare}.csv`, list)
+        Helper.saveJSONAsCSV(`${fileRoot}/armors/${armorRare}.csv`, list)
     }
 }
 
@@ -563,7 +563,93 @@ async function fetchJewels() {
         }
     }
 
-    Helper.saveJSONAsCSV(`${crawlerRoot}/jewels.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${fileRoot}/jewels.csv`, Object.values(mapping))
+}
+
+async function fetchEnhances() {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
+    let mapping = {}
+    let mappingKey = null
+
+    let langKeyMapping = {}
+
+    // Fetch List Page
+    fetchPageUrl = getFullUrl('zhTW', urls.enhances)
+    fetchPageName = 'enhances'
+
+    console.log(fetchPageUrl, fetchPageName)
+
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+    if (Helper.isEmpty(listDom)) {
+        console.log(fetchPageUrl, fetchPageName, 'Err')
+
+        return
+    }
+
+    for (let rowIndex = 0; rowIndex < listDom('ul.relative li.bg-white').length; rowIndex++) {
+        let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
+
+        // Get Data
+        let name = formatName(rowNode.find('a p').eq(0).text().trim())
+        let description = rowNode.find('a p').eq(1).text().trim()
+
+        mappingKey = name
+
+        if (Helper.isEmpty(mapping[mappingKey])) {
+            mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
+        }
+
+        // Set Lang Mapping
+        let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
+        langKeyMapping[uniqueKey] = mappingKey
+
+        mapping[mappingKey].name = {
+            zhTW: name,
+            jaJP: null,
+            enUS: null
+        }
+        mapping[mappingKey].description = {
+            zhTW: description,
+            jaJP: null,
+            enUS: null
+        }
+    }
+
+    // Get Other Lang
+    for (let lang of ['jaJP', 'enUS']) {
+        fetchPageUrl = getFullUrl(lang, urls.enhances)
+        fetchPageName = `enhances:${lang}`
+
+        console.log(fetchPageUrl, fetchPageName)
+
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
+
+            return
+        }
+
+        for (let rowIndex = 0; rowIndex < listDom('ul.relative li.bg-white').length; rowIndex++) {
+            let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
+
+            // Get Data
+            let name = formatName(rowNode.find('a p').eq(0).text().trim())
+            let description = rowNode.find('a p').eq(1).text().trim()
+
+            // Set Lang Mapping
+            let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
+            let mappingKey = langKeyMapping[uniqueKey]
+
+            mapping[mappingKey].name[lang] = name
+            mapping[mappingKey].description[lang] = description
+        }
+    }
+
+    Helper.saveJSONAsCSV(`${fileRoot}/enhances.csv`, Object.values(mapping))
 }
 
 async function fetchSkills() {
@@ -677,110 +763,24 @@ async function fetchSkills() {
         }
     }
 
-    Helper.saveJSONAsCSV(`${crawlerRoot}/skills.csv`, Object.values(mapping))
-}
-
-async function fetchEnhances() {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
-    let mapping = {}
-    let mappingKey = null
-
-    let langKeyMapping = {}
-
-    // Fetch List Page
-    fetchPageUrl = getFullUrl('zhTW', urls.enhances)
-    fetchPageName = 'enhances'
-
-    console.log(fetchPageUrl, fetchPageName)
-
-    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-    if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
-
-        return
-    }
-
-    for (let rowIndex = 0; rowIndex < listDom('ul.relative li.bg-white').length; rowIndex++) {
-        let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
-
-        // Get Data
-        let name = formatName(rowNode.find('a p').eq(0).text().trim())
-        let description = rowNode.find('a p').eq(1).text().trim()
-
-        mappingKey = name
-
-        if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
-        }
-
-        // Set Lang Mapping
-        let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
-        langKeyMapping[uniqueKey] = mappingKey
-
-        mapping[mappingKey].name = {
-            zhTW: name,
-            jaJP: null,
-            enUS: null
-        }
-        mapping[mappingKey].description = {
-            zhTW: description,
-            jaJP: null,
-            enUS: null
-        }
-    }
-
-    // Get Other Lang
-    for (let lang of ['jaJP', 'enUS']) {
-        fetchPageUrl = getFullUrl(lang, urls.enhances)
-        fetchPageName = `enhances:${lang}`
-
-        console.log(fetchPageUrl, fetchPageName)
-
-        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-        if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
-
-            return
-        }
-
-        for (let rowIndex = 0; rowIndex < listDom('ul.relative li.bg-white').length; rowIndex++) {
-            let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
-
-            // Get Data
-            let name = formatName(rowNode.find('a p').eq(0).text().trim())
-            let description = rowNode.find('a p').eq(1).text().trim()
-
-            // Set Lang Mapping
-            let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
-            let mappingKey = langKeyMapping[uniqueKey]
-
-            mapping[mappingKey].name[lang] = name
-            mapping[mappingKey].description[lang] = description
-        }
-    }
-
-    Helper.saveJSONAsCSV(`${crawlerRoot}/enhances.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${fileRoot}/skills.csv`, Object.values(mapping))
 }
 
 function statistics() {
     for (let weaponType of Object.keys(urls.weapons)) {
-        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/weapons/${weaponType}.csv`)
+        let list = Helper.loadCSVAsJSON(`${fileRoot}/weapons/${weaponType}.csv`)
 
         console.log(`weapons:${weaponType} (${list.length})`)
     }
 
     for (let armorRare of Object.keys(urls.armors)) {
-        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/armors/${armorRare}.csv`)
+        let list = Helper.loadCSVAsJSON(`${fileRoot}/armors/${armorRare}.csv`)
 
         console.log(`armors:${armorRare} (${list.length})`)
     }
 
-    for (let target of ['jewels', 'skills', 'enhances']) {
-        let list = Helper.loadCSVAsJSON(`${crawlerRoot}/${target}.csv`)
+    for (let target of ['jewels', 'enhances', 'skills']) {
+        let list = Helper.loadCSVAsJSON(`${fileRoot}/${target}.csv`)
 
         console.log(`${target} (${list.length})`)
     }
@@ -791,8 +791,8 @@ function fetchAll() {
         fetchWeapons(),
         fetchArmors(),
         fetchJewels(),
-        fetchSkills(),
-        fetchEnhances()
+        fetchEnhances(),
+        fetchSkills()
     ]).then(() => {
         statistics()
     })
@@ -803,7 +803,7 @@ export default {
     fetchWeapons,
     fetchArmors,
     fetchJewels,
-    fetchSkills,
     fetchEnhances,
+    fetchSkills,
     statistics
 }

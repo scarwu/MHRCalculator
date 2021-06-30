@@ -496,6 +496,16 @@ function saveJSONAsCSV(subPath, data) {
     return true
 }
 
+function cleanFolder(subPath) {
+    let filePath = `${global.root}/${subPath}`
+
+    if (true === fs.existsSync(path.dirname(filePath))) {
+        fs.rmdirSync(filePath, {
+            recursive: true
+        })
+    }
+}
+
 export default {
     isEmpty,
     isNotEmpty,
@@ -515,5 +525,6 @@ export default {
     loadCSV,
     saveCSV,
     loadCSVAsJSON,
-    saveJSONAsCSV
+    saveJSONAsCSV,
+    cleanFolder
 }

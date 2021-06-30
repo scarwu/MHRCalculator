@@ -623,12 +623,66 @@ function arrange() {
         game8: ['jaJP']
     }
 
+    const specialReplaceText = (text, lang) => {
+        let replacementMapping = {
+
+            // kiranico
+            '風雷合一': { lang: 'jaJP', replaceValue: '風雷の合一', },
+            '龍姬的斬擊斧': { lang: 'zhTW', replaceValue: '龍姬的劍斧', },
+
+            // gameqb
+            '倪泰裡【面具】': { lang: 'zhTW', replaceValue: '倪泰裡【蒙面】', },
+            '鎌鼬龍': { lang: 'zhTW', replaceValue: '鐮鼬龍', },
+
+            // game8
+            'デスタ': { lang: 'jaJP', replaceValue: 'テスタ' },
+            'ブール': { lang: 'jaJP', replaceValue: 'ブーツ' },
+            'ウツシ表・覇【覆面】': { lang: 'jaJP', replaceValue: 'ウツシ表【覆面】覇', },
+            'ウツシ表・覇【上衣】': { lang: 'jaJP', replaceValue: 'ウツシ表【上衣】覇', },
+            'ウツシ表・覇【手甲】': { lang: 'jaJP', replaceValue: 'ウツシ表【手甲】覇', },
+            'ウツシ表・覇【腰巻】': { lang: 'jaJP', replaceValue: 'ウツシ表【腰巻】覇', },
+            'ウツシ表・覇【脚絆】': { lang: 'jaJP', replaceValue: 'ウツシ表【脚絆】覇', },
+            'ウツシ裏・覇【御面】': { lang: 'jaJP', replaceValue: 'ウツシ裏【御面】覇', },
+            'ウツシ裏・覇【上衣】': { lang: 'jaJP', replaceValue: 'ウツシ裏【上衣】覇', },
+            'ウツシ裏・覇【手甲】': { lang: 'jaJP', replaceValue: 'ウツシ裏【手甲】覇', },
+            'ウツシ裏・覇【腰巻】': { lang: 'jaJP', replaceValue: 'ウツシ裏【腰巻】覇', },
+            'ウツシ裏・覇【脚絆】': { lang: 'jaJP', replaceValue: 'ウツシ裏【脚絆】覇', },
+            '切れ味': { lang: 'jaJP', replaceValue: '斬れ味', },
+            '速射対応【火炎弾】': { lang: 'jaJP', replaceValue: '速射対応【火炎】' },
+            '速射対応【水冷弾】': { lang: 'jaJP', replaceValue: '速射対応【水冷】' },
+            '速射対応【電撃弾】': { lang: 'jaJP', replaceValue: '速射対応【電撃】' },
+            '速射対応【氷結弾】': { lang: 'jaJP', replaceValue: '速射対応【氷結】' },
+            '速射対応【滅龍弾】': { lang: 'jaJP', replaceValue: '速射対応【滅龍】' }
+        }
+
+        for (let searchText of Object.keys(replacementMapping)) {
+            if (-1 !== text.indexOf(searchText) && lang === replacementMapping[searchText].lang) {
+                text = text.replace(searchText, replacementMapping[searchText].replaceValue)
+            }
+        }
+
+        return text
+    }
+
     for (let target of Object.keys(arrangeDataMapping)) {
 
         // Major Crawler Data Init
         console.log(`arrange:${target}:majorCrawler:${majorCrawler}`)
 
         crawlerDataMapping[target][majorCrawler].forEach((item) => {
+
+            // Special Replace Text
+            supportLang[majorCrawler].forEach((lang) => {
+                ['series', 'name', 'description', 'effect'].forEach((key) => {
+                    if (Helper.isEmpty(item[key]) || Helper.isEmpty(item[key][lang])) {
+                        return
+                    }
+
+
+                    item[key][lang] = specialReplaceText(item[key][lang], lang)
+                })
+            })
+
             let itemId = `${target}:id:${md5(item.name.zhTW)}` // Using zhTW as ID
 
             supportLang[majorCrawler].forEach((lang) => {
@@ -650,46 +704,37 @@ function arrange() {
 
             crawlerDataMapping[target][minorCrawler].forEach((item) => {
 
-                // Create Self Hash
-                item.hash = Helper.jsonHash(item)
+                // Special Replace Text
+                supportLang[minorCrawler].forEach((lang) => {
+                    ['series', 'name', 'description', 'effect'].forEach((key) => {
+                        if (Helper.isEmpty(item[key]) || Helper.isEmpty(item[key][lang])) {
+                            return
+                        }
+
+                        item[key][lang] = specialReplaceText(item[key][lang], lang)
+                    })
+                })
 
                 supportLang[minorCrawler].forEach((lang) => {
-                    if (Helper.isEmpty(item.name[lang])) {
-                        item.reason = `name:${lang} is empty`
-
-                        untrackDataMapping[target][minorCrawler].push(item)
-
-                        return
-                    }
-
                     let translateId = `${target}:name:${lang}:${md5(item.name[lang])}`
 
                     if (Helper.isEmpty(translateIdMapping[translateId])) {
-                        item.reason = `translateId:${translateId} not found`
-
                         untrackDataMapping[target][minorCrawler].push(item)
 
                         return
                     }
 
                     let itemId = translateIdMapping[translateId]
-                    let mergedItem = mergeItem(target, arrangeDataMapping[target][itemId], item, lang)
 
-                    if (Helper.isEmpty(mergedItem)) {
-                        item.reason = `merge:${itemId} is fail`
-
-                        untrackDataMapping[target][minorCrawler].push(item)
-
-                        return
-                    }
-
-                    arrangeDataMapping[target][itemId] = mergedItem
+                    arrangeDataMapping[target][itemId] = mergeItem(target, arrangeDataMapping[target][itemId], item, lang)
                 })
             })
         })
     }
 
     // Save Data
+    Helper.cleanFolder(combineRoot)
+
     Object.keys(arrangeDataMapping).forEach((target) => {
         Helper.saveJSONAsCSV(`${combineRoot}/arrange/${target}.csv`, Object.values(arrangeDataMapping[target]))
     })

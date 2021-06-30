@@ -309,7 +309,7 @@ async function fetchArmors() {
         return
     }
 
-    const replaceName = (text) => {
+    const specialReplaceName = (text) => {
         let specialWordMapping = {
             'スカルダ/スパイオS': 'スカルダS/スパイオS',
             'スカルダ/スパイオSテスタ': 'スカルダSテスタ/スパイオSテスタ',
@@ -323,7 +323,7 @@ async function fetchArmors() {
             text = specialWordMapping[text]
         }
 
-        return text.replace('デスタ', 'テスタ')
+        return text
     }
 
     for (let tableIndex = 1; tableIndex <= 2; tableIndex++) {
@@ -331,7 +331,7 @@ async function fetchArmors() {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody td`).eq(rowIndex)
 
             // Get Data
-            let seriesList = normalizeText(replaceName(rowNode.eq(0).find('a').text().trim())).split('/')
+            let seriesList = normalizeText(specialReplaceName(rowNode.eq(0).find('a').text().trim())).split('/')
 
             for (let entry of Object.entries(seriesList)) {
                 let seriesIndex = parseFloat(entry[0])
@@ -371,7 +371,7 @@ async function fetchArmors() {
                             let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
 
                             // Get Data
-                            let name = normalizeText(replaceName(armorNode.find('td').eq(0).text().trim()))
+                            let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).text().trim()))
 
                             if (2 === seriesList.length) {
                                 name = name.split('/')[seriesIndex]
@@ -426,7 +426,7 @@ async function fetchArmors() {
 
                             // Get Data
                             let type = armorNode.find('td').eq(0).find('.align').text().trim()
-                            let name = normalizeText(replaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
+                            let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
                             let minDefense = armorNode.find('td').eq(1).text().trim()
                             let maxDefense = (3 === armorNode.find('td').length)
                                 ? armorNode.find('td').eq(2).text().trim() : null
@@ -477,7 +477,7 @@ async function fetchArmors() {
 
                             // Get Data
                             let type = armorNode.find('td').eq(0).find('.align').text().trim()
-                            let name = normalizeText(replaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
+                            let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
                             let resistenceFire = armorNode.find('td').eq(1).text().trim()
                             let resistenceWater = armorNode.find('td').eq(2).text().trim()
                             let resistenceThunder = armorNode.find('td').eq(3).text().trim()

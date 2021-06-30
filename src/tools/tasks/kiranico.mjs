@@ -14,7 +14,7 @@ import {
     defaultEnhance,
     defaultSkill,
     autoExtendCols,
-    formatName,
+    normalizeText,
     weaponTypeList,
     rareList,
     sizeList
@@ -102,7 +102,7 @@ async function fetchWeapons() {
             let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
             // Get Data
-            let name = formatName(rowNode.find('td').eq(1).find('a').text().trim())
+            let name = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
 
             mappingKey = `${weaponType}:${name}`
 
@@ -110,7 +110,11 @@ async function fetchWeapons() {
                 mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
             }
 
-            mapping[mappingKey].series = null
+            mapping[mappingKey].series = {
+                zhTW: null,
+                jaJP: null,
+                enUS: null
+            }
             mapping[mappingKey].name = {
                 zhTW: name,
                 jaJP: null,
@@ -253,7 +257,7 @@ async function fetchWeapons() {
 
             // Enhances
             weaponDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
-                let enhanceName = formatName(weaponDom(node).find('td').eq(1).find('a').text())
+                let enhanceName = normalizeText(weaponDom(node).find('td').eq(1).find('a').text())
 
                 mapping[mappingKey].enhances.push({
                     name: enhanceName
@@ -283,7 +287,7 @@ async function fetchWeapons() {
                 let uniqueKey = rowNode.find('td').eq(1).find('a').attr('href').split('/').pop()
                 let mappingKey = langKeyMapping[uniqueKey]
 
-                mapping[mappingKey].name[lang] = formatName(rowNode.find('td').eq(1).find('a').text().trim())
+                mapping[mappingKey].name[lang] = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
             }
         }
 
@@ -331,7 +335,7 @@ async function fetchArmors() {
             let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
             // Get Data
-            let name = rowNode.find('td').eq(2).find('a').text().trim()
+            let name = normalizeText(rowNode.find('td').eq(2).find('a').text().trim())
 
             // Fetch Detail Page
             fetchPageUrl = rowNode.find('td').eq(2).find('a').attr('href')
@@ -347,7 +351,7 @@ async function fetchArmors() {
                 return
             }
 
-            let series = armorDom('dl.grid dd').eq(2).text().trim()
+            let series = normalizeText(armorDom('dl.grid dd').eq(2).text().trim())
 
             mappingKey = `${series}:${name}`
 
@@ -359,7 +363,11 @@ async function fetchArmors() {
                 mapping[mappingKey] = Helper.deepCopy(defaultArmor)
             }
 
-            mapping[mappingKey].series = null
+            mapping[mappingKey].series = {
+                zhTW: null,
+                jaJP: null,
+                enUS: null
+            }
             mapping[mappingKey].name = {
                 zhTW: name,
                 jaJP: null,
@@ -442,7 +450,7 @@ async function fetchArmors() {
 
             // Skills
             armorDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
-                let skillName = armorDom(node).find('td').eq(0).find('a').text()
+                let skillName = normalizeText(armorDom(node).find('td').eq(0).find('a').text())
 
                 mapping[mappingKey].skills.push({
                     name: skillName,
@@ -473,7 +481,7 @@ async function fetchArmors() {
                 let uniqueKey = rowNode.find('td').eq(2).find('a').attr('href').split('/').pop()
                 let mappingKey = langKeyMapping[uniqueKey]
 
-                mapping[mappingKey].name[lang] = formatName(rowNode.find('td').eq(2).find('a').text().trim())
+                mapping[mappingKey].name[lang] = normalizeText(rowNode.find('td').eq(2).find('a').text().trim())
             }
         }
 
@@ -510,9 +518,9 @@ async function fetchJewels() {
         let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
         // Get Data
-        let name = rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(\d+)】$/)[1]
+        let name = normalizeText(rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(\d+)】$/)[1])
         let size = rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(\d+)】$/)[2]
-        let skillName = rowNode.find('td').eq(1).find('a').text().trim()
+        let skillName = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
 
         mappingKey = name
 
@@ -557,8 +565,8 @@ async function fetchJewels() {
 
             // Get Data
             let name = ('enUS' === lang)
-                ? rowNode.find('td').eq(0).text().trim().match(/^(.*?)( \d+)$/)[1]
-                : rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(.+)】$/)[1]
+                ? normalizeText(rowNode.find('td').eq(0).text().trim().match(/^(.*?)( \d+)$/)[1])
+                : normalizeText(rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(.+)】$/)[1])
 
             // Set Lang Mapping
             let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
@@ -598,7 +606,7 @@ async function fetchEnhances() {
         let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
 
         // Get Data
-        let name = formatName(rowNode.find('a p').eq(0).text().trim())
+        let name = normalizeText(rowNode.find('a p').eq(0).text().trim())
         let description = rowNode.find('a p').eq(1).text().trim()
 
         mappingKey = name
@@ -642,7 +650,7 @@ async function fetchEnhances() {
             let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
 
             // Get Data
-            let name = formatName(rowNode.find('a p').eq(0).text().trim())
+            let name = normalizeText(rowNode.find('a p').eq(0).text().trim())
             let description = rowNode.find('a p').eq(1).text().trim()
 
             // Set Lang Mapping
@@ -684,7 +692,7 @@ async function fetchSkills() {
         let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
         // Get Data
-        let name = rowNode.find('td').eq(0).find('a').text().trim()
+        let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
         let description = null
 
         rowNode.find('td').eq(2).find('div').each((index, node) => {
@@ -745,7 +753,7 @@ async function fetchSkills() {
             let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
 
             // Get Data
-            let name = rowNode.find('td').eq(0).find('a').text().trim()
+            let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
             let description = null
 
             rowNode.find('td').eq(2).find('div').each((index, node) => {

@@ -14,7 +14,7 @@ import {
     defaultEnhance,
     defaultSkill,
     autoExtendCols,
-    formatName,
+    normalizeText,
     weaponTypeList,
     rareList,
     sizeList
@@ -96,7 +96,7 @@ async function fetchWeapons() {
             for (let itemIndex = 0; itemIndex < listDom(`#${mdId} + table tbody tr`).find('.a-link').length; itemIndex++) {
                 let itemNode = listDom(`#${mdId} + table tbody tr`).find('.a-link').eq(itemIndex)
 
-                let name = formatName(itemNode.text().trim())
+                let name = normalizeText(itemNode.text().trim())
 
                 // Fetch Detail Page
                 fetchPageUrl = itemNode.attr('href')
@@ -121,7 +121,7 @@ async function fetchWeapons() {
                     return
                 }
 
-                let series = weaponDom('h3#hm_1').text().replace('の性能まとめ', '')
+                let series = normalizeText(weaponDom('h3#hm_1').text().replace('の性能まとめ', ''))
 
                 for (let subIndex = 0; subIndex < weaponDom('.a-table').length; subIndex++) {
                     let subNode = weaponDom('.a-table').eq(subIndex)
@@ -130,7 +130,7 @@ async function fetchWeapons() {
                         continue
                     }
 
-                    let subName = formatName(subNode.find('b.a-bold').text())
+                    let subName = normalizeText(subNode.find('b.a-bold').text())
 
                     if (name !== subName) {
                         continue
@@ -261,7 +261,7 @@ async function fetchWeapons() {
 
                     subNode.find('tbody tr').eq(enhanceRowIndex).find('a').each((index, node) => {
                         mapping[mappingKey].enhances.push({
-                            name: formatName(weaponDom(node).text())
+                            name: normalizeText(weaponDom(node).text())
                         })
                     })
 
@@ -331,7 +331,7 @@ async function fetchArmors() {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody td`).eq(rowIndex)
 
             // Get Data
-            let seriesList = replaceName(rowNode.eq(0).find('a').text().trim()).split('/')
+            let seriesList = normalizeText(replaceName(rowNode.eq(0).find('a').text().trim())).split('/')
 
             for (let entry of Object.entries(seriesList)) {
                 let seriesIndex = parseFloat(entry[0])
@@ -371,7 +371,7 @@ async function fetchArmors() {
                             let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
 
                             // Get Data
-                            let name = replaceName(armorNode.find('td').eq(0).text().trim())
+                            let name = normalizeText(replaceName(armorNode.find('td').eq(0).text().trim()))
 
                             if (2 === seriesList.length) {
                                 name = name.split('/')[seriesIndex]
@@ -392,7 +392,7 @@ async function fetchArmors() {
                             mapping[mappingKey].gender = gender
 
                             armorNode.find('td').eq(1).find('a').each((index, node) => {
-                                let skillName = armorDom(node).text()
+                                let skillName = normalizeText(armorDom(node).text())
                                 let skillLevel = armorDom(node)[0].next.data.replace('Lv.', '')
 
                                 mapping[mappingKey].skills.push({
@@ -426,7 +426,7 @@ async function fetchArmors() {
 
                             // Get Data
                             let type = armorNode.find('td').eq(0).find('.align').text().trim()
-                            let name = replaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim())
+                            let name = normalizeText(replaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
                             let minDefense = armorNode.find('td').eq(1).text().trim()
                             let maxDefense = (3 === armorNode.find('td').length)
                                 ? armorNode.find('td').eq(2).text().trim() : null
@@ -477,7 +477,7 @@ async function fetchArmors() {
 
                             // Get Data
                             let type = armorNode.find('td').eq(0).find('.align').text().trim()
-                            let name = replaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim())
+                            let name = normalizeText(replaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
                             let resistenceFire = armorNode.find('td').eq(1).text().trim()
                             let resistenceWater = armorNode.find('td').eq(2).text().trim()
                             let resistenceThunder = armorNode.find('td').eq(3).text().trim()
@@ -561,8 +561,8 @@ async function fetchJewels() {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
 
             // Get Data
-            let name = rowNode.find('td').eq(0).find('a').text().trim()
-            let skillName = rowNode.find('td').eq(1).text().trim()
+            let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
+            let skillName = normalizeText(rowNode.find('td').eq(1).text().trim())
 
             // Fetch Detail Page
             fetchPageUrl = rowNode.find('td').eq(0).find('a').attr('href')
@@ -629,7 +629,7 @@ async function fetchEnhances() {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
 
             // Get Data
-            let name = formatName(rowNode.find('td').eq(0).text().trim())
+            let name = normalizeText(rowNode.find('td').eq(0).text().trim())
             let description = rowNode.find('td').eq(1).text().trim()
 
             mappingKey = name
@@ -676,7 +676,7 @@ async function fetchSkills() {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
 
             // Get Data
-            let name = rowNode.find('td').eq(0).find('a').text().trim()
+            let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
             let description = rowNode.find('td').eq(1).text().trim()
 
             // Fetch Detail Page

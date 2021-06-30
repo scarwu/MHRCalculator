@@ -184,7 +184,7 @@ export const autoExtendCols = (list) => {
     })
 }
 
-export const formatName = (text) => {
+export const normalizeText = (text) => {
     return text
         .replace(/(│|├|└)*/g, '')
         .replace(/(┃|┣|┗|　)*/g, '')
@@ -193,6 +193,13 @@ export const formatName = (text) => {
         .replace('Ⅲ', 'III')
         .replace('Ⅳ', 'IV')
         .replace('Ⅴ', 'V')
+        .replace('Ｓ', 'S')
+        .replace('Ｄ', 'D')
+        .replace('＝', '=')
+        .replace('ＫＯ', 'KO')
+        .replace('Ｌｖ', 'Lv')
+        .replace('ＵＰ', 'UP')
+        .replace('･', '・')
 }
 
 export const weaponTypeList = [

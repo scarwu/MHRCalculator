@@ -9,6 +9,7 @@ import md5 from 'md5'
 
 import Helper from '../liberaries/helper.mjs'
 import {
+    autoExtendListQuantity,
     weaponTypeList,
     rareList,
     sizeList,
@@ -376,6 +377,60 @@ const mergeItem = (target, major, minor, lang) => {
     }
 }
 
+const specialReplaceText = (text, lang) => {
+    let replacementList = [
+
+        // kiranico
+        { lang: 'jaJP', searchValue: '風雷合一', replaceValue: '風雷の合一' },
+        { lang: 'zhTW', searchValue: '龍姬的斬擊斧', replaceValue: '龍姬的劍斧' },
+
+        // gameqb
+        { lang: 'zhTW', searchValue: '倪泰裡【面具】', replaceValue: '倪泰裡【蒙面】' },
+        { lang: 'zhTW', searchValue: '鎌鼬龍', replaceValue: '鐮鼬龍' },
+
+        // game8
+        { lang: 'jaJP', searchValue: 'デスタ', replaceValue: 'テスタ' },
+        { lang: 'jaJP', searchValue: 'ブール', replaceValue: 'ブーツ' },
+        { lang: 'jaJP', searchValue: 'ウツシ表・覇【覆面】', replaceValue: 'ウツシ表【覆面】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ表・覇【上衣】', replaceValue: 'ウツシ表【上衣】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ表・覇【手甲】', replaceValue: 'ウツシ表【手甲】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ表・覇【腰巻】', replaceValue: 'ウツシ表【腰巻】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ表・覇【脚絆】', replaceValue: 'ウツシ表【脚絆】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ裏・覇【御面】', replaceValue: 'ウツシ裏【御面】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ裏・覇【上衣】', replaceValue: 'ウツシ裏【上衣】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ裏・覇【手甲】', replaceValue: 'ウツシ裏【手甲】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ裏・覇【腰巻】', replaceValue: 'ウツシ裏【腰巻】覇' },
+        { lang: 'jaJP', searchValue: 'ウツシ裏・覇【脚絆】', replaceValue: 'ウツシ裏【脚絆】覇' },
+        { lang: 'jaJP', searchValue: '切れ味', replaceValue: '斬れ味' },
+        { lang: 'jaJP', searchValue: '速射対応【火炎弾】', replaceValue: '速射対応【火炎】' },
+        { lang: 'jaJP', searchValue: '速射対応【水冷弾】', replaceValue: '速射対応【水冷】' },
+        { lang: 'jaJP', searchValue: '速射対応【電撃弾】', replaceValue: '速射対応【電撃】' },
+        { lang: 'jaJP', searchValue: '速射対応【氷結弾】', replaceValue: '速射対応【氷結】' },
+        { lang: 'jaJP', searchValue: '速射対応【滅龍弾】', replaceValue: '速射対応【滅龍】' },
+        { lang: 'jaJP', searchValue: '龍天盾剣斧ロスドナータ', replaceValue: '龍天剣斧ロスドナータ' },
+        { lang: 'jaJP', searchValue: '龍天盾斧棍スカルテバト', replaceValue: '龍天盾斧スカルテバト' },
+        { lang: 'jaJP', searchValue: '神源ノ神貫キ', replaceValue: '神源ノ雷貫キ' },
+        { lang: 'jaJP', searchValue: '金剛盾斧イカズチ', replaceValue: '金剛盾斧イカヅチ' },
+        { lang: 'jaJP', searchValue: 'すがのねの薙刀の巴', replaceValue: 'すがのねの長薙の巴' },
+        { lang: 'jaJP', searchValue: 'リムズバルラム', replaceValue: 'リムズパルラム' },
+        { lang: 'jaJP', searchValue: 'カーマヒトパーレ', replaceValue: 'カーマヒトバーレ' },
+
+        // fextralife
+    ]
+
+    for (let item of replacementList) {
+        if (lang !== item.lang) {
+            continue
+        }
+
+        if (-1 !== text.indexOf(item.searchValue)) {
+            text = text.replace(item.searchValue, item.replaceValue)
+        }
+    }
+
+    return text
+}
+
 function arrange() {
 
     // Load Data
@@ -463,63 +518,12 @@ function arrange() {
     }
 
     let majorCrawler = 'kiranico'
-    let minorCrawlers = ['gameqb', 'game8']
+    let minorCrawlers = ['gameqb', 'game8', 'fextralife']
     let supportLang = {
         kiranico: ['zhTW', 'jaJP', 'enUS'],
         gameqb: ['zhTW'],
-        game8: ['jaJP']
-    }
-
-    const specialReplaceText = (text, lang) => {
-        let replacementList = [
-
-            // kiranico
-            {lang: 'jaJP', searchValue: '風雷合一', replaceValue: '風雷の合一'},
-            {lang: 'zhTW', searchValue: '龍姬的斬擊斧', replaceValue: '龍姬的劍斧'},
-
-            // gameqb
-            {lang: 'zhTW', searchValue: '倪泰裡【面具】', replaceValue: '倪泰裡【蒙面】'},
-            {lang: 'zhTW', searchValue: '鎌鼬龍', replaceValue: '鐮鼬龍'},
-
-            // game8
-            {lang: 'jaJP', searchValue: 'デスタ', replaceValue: 'テスタ'},
-            {lang: 'jaJP', searchValue: 'ブール', replaceValue: 'ブーツ'},
-            {lang: 'jaJP', searchValue: 'ウツシ表・覇【覆面】', replaceValue: 'ウツシ表【覆面】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ表・覇【上衣】', replaceValue: 'ウツシ表【上衣】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ表・覇【手甲】', replaceValue: 'ウツシ表【手甲】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ表・覇【腰巻】', replaceValue: 'ウツシ表【腰巻】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ表・覇【脚絆】', replaceValue: 'ウツシ表【脚絆】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【御面】', replaceValue: 'ウツシ裏【御面】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【上衣】', replaceValue: 'ウツシ裏【上衣】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【手甲】', replaceValue: 'ウツシ裏【手甲】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【腰巻】', replaceValue: 'ウツシ裏【腰巻】覇'},
-            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【脚絆】', replaceValue: 'ウツシ裏【脚絆】覇'},
-            {lang: 'jaJP', searchValue: '切れ味', replaceValue: '斬れ味'},
-            {lang: 'jaJP', searchValue: '速射対応【火炎弾】', replaceValue: '速射対応【火炎】'},
-            {lang: 'jaJP', searchValue: '速射対応【水冷弾】', replaceValue: '速射対応【水冷】'},
-            {lang: 'jaJP', searchValue: '速射対応【電撃弾】', replaceValue: '速射対応【電撃】'},
-            {lang: 'jaJP', searchValue: '速射対応【氷結弾】', replaceValue: '速射対応【氷結】'},
-            {lang: 'jaJP', searchValue: '速射対応【滅龍弾】', replaceValue: '速射対応【滅龍】'},
-            {lang: 'jaJP', searchValue: '龍天盾剣斧ロスドナータ', replaceValue: '龍天剣斧ロスドナータ'},
-            {lang: 'jaJP', searchValue: '龍天盾斧棍スカルテバト', replaceValue: '龍天盾斧スカルテバト'},
-            {lang: 'jaJP', searchValue: '神源ノ神貫キ', replaceValue: '神源ノ雷貫キ'},
-            {lang: 'jaJP', searchValue: '金剛盾斧イカズチ', replaceValue: '金剛盾斧イカヅチ'},
-            {lang: 'jaJP', searchValue: 'すがのねの薙刀の巴', replaceValue: 'すがのねの長薙の巴'},
-            {lang: 'jaJP', searchValue: 'リムズバルラム', replaceValue: 'リムズパルラム'},
-            {lang: 'jaJP', searchValue: 'カーマヒトパーレ', replaceValue: 'カーマヒトバーレ'}
-        ]
-
-        for (let item of replacementList) {
-            if (lang !== item.lang) {
-                continue
-            }
-
-            if (-1 !== text.indexOf(item.searchValue)) {
-                text = text.replace(item.searchValue, item.replaceValue)
-            }
-        }
-
-        return text
+        game8: ['jaJP'],
+        fextralife: ['enUS']
     }
 
     for (let target of Object.keys(arrangeDataMapping)) {

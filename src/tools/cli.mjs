@@ -16,12 +16,14 @@ import CombineTask from './tasks/combine.mjs'
 import Game8Task from './tasks/game8.mjs'
 import GameqbTask from './tasks/gameqb.mjs'
 import KiranicobTask from './tasks/kiranico.mjs'
+import FextralifeTask from './tasks/fextralife.mjs'
 
 let taskMapping = {
     combine: CombineTask,
     game8: Game8Task,
     gameqb: GameqbTask,
-    kiranico: KiranicobTask
+    kiranico: KiranicobTask,
+    fextralife: FextralifeTask
 }
 
 // Check Task

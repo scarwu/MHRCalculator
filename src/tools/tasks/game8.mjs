@@ -13,7 +13,7 @@ import {
     defaultJewel,
     defaultEnhance,
     defaultSkill,
-    autoExtendCols,
+    autoExtendListQuantity,
     normalizeText,
     weaponTypeList,
     rareList,
@@ -41,7 +41,7 @@ const urls = {
     },
     armors: 'https://game8.jp/mhrise/363845',
     // charms: null,
-    // petalaces: null,
+    // petalaces: 'https://game8.jp/mhrise/364037',
     jewels: 'https://game8.jp/mhrise/363846',
     enhances: 'https://game8.jp/mhrise/382391',
     skills: 'https://game8.jp/mhrise/363848'
@@ -282,7 +282,7 @@ async function fetchWeapons() {
             }
         }
 
-        let list = autoExtendCols(Object.values(mapping))
+        let list = autoExtendListQuantity(Object.values(mapping))
 
         Helper.saveJSONAsCSV(`${fileRoot}/weapons/${weaponType}.csv`, list)
     }
@@ -530,7 +530,7 @@ async function fetchArmors() {
         }
     }
 
-    let list = autoExtendCols(Object.values(mapping))
+    let list = autoExtendListQuantity(Object.values(mapping))
 
     Helper.saveJSONAsCSV(`${fileRoot}/armors.csv`, list)
 }

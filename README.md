@@ -38,3 +38,4 @@ gulp release # and commit to github
 * https://mhr.gameqb.net
 * https://game8.jp/mhrise
 * https://monsterhunterrise.wiki.fextralife.com
+* https://mhrise.kiranico.com/zh-Hant

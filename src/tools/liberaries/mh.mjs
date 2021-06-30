@@ -123,7 +123,7 @@ export const defaultSkill = {
     effect: null
 }
 
-export const autoExtendCols = (list) => {
+export const autoExtendListQuantity = (list) => {
     let slotCount = 0
     let skillCount = 0
     let enhanceCount = 0
@@ -217,5 +217,5 @@ export const sizeList = [
 ]
 
 export const crawlerNameList = [
-    'gameqb', 'game8', 'kiranico'
+    'gameqb', 'game8', 'kiranico', 'fextralife'
 ]

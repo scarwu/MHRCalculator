@@ -13,7 +13,7 @@ import {
     defaultJewel,
     defaultEnhance,
     defaultSkill,
-    autoExtendCols,
+    autoExtendListQuantity,
     normalizeText,
     weaponTypeList,
     rareList,
@@ -338,12 +338,12 @@ const fetchWeapons = async () => {
             }
         }
 
-        let list = autoExtendCols(Object.values(mapping))
+        let list = autoExtendListQuantity(Object.values(mapping))
 
         Helper.saveJSONAsCSV(`${fileRoot}/weapons/${weaponType}.csv`, list)
 
         if (Helper.isEmpty(targetWeaponType)) {
-            let enhanceList = autoExtendCols(Object.values(enhanceMapping))
+            let enhanceList = autoExtendListQuantity(Object.values(enhanceMapping))
 
             Helper.saveJSONAsCSV(`${fileRoot}/enhances.csv`, enhanceList)
         }
@@ -539,7 +539,7 @@ const fetchArmors = async () => {
         })
     }
 
-    let list = autoExtendCols(Object.values(mapping))
+    let list = autoExtendListQuantity(Object.values(mapping))
 
     Helper.saveJSONAsCSV(`${fileRoot}/armors.csv`, list)
 }

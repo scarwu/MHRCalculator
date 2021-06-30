@@ -18,11 +18,162 @@ import {
 const crawlerRoot = 'temp/crawler'
 const combineRoot = 'temp/combine'
 
-const mergeItem = (target, major, minor, lang) => {
+const mergeNormalValue = (major, minor, keys ) => {
+    for (let key of keys) {
+        if (Helper.isEmpty(major[key])
+            && Helper.isNotEmpty(minor[key])
+        ) {
+            major[key] = minor[key]
+        }
+    }
+
+    return major
+}
+
+const mergeTranslateValue = (major, minor, lang, keys) => {
+    for (let key of keys) {
+        if (Helper.isEmpty(major[key])) {
+            major[key] = {}
+        }
+
+        if (Helper.isEmpty(major[key][lang])
+            && Helper.isNotEmpty(minor[key])
+            && Helper.isNotEmpty(minor[key][lang])
+        ) {
+            major[key][lang] = minor[key][lang]
+        }
+    }
+
+    return major
+}
+
+const mergeSlotsValue = (major, minor) => {
     let slotMaxIndex = 0
+
+    if (Helper.isNotEmpty(major.slots)) {
+        slotMaxIndex = (major.slots.length > slotMaxIndex) ? major.slots.length : slotMaxIndex
+    }
+
+    if (Helper.isNotEmpty(minor.slots)) {
+        slotMaxIndex = (minor.slots.length > slotMaxIndex) ? minor.slots.length : slotMaxIndex
+    }
+
+    if (0 !== slotMaxIndex) {
+        if (Helper.isEmpty(major.slots)) {
+            major.slots = []
+        }
+
+        if (Helper.isEmpty(minor.slots)) {
+            minor.slots = []
+        }
+
+        for (let index = 0; index < slotMaxIndex; index++) {
+            if (Helper.isEmpty(major.slots[index])) {
+                major.slots[index] = {}
+            }
+
+            if (Helper.isEmpty(minor.slots[index])) {
+                minor.slots[index] = {}
+            }
+
+            if (Helper.isEmpty(major.slots[index].size)
+                && Helper.isNotEmpty(minor.slots[index].size)
+            ) {
+                major.slots[index].size = minor.slots[index].size
+            }
+        }
+    }
+
+    return major
+}
+
+const mergeSkillsValue = (major, minor) => {
     let skillMaxIndex = 0
+
+    if (Helper.isNotEmpty(major.skills)) {
+        skillMaxIndex = (major.skills.length > skillMaxIndex) ? major.skills.length : skillMaxIndex
+    }
+
+    if (Helper.isNotEmpty(minor.skills)) {
+        skillMaxIndex = (minor.skills.length > skillMaxIndex) ? minor.skills.length : skillMaxIndex
+    }
+
+    if (0 !== skillMaxIndex) {
+        if (Helper.isEmpty(major.skills)) {
+            major.skills = []
+        }
+
+        if (Helper.isEmpty(minor.skills)) {
+            minor.skills = []
+        }
+
+        for (let index = 0; index < skillMaxIndex; index++) {
+            if (Helper.isEmpty(major.skills[index])) {
+                major.skills[index] = {}
+            }
+
+            if (Helper.isEmpty(minor.skills[index])) {
+                minor.skills[index] = {}
+            }
+
+            if (Helper.isEmpty(major.skills[index].name)
+                && Helper.isNotEmpty(minor.skills[index].name)
+            ) {
+                major.skills[index].name = minor.skills[index].name
+            }
+
+            if (Helper.isEmpty(major.skills[index].level)
+                && Helper.isNotEmpty(minor.skills[index].level)
+            ) {
+                major.skills[index].level = minor.skills[index].level
+            }
+        }
+    }
+
+    return major
+}
+
+const mergeEnhancesValue = (major, minor) => {
     let enhanceMaxIndex = 0
 
+    if (Helper.isNotEmpty(major.enhances)) {
+        enhanceMaxIndex = (major.enhances.length > enhanceMaxIndex) ? major.enhances.length : enhanceMaxIndex
+    }
+
+    if (Helper.isNotEmpty(minor.enhances)) {
+        enhanceMaxIndex = (minor.enhances.length > enhanceMaxIndex) ? minor.enhances.length : enhanceMaxIndex
+    }
+
+    if (0 !== enhanceMaxIndex) {
+        if (Helper.isEmpty(major.enhances)) {
+            major.enhances = []
+        }
+
+        if (Helper.isEmpty(minor.enhances)) {
+            minor.enhances = []
+        }
+
+        for (let index = 0; index < enhanceMaxIndex; index++) {
+            if (Helper.isEmpty(major.enhances[index])) {
+                major.enhances[index] = {}
+            }
+
+            if (Helper.isEmpty(minor.enhances[index])) {
+                minor.enhances[index] = {}
+            }
+
+            if (Helper.isEmpty(major.enhances[index].name)
+                && Helper.isNotEmpty(minor.enhances[index].name)
+            ) {
+                major.enhances[index].name = minor.enhances[index].name
+            }
+        }
+    }
+
+    return major
+}
+
+const mergeItem = (target, major, minor, lang) => {
     switch (target) {
     case 'weapons':
         // Format: {
@@ -65,29 +216,10 @@ const mergeItem = (target, major, minor, lang) => {
         //         // }
         //     ]
         // }
-
-        // Normal Value
-        for (let key of ['rare', 'type', 'attack', 'criticalRate', 'defense']) {
-            if (Helper.isEmpty(major[key])
-                && Helper.isNotEmpty(minor[key])
-            ) {
-                major[key] = minor[key]
-            }
-        }
-
-        // Translate Value
-        for (let key of ['series', 'name']) {
-            if (Helper.isEmpty(major[key])) {
-                major[key] = {}
-            }
-
-            if (Helper.isEmpty(major[key][lang])
-                && Helper.isNotEmpty(minor[key])
-                && Helper.isNotEmpty(minor[key][lang])
-            ) {
-                major[key][lang] = minor[key][lang]
-            }
-        }
+        major = mergeNormalValue(major, minor, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
+        major = mergeTranslateValue(major, minor, lang, ['series', 'name'])
+        major = mergeSlotsValue(major, minor)
+        major = mergeEnhancesValue(major, minor)
 
         // Element Attack & Status Value
         for (let key of ['attack', 'status']) {
@@ -116,80 +248,6 @@ const mergeItem = (target, major, minor, lang) => {
                 && Helper.isNotEmpty(minor.sharpness[key])
             ) {
                 major.sharpness[key] = minor.sharpness[key]
-            }
-        }
-
-        // Slots Value
-        slotMaxIndex = 0
-
-        if (Helper.isNotEmpty(major.slots)) {
-            slotMaxIndex = (major.slots.length > slotMaxIndex) ? major.slots.length : slotMaxIndex
-        }
-
-        if (Helper.isNotEmpty(minor.slots)) {
-            slotMaxIndex = (minor.slots.length > slotMaxIndex) ? minor.slots.length : slotMaxIndex
-        }
-
-        if (0 !== slotMaxIndex) {
-            if (Helper.isEmpty(major.slots)) {
-                major.slots = []
-            }
-
-            if (Helper.isEmpty(minor.slots)) {
-                minor.slots = []
-            }
-
-            for (let index = 0; index < slotMaxIndex; index++) {
-                if (Helper.isEmpty(major.slots[index])) {
-                    major.slots[index] = {}
-                }
-
-                if (Helper.isEmpty(minor.slots[index])) {
-                    minor.slots[index] = {}
-                }
-
-                if (Helper.isEmpty(major.slots[index].size)
-                    && Helper.isNotEmpty(minor.slots[index].size)
-                ) {
-                    major.slots[index].size = minor.slots[index].size
-                }
-            }
-        }
-
-        // Enhances Value
-        enhanceMaxIndex = 0
-
-        if (Helper.isNotEmpty(major.enhances)) {
-            enhanceMaxIndex = (major.enhances.length > enhanceMaxIndex) ? major.enhances.length : enhanceMaxIndex
-        }
-
-        if (Helper.isNotEmpty(minor.enhances)) {
-            enhanceMaxIndex = (minor.enhances.length > enhanceMaxIndex) ? minor.enhances.length : enhanceMaxIndex
-        }
-
-        if (0 !== enhanceMaxIndex) {
-            if (Helper.isEmpty(major.enhances)) {
-                major.enhances = []
-            }
-
-            if (Helper.isEmpty(minor.enhances)) {
-                minor.enhances = []
-            }
-
-            for (let index = 0; index < enhanceMaxIndex; index++) {
-                if (Helper.isEmpty(major.enhances[index])) {
-                    major.enhances[index] = {}
-                }
-
-                if (Helper.isEmpty(minor.enhances[index])) {
-                    minor.enhances[index] = {}
-                }
-
-                if (Helper.isEmpty(major.enhances[index].name)
-                    && Helper.isNotEmpty(minor.enhances[index].name)
-                ) {
-                    major.enhances[index].name = minor.enhances[index].name
-                }
             }
         }
 
@@ -222,29 +280,10 @@ const mergeItem = (target, major, minor, lang) => {
         //         // }
         //     ]
         // }
-
-        // Normal Value
-        for (let key of ['rare', 'type', 'gender', 'minDefense', 'maxDefense']) {
-            if (Helper.isEmpty(major[key])
-                && Helper.isNotEmpty(minor[key])
-            ) {
-                major[key] = minor[key]
-            }
-        }
-
-        // Translate Value
-        for (let key of ['series', 'name']) {
-            if (Helper.isEmpty(major[key])) {
-                major[key] = {}
-            }
-
-            if (Helper.isEmpty(major[key][lang])
-                && Helper.isNotEmpty(minor[key])
-                && Helper.isNotEmpty(minor[key][lang])
-            ) {
-                major[key][lang] = minor[key][lang]
-            }
-        }
+        major = mergeNormalValue(major, minor, ['rare', 'type', 'gender', 'minDefense', 'maxDefense'])
+        major = mergeTranslateValue(major, minor, lang, ['series', 'name'])
+        major = mergeSlotsValue(major, minor)
+        major = mergeSkillsValue(major, minor)
 
         // Resistence Value
         for (let key of ['fire', 'water', 'thunder', 'ice', 'dragon']) {
@@ -252,86 +291,6 @@ const mergeItem = (target, major, minor, lang) => {
                 && Helper.isNotEmpty(minor.resistence[key])
             ) {
                 major.resistence[key] = minor.resistence[key]
-            }
-        }
-
-        // Slots Value
-        slotMaxIndex = 0
-
-        if (Helper.isNotEmpty(major.slots)) {
-            slotMaxIndex = (major.slots.length > slotMaxIndex) ? major.slots.length : slotMaxIndex
-        }
-
-        if (Helper.isNotEmpty(minor.slots)) {
-            slotMaxIndex = (minor.slots.length > slotMaxIndex) ? minor.slots.length : slotMaxIndex
-        }
-
-        if (0 !== slotMaxIndex) {
-            if (Helper.isEmpty(major.slots)) {
-                major.slots = []
-            }
-
-            if (Helper.isEmpty(minor.slots)) {
-                minor.slots = []
-            }
-
-            for (let index = 0; index < slotMaxIndex; index++) {
-                if (Helper.isEmpty(major.slots[index])) {
-                    major.slots[index] = {}
-                }
-
-                if (Helper.isEmpty(minor.slots[index])) {
-                    minor.slots[index] = {}
-                }
-
-                if (Helper.isEmpty(major.slots[index].size)
-                    && Helper.isNotEmpty(minor.slots[index].size)
-                ) {
-                    major.slots[index].size = minor.slots[index].size
-                }
-            }
-        }
-
-        // Skills Value
-        skillMaxIndex = 0
-
-        if (Helper.isNotEmpty(major.skills)) {
-            skillMaxIndex = (major.skills.length > skillMaxIndex) ? major.skills.length : skillMaxIndex
-        }
-
-        if (Helper.isNotEmpty(minor.skills)) {
-            skillMaxIndex = (minor.skills.length > skillMaxIndex) ? minor.skills.length : skillMaxIndex
-        }
-
-        if (0 !== skillMaxIndex) {
-            if (Helper.isEmpty(major.skills)) {
-                major.skills = []
-            }
-
-            if (Helper.isEmpty(minor.skills)) {
-                minor.skills = []
-            }
-
-            for (let index = 0; index < skillMaxIndex; index++) {
-                if (Helper.isEmpty(major.skills[index])) {
-                    major.skills[index] = {}
-                }
-
-                if (Helper.isEmpty(minor.skills[index])) {
-                    minor.skills[index] = {}
-                }
-
-                if (Helper.isEmpty(major.skills[index].name)
-                    && Helper.isNotEmpty(minor.skills[index].name)
-                ) {
-                    major.skills[index].name = minor.skills[index].name
-                }
-
-                if (Helper.isEmpty(major.skills[index].level)
-                    && Helper.isNotEmpty(minor.skills[index].level)
-                ) {
-                    major.skills[index].level = minor.skills[index].level
-                }
             }
         }
 
@@ -348,66 +307,9 @@ const mergeItem = (target, major, minor, lang) => {
         //         // }
         //     ]
         // }
-
-        // Normal Value
-        for (let key of ['rare', 'size']) {
-            if (Helper.isEmpty(major[key])
-                && Helper.isNotEmpty(minor[key])
-            ) {
-                major[key] = minor[key]
-            }
-        }
-
-        // Translate Value
-        for (let key of ['name']) {
-            if (Helper.isEmpty(major[key])) {
-                major[key] = {}
-            }
-
-            if (Helper.isEmpty(major[key][lang])
-                && Helper.isNotEmpty(minor[key])
-                && Helper.isNotEmpty(minor[key][lang])
-            ) {
-                major[key][lang] = minor[key][lang]
-            }
-        }
-
-        // Slots Value
-        slotMaxIndex = 0
-
-        if (Helper.isNotEmpty(major.slots)) {
-            slotMaxIndex = (major.slots.length > slotMaxIndex) ? major.slots.length : slotMaxIndex
-        }
-
-        if (Helper.isNotEmpty(minor.slots)) {
-            slotMaxIndex = (minor.slots.length > slotMaxIndex) ? minor.slots.length : slotMaxIndex
-        }
-
-        if (0 !== slotMaxIndex) {
-            if (Helper.isEmpty(major.slots)) {
-                major.slots = []
-            }
-
-            if (Helper.isEmpty(minor.slots)) {
-                minor.slots = []
-            }
-
-            for (let index = 0; index < slotMaxIndex; index++) {
-                if (Helper.isEmpty(major.slots[index])) {
-                    major.slots[index] = {}
-                }
-
-                if (Helper.isEmpty(minor.slots[index])) {
-                    minor.slots[index] = {}
-                }
-
-                if (Helper.isEmpty(major.slots[index].size)
-                    && Helper.isNotEmpty(minor.slots[index].size)
-                ) {
-                    major.slots[index].size = minor.slots[index].size
-                }
-            }
-        }
+        major = mergeNormalValue(major, minor, ['rare', 'size'])
+        major = mergeTranslateValue(major, minor, lang, ['name'])
+        major = mergeSlotsValue(major, minor)
 
         return Helper.deepCopy(major)
     case 'petalaces':
@@ -431,29 +333,8 @@ const mergeItem = (target, major, minor, lang) => {
         //         obtain: null
         //     }
         // }
-
-        // Normal Value
-        for (let key of ['rare']) {
-            if (Helper.isEmpty(major[key])
-                && Helper.isNotEmpty(minor[key])
-            ) {
-                major[key] = minor[key]
-            }
-        }
-
-        // Translate Value
-        for (let key of ['name']) {
-            if (Helper.isEmpty(major[key])) {
-                major[key] = {}
-            }
-
-            if (Helper.isEmpty(major[key][lang])
-                && Helper.isNotEmpty(minor[key])
-                && Helper.isNotEmpty(minor[key][lang])
-            ) {
-                major[key][lang] = minor[key][lang]
-            }
-        }
+        major = mergeNormalValue(major, minor, ['rare'])
+        major = mergeTranslateValue(major, minor, lang, ['name'])
 
         // Increment & Obtain Value
         for (let key of ['health', 'stamina', 'attack', 'defense']) {
@@ -476,20 +357,7 @@ const mergeItem = (target, major, minor, lang) => {
         //     name: { lang },
         //     description: { lang }
         // }
-
-        // Translate Value
-        for (let key of ['name', 'description']) {
-            if (Helper.isEmpty(major[key])) {
-                major[key] = {}
-            }
-
-            if (Helper.isEmpty(major[key][lang])
-                && Helper.isNotEmpty(minor[key])
-                && Helper.isNotEmpty(minor[key][lang])
-            ) {
-                major[key][lang] = minor[key][lang]
-            }
-        }
+        major = mergeTranslateValue(major, minor, lang, ['name', 'description'])
 
         return Helper.deepCopy(major)
     case 'skills':
@@ -499,29 +367,8 @@ const mergeItem = (target, major, minor, lang) => {
         //     level: null,
         //     effect: { lang }
         // }
-
-        // Normal Value
-        for (let key of ['level']) {
-            if (Helper.isEmpty(major[key])
-                && Helper.isNotEmpty(minor[key])
-            ) {
-                major[key] = minor[key]
-            }
-        }
-
-        // Translate Value
-        for (let key of ['name', 'description', 'effect']) {
-            if (Helper.isEmpty(major[key])) {
-                major[key] = {}
-            }
-
-            if (Helper.isEmpty(major[key][lang])
-                && Helper.isNotEmpty(minor[key])
-                && Helper.isNotEmpty(minor[key][lang])
-            ) {
-                major[key][lang] = minor[key][lang]
-            }
-        }
+        major = mergeNormalValue(major, minor, ['level'])
+        major = mergeTranslateValue(major, minor, lang, ['name', 'description', 'effect'])
 
         return Helper.deepCopy(major)
     default:
@@ -624,40 +471,51 @@ function arrange() {
     }
 
     const specialReplaceText = (text, lang) => {
-        let replacementMapping = {
+        let replacementList = [
 
             // kiranico
-            '風雷合一': { lang: 'jaJP', replaceValue: '風雷の合一', },
-            '龍姬的斬擊斧': { lang: 'zhTW', replaceValue: '龍姬的劍斧', },
+            {lang: 'jaJP', searchValue: '風雷合一', replaceValue: '風雷の合一'},
+            {lang: 'zhTW', searchValue: '龍姬的斬擊斧', replaceValue: '龍姬的劍斧'},
 
             // gameqb
-            '倪泰裡【面具】': { lang: 'zhTW', replaceValue: '倪泰裡【蒙面】', },
-            '鎌鼬龍': { lang: 'zhTW', replaceValue: '鐮鼬龍', },
+            {lang: 'zhTW', searchValue: '倪泰裡【面具】', replaceValue: '倪泰裡【蒙面】'},
+            {lang: 'zhTW', searchValue: '鎌鼬龍', replaceValue: '鐮鼬龍'},
 
             // game8
-            'デスタ': { lang: 'jaJP', replaceValue: 'テスタ' },
-            'ブール': { lang: 'jaJP', replaceValue: 'ブーツ' },
-            'ウツシ表・覇【覆面】': { lang: 'jaJP', replaceValue: 'ウツシ表【覆面】覇', },
-            'ウツシ表・覇【上衣】': { lang: 'jaJP', replaceValue: 'ウツシ表【上衣】覇', },
-            'ウツシ表・覇【手甲】': { lang: 'jaJP', replaceValue: 'ウツシ表【手甲】覇', },
-            'ウツシ表・覇【腰巻】': { lang: 'jaJP', replaceValue: 'ウツシ表【腰巻】覇', },
-            'ウツシ表・覇【脚絆】': { lang: 'jaJP', replaceValue: 'ウツシ表【脚絆】覇', },
-            'ウツシ裏・覇【御面】': { lang: 'jaJP', replaceValue: 'ウツシ裏【御面】覇', },
-            'ウツシ裏・覇【上衣】': { lang: 'jaJP', replaceValue: 'ウツシ裏【上衣】覇', },
-            'ウツシ裏・覇【手甲】': { lang: 'jaJP', replaceValue: 'ウツシ裏【手甲】覇', },
-            'ウツシ裏・覇【腰巻】': { lang: 'jaJP', replaceValue: 'ウツシ裏【腰巻】覇', },
-            'ウツシ裏・覇【脚絆】': { lang: 'jaJP', replaceValue: 'ウツシ裏【脚絆】覇', },
-            '切れ味': { lang: 'jaJP', replaceValue: '斬れ味', },
-            '速射対応【火炎弾】': { lang: 'jaJP', replaceValue: '速射対応【火炎】' },
-            '速射対応【水冷弾】': { lang: 'jaJP', replaceValue: '速射対応【水冷】' },
-            '速射対応【電撃弾】': { lang: 'jaJP', replaceValue: '速射対応【電撃】' },
-            '速射対応【氷結弾】': { lang: 'jaJP', replaceValue: '速射対応【氷結】' },
-            '速射対応【滅龍弾】': { lang: 'jaJP', replaceValue: '速射対応【滅龍】' }
-        }
+            {lang: 'jaJP', searchValue: 'デスタ', replaceValue: 'テスタ'},
+            {lang: 'jaJP', searchValue: 'ブール', replaceValue: 'ブーツ'},
+            {lang: 'jaJP', searchValue: 'ウツシ表・覇【覆面】', replaceValue: 'ウツシ表【覆面】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ表・覇【上衣】', replaceValue: 'ウツシ表【上衣】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ表・覇【手甲】', replaceValue: 'ウツシ表【手甲】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ表・覇【腰巻】', replaceValue: 'ウツシ表【腰巻】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ表・覇【脚絆】', replaceValue: 'ウツシ表【脚絆】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【御面】', replaceValue: 'ウツシ裏【御面】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【上衣】', replaceValue: 'ウツシ裏【上衣】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【手甲】', replaceValue: 'ウツシ裏【手甲】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【腰巻】', replaceValue: 'ウツシ裏【腰巻】覇'},
+            {lang: 'jaJP', searchValue: 'ウツシ裏・覇【脚絆】', replaceValue: 'ウツシ裏【脚絆】覇'},
+            {lang: 'jaJP', searchValue: '切れ味', replaceValue: '斬れ味'},
+            {lang: 'jaJP', searchValue: '速射対応【火炎弾】', replaceValue: '速射対応【火炎】'},
+            {lang: 'jaJP', searchValue: '速射対応【水冷弾】', replaceValue: '速射対応【水冷】'},
+            {lang: 'jaJP', searchValue: '速射対応【電撃弾】', replaceValue: '速射対応【電撃】'},
+            {lang: 'jaJP', searchValue: '速射対応【氷結弾】', replaceValue: '速射対応【氷結】'},
+            {lang: 'jaJP', searchValue: '速射対応【滅龍弾】', replaceValue: '速射対応【滅龍】'},
+            {lang: 'jaJP', searchValue: '龍天盾剣斧ロスドナータ', replaceValue: '龍天剣斧ロスドナータ'},
+            {lang: 'jaJP', searchValue: '龍天盾斧棍スカルテバト', replaceValue: '龍天盾斧スカルテバト'},
+            {lang: 'jaJP', searchValue: '神源ノ神貫キ', replaceValue: '神源ノ雷貫キ'},
+            {lang: 'jaJP', searchValue: '金剛盾斧イカズチ', replaceValue: '金剛盾斧イカヅチ'},
+            {lang: 'jaJP', searchValue: 'すがのねの薙刀の巴', replaceValue: 'すがのねの長薙の巴'},
+            {lang: 'jaJP', searchValue: 'リムズバルラム', replaceValue: 'リムズパルラム'},
+            {lang: 'jaJP', searchValue: 'カーマヒトパーレ', replaceValue: 'カーマヒトバーレ'}
+        ]
 
-        for (let searchText of Object.keys(replacementMapping)) {
-            if (-1 !== text.indexOf(searchText) && lang === replacementMapping[searchText].lang) {
-                text = text.replace(searchText, replacementMapping[searchText].replaceValue)
+        for (let item of replacementList) {
+            if (lang !== item.lang) {
+                continue
+            }
+
+            if (-1 !== text.indexOf(item.searchValue)) {
+                text = text.replace(item.searchValue, item.replaceValue)
             }
         }
 

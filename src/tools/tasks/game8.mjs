@@ -254,7 +254,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     }
 
                     subNode.find('tbody tr').eq(enhanceRowIndex).find('a').each((index, node) => {
-                        mapping[mappingKey].enhances.push({
+                        mapping[mappingKey].enhance.list.push({
                             name: normalizeText(weaponDom(node).text())
                         })
                     })

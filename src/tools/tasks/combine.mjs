@@ -134,39 +134,45 @@ const mergeSkillsValue = (major, minor) => {
     return major
 }
 
-const mergeEnhancesValue = (major, minor) => {
-    let enhanceMaxIndex = 0
-
-    if (Helper.isNotEmpty(major.enhances)) {
-        enhanceMaxIndex = (major.enhances.length > enhanceMaxIndex) ? major.enhances.length : enhanceMaxIndex
+const mergeEnhanceValue = (major, minor) => {
+    if (Helper.isEmpty(major.enhance.limit)
+        && Helper.isNotEmpty(minor.enhance.limit)
+    ) {
+        major.enhance.limit = minor.enhance.limit
     }
 
-    if (Helper.isNotEmpty(minor.enhances)) {
-        enhanceMaxIndex = (minor.enhances.length > enhanceMaxIndex) ? minor.enhances.length : enhanceMaxIndex
+    let enhanceMaxIndex = 0
+
+    if (Helper.isNotEmpty(major.enhance.list)) {
+        enhanceMaxIndex = (major.enhance.list.length > enhanceMaxIndex) ? major.enhance.list.length : enhanceMaxIndex
+    }
+
+    if (Helper.isNotEmpty(minor.enhance.list)) {
+        enhanceMaxIndex = (minor.enhance.list.length > enhanceMaxIndex) ? minor.enhance.list.length : enhanceMaxIndex
     }
 
     if (0 !== enhanceMaxIndex) {
-        if (Helper.isEmpty(major.enhances)) {
-            major.enhances = []
+        if (Helper.isEmpty(major.enhance.list)) {
+            major.enhance.list = []
         }
 
-        if (Helper.isEmpty(minor.enhances)) {
-            minor.enhances = []
+        if (Helper.isEmpty(minor.enhance.list)) {
+            minor.enhance.list = []
         }
 
         for (let index = 0; index < enhanceMaxIndex; index++) {
-            if (Helper.isEmpty(major.enhances[index])) {
-                major.enhances[index] = {}
+            if (Helper.isEmpty(major.enhance.list[index])) {
+                major.enhance.list[index] = {}
             }
 
-            if (Helper.isEmpty(minor.enhances[index])) {
-                minor.enhances[index] = {}
+            if (Helper.isEmpty(minor.enhance.list[index])) {
+                minor.enhance.list[index] = {}
             }
 
-            if (Helper.isEmpty(major.enhances[index].name)
-                && Helper.isNotEmpty(minor.enhances[index].name)
+            if (Helper.isEmpty(major.enhance.list[index].name)
+                && Helper.isNotEmpty(minor.enhance.list[index].name)
             ) {
-                major.enhances[index].name = minor.enhances[index].name
+                major.enhance.list[index].name = minor.enhance.list[index].name
             }
         }
     }
@@ -220,7 +226,7 @@ const mergeItem = (target, major, minor, lang) => {
         major = mergeNormalValue(major, minor, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
         major = mergeTranslateValue(major, minor, lang, ['series', 'name'])
         major = mergeSlotsValue(major, minor)
-        major = mergeEnhancesValue(major, minor)
+        major = mergeEnhanceValue(major, minor)
 
         // Element Attack & Status Value
         for (let key of ['attack', 'status']) {
@@ -697,6 +703,10 @@ export const statisticsAction = () => {
                         if (Helper.isNotEmpty(item.rare)) {
                             let rare = `rare${item.rare}`
 
+                            if (Helper.isEmpty(result.weapons[weaponType][rare])) {
+                                console.log(item)
+                            }
+
                             if (Helper.isEmpty(result.weapons[weaponType][rare][crawlerName])) {
                                 result.weapons[weaponType][rare][crawlerName] = 0
                             }
@@ -719,6 +729,10 @@ export const statisticsAction = () => {
             for (let item of armorList) {
                 if (Helper.isNotEmpty(item.rare)) {
                     let rare = `rare${item.rare}`
+
+                    if (Helper.isEmpty(result.armors[rare])) {
+                        console.log(item)
+                    }
 
                     if (Helper.isEmpty(result.armors[rare][crawlerName])) {
                         result.armors[rare][crawlerName] = 0

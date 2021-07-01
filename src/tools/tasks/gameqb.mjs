@@ -268,7 +268,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 
                         let enhanceName = normalizeText(enhanceNode.text())
 
-                        mapping[mappingKey].enhances.push({
+                        mapping[mappingKey].enhance.list.push({
                             name: enhanceName
                         })
 

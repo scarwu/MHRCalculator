@@ -43,11 +43,14 @@ export const defaultWeapon = {
         //     size: null
         // }
     ],
-    enhances: [
-        // {
-        //     name: null
-        // }
-    ]
+    enhance: {
+        amount: null,
+        list: [
+            // {
+            //     name: null
+            // }
+        ]
+    }
 }
 
 export const defaultArmor = {

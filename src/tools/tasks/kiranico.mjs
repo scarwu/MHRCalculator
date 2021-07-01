@@ -253,7 +253,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             weaponDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
                 let enhanceName = normalizeText(weaponDom(node).find('td').eq(1).find('a').text())
 
-                mapping[mappingKey].enhances.push({
+                mapping[mappingKey].enhance.list.push({
                     name: enhanceName
                 })
             })

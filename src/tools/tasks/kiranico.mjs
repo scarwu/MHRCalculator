@@ -64,15 +64,9 @@ const getFullUrl = (lang, url) => {
     return `${urls.langs[lang]}/${url}`
 }
 
-async function fetchWeapons() {
+export const fetchWeaponsAction = async (targetWeaponType = null) => {
     let fetchPageUrl = null
     let fetchPageName = null
-
-    let targetWeaponType = null
-
-    if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
-        targetWeaponType = process.argv[4]
-    }
 
     for (let weaponType of Object.keys(urls.weapons)) {
         if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
@@ -297,15 +291,9 @@ async function fetchWeapons() {
     }
 }
 
-async function fetchArmors() {
+export const fetchArmorsAction = async (targetArmorRare = null) => {
     let fetchPageUrl = null
     let fetchPageName = null
-
-    let targetArmorRare = null
-
-    if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.armors[process.argv[4]])) {
-        targetArmorRare = process.argv[4]
-    }
 
     for (let armorRare of Object.keys(urls.armors)) {
         if (Helper.isNotEmpty(targetArmorRare) && targetArmorRare !== armorRare) {
@@ -491,7 +479,7 @@ async function fetchArmors() {
     }
 }
 
-async function fetchJewels() {
+export const fetchJewelsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -579,7 +567,7 @@ async function fetchJewels() {
     Helper.saveJSONAsCSV(`${fileRoot}/jewels.csv`, Object.values(mapping))
 }
 
-async function fetchEnhances() {
+export const fetchEnhancesAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -665,7 +653,7 @@ async function fetchEnhances() {
     Helper.saveJSONAsCSV(`${fileRoot}/enhances.csv`, Object.values(mapping))
 }
 
-async function fetchSkills() {
+export const fetchSkillsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -779,13 +767,12 @@ async function fetchSkills() {
     Helper.saveJSONAsCSV(`${fileRoot}/skills.csv`, Object.values(mapping))
 }
 
-function statistics() {
+export const statisticsAction = () => {
 
     // Generate Result Format
     let result = {
         weapons: {},
         armors: {},
-        petalaces: {},
         jewels: {},
         enhances: {},
         skills: {}
@@ -813,90 +800,46 @@ function statistics() {
     }
 
     // Weapons
-    let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons.csv`)
+    for (let weaponType of weaponTypeList) {
+        let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons/${weaponType}.csv`)
 
-    if (Helper.isNotEmpty(weaponList)) {
-        result.weapons.all = weaponList.length
-
-        for (let item of weaponList) {
-            let weaponType = item.type
+        if (Helper.isNotEmpty(weaponList)) {
+            if (Helper.isEmpty(result.weapons.all)) {
+                result.weapons.all = 0
+            }
 
             if (Helper.isEmpty(result.weapons[weaponType].all)) {
                 result.weapons[weaponType].all = 0
             }
 
-            result.weapons[weaponType].all += 1
+            result.weapons.all += weaponList.length
+            result.weapons[weaponType].all += weaponList.length
 
-            if (Helper.isNotEmpty(item.rare)) {
-                let rare = `rare${item.rare}`
+            for (let item of weaponList) {
+                if (Helper.isNotEmpty(item.rare)) {
+                    let rare = `rare${item.rare}`
 
-                if (Helper.isEmpty(result.weapons[weaponType][rare])) {
-                    result.weapons[weaponType][rare] = 0
-                }
-
-                result.weapons[weaponType][rare] += 1
-            }
-        }
-    } else {
-        for (let weaponType of weaponTypeList) {
-            let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons/${weaponType}.csv`)
-
-            if (Helper.isNotEmpty(weaponList)) {
-                if (Helper.isEmpty(result.weapons.all)) {
-                    result.weapons.all = 0
-                }
-
-                if (Helper.isEmpty(result.weapons[weaponType].all)) {
-                    result.weapons[weaponType].all = 0
-                }
-
-                result.weapons.all += weaponList.length
-                result.weapons[weaponType].all += weaponList.length
-
-                for (let item of weaponList) {
-                    if (Helper.isNotEmpty(item.rare)) {
-                        let rare = `rare${item.rare}`
-
-                        if (Helper.isEmpty(result.weapons[weaponType][rare])) {
-                            result.weapons[weaponType][rare] = 0
-                        }
-
-                        result.weapons[weaponType][rare] += 1
+                    if (Helper.isEmpty(result.weapons[weaponType][rare])) {
+                        result.weapons[weaponType][rare] = 0
                     }
+
+                    result.weapons[weaponType][rare] += 1
                 }
             }
         }
     }
 
     // Armors
-    let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors.csv`)
+    for (let rare of rareList) {
+        let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors/${rare}.csv`)
 
-    if (Helper.isNotEmpty(armorList)) {
-        result.armors.all = armorList.length
-
-        for (let item of armorList) {
-            if (Helper.isNotEmpty(item.rare)) {
-                let rare = `rare${item.rare}`
-
-                if (Helper.isEmpty(result.armors[rare])) {
-                    result.armors[rare] = 0
-                }
-
-                result.armors[rare] += 1
+        if (Helper.isNotEmpty(armorList)) {
+            if (Helper.isEmpty(result.armors.all)) {
+                result.armors.all = 0
             }
-        }
-    } else {
-        for (let rare of rareList) {
-            let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors/${rare}.csv`)
 
-            if (Helper.isNotEmpty(armorList)) {
-                if (Helper.isEmpty(result.armors.all)) {
-                    result.armors.all = 0
-                }
-
-                result.armors.all += armorList.length
-                result.armors[rare] = armorList.length
-            }
+            result.armors.all += armorList.length
+            result.armors[rare] = armorList.length
         }
     }
 
@@ -919,8 +862,8 @@ function statistics() {
         }
     }
 
-    // Petalaces, Enhances & Skills
-    for (let target of ['petalaces', 'enhances', 'skills']) {
+    // Enhances & Skills
+    for (let target of ['enhances', 'skills']) {
         let targetList = Helper.loadCSVAsJSON(`${fileRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {
@@ -932,24 +875,24 @@ function statistics() {
     console.log(result)
 }
 
-function fetchAll() {
+export const fetchAllAction = () => {
     Promise.all([
-        fetchWeapons(),
-        fetchArmors(),
-        fetchJewels(),
-        fetchEnhances(),
-        fetchSkills()
+        fetchWeaponsAction(),
+        fetchArmorsAction(),
+        fetchJewelsAction(),
+        fetchEnhancesAction(),
+        fetchSkillsAction()
     ]).then(() => {
-        statistics()
+        statisticsAction()
     })
 }
 
 export default {
-    fetchAll,
-    fetchWeapons,
-    fetchArmors,
-    fetchJewels,
-    fetchEnhances,
-    fetchSkills,
-    statistics
+    fetchAllAction,
+    fetchWeaponsAction,
+    fetchArmorsAction,
+    fetchJewelsAction,
+    fetchEnhancesAction,
+    fetchSkillsAction,
+    statisticsAction
 }

@@ -416,6 +416,7 @@ const specialReplaceText = (text, lang) => {
         { lang: 'jaJP', searchValue: 'カーマヒトパーレ', replaceValue: 'カーマヒトバーレ' },
 
         // fextralife
+        { lang: 'enUS', searchValue: 'Bowwgun', replaceValue: 'Bowgun' },
     ]
 
     for (let item of replacementList) {
@@ -431,7 +432,7 @@ const specialReplaceText = (text, lang) => {
     return text
 }
 
-function arrange() {
+export const arrangeAction = () => {
 
     // Load Data
     let crawlerDataMapping = {
@@ -612,7 +613,7 @@ function arrange() {
     })
 }
 
-function statistics() {
+export const statisticsAction = () => {
 
     // Generate Result Format
     let result = {
@@ -781,6 +782,6 @@ function statistics() {
 }
 
 export default {
-    arrange,
-    statistics
+    arrangeAction,
+    statisticsAction
 }

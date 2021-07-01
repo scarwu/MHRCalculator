@@ -50,15 +50,15 @@ if (Helper.isEmpty(actionName)) {
     console.log('Actions:')
 
     Object.keys(taskMapping[taskName]).forEach((actionName) => {
-        console.log(`    ${actionName}`)
+        console.log(`    ${actionName.replace(/Action$/, '')}`)
     })
 
     process.exit()
-} else if (Helper.isEmpty(taskMapping[taskName][actionName])) {
+} else if (Helper.isEmpty(taskMapping[taskName][actionName + 'Action'])) {
     console.log(`Task "${taskName}" Action "${actionName}" not found`)
 
     process.exit()
 }
 
 // Run CLI
-taskMapping[taskName][actionName]()
+taskMapping[taskName][actionName + 'Action'](...process.argv.slice(4))

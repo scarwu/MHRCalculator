@@ -48,248 +48,294 @@ const urls = {
     skills: 'https://monsterhunterrise.wiki.fextralife.com/Skills'
 }
 
-// async function fetchWeapons() {
-//     let fetchPageUrl = null
-//     let fetchPageName = null
+export const fetchWeaponsAction = async (targetWeaponType = null) => {
+    let fetchPageUrl = null
+    let fetchPageName = null
 
-//     let targetWeaponType = null
+    const specialReplaceName = (text) => {
+        let specialWordMapping = {
+            '/Rogue+Flames+I': '/Rouge+Flames+I',
+            'Rogue Flames I': 'Rouge Flames I',
+            '/Bazel+Bluster+II': '/Bazel+Buster+II',
+            'Bazel Bluster II': 'Bazel Buster II',
+            '/Tigrex+Glaive': '/Tigerclaw+Glaive',
+            'Tigrex Glaive': 'Tigerclaw Glaive',
 
-//     if (Helper.isNotEmpty(process.argv[4]) && Helper.isNotEmpty(urls.weapons[process.argv[4]])) {
-//         targetWeaponType = process.argv[4]
-//     }
+            '/Felyne+Bowgun+II': '/Felyne+Bowwgun+II',
+            'Felyne Bowgun II': 'Felyne Bowwgun II'
+        }
 
-//     for (let weaponType of Object.keys(urls.weapons)) {
-//         if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
-//             continue
-//         }
+        if (Helper.isNotEmpty(specialWordMapping[text])) {
+            text = specialWordMapping[text]
+        }
 
-//         let mapping = {}
-//         let mappingKey = null
+        return text
+    }
 
-//         // Fetch List Page
-//         fetchPageUrl = urls.weapons[weaponType]
-//         fetchPageName = `weapons:${weaponType}`
+    for (let weaponType of Object.keys(urls.weapons)) {
+        if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
+            continue
+        }
 
-//         console.log(fetchPageUrl, fetchPageName)
+        let mapping = {}
+        let mappingKey = null
 
-//         let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+        // Fetch List Page
+        fetchPageUrl = urls.weapons[weaponType]
+        fetchPageName = `weapons:${weaponType}`
 
-//         if (Helper.isEmpty(listDom)) {
-//             console.log(fetchPageUrl, fetchPageName, 'Err')
+        console.log(fetchPageUrl, fetchPageName)
 
-//             return
-//         }
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//         // Get Exists Header Ids
-//         let mhIds = []
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//         listDom('h3.a-header--3').each((index, node) => {
-//             let mhId = listDom(node).attr('id')
+            return
+        }
 
-//             if (Helper.isNotEmpty(mhId) && '' !== mhId) {
-//                 mhIds.push(mhId)
-//             }
-//         })
+        for (let rowIndex = 1; rowIndex < listDom('table.wiki_table.sortable tbody tr').length; rowIndex++) {
+            let rowNode = listDom('table.wiki_table.sortable tbody tr').eq(rowIndex)
 
-//         for (let mdId of mhIds) {
-//             console.log(listDom(`#${mdId}`).text())
+            // Get Data
+            let name = normalizeText(specialReplaceName(rowNode.find('td').eq(0).find('a').text().trim()))
 
-//             for (let itemIndex = 0; itemIndex < listDom(`#${mdId} + table tbody tr`).find('.a-link').length; itemIndex++) {
-//                 let itemNode = listDom(`#${mdId} + table tbody tr`).find('.a-link').eq(itemIndex)
+            // Fetch Detail Page
+            fetchPageUrl = urls.domain + specialReplaceName(rowNode.find('td').eq(0).find('a').attr('href'))
+            fetchPageName = `weapons:${weaponType}:${name}`
 
-//                 let name = normalizeText(itemNode.text().trim())
+            console.log(fetchPageUrl, fetchPageName)
 
-//                 // Fetch Detail Page
-//                 fetchPageUrl = itemNode.attr('href')
-//                 fetchPageName = `weapons:${weaponType}:${name}`
+            let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//                 // Fix Path Url
-//                 if (/^\/mhrise\d+$/.test(fetchPageUrl)) {
-//                     fetchPageUrl = fetchPageUrl.replace('/mhrise', '/mhrise/')
-//                 }
+            if (Helper.isEmpty(weaponDom)) {
+                console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//                 if (/^\/mhrise\/\d+$/.test(fetchPageUrl)) {
-//                     fetchPageUrl = `https://game8.jp${fetchPageUrl}`
-//                 }
+                return
+            }
 
-//                 console.log(fetchPageUrl, fetchPageName)
+            // Get Data
+            let series = normalizeText(weaponDom('h3.special').text()).replace(' Tree', '')
 
-//                 let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+            mappingKey = `${series}:${name}`
 
-//                 if (Helper.isEmpty(weaponDom)) {
-//                     console.log(fetchPageUrl, fetchPageName, 'Err')
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
+            }
 
-//                     return
-//                 }
+            //
+        }
 
-//                 let series = normalizeText(weaponDom('h3#hm_1').text().replace('の性能まとめ', ''))
+        // // Get Exists Header Ids
+        // let mhIds = []
 
-//                 for (let subIndex = 0; subIndex < weaponDom('.a-table').length; subIndex++) {
-//                     let subNode = weaponDom('.a-table').eq(subIndex)
+        // listDom('h3.a-header--3').each((index, node) => {
+        //     let mhId = listDom(node).attr('id')
 
-//                     if ('レア度' !== subNode.find('tbody tr').eq(0).find('th').eq(0).text()) {
-//                         continue
-//                     }
+        //     if (Helper.isNotEmpty(mhId) && '' !== mhId) {
+        //         mhIds.push(mhId)
+        //     }
+        // })
 
-//                     let subName = normalizeText(subNode.find('b.a-bold').text())
+        // for (let mdId of mhIds) {
+        //     console.log(listDom(`#${mdId}`).text())
 
-//                     if (name !== subName) {
-//                         continue
-//                     }
+        //     for (let itemIndex = 0; itemIndex < listDom(`#${mdId} + table tbody tr`).find('.a-link').length; itemIndex++) {
+        //         let itemNode = listDom(`#${mdId} + table tbody tr`).find('.a-link').eq(itemIndex)
 
-//                     mappingKey = `${series}:${name}`
+        //         let name = normalizeText(itemNode.text().trim())
 
-//                     if (Helper.isEmpty(mapping[mappingKey])) {
-//                         mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
-//                     }
+        //         // Fetch Detail Page
+        //         fetchPageUrl = itemNode.attr('href')
+        //         fetchPageName = `weapons:${weaponType}:${name}`
 
-//                     let rare = subNode.find('tbody tr').eq(1).find('td').eq(0).text()
-//                     let attack = subNode.find('tbody tr').eq(1).find('td').eq(1).text()
-//                     let criticalRate = subNode.find('tbody tr').eq(1).find('td').eq(2).text()
-//                     let element = subNode.find('tbody tr').eq(3).find('td').eq(0).text()
-//                     let defense = subNode.find('tbody tr').eq(3).find('td').eq(2).text()
+        //         // Fix Path Url
+        //         if (/^\/mhrise\d+$/.test(fetchPageUrl)) {
+        //             fetchPageUrl = fetchPageUrl.replace('/mhrise', '/mhrise/')
+        //         }
 
-//                     // Element
-//                     if ('--' !== element) {
-//                         let elements = []
-//                         let match = null
+        //         if (/^\/mhrise\/\d+$/.test(fetchPageUrl)) {
+        //             fetchPageUrl = `https://game8.jp${fetchPageUrl}`
+        //         }
 
-//                         match = element.match(/^(.+?)\/(.+?)(\d+)\/(\d+)/)
+        //         console.log(fetchPageUrl, fetchPageName)
 
-//                         if (Helper.isNotEmpty(match)) {
-//                             elements.push({
-//                                 type: match[1],
-//                                 value: match[3],
-//                                 match: match
-//                             })
+        //         let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-//                             elements.push({
-//                                 type: match[2],
-//                                 value: match[4],
-//                                 match: match
-//                             })
-//                         } else {
-//                             match = element.match(/^(.+?)((?:\-|\+)?\d+)/)
+        //         if (Helper.isEmpty(weaponDom)) {
+        //             console.log(fetchPageUrl, fetchPageName, 'Err')
 
-//                             if (Helper.isNotEmpty(match)) {
-//                                 elements.push({
-//                                     type: match[1],
-//                                     value: match[2],
-//                                     match: match
-//                                 })
-//                             }
-//                         }
+        //             return
+        //         }
 
-//                         elements.forEach((element) => {
-//                             switch (element.type) {
-//                             case '火':
-//                                 mapping[mappingKey].element.attack.type = 'fire'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
+        //         let series = normalizeText(weaponDom('h3#hm_1').text().replace('の性能まとめ', ''))
 
-//                                 break
-//                             case '水':
-//                                 mapping[mappingKey].element.attack.type = 'water'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
+        //         for (let subIndex = 0; subIndex < weaponDom('.a-table').length; subIndex++) {
+        //             let subNode = weaponDom('.a-table').eq(subIndex)
 
-//                                 break
-//                             case '雷':
-//                                 mapping[mappingKey].element.attack.type = 'thunder'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
+        //             if ('レア度' !== subNode.find('tbody tr').eq(0).find('th').eq(0).text()) {
+        //                 continue
+        //             }
 
-//                                 break
-//                             case '氷':
-//                                 mapping[mappingKey].element.attack.type = 'ice'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
+        //             let subName = normalizeText(subNode.find('b.a-bold').text())
 
-//                                 break
-//                             case '龍':
-//                                 mapping[mappingKey].element.attack.type = 'dragon'
-//                                 mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
+        //             if (name !== subName) {
+        //                 continue
+        //             }
 
-//                                 break
-//                             case '睡眠':
-//                                 mapping[mappingKey].element.status.type = 'sleep'
-//                                 mapping[mappingKey].element.status.minValue = parseFloat(element.value)
+        //             mappingKey = `${series}:${name}`
 
-//                                 break
-//                             case '麻痹':
-//                             case '麻痺':
-//                                 mapping[mappingKey].element.status.type = 'paralysis'
-//                                 mapping[mappingKey].element.status.minValue = parseFloat(element.value)
+        //             if (Helper.isEmpty(mapping[mappingKey])) {
+        //                 mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
+        //             }
 
-//                                 break
-//                             case '爆破':
-//                                 mapping[mappingKey].element.status.type = 'blast'
-//                                 mapping[mappingKey].element.status.minValue = parseFloat(element.value)
+        //             let rare = subNode.find('tbody tr').eq(1).find('td').eq(0).text()
+        //             let attack = subNode.find('tbody tr').eq(1).find('td').eq(1).text()
+        //             let criticalRate = subNode.find('tbody tr').eq(1).find('td').eq(2).text()
+        //             let element = subNode.find('tbody tr').eq(3).find('td').eq(0).text()
+        //             let defense = subNode.find('tbody tr').eq(3).find('td').eq(2).text()
 
-//                                 break
-//                             case '毒':
-//                                 mapping[mappingKey].element.status.type = 'poison'
-//                                 mapping[mappingKey].element.status.minValue = parseFloat(element.value)
+        //             // Element
+        //             if ('--' !== element) {
+        //                 let elements = []
+        //                 let match = null
 
-//                                 break
-//                             default:
-//                                 console.log('no match property', match)
+        //                 match = element.match(/^(.+?)\/(.+?)(\d+)\/(\d+)/)
 
-//                                 break
-//                             }
-//                         })
-//                     }
+        //                 if (Helper.isNotEmpty(match)) {
+        //                     elements.push({
+        //                         type: match[1],
+        //                         value: match[3],
+        //                         match: match
+        //                     })
 
-//                     // Slot
-//                     subNode.find('tbody tr').eq(3).find('td').eq(1).text().split('').forEach((slotSize) => {
-//                         if ('③' === slotSize) {
-//                             mapping[mappingKey].slots.push({
-//                                 size: 3
-//                             })
-//                         } else if ('②' === slotSize) {
-//                             mapping[mappingKey].slots.push({
-//                                 size: 2
-//                             })
-//                         } else if ('①' === slotSize) {
-//                             mapping[mappingKey].slots.push({
-//                                 size: 1
-//                             })
-//                         }
-//                     })
+        //                     elements.push({
+        //                         type: match[2],
+        //                         value: match[4],
+        //                         match: match
+        //                     })
+        //                 } else {
+        //                     match = element.match(/^(.+?)((?:\-|\+)?\d+)/)
 
-//                     // Enhances
-//                     let enhanceRowIndex = 4
+        //                     if (Helper.isNotEmpty(match)) {
+        //                         elements.push({
+        //                             type: match[1],
+        //                             value: match[2],
+        //                             match: match
+        //                         })
+        //                     }
+        //                 }
 
-//                     if ('lightBowgun' === weaponType || 'heavyBowgun' === weaponType) {
-//                         enhanceRowIndex = 7
-//                     }
+        //                 elements.forEach((element) => {
+        //                     switch (element.type) {
+        //                     case '火':
+        //                         mapping[mappingKey].element.attack.type = 'fire'
+        //                         mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
-//                     subNode.find('tbody tr').eq(enhanceRowIndex).find('a').each((index, node) => {
-//                         mapping[mappingKey].enhances.push({
-//                             name: normalizeText(weaponDom(node).text())
-//                         })
-//                     })
+        //                         break
+        //                     case '水':
+        //                         mapping[mappingKey].element.attack.type = 'water'
+        //                         mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
-//                     mapping[mappingKey].series = {
-//                         enUS: series
-//                     }
-//                     mapping[mappingKey].name = {
-//                         enUS: name
-//                     }
-//                     mapping[mappingKey].type = weaponType
-//                     mapping[mappingKey].rare = parseFloat(rare)
-//                     mapping[mappingKey].attack = parseFloat(attack)
-//                     mapping[mappingKey].defense = ('-' !== defense)
-//                         ? parseFloat(defense) : null
-//                     mapping[mappingKey].criticalRate = (0 !== parseFloat(criticalRate))
-//                         ? parseFloat(criticalRate) : null
-//                 }
-//             }
-//         }
+        //                         break
+        //                     case '雷':
+        //                         mapping[mappingKey].element.attack.type = 'thunder'
+        //                         mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
-//         let list = autoExtendListQuantity(Object.values(mapping))
+        //                         break
+        //                     case '氷':
+        //                         mapping[mappingKey].element.attack.type = 'ice'
+        //                         mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
-//         Helper.saveJSONAsCSV(`${fileRoot}/weapons/${weaponType}.csv`, list)
-//     }
-// }
+        //                         break
+        //                     case '龍':
+        //                         mapping[mappingKey].element.attack.type = 'dragon'
+        //                         mapping[mappingKey].element.attack.minValue = parseFloat(element.value)
 
-async function fetchArmors() {
+        //                         break
+        //                     case '睡眠':
+        //                         mapping[mappingKey].element.status.type = 'sleep'
+        //                         mapping[mappingKey].element.status.minValue = parseFloat(element.value)
+
+        //                         break
+        //                     case '麻痹':
+        //                     case '麻痺':
+        //                         mapping[mappingKey].element.status.type = 'paralysis'
+        //                         mapping[mappingKey].element.status.minValue = parseFloat(element.value)
+
+        //                         break
+        //                     case '爆破':
+        //                         mapping[mappingKey].element.status.type = 'blast'
+        //                         mapping[mappingKey].element.status.minValue = parseFloat(element.value)
+
+        //                         break
+        //                     case '毒':
+        //                         mapping[mappingKey].element.status.type = 'poison'
+        //                         mapping[mappingKey].element.status.minValue = parseFloat(element.value)
+
+        //                         break
+        //                     default:
+        //                         console.log('no match property', match)
+
+        //                         break
+        //                     }
+        //                 })
+        //             }
+
+        //             // Slot
+        //             subNode.find('tbody tr').eq(3).find('td').eq(1).text().split('').forEach((slotSize) => {
+        //                 if ('③' === slotSize) {
+        //                     mapping[mappingKey].slots.push({
+        //                         size: 3
+        //                     })
+        //                 } else if ('②' === slotSize) {
+        //                     mapping[mappingKey].slots.push({
+        //                         size: 2
+        //                     })
+        //                 } else if ('①' === slotSize) {
+        //                     mapping[mappingKey].slots.push({
+        //                         size: 1
+        //                     })
+        //                 }
+        //             })
+
+        //             // Enhances
+        //             let enhanceRowIndex = 4
+
+        //             if ('lightBowgun' === weaponType || 'heavyBowgun' === weaponType) {
+        //                 enhanceRowIndex = 7
+        //             }
+
+        //             subNode.find('tbody tr').eq(enhanceRowIndex).find('a').each((index, node) => {
+        //                 mapping[mappingKey].enhances.push({
+        //                     name: normalizeText(weaponDom(node).text())
+        //                 })
+        //             })
+
+        //             mapping[mappingKey].series = {
+        //                 enUS: series
+        //             }
+        //             mapping[mappingKey].name = {
+        //                 enUS: name
+        //             }
+        //             mapping[mappingKey].type = weaponType
+        //             mapping[mappingKey].rare = parseFloat(rare)
+        //             mapping[mappingKey].attack = parseFloat(attack)
+        //             mapping[mappingKey].defense = ('-' !== defense)
+        //                 ? parseFloat(defense) : null
+        //             mapping[mappingKey].criticalRate = (0 !== parseFloat(criticalRate))
+        //                 ? parseFloat(criticalRate) : null
+        //         }
+        //     }
+        // }
+
+        let list = autoExtendListQuantity(Object.values(mapping))
+
+        Helper.saveJSONAsCSV(`${fileRoot}/weapons/${weaponType}.csv`, list)
+    }
+}
+
+export const fetchArmorsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -310,8 +356,8 @@ async function fetchArmors() {
         return
     }
 
-    for (let rowIndex = 0; rowIndex < listDom('div.tabcontent h4 a.wiki_link.wiki_tooltip').length; rowIndex++) {
-        let rowNode = listDom('div.tabcontent h4 a.wiki_link.wiki_tooltip').eq(rowIndex)
+    for (let rowIndex = 0; rowIndex < listDom('div.col-sm-3 h3.special + div.row a.wiki_link').length; rowIndex++) {
+        let rowNode = listDom('div.col-sm-3 h3.special + div.row a.wiki_link').eq(rowIndex)
 
         let series = rowNode.text()
 
@@ -334,7 +380,23 @@ async function fetchArmors() {
         for (let rowIndex = 0; rowIndex < armorDom('table.wiki_table').eq(1).find('tbody tr').length; rowIndex++) {
             let rowNode = armorDom('table.wiki_table').eq(1).find('tbody tr').eq(rowIndex)
 
+            if (0 === rowNode.find('td').eq(0).find('a').length) {
+                continue
+            }
+
             let name = rowNode.find('td').eq(0).find('a').text()
+
+            if ('No Helm' === name
+                || 'No Chest' === name
+                || 'No Arm' === name
+                || 'No Arms' === name
+                || 'No Waist' === name
+                || 'No Leg' === name
+                || 'No Legs' === name
+            ) {
+                continue
+            }
+
             let minDefense = rowNode.find('td').eq(1).text()
             let resistenceFire = rowNode.find('td').eq(3).text()
             let resistenceWater = rowNode.find('td').eq(4).text()
@@ -364,15 +426,15 @@ async function fetchArmors() {
             mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
 
             rowNode.find('td').eq(2).find('img').each((index, node) => {
-                if ('/file/Monster-Hunter-Rise/gem_level_3_icon_monster_hunter_rise_wiki_guide_24px.png' === armorDom(node).attr('img')) {
+                if ('/file/Monster-Hunter-Rise/gem_level_3_icon_monster_hunter_rise_wiki_guide_24px.png' === armorDom(node).attr('src')) {
                     mapping[mappingKey].slots.push({
                         size: 3
                     })
-                } else if ('/file/Monster-Hunter-Rise/gem_level_2_icon_monster_hunter_rise_wiki_guide_24px.png' === armorDom(node).attr('img')) {
+                } else if ('/file/Monster-Hunter-Rise/gem_level_2_icon_monster_hunter_rise_wiki_guide_24px.png' === armorDom(node).attr('src')) {
                     mapping[mappingKey].slots.push({
                         size: 2
                     })
-                } else if ('/file/Monster-Hunter-Rise/gem_level_1_icon_monster_hunter_rise_wiki_guide_24px.png' === armorDom(node).attr('img')) {
+                } else if ('/file/Monster-Hunter-Rise/gem_level_1_icon_monster_hunter_rise_wiki_guide_24px.png' === armorDom(node).attr('src')) {
                     mapping[mappingKey].slots.push({
                         size: 1
                     })
@@ -393,13 +455,34 @@ async function fetchArmors() {
                 mapping[mappingKey].type = 'leg'
             }
 
-            armorDom('table.wiki_table').eq(0).find('tbody tr').eq(7 + rowIndex).find('td').eq(1).find('a').each((index, node) => {
-                console.log(name, armorDom(node).text())
-                // console.log(armorDom(node))
+            // Fetch Item Page
+            fetchPageUrl = urls.domain + rowNode.find('td').eq(0).find('a').attr('href')
+            fetchPageName = `armors:${series}:${name}`
+
+            console.log(fetchPageUrl, fetchPageName)
+
+            let itemDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+            if (Helper.isEmpty(itemDom)) {
+                console.log(fetchPageUrl, fetchPageName, 'Err')
+
+                return
+            }
+
+            // Skill
+            itemDom('table.wiki_table').eq(0).find('tbody tr').eq(11).find('td').eq(0).html().split('<br>').forEach((node) => {
+                let tempText = normalizeText(itemDom(node).text().trim())
+                let match = tempText.match(/^(.*?)x(\d)$/)
+
+                if (Helper.isEmpty(match)) {
+                    console.log(name, `<${tempText}>`)
+
+                    return
+                }
 
                 mapping[mappingKey].skills.push({
-                    name: armorDom(node).text(),
-                    level: parseInt(armorDom(node)[0].next.data.replace('x', ''))
+                    name: match[1].trim(),
+                    level: parseInt(match[2].trim())
                 })
             })
         }
@@ -410,7 +493,7 @@ async function fetchArmors() {
     Helper.saveJSONAsCSV(`${fileRoot}/armors.csv`, list)
 }
 
-async function fetchJewels() {
+export const fetchJewelsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -460,7 +543,7 @@ async function fetchJewels() {
     Helper.saveJSONAsCSV(`${fileRoot}/jewels.csv`, Object.values(mapping))
 }
 
-async function fetchEnhances() {
+export const fetchEnhancesAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -505,7 +588,7 @@ async function fetchEnhances() {
     Helper.saveJSONAsCSV(`${fileRoot}/enhances.csv`, Object.values(mapping))
 }
 
-async function fetchSkills() {
+export const fetchSkillsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -537,7 +620,7 @@ async function fetchSkills() {
             let skillNode = rowNode.find('td').eq(3).find('li').eq(skillIndex)
 
             // Get Data
-            let tempText = skillNode.text().trim().replace(/ /g, ' ')
+            let tempText = normalizeText(skillNode.text().trim())
 
             let level = tempText.match(/^Level (\d)\: (.*?)$/)[1]
             let effect = tempText.match(/^Level (\d)\: (.*?)$/)[2]
@@ -564,177 +647,137 @@ async function fetchSkills() {
     Helper.saveJSONAsCSV(`${fileRoot}/skills.csv`, Object.values(mapping))
 }
 
-// function statistics() {
+export const statisticsAction = () => {
 
-//     // Generate Result Format
-//     let result = {
-//         weapons: {},
-//         armors: {},
-//         petalaces: {},
-//         jewels: {},
-//         enhances: {},
-//         skills: {}
-//     }
+    // Generate Result Format
+    let result = {
+        weapons: {},
+        armors: {},
+        jewels: {},
+        enhances: {},
+        skills: {}
+    }
 
-//     result.weapons.all = null
-//     result.armors.all = null
-//     result.jewels.all = null
+    result.weapons.all = null
+    result.armors.all = null
+    result.jewels.all = null
 
-//     for (let weaponType of weaponTypeList) {
-//         result.weapons[weaponType] = {}
-//         result.weapons[weaponType].all = null
+    for (let weaponType of weaponTypeList) {
+        result.weapons[weaponType] = {}
+        result.weapons[weaponType].all = null
 
-//         for (let rare of rareList) {
-//             result.weapons[weaponType][rare] = null
-//         }
-//     }
+        for (let rare of rareList) {
+            result.weapons[weaponType][rare] = null
+        }
+    }
 
-//     for (let rare of rareList) {
-//         result.armors[rare] = null
-//     }
+    for (let rare of rareList) {
+        result.armors[rare] = null
+    }
 
-//     for (let size of sizeList) {
-//         result.jewels[size] = null
-//     }
+    for (let size of sizeList) {
+        result.jewels[size] = null
+    }
 
-//     // Weapons
-//     let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons.csv`)
+    // Weapons
+    for (let weaponType of weaponTypeList) {
+        let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons/${weaponType}.csv`)
 
-//     if (Helper.isNotEmpty(weaponList)) {
-//         result.weapons.all = weaponList.length
+        if (Helper.isNotEmpty(weaponList)) {
+            if (Helper.isEmpty(result.weapons.all)) {
+                result.weapons.all = 0
+            }
 
-//         for (let item of weaponList) {
-//             let weaponType = item.type
+            if (Helper.isEmpty(result.weapons[weaponType].all)) {
+                result.weapons[weaponType].all = 0
+            }
 
-//             if (Helper.isEmpty(result.weapons[weaponType].all)) {
-//                 result.weapons[weaponType].all = 0
-//             }
+            result.weapons.all += weaponList.length
+            result.weapons[weaponType].all += weaponList.length
 
-//             result.weapons[weaponType].all += 1
+            for (let item of weaponList) {
+                if (Helper.isNotEmpty(item.rare)) {
+                    let rare = `rare${item.rare}`
 
-//             if (Helper.isNotEmpty(item.rare)) {
-//                 let rare = `rare${item.rare}`
+                    if (Helper.isEmpty(result.weapons[weaponType][rare])) {
+                        result.weapons[weaponType][rare] = 0
+                    }
 
-//                 if (Helper.isEmpty(result.weapons[weaponType][rare])) {
-//                     result.weapons[weaponType][rare] = 0
-//                 }
+                    result.weapons[weaponType][rare] += 1
+                }
+            }
+        }
+    }
 
-//                 result.weapons[weaponType][rare] += 1
-//             }
-//         }
-//     } else {
-//         for (let weaponType of weaponTypeList) {
-//             let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons/${weaponType}.csv`)
+    // Armors
+    let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors.csv`)
 
-//             if (Helper.isNotEmpty(weaponList)) {
-//                 if (Helper.isEmpty(result.weapons.all)) {
-//                     result.weapons.all = 0
-//                 }
+    if (Helper.isNotEmpty(armorList)) {
+        result.armors.all = armorList.length
 
-//                 if (Helper.isEmpty(result.weapons[weaponType].all)) {
-//                     result.weapons[weaponType].all = 0
-//                 }
+        for (let item of armorList) {
+            if (Helper.isNotEmpty(item.rare)) {
+                let rare = `rare${item.rare}`
 
-//                 result.weapons.all += weaponList.length
-//                 result.weapons[weaponType].all += weaponList.length
+                if (Helper.isEmpty(result.armors[rare])) {
+                    result.armors[rare] = 0
+                }
 
-//                 for (let item of weaponList) {
-//                     if (Helper.isNotEmpty(item.rare)) {
-//                         let rare = `rare${item.rare}`
+                result.armors[rare] += 1
+            }
+        }
+    }
 
-//                         if (Helper.isEmpty(result.weapons[weaponType][rare])) {
-//                             result.weapons[weaponType][rare] = 0
-//                         }
+    // Jewels
+    let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewels.csv`)
 
-//                         result.weapons[weaponType][rare] += 1
-//                     }
-//                 }
-//             }
-//         }
-//     }
+    if (Helper.isNotEmpty(jewelList)) {
+        result.jewels.all = jewelList.length
 
-//     // Armors
-//     let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors.csv`)
+        for (let item of jewelList) {
+            if (Helper.isNotEmpty(item.size)) {
+                let size = `size${item.size}`
 
-//     if (Helper.isNotEmpty(armorList)) {
-//         result.armors.all = armorList.length
+                if (Helper.isEmpty(result.jewels[size])) {
+                    result.jewels[size] = 0
+                }
 
-//         for (let item of armorList) {
-//             if (Helper.isNotEmpty(item.rare)) {
-//                 let rare = `rare${item.rare}`
+                result.jewels[size] += 1
+            }
+        }
+    }
 
-//                 if (Helper.isEmpty(result.armors[rare])) {
-//                     result.armors[rare] = 0
-//                 }
+    // Enhances & Skills
+    for (let target of ['enhances', 'skills']) {
+        let targetList = Helper.loadCSVAsJSON(`${fileRoot}/${target}.csv`)
 
-//                 result.armors[rare] += 1
-//             }
-//         }
-//     } else {
-//         for (let rare of rareList) {
-//             let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors/${rare}.csv`)
+        if (Helper.isNotEmpty(targetList)) {
+            result[target] = targetList.length
+        }
+    }
 
-//             if (Helper.isNotEmpty(armorList)) {
-//                 if (Helper.isEmpty(result.armors.all)) {
-//                     result.armors.all = 0
-//                 }
+    // Result
+    console.log(result)
+}
 
-//                 result.armors.all += armorList.length
-//                 result.armors[rare] = armorList.length
-//             }
-//         }
-//     }
-
-//     // Jewels
-//     let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewels.csv`)
-
-//     if (Helper.isNotEmpty(jewelList)) {
-//         result.jewels.all = jewelList.length
-
-//         for (let item of jewelList) {
-//             if (Helper.isNotEmpty(item.size)) {
-//                 let size = `size${item.size}`
-
-//                 if (Helper.isEmpty(result.jewels[size])) {
-//                     result.jewels[size] = 0
-//                 }
-
-//                 result.jewels[size] += 1
-//             }
-//         }
-//     }
-
-//     // Petalaces, Enhances & Skills
-//     for (let target of ['petalaces', 'enhances', 'skills']) {
-//         let targetList = Helper.loadCSVAsJSON(`${fileRoot}/${target}.csv`)
-
-//         if (Helper.isNotEmpty(targetList)) {
-//             result[target] = targetList.length
-//         }
-//     }
-
-//     // Result
-//     console.log(result)
-// }
-
-function fetchAll() {
+export const fetchAllAction = () => {
     Promise.all([
-        // fetchWeapons(),
-        fetchArmors(),
-        fetchJewels(),
-        fetchEnhances(),
-        fetchSkills()
+        fetchWeaponsAction(),
+        fetchArmorsAction(),
+        fetchJewelsAction(),
+        fetchEnhancesAction(),
+        fetchSkillsAction()
     ]).then(() => {
-        // statistics()
+        statisticsAction()
     })
 }
 
 export default {
-    fetchAll,
-    // fetchWeapons,
-    fetchArmors,
-    fetchJewels,
-    fetchEnhances,
-    fetchSkills,
-    // statistics
+    fetchAllAction,
+    fetchWeaponsAction,
+    fetchArmorsAction,
+    fetchJewelsAction,
+    fetchEnhancesAction,
+    fetchSkillsAction,
+    statisticsAction
 }

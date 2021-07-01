@@ -200,6 +200,7 @@ export const normalizeText = (text) => {
         .replace('Ｌｖ', 'Lv')
         .replace('ＵＰ', 'UP')
         .replace('･', '・')
+        .replace(/ /g, ' ')
 }
 
 export const weaponTypeList = [

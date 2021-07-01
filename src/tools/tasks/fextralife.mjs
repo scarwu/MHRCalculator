@@ -350,7 +350,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 
             mapping[mappingKey].enhance.limit = parseFloat(enhanceLimit)
 
-            weaponNode.eq(enhanceIndex + 1).find('a').each((index, node) => {
+            weaponNode.eq(enhanceIndex + 1).find('td').eq(1).find('a').each((index, node) => {
                 let name = weaponDom(node).text().trim()
 
                 mapping[mappingKey].enhance.list.push({

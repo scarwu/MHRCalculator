@@ -383,12 +383,29 @@ const mergeItem = (target, major, minor, lang) => {
     }
 }
 
-const specialReplaceText = (text, lang) => {
+const specialReplaceText = (text, lang, rare) => {
     let replacementList = [
 
         // kiranico
-        { lang: 'jaJP', searchValue: '風雷合一', replaceValue: '風雷の合一' },
         { lang: 'zhTW', searchValue: '龍姬的斬擊斧', replaceValue: '龍姬的劍斧' },
+        { lang: 'jaJP', searchValue: '風雷合一', replaceValue: '風雷の合一' },
+        { lang: 'enUS', searchValue: 'Utsushi Mask (V)', replaceValue: 'Utsushi Mask (Visible)' },
+        { lang: 'enUS', searchValue: 'Utsushi Chest (V)', replaceValue: 'Utsushi Chest (Visible)' },
+        { lang: 'enUS', searchValue: 'Utsushi Braces (V)', replaceValue: 'Utsushi Braces (Visible)' },
+        { lang: 'enUS', searchValue: 'Utsushi Tassets (V)', replaceValue: 'Utsushi Tassets (Visible)' },
+        { lang: 'enUS', searchValue: 'Utsushi Greaves (V)', replaceValue: 'Utsushi Greaves (Visible)' },
+        { lang: 'enUS', searchValue: 'Utsushi Mask (H)', replaceValue: 'Utsushi Mask (Hidden)' },
+        { lang: 'enUS', searchValue: 'Utsushi Chest (H)', replaceValue: 'Utsushi Chest (Hidden)' },
+        { lang: 'enUS', searchValue: 'Utsushi Braces (H)', replaceValue: 'Utsushi Braces (Hidden)' },
+        { lang: 'enUS', searchValue: 'Utsushi Tassets (H)', replaceValue: 'Utsushi Tassets (Hidden)' },
+        { lang: 'enUS', searchValue: 'Utsushi Greaves (H)', replaceValue: 'Utsushi Greaves (Hidden)' },
+        { lang: 'enUS', searchValue: 'S. Studded', replaceValue: 'Shell-Studded' },
+        { lang: 'enUS', searchValue: 'Shelled', replaceValue: 'Shell-Studded' },
+        { lang: 'enUS', searchValue: 'Kadachi Braces S', replaceValue: 'Tobi-Kadachi Braces S' },
+        { lang: 'enUS', searchValue: 'Tobi-Tobi-Kadachi Braces S', replaceValue: 'Tobi-Kadachi Braces S' },
+
+        { lang: 'enUS', searchValue: 'Pukei Greaves', replaceValue: 'Pukei-Pukei Greaves' },
+        { lang: 'enUS', searchValue: 'Pukei-Pukei-Pukei Greaves', replaceValue: 'Pukei-Pukei Greaves' },
 
         // gameqb
         { lang: 'zhTW', searchValue: '倪泰裡【面具】', replaceValue: '倪泰裡【蒙面】' },
@@ -422,7 +439,70 @@ const specialReplaceText = (text, lang) => {
         { lang: 'jaJP', searchValue: 'カーマヒトパーレ', replaceValue: 'カーマヒトバーレ' },
 
         // fextralife
+        { lang: 'enUS', searchValue: 'Visor', replaceValue: 'Vizor' },
         { lang: 'enUS', searchValue: 'Bowwgun', replaceValue: 'Bowgun' },
+        { lang: 'enUS', searchValue: 'Wyvern Exploit (Dragon Exploit)', replaceValue: 'Wyvern Exploit' },
+        { lang: 'enUS', searchValue: 'Fire Resistance Skill', replaceValue: 'Fire Resistance' },
+        { lang: 'enUS', searchValue: 'Ice Resistance Skill', replaceValue: 'Ice Resistance' },
+        { lang: 'enUS', searchValue: 'Dragon Resistance Skill', replaceValue: 'Dragon Resistance' },
+        { lang: 'enUS', searchValue: 'Water Resistance Skill', replaceValue: 'Water Resistance' },
+        { lang: 'enUS', searchValue: 'Thunder Resistance Skill', replaceValue: 'Thunder Resistance' },
+        { lang: 'enUS', searchValue: 'Utsushi Mask S (Visible)', replaceValue: 'Utsushi Mask (Visible) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Chest S (Visible)', replaceValue: 'Utsushi Chest (Visible) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Braces S (Visible)', replaceValue: 'Utsushi Braces (Visible) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Tassets S (Visible)', replaceValue: 'Utsushi Tassets (Visible) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Greaves S (Visible)', replaceValue: 'Utsushi Greaves (Visible) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Mask S (Hidden)', replaceValue: 'Utsushi Mask (Hidden) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Chest S (Hidden)', replaceValue: 'Utsushi Chest (Hidden) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Braces S (Hidden)', replaceValue: 'Utsushi Braces (Hidden) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Tassets S (Hidden)', replaceValue: 'Utsushi Tassets (Hidden) S' },
+        { lang: 'enUS', searchValue: 'Utsushi Greaves S (Hidden)', replaceValue: 'Utsushi Greaves (Hidden) S' },
+        { lang: 'enUS', searchValue: 'Narwa Breastplate', replaceValue: 'Narwa\'s Breastplate' },
+        { lang: 'enUS', searchValue: 'Tetranadon Helm s', replaceValue: 'Tetranadon Helm S' },
+        { lang: 'enUS', searchValue: 'Kamura Leggins', replaceValue: 'Kamura Leggings' },
+        { lang: 'enUS', searchValue: 'Kamura Niuja Sword', replaceValue: 'Kamura Ninja Sword' },
+        { lang: 'enUS', searchValue: 'Royal Ludroth Claw Sword & Shield', replaceValue: 'Royal Ludroth Claw' },
+        { lang: 'enUS', searchValue: 'Antecka Rack', replaceValue: 'Anteka Rack' },
+        { lang: 'enUS', searchValue: 'Frilled Slah', replaceValue: 'Frilled Slash' },
+        { lang: 'enUS', searchValue: 'Azure Elder Long sword', replaceValue: 'Azure Elder Long Sword' },
+        { lang: 'enUS', searchValue: 'Yet Hammer', replaceValue: 'Yeti Hammer' },
+        { lang: 'enUS', searchValue: 'Teostra\'s Orphee', replaceValue: 'Teostra\'s Orphée' },
+        { lang: 'enUS', searchValue: 'Rhenoshasta', replaceValue: 'Rhenohasta' },
+        { lang: 'enUS', searchValue: 'Striker\'s Ggunlance', replaceValue: 'Striker\'s Gunlance' },
+        { lang: 'enUS', searchValue: 'Admiralls Arbalance', replaceValue: 'Admirall\'s Arbalance' },
+        { lang: 'enUS', searchValue: 'Arknalance', replaceValue: 'Araknalance' },
+        { lang: 'enUS', searchValue: 'Bone Sgrongarm', replaceValue: 'Bone Strongarm' },
+        { lang: 'enUS', searchValue: 'Bone Blade I Charge Blade', replaceValue: 'Bone Blade I' },
+        { lang: 'enUS', searchValue: 'Hunter\'s Prodbow', replaceValue: 'Hunter\'s Proudbow' },
+        { lang: 'enUS', searchValue: 'Flammenbongen II', replaceValue: 'Flammenbogen II' },
+        { lang: 'enUS', searchValue: 'Porifero Bow', replaceValue: 'Porifera Bow' },
+        { lang: 'enUS', searchValue: 'Sinsiter Shadow Bolt', replaceValue: 'Sinister Shadow Bolt' },
+        { lang: 'enUS', searchValue: 'Arachnid Silversting', replaceValue: 'Arachnid Silverstring' },
+        { lang: 'enUS', searchValue: 'Arko Nulu Black', replaceValue: 'Arko Nulo Black' },
+        { lang: 'enUS', searchValue: 'Paladire Charge Blade', replaceValue: 'Paladire' },
+        { lang: 'enUS', searchValue: 'Grior\'s Landmaker', replaceValue: 'Gríðr\'s Landmaker' },
+        { lang: 'enUS', searchValue: 'Admirall\'s Arbalance', replaceValue: 'Admiral\'s Arbalance' },
+        { lang: 'enUS', searchValue: 'Rampage C.Blade S', replaceValue: 'Rampage C. Blade S' },
+        { lang: 'enUS', searchValue: 'Rampage L.Bowgun S', replaceValue: 'Rampage L. Bowgun S' },
+
+        { lang: 'enUS', searchValue: 'Ibushi\'s Breastplate', replaceValue: 'Ibushi\'s Breastplate S' },
+        { lang: 'enUS', searchValue: 'Ibushi\'s Breastplate S S', replaceValue: 'Ibushi\'s Breastplate S' },
+        { lang: 'enUS', searchValue: 'Narwa\'s Breastplate', replaceValue: 'Narwa\'s Breastplate S' },
+        { lang: 'enUS', searchValue: 'Narwa\'s Breastplate S S', replaceValue: 'Narwa\'s Breastplate S' },
+        { lang: 'enUS', searchValue: 'Redwing Glaive', replaceValue: 'Redwing Glaive I' },
+        { lang: 'enUS', searchValue: 'Redwing Glaive I I', replaceValue: 'Redwing Glaive I' },
+        { lang: 'enUS', searchValue: 'Flammenkanone I Heavy Bowgun', replaceValue: 'Flammenkanone I' },
+        { lang: 'enUS', searchValue: 'Flammenkanone II Heavy Bowgun', replaceValue: 'Flammenkanone II' },
+        { lang: 'enUS', searchValue: 'Ladybug Morta', replaceValue: 'Ladybug Mortar' },
+        { lang: 'enUS', searchValue: 'Ladybug Mortarr', replaceValue: 'Ladybug Mortar' },
+        { lang: 'enUS', searchValue: 'Daora\'s Delphinidae', replaceValue: 'Daora\'s Delphinidae I' },
+        { lang: 'enUS', searchValue: 'Daora\'s Delphinidae I I', replaceValue: 'Daora\'s Delphinidae I' },
+
+        { lang: 'enUS', searchValue: 'Flammenschild', replaceValue: 'Flammenschild I', rare: 3 },
+        { lang: 'enUS', searchValue: 'Flammenschild I I', replaceValue: 'Flammenschild I', rare: 3 },
+        { lang: 'enUS', searchValue: 'Flammenschild', replaceValue: 'Flammenschild II', rare: 5 },
+        { lang: 'enUS', searchValue: 'Flammenschild II II', replaceValue: 'Flammenschild II', rare: 5 },
+        { lang: 'enUS', searchValue: 'Arko Nulo Black', replaceValue: 'Arko Nulo Black I', rare: 6 }
     ]
 
     for (let item of replacementList) {
@@ -431,6 +511,10 @@ const specialReplaceText = (text, lang) => {
         }
 
         if (-1 !== text.indexOf(item.searchValue)) {
+            if (Helper.isNotEmpty(item.rare) && rare !== item.rare) {
+                continue
+            }
+
             text = text.replace(item.searchValue, item.replaceValue)
         }
     }
@@ -547,8 +631,7 @@ export const arrangeAction = () => {
                         return
                     }
 
-
-                    item[key][lang] = specialReplaceText(item[key][lang], lang)
+                    item[key][lang] = specialReplaceText(item[key][lang], lang, item.rare)
                 })
             })
 
@@ -580,7 +663,7 @@ export const arrangeAction = () => {
                             return
                         }
 
-                        item[key][lang] = specialReplaceText(item[key][lang], lang)
+                        item[key][lang] = specialReplaceText(item[key][lang], lang, item.rare)
                     })
                 })
 

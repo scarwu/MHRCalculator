@@ -132,16 +132,22 @@ export const autoExtendListQuantity = (list) => {
     let enhanceCount = 0
 
     list.forEach((row) => {
-        if (Helper.isNotEmpty(row.slots) && slotCount < row.slots.length) {
+        if (Helper.isNotEmpty(row.slots)
+            && slotCount < row.slots.length
+        ) {
             slotCount = row.slots.length
         }
 
-        if (Helper.isNotEmpty(row.skills) && skillCount < row.skills.length) {
+        if (Helper.isNotEmpty(row.skills)
+            && skillCount < row.skills.length
+        ) {
             skillCount = row.skills.length
         }
 
-        if (Helper.isNotEmpty(row.enhances) && enhanceCount < row.enhances.length) {
-            enhanceCount = row.enhances.length
+        if (Helper.isNotEmpty(row.enhance) && Helper.isNotEmpty(row.enhance.list)
+            && enhanceCount < row.enhance.list.length
+        ) {
+            enhanceCount = row.enhance.list.length
         }
     })
 
@@ -171,13 +177,13 @@ export const autoExtendListQuantity = (list) => {
             }
         }
 
-        if (Helper.isNotEmpty(row.enhances)) {
+        if (Helper.isNotEmpty(row.enhance) && Helper.isNotEmpty(row.enhance.list)) {
             for (let index = 0; index < enhanceCount; index++) {
-                if (Helper.isNotEmpty(row.enhances[index])) {
+                if (Helper.isNotEmpty(row.enhance.list[index])) {
                     continue
                 }
 
-                row.enhances[index] = {
+                row.enhance.list[index] = {
                     name: null
                 }
             }
@@ -189,21 +195,26 @@ export const autoExtendListQuantity = (list) => {
 
 export const normalizeText = (text) => {
     return text
-        .replace(/(│|├|└)*/g, '')
-        .replace(/(┃|┣|┗|　)*/g, '')
-        .replace('Ⅰ', 'I')
-        .replace('Ⅱ', 'II')
-        .replace('Ⅲ', 'III')
-        .replace('Ⅳ', 'IV')
-        .replace('Ⅴ', 'V')
-        .replace('Ｓ', 'S')
-        .replace('Ｄ', 'D')
-        .replace('＝', '=')
-        .replace('ＫＯ', 'KO')
-        .replace('Ｌｖ', 'Lv')
-        .replace('ＵＰ', 'UP')
-        .replace('･', '・')
         .replace(/ /g, ' ')
+        .replace(/(│|├|└)*/g, '').replace(/(┃|┣|┗|　)*/g, '')
+
+        .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+
+        .replace('Ａ', 'A').replace('Ｂ', 'B').replace('Ｃ', 'C').replace('Ｄ', 'D').replace('Ｅ', 'E')
+        .replace('Ｆ', 'F').replace('Ｇ', 'G').replace('Ｈ', 'H').replace('Ｉ', 'I').replace('Ｊ', 'J')
+        .replace('Ｋ', 'K').replace('Ｌ', 'L').replace('Ｍ', 'M').replace('Ｎ', 'N').replace('Ｏ', 'O')
+        .replace('Ｐ', 'P').replace('Ｑ', 'Q').replace('Ｒ', 'R').replace('Ｓ', 'S').replace('Ｔ', 'T')
+        .replace('Ｕ', 'U').replace('Ｖ', 'V').replace('Ｗ', 'W').replace('Ｘ', 'X').replace('Ｙ', 'Y')
+        .replace('Ｚ', 'Z')
+
+        .replace('ａ', 'a').replace('ｂ', 'b').replace('ｃ', 'c').replace('ｄ', 'd').replace('ｅ', 'e')
+        .replace('ｆ', 'f').replace('ｇ', 'g').replace('ｈ', 'h').replace('ｉ', 'i').replace('ｊ', 'j')
+        .replace('ｋ', 'k').replace('ｌ', 'l').replace('ｍ', 'm').replace('ｎ', 'n').replace('ｏ', 'o')
+        .replace('ｐ', 'p').replace('ｑ', 'q').replace('ｒ', 'r').replace('ｓ', 's').replace('ｔ', 't')
+        .replace('ｕ', 'u').replace('ｖ', 'v').replace('ｗ', 'w').replace('ｘ', 'x').replace('ｙ', 'y')
+        .replace('ｚ', 'z')
+
+        .replace('＝', '=').replace('･', '・')
 }
 
 export const weaponTypeList = [

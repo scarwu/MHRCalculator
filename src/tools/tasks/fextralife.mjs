@@ -94,7 +94,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             return
         }
 
-        for (let rowIndex = 1; rowIndex < listDom('table.wiki_table.sortable tbody tr').length; rowIndex++) {
+        for (let rowIndex = 0; rowIndex < listDom('table.wiki_table.sortable tbody tr').length; rowIndex++) {
             let rowNode = listDom('table.wiki_table.sortable tbody tr').eq(rowIndex)
 
             // Get Data
@@ -544,7 +544,7 @@ export const fetchJewelsAction = async () => {
         return
     }
 
-    for (let rowIndex = 1; rowIndex < listDom('table.wiki_table tbody tr').length; rowIndex++) {
+    for (let rowIndex = 0; rowIndex < listDom('table.wiki_table tbody tr').length; rowIndex++) {
         let rowNode = listDom('table.wiki_table tbody tr').eq(rowIndex)
 
         // Get Data
@@ -594,7 +594,7 @@ export const fetchEnhancesAction = async () => {
         return
     }
 
-    for (let rowIndex = 1; rowIndex < listDom('table.wiki_table tbody tr').length; rowIndex++) {
+    for (let rowIndex = 0; rowIndex < listDom('table.wiki_table tbody tr').length; rowIndex++) {
         let rowNode = listDom('table.wiki_table tbody tr').eq(rowIndex)
 
         // Get Data
@@ -639,7 +639,7 @@ export const fetchSkillsAction = async () => {
         return
     }
 
-    for (let rowIndex = 1; rowIndex < listDom('table.wiki_table tbody tr').length; rowIndex++) {
+    for (let rowIndex = 0; rowIndex < listDom('table.wiki_table tbody tr').length; rowIndex++) {
         let rowNode = listDom('table.wiki_table tbody tr').eq(rowIndex)
 
         // Get Data

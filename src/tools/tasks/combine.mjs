@@ -203,10 +203,27 @@ const specialReplaceEnhanceName = (text) => {
         { searchValue: 'Affinty Boost I', replaceValue: 'Affinity Boost I' },
         { searchValue: 'Affinty Boost II', replaceValue: 'Affinity Boost II' },
         { searchValue: 'Affinty Boost III', replaceValue: 'Affinity Boost III' },
-        { searchValue: 'Affiinity Boost I -> Affinity Boost I' },
-        { searchValue: 'Affiinity Boost II -> Affinity Boost II' },
-        { searchValue: 'Silkbing Boost -> Silkbind Boost' },
-        // { searchValue: 'Anti-Aerial -> Anti-Aerial Species' }
+        { searchValue: 'Affiinity Boost I', replaceValue: 'Affinity Boost I' },
+        { searchValue: 'Affiinity Boost II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Silkbing Boost', replaceValue: 'Silkbind Boost' },
+        { searchValue: 'Burtal Strike', replaceValue: 'Brutal Strike' },
+        { searchValue: 'Affinity Bonus II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Silk Boost', replaceValue: 'Silkbind Boost' },
+        { searchValue: 'Atttack Boost II', replaceValue: 'Attack Boost II' },
+        { searchValue: 'Affiinity Boost I', replaceValue: 'Affinity Boost I' },
+        { searchValue: 'Affiinity Boost II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Anti-aquatic Species', replaceValue: 'Anti-Aquatic Species' },
+        { searchValue: 'Silkbing Boost', replaceValue: 'Silkbind Boost' },
+        { searchValue: 'Spiribird Double', replaceValue: 'Spiribird Doubled' },
+        { searchValue: 'Anti-Aerial Species', replaceValue: 'Anti Aerial Species' },
+        { searchValue: 'Affinity I', replaceValue: 'Affinity Boost I' },
+        { searchValue: 'Affinity II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Fire Blight Exploit', replaceValue: 'Fireblight Exploit' },
+        { searchValue: 'Poiston Boost I', replaceValue: 'Poison Boost I' },
+        { searchValue: 'Poiston Boost II', replaceValue: 'Poison Boost II' },
+        { searchValue: 'Ice Bloost II', replaceValue: 'Ice Boost II' },
+        { searchValue: 'Brutal Strke', replaceValue: 'Brutal Strike' },
+        { searchValue: 'Lasting Arch Shot', replaceValue: 'Lasting Arc Shot' },
     ]
 
     for (let item of replacementList) {
@@ -390,41 +407,41 @@ export const arrangeAction = () => {
     const mergeItem = (minorCrawler, target, major, minor, lang) => {
         switch (target) {
         case 'weapons':
-            major = mergeNormalValue(minorCrawler, major, minor, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
-            major = mergeTranslateValue(minorCrawler, major, minor, lang, ['series', 'name'])
-            major = mergeElementValue(minorCrawler, major, minor)
-            major = mergeSharpnessValue(minorCrawler, major, minor)
-            major = mergeSlotsValue(minorCrawler, major, minor)
-            major = mergeEnhanceValue(minorCrawler, major, minor, translateMapping.enhances)
+            major = mergeNormalValue(minorCrawler, target, major, minor, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
+            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['series', 'name'])
+            major = mergeElementValue(minorCrawler, target, major, minor)
+            major = mergeSharpnessValue(minorCrawler, target, major, minor)
+            major = mergeSlotsValue(minorCrawler, target, major, minor)
+            major = mergeEnhanceValue(minorCrawler, target, major, minor, translateMapping.enhances)
 
             return Helper.deepCopy(major)
         case 'armors':
-            major = mergeNormalValue(minorCrawler, major, minor, ['rare', 'type', 'gender', 'minDefense', 'maxDefense'])
-            major = mergeTranslateValue(minorCrawler, major, minor, lang, ['series', 'name'])
-            major = mergeResistenceValue(minorCrawler, major, minor)
-            major = mergeSlotsValue(minorCrawler, major, minor)
-            major = mergeSkillsValue(minorCrawler, major, minor, translateMapping.skills)
+            major = mergeNormalValue(minorCrawler, target, major, minor, ['rare', 'type', 'gender', 'minDefense', 'maxDefense'])
+            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['series', 'name'])
+            major = mergeResistenceValue(minorCrawler, target, major, minor)
+            major = mergeSlotsValue(minorCrawler, target, major, minor)
+            major = mergeSkillsValue(minorCrawler, target, major, minor, translateMapping.skills)
 
             return Helper.deepCopy(major)
         case 'jewels':
-            major = mergeNormalValue(minorCrawler, major, minor, ['rare', 'size'])
-            major = mergeTranslateValue(minorCrawler, major, minor, lang, ['name'])
-            major = mergeSkillsValue(minorCrawler, major, minor, translateMapping.skills)
+            major = mergeNormalValue(minorCrawler, target, major, minor, ['rare', 'size'])
+            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['name'])
+            major = mergeSkillsValue(minorCrawler, target, major, minor, translateMapping.skills)
 
             return Helper.deepCopy(major)
         case 'petalaces':
-            major = mergeNormalValue(minorCrawler, major, minor, ['rare'])
-            major = mergeTranslateValue(minorCrawler, major, minor, lang, ['name'])
-            major = mergeIncrementAndObtainValue(minorCrawler, major, minor, lang, ['name'])
+            major = mergeNormalValue(minorCrawler, target, major, minor, ['rare'])
+            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['name'])
+            major = mergeIncrementAndObtainValue(minorCrawler, target, major, minor, lang, ['name'])
 
             return Helper.deepCopy(major)
         case 'enhances':
-            major = mergeTranslateValue(minorCrawler, major, minor, lang, ['name', 'description'])
+            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['name', 'description'])
 
             return Helper.deepCopy(major)
         case 'skills':
-            major = mergeNormalValue(minorCrawler, major, minor, ['level'])
-            major = mergeTranslateValue(minorCrawler, major, minor, lang, ['name', 'description', 'effect'])
+            major = mergeNormalValue(minorCrawler, target, major, minor, ['level'])
+            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['name', 'description', 'effect'])
 
             return Helper.deepCopy(major)
         default:
@@ -432,7 +449,7 @@ export const arrangeAction = () => {
         }
     }
 
-    const mergeNormalValue = (minorCrawler, major, minor, keys) => {
+    const mergeNormalValue = (minorCrawler, target, major, minor, keys) => {
         for (let key of keys) {
 
             // Copy Value
@@ -452,7 +469,9 @@ export const arrangeAction = () => {
                 }
 
                 duplicateValueList.normal.push({
+                    majorCrawler: majorCrawler,
                     minorCrawler: minorCrawler,
+                    target: target,
                     majorName: major.name.zhTW,
                     key: key,
                     majorValue: major[key],
@@ -464,7 +483,7 @@ export const arrangeAction = () => {
         return major
     }
 
-    const mergeTranslateValue = (minorCrawler, major, minor, lang, keys) => {
+    const mergeTranslateValue = (minorCrawler, target, major, minor, lang, keys) => {
         for (let key of keys) {
             if (Helper.isEmpty(major[key])) {
                 major[key] = {}
@@ -491,7 +510,9 @@ export const arrangeAction = () => {
                 }
 
                 duplicateValueList.translate.push({
+                    majorCrawler: majorCrawler,
                     minorCrawler: minorCrawler,
+                    target: target,
                     majorName: major.name.zhTW,
                     key: key,
                     lang: lang,
@@ -504,7 +525,7 @@ export const arrangeAction = () => {
         return major
     }
 
-    const mergeElementValue = (minorCrawler, major, minor) => {
+    const mergeElementValue = (minorCrawler, target, major, minor) => {
         for (let key of ['attack', 'status']) {
             for (let property of ['type', 'minValue', 'maxValue']) {
 
@@ -525,7 +546,9 @@ export const arrangeAction = () => {
                     }
 
                     duplicateValueList.element.push({
+                        majorCrawler: majorCrawler,
                         minorCrawler: minorCrawler,
+                        target: target,
                         majorName: major.name.zhTW,
                         key: key,
                         property: property,
@@ -539,7 +562,7 @@ export const arrangeAction = () => {
         return major
     }
 
-    const mergeSharpnessValue = (minorCrawler, major, minor) => {
+    const mergeSharpnessValue = (minorCrawler, target, major, minor) => {
         for (let key of ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'purple']) {
 
             // Copy Value
@@ -559,7 +582,9 @@ export const arrangeAction = () => {
                 }
 
                 duplicateValueList.sharpness.push({
+                    majorCrawler: majorCrawler,
                     minorCrawler: minorCrawler,
+                    target: target,
                     majorName: major.name.zhTW,
                     key: key,
                     majorValue: major.sharpness[key],
@@ -571,7 +596,7 @@ export const arrangeAction = () => {
         return major
     }
 
-    const mergeResistenceValue = (minorCrawler, major, minor) => {
+    const mergeResistenceValue = (minorCrawler, target, major, minor) => {
         for (let key of ['fire', 'water', 'thunder', 'ice', 'dragon']) {
 
             // Copy Value
@@ -591,7 +616,9 @@ export const arrangeAction = () => {
                 }
 
                 duplicateValueList.resistence.push({
+                    majorCrawler: majorCrawler,
                     minorCrawler: minorCrawler,
+                    target: target,
                     majorName: major.name.zhTW,
                     key: key,
                     majorValue: major.resistence[key],
@@ -603,7 +630,7 @@ export const arrangeAction = () => {
         return major
     }
 
-    const mergeIncrementAndObtainValue = (minorCrawler, major, minor) => {
+    const mergeIncrementAndObtainValue = (minorCrawler, target, major, minor) => {
         for (let key of ['health', 'stamina', 'attack', 'defense']) {
             for (let property of ['increment', 'obtain']) {
 
@@ -624,7 +651,9 @@ export const arrangeAction = () => {
                     }
 
                     duplicateValueList.petalace.push({
+                        majorCrawler: majorCrawler,
                         minorCrawler: minorCrawler,
+                        target: target,
                         majorName: major.name.zhTW,
                         key: key,
                         property: property,
@@ -638,7 +667,7 @@ export const arrangeAction = () => {
         return major
     }
 
-    const mergeSlotsValue = (minorCrawler, major, minor) => {
+    const mergeSlotsValue = (minorCrawler, target, major, minor) => {
         let maxIndex = 0
 
         if (Helper.isEmpty(major.slots)) {
@@ -694,7 +723,9 @@ export const arrangeAction = () => {
                     }
 
                     duplicateValueList.slots.push({
+                        majorCrawler: majorCrawler,
                         minorCrawler: minorCrawler,
+                        target: target,
                         majorName: major.name.zhTW,
                         index: index,
                         property: 'size',
@@ -708,7 +739,7 @@ export const arrangeAction = () => {
         return major
     }
 
-    const mergeSkillsValue = (minorCrawler, major, minor, translateMapping) => {
+    const mergeSkillsValue = (minorCrawler, target, major, minor, translateMapping) => {
         major.skills = Helper.isNotEmpty(major.skills)
             ? major.skills.filter(function (item) {
                 return Helper.isNotEmpty(item.name)
@@ -727,6 +758,7 @@ export const arrangeAction = () => {
             if (Helper.isEmpty(translateMapping[item.name])) {
                 untrackMergeMapping.skills[`${minorCrawler}:${item.name}`] = {
                     crawler: 'kiranico',
+                    target: target,
                     name: major.name,
                     skillName: item.name
                 }
@@ -745,6 +777,7 @@ export const arrangeAction = () => {
             if (Helper.isEmpty(translateMapping[item.name])) {
                 untrackMergeMapping.skills[`${minorCrawler}:${item.name}`] = {
                     crawler: minorCrawler,
+                    target: target,
                     name: major.name,
                     skillName: item.name
                 }
@@ -762,7 +795,9 @@ export const arrangeAction = () => {
                 }
 
                 duplicateValueList.skills.push({
+                    majorCrawler: majorCrawler,
                     minorCrawler: minorCrawler,
+                    target: target,
                     majorName: major.name.zhTW,
                     majorLostValue: item.name
                 })
@@ -783,7 +818,7 @@ export const arrangeAction = () => {
         return major
     }
 
-    const mergeEnhanceValue = (minorCrawler, major, minor, translateMapping) => {
+    const mergeEnhanceValue = (minorCrawler, target, major, minor, translateMapping) => {
         if (Helper.isEmpty(major.enhance.limit)
             && Helper.isNotEmpty(minor.enhance.limit)
         ) {
@@ -808,6 +843,7 @@ export const arrangeAction = () => {
             if (Helper.isEmpty(translateMapping[item.name])) {
                 untrackMergeMapping.enhances[`${minorCrawler}:${item.name}`] = {
                     crawler: 'kiranico',
+                    target: target,
                     name: major.name,
                     enhanceName: item.name
                 }
@@ -825,7 +861,9 @@ export const arrangeAction = () => {
 
             if (Helper.isEmpty(translateMapping[item.name])) {
                 untrackMergeMapping.enhances[`${minorCrawler}:${item.name}`] = {
+                    majorCrawler: majorCrawler,
                     minorCrawler: minorCrawler,
+                    target: target,
                     name: major.name,
                     enhanceName: item.name
                 }
@@ -843,7 +881,9 @@ export const arrangeAction = () => {
                 }
 
                 duplicateValueList.enhance.push({
+                    majorCrawler: majorCrawler,
                     minorCrawler: minorCrawler,
+                    target: target,
                     majorName: major.name.zhTW,
                     majorLostValue: item.name
                 })

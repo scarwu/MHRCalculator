@@ -9,7 +9,8 @@
 
 import Helper from './helper.mjs'
 
-export const defaultWeapon = {
+export const defaultWeaponItem = {
+    id: null,
     series: null,
     name: null,
     rare: null,
@@ -53,7 +54,8 @@ export const defaultWeapon = {
     }
 }
 
-export const defaultArmor = {
+export const defaultArmorItem = {
+    id: null,
     series: null,
     name: null,
     rare: null,
@@ -81,7 +83,8 @@ export const defaultArmor = {
     ]
 }
 
-export const defaultJewel = {
+export const defaultJewelItem = {
+    id: null,
     name: null,
     rare: null,
     size: null,
@@ -93,7 +96,8 @@ export const defaultJewel = {
     ]
 }
 
-export const defaultPetalace = {
+export const defaultPetalaceItem = {
+    id: null,
     name: null,
     rare: null,
     health: {
@@ -114,12 +118,14 @@ export const defaultPetalace = {
     }
 }
 
-export const defaultEnhance = {
+export const defaultEnhanceItem = {
+    id: null,
     name: null,
     description: null
 }
 
-export const defaultSkill = {
+export const defaultSkillItem = {
+    id: null,
     name: null,
     description: null,
     level: null,
@@ -229,8 +235,4 @@ export const rareList = [
 
 export const sizeList = [
     'size1', 'size2', 'size3'
-]
-
-export const crawlerNameList = [
-    'gameqb', 'game8', 'kiranico', 'fextralife'
 ]

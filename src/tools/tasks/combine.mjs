@@ -9,17 +9,35 @@ import md5 from 'md5'
 
 import Helper from '../liberaries/helper.mjs'
 import {
+    defaultWeaponItem,
+    defaultArmorItem,
+    defaultPetalaceItem,
+    defaultJewelItem,
+    defaultEnhanceItem,
+    defaultSkillItem,
     autoExtendListQuantity,
     weaponTypeList,
     rareList,
-    sizeList,
-    crawlerNameList
+    sizeList
 } from '../liberaries/mh.mjs'
 
 const crawlerRoot = 'temp/crawler'
 const combineRoot = 'temp/combine'
 
-const specialReplaceName = (text, lang, rare) => {
+export const crawlerList = [
+    'gameqb', 'game8', 'kiranico', 'fextralife'
+]
+
+export const targetList = [
+    'weapons',
+    'armors',
+    'petalaces',
+    'jewels',
+    'enhances',
+    'skills'
+]
+
+const specialReplaceItemName = (text, lang, rare) => {
     let replacementList = [
 
         // kiranico
@@ -158,7 +176,7 @@ const specialReplaceName = (text, lang, rare) => {
     return text
 }
 
-const specialReplaceSkillName = (text) => {
+const specialReplaceSkillPropertyName = (text) => {
     let replacementList = [
 
         // gameqb
@@ -182,7 +200,7 @@ const specialReplaceSkillName = (text) => {
     return text
 }
 
-const specialReplaceEnhanceName = (text) => {
+const specialReplaceEnhancePropertyName = (text) => {
     let replacementList = [
 
         // kiranico
@@ -237,684 +255,698 @@ const specialReplaceEnhanceName = (text) => {
 
 export const arrangeAction = () => {
 
-    // Load Data
-    let crawlerDataMapping = {
-        weapons: {},
-        armors: {},
-        petalaces: {},
-        jewels: {},
-        enhances: {},
-        skills: {}
+    let rawDataMapping = {}
+    let metaDataMapping = {}
+    let arrangeDataMapping = {}
+
+    let untrackDataMapping = {}
+    let untrackMergeMapping = {}
+    let duplicateValueMapping = {}
+
+    let translateIdMapping = {}
+
+    let crawlerInfo = {
+        major: {
+            name: 'kiranico',
+            langs: ['zhTW', 'jaJP', 'enUS']
+        },
+        minors: [
+            {
+                name: 'gameqb',
+                lang: 'zhTW'
+            },
+            {
+                name: 'game8',
+                lang: 'jaJP'
+            },
+            {
+                name: 'fextralife',
+                lang: 'enUS'
+            }
+        ]
     }
 
-    Object.keys(crawlerDataMapping).forEach((target) => {
-        crawlerNameList.forEach((crawlerName) => {
-            crawlerDataMapping[target][crawlerName] = []
+    // Load Raw Data
+    Object.values(targetList).forEach((target) => {
+        rawDataMapping[target] = {}
+
+        Object.values(crawlerList).forEach((crawler) => {
+            rawDataMapping[target][crawler] = []
         })
     })
 
-    for (let crawlerName of crawlerNameList) {
-        console.log(`concat:${crawlerName}`)
+    for (let target of Object.keys(rawDataMapping)) {
+        console.log(`concat:${target}`)
 
-        // Weapons
-        console.log(`concat:${crawlerName}:weapons`)
+        for (let crawler of Object.keys(rawDataMapping[target])) {
+            console.log(`concat:${target}:${crawler}`)
 
-        let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/weapons.csv`)
-
-        if (Helper.isNotEmpty(weaponList)) {
-            crawlerDataMapping.weapons[crawlerName] = weaponList
-        } else {
-            for (let weaponType of weaponTypeList) {
-                let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/weapons/${weaponType}.csv`)
+            if ('weapons' === target) {
+                let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons.csv`)
 
                 if (Helper.isNotEmpty(weaponList)) {
-                    crawlerDataMapping.weapons[crawlerName] = crawlerDataMapping.weapons[crawlerName].concat(weaponList)
+                    rawDataMapping.weapons[crawler] = weaponList
+
+                    continue
                 }
+
+                for (let weaponType of weaponTypeList) {
+                    let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons/${weaponType}.csv`)
+
+                    if (Helper.isNotEmpty(weaponList)) {
+                        rawDataMapping.weapons[crawler] = rawDataMapping.weapons[crawler].concat(weaponList)
+                    }
+                }
+
+                continue
             }
-        }
 
-        // Armors
-        console.log(`concat:${crawlerName}:armors`)
-
-        let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/armors.csv`)
-
-        if (Helper.isNotEmpty(armorList)) {
-            crawlerDataMapping.armors[crawlerName] = armorList
-        } else {
-            for (let rare of rareList) {
-                let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/armors/${rare}.csv`)
+            if ('armors' === target) {
+                let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors.csv`)
 
                 if (Helper.isNotEmpty(armorList)) {
-                    crawlerDataMapping.armors[crawlerName] = crawlerDataMapping.armors[crawlerName].concat(armorList)
+                    rawDataMapping.armors[crawler] = armorList
+
+                    continue
                 }
+
+                for (let rare of rareList) {
+                    let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors/${rare}.csv`)
+
+                    if (Helper.isNotEmpty(armorList)) {
+                        rawDataMapping.armors[crawler] = rawDataMapping.armors[crawler].concat(armorList)
+                    }
+                }
+
+                continue
             }
-        }
 
-        // Others
-        for (let target of ['petalaces', 'jewels', 'enhances', 'skills']) {
-            console.log(`concat:${crawlerName}:${target}`)
-
-            let targetList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/${target}.csv`)
+            let targetList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/${target}.csv`)
 
             if (Helper.isNotEmpty(targetList)) {
-                crawlerDataMapping[target][crawlerName] = targetList
+                rawDataMapping[target][crawler] = targetList
             }
         }
     }
 
-    // Transform Data
-    let translateIdMapping = {}
-    let arrangeDataMapping = {
-        weapons: {},
-        armors: {},
-        petalaces: {},
-        jewels: {},
-        enhances: {},
-        skills: {}
-    }
-    let untrackDataMapping = {
-        weapons: {},
-        armors: {},
-        petalaces: {},
-        jewels: {},
-        enhances: {},
-        skills: {}
-    }
-    let untrackMergeMapping = {
-        enhances: {},
-        skills: {}
-    }
+    // Generate Meta Data
+    for (let target of Object.keys(rawDataMapping)) {
 
-    let translateMapping = {}
-    let duplicateValueList = {}
+        // Major Crawler Handle
+        let majorCrawler = crawlerInfo.major
 
-    let majorCrawler = 'kiranico'
-    let minorCrawlers = ['gameqb', 'game8', 'fextralife']
-    let supportLang = {
-        kiranico: ['zhTW', 'jaJP', 'enUS'],
-        gameqb: ['zhTW'],
-        game8: ['jaJP'],
-        fextralife: ['enUS']
-    }
+        rawDataMapping[target][majorCrawler.name].forEach((item) => {
 
-    const mergeTarget = (target) => {
-
-        // Major Crawler Data Init
-        console.log(`merge:${target}:majorCrawler:${majorCrawler}`)
-
-        crawlerDataMapping[target][majorCrawler].forEach((item) => {
-
-            // Special Replace Text
-            supportLang[majorCrawler].forEach((lang) => {
-                ['series', 'name', 'description', 'effect'].forEach((key) => {
-                    if (Helper.isEmpty(item[key]) || Helper.isEmpty(item[key][lang])) {
-                        return
-                    }
-
-                    item[key][lang] = specialReplaceName(item[key][lang], lang, item.rare)
-                })
+            // Special Replace Name
+            majorCrawler.langs.forEach((lang) => {
+                item.name[lang] = specialReplaceItemName(item.name[lang])
             })
 
-            let itemId = `${target}:id:${md5(item.name.zhTW)}` // Using zhTW as ID
+            // Create Item Id By zhTW Name
+            let itemId = null
 
-            supportLang[majorCrawler].forEach((lang) => {
-                let translateId = `${target}:name:${lang}:${md5(item.name[lang])}`
+            if ('skills' === target) {
+                itemId = `${target}:id:${md5(item.name.zhTW)}:${item.level}`
+            } else {
+                itemId = `${target}:id:${md5(item.name.zhTW)}`
+            }
+
+            majorCrawler.langs.forEach((lang) => {
+                let translateId = null
+
+                if ('skills' === target) {
+                    translateId = `${target}:name:${lang}:${md5(item.name[lang])}:${item.level}`
+                } else {
+                    translateId = `${target}:name:${lang}:${md5(item.name[lang])}`
+                }
 
                 translateIdMapping[translateId] = itemId
             })
 
-            arrangeDataMapping[target][itemId] = item
-        })
-
-        // Minor Crawler Data Merge
-        minorCrawlers.forEach((minorCrawler) => {
-            console.log(`merge:${target}:minorCrawler:${minorCrawler}`)
-
-            if (Helper.isEmpty(untrackDataMapping[target][minorCrawler])) {
-                untrackDataMapping[target][minorCrawler] = []
+            if (Helper.isEmpty(metaDataMapping[target])) {
+                metaDataMapping[target] = {}
             }
 
-            crawlerDataMapping[target][minorCrawler].forEach((item) => {
+            if (Helper.isEmpty(metaDataMapping[target][itemId])) {
+                metaDataMapping[target][itemId] = {}
+            }
 
-                // Special Replace Text
-                supportLang[minorCrawler].forEach((lang) => {
-                    ['series', 'name', 'description', 'effect'].forEach((key) => {
-                        if (Helper.isEmpty(item[key]) || Helper.isEmpty(item[key][lang])) {
-                            return
-                        }
+            metaDataMapping[target][itemId][majorCrawler.name] = item
+        })
 
-                        item[key][lang] = specialReplaceName(item[key][lang], lang, item.rare)
-                    })
-                })
+        // Minor Crawlers Handle
+        crawlerInfo.minors.forEach((minorCrawler) => {
+            rawDataMapping[target][minorCrawler.name].forEach((item) => {
+                let lang = minorCrawler.lang
 
-                supportLang[minorCrawler].forEach((lang) => {
-                    let translateId = `${target}:name:${lang}:${md5(item.name[lang])}`
+                item.name[lang] = specialReplaceItemName(item.name[lang])
 
-                    if (Helper.isEmpty(translateIdMapping[translateId])) {
-                        untrackDataMapping[target][minorCrawler].push(item)
+                let translateId = null
 
-                        return
+                if ('skills' === target) {
+                    translateId = `${target}:name:${lang}:${md5(item.name[lang])}:${item.level}`
+                } else {
+                    translateId = `${target}:name:${lang}:${md5(item.name[lang])}`
+                }
+
+                // Record UntrackDataMapping
+                if (Helper.isEmpty(translateIdMapping[translateId])) {
+                    if (Helper.isEmpty(untrackDataMapping[target])) {
+                        untrackDataMapping[target] = {}
                     }
 
-                    let itemId = translateIdMapping[translateId]
+                    if (Helper.isEmpty(untrackDataMapping[target][minorCrawler.name])) {
+                        untrackDataMapping[target][minorCrawler.name] = []
+                    }
 
-                    arrangeDataMapping[target][itemId] = mergeItem(minorCrawler, target, arrangeDataMapping[target][itemId], item, lang)
-                })
+                    untrackDataMapping[target][minorCrawler.name].push(item)
+
+                    return
+                }
+
+                let itemId = translateIdMapping[translateId]
+
+                if (Helper.isEmpty(metaDataMapping[target])) {
+                    metaDataMapping[target] = {}
+                }
+
+                if (Helper.isEmpty(metaDataMapping[target][itemId])) {
+                    metaDataMapping[target][itemId] = {}
+                }
+
+                metaDataMapping[target][itemId][minorCrawler.name] = item
             })
         })
     }
 
-    const mergeItem = (minorCrawler, target, major, minor, lang) => {
+    const mergeItem = (target, crawlers) => {
+        let item = null
+
         switch (target) {
         case 'weapons':
-            major = mergeNormalValue(minorCrawler, target, major, minor, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
-            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['series', 'name'])
-            major = mergeElementValue(minorCrawler, target, major, minor)
-            major = mergeSharpnessValue(minorCrawler, target, major, minor)
-            major = mergeSlotsValue(minorCrawler, target, major, minor)
-            major = mergeEnhanceValue(minorCrawler, target, major, minor, translateMapping.enhances)
+            item = Helper.deepCopy(defaultWeaponItem)
+            item = mergeNormalValue(target, item, crawlers, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
+            item = mergeTranslateValue(target, item, crawlers, ['series', 'name'])
+            item = mergeElementValue(target, item, crawlers)
+            item = mergeSharpnessValue(target, item, crawlers)
+            item = mergeSlotsValue(target, item, crawlers)
+            item = mergeEnhanceValue(target, item, crawlers)
 
-            return Helper.deepCopy(major)
+            return Helper.deepCopy(item)
         case 'armors':
-            major = mergeNormalValue(minorCrawler, target, major, minor, ['rare', 'type', 'gender', 'minDefense', 'maxDefense'])
-            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['series', 'name'])
-            major = mergeResistenceValue(minorCrawler, target, major, minor)
-            major = mergeSlotsValue(minorCrawler, target, major, minor)
-            major = mergeSkillsValue(minorCrawler, target, major, minor, translateMapping.skills)
+            item = Helper.deepCopy(defaultArmorItem)
+            item = mergeNormalValue(target, item, crawlers, ['rare', 'type', 'gender', 'minDefense', 'maxDefense'])
+            item = mergeTranslateValue(target, item, crawlers, ['series', 'name'])
+            item = mergeResistenceValue(target, item, crawlers)
+            item = mergeSlotsValue(target, item, crawlers)
+            item = mergeSkillsValue(target, item, crawlers)
 
-            return Helper.deepCopy(major)
+            return Helper.deepCopy(item)
         case 'jewels':
-            major = mergeNormalValue(minorCrawler, target, major, minor, ['rare', 'size'])
-            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['name'])
-            major = mergeSkillsValue(minorCrawler, target, major, minor, translateMapping.skills)
+            item = Helper.deepCopy(defaultJewelItem)
+            item = mergeNormalValue(target, item, crawlers, ['rare', 'size'])
+            item = mergeTranslateValue(target, item, crawlers, ['name'])
+            item = mergeSkillsValue(target, item, crawlers)
 
-            return Helper.deepCopy(major)
+            return Helper.deepCopy(item)
         case 'petalaces':
-            major = mergeNormalValue(minorCrawler, target, major, minor, ['rare'])
-            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['name'])
-            major = mergeIncrementAndObtainValue(minorCrawler, target, major, minor, lang, ['name'])
+            item = Helper.deepCopy(defaultPetalaceItem)
+            item = mergeNormalValue(target, item, crawlers, ['rare'])
+            item = mergeTranslateValue(target, item, crawlers, ['name'])
+            item = mergeIncrementAndObtainValue(target, item, crawlers, ['name'])
 
-            return Helper.deepCopy(major)
+            return Helper.deepCopy(item)
         case 'enhances':
-            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['name', 'description'])
+            item = Helper.deepCopy(defaultEnhanceItem)
+            item = mergeTranslateValue(target, item, crawlers, ['name', 'description'])
 
-            return Helper.deepCopy(major)
+            return Helper.deepCopy(item)
         case 'skills':
-            major = mergeNormalValue(minorCrawler, target, major, minor, ['level'])
-            major = mergeTranslateValue(minorCrawler, target, major, minor, lang, ['name', 'description', 'effect'])
+            item = Helper.deepCopy(defaultSkillItem)
+            item = mergeNormalValue(target, item, crawlers, ['level'])
+            item = mergeTranslateValue(target, item, crawlers, ['name', 'description', 'effect'])
 
-            return Helper.deepCopy(major)
+            return Helper.deepCopy(item)
         default:
             throw 'wrong target'
         }
     }
 
-    const mergeNormalValue = (minorCrawler, target, major, minor, keys) => {
-        for (let key of keys) {
+    // const mergeNormalValue = (target, item, crawlers, keys) => {
+    //     for (let key of keys) {
 
-            // Copy Value
-            if (Helper.isEmpty(major[key])
-                && Helper.isNotEmpty(minor[key])
-            ) {
-                major[key] = minor[key]
-            }
+    //         // Copy Value
+    //         if (Helper.isEmpty(major[key])
+    //             && Helper.isNotEmpty(minor[key])
+    //         ) {
+    //             major[key] = minor[key]
+    //         }
 
-            // Duplicate Value
-            if (Helper.isNotEmpty(major[key])
-                && Helper.isNotEmpty(minor[key])
-                && major[key] !== minor[key]
-            ) {
-                if (Helper.isEmpty(duplicateValueList.normal)) {
-                    duplicateValueList.normal = []
-                }
+    //         // Duplicate Value
+    //         if (Helper.isNotEmpty(major[key])
+    //             && Helper.isNotEmpty(minor[key])
+    //             && major[key] !== minor[key]
+    //         ) {
+    //             if (Helper.isEmpty(duplicateValueMapping.normal)) {
+    //                 duplicateValueMapping.normal = []
+    //             }
 
-                duplicateValueList.normal.push({
-                    majorCrawler: majorCrawler,
-                    minorCrawler: minorCrawler,
-                    target: target,
-                    majorName: major.name.zhTW,
-                    key: key,
-                    majorValue: major[key],
-                    minorValue: minor[key]
-                })
-            }
+    //             duplicateValueMapping.normal.push({
+    //                 majorCrawler: majorCrawler,
+    //                 minorCrawler: minorCrawler,
+    //                 target: target,
+    //                 majorName: major.name.zhTW,
+    //                 key: key,
+    //                 majorValue: major[key],
+    //                 minorValue: minor[key]
+    //             })
+    //         }
+    //     }
+
+    //     return major
+    // }
+
+    // const mergeTranslateValue = (target, item, crawlers, lang, keys) => {
+    //     for (let key of keys) {
+    //         if (Helper.isEmpty(major[key])) {
+    //             major[key] = {}
+    //         }
+
+    //         if (Helper.isEmpty(minor[key])) {
+    //             minor[key] = {}
+    //         }
+
+    //         // Copy Value
+    //         if (Helper.isEmpty(major[key][lang])
+    //             && Helper.isNotEmpty(minor[key][lang])
+    //         ) {
+    //             major[key][lang] = minor[key][lang]
+    //         }
+
+    //         // Duplicate Value
+    //         if (Helper.isNotEmpty(major[key][lang])
+    //             && Helper.isNotEmpty(minor[key][lang])
+    //             && major[key][lang] !== minor[key][lang]
+    //         ) {
+    //             if (Helper.isEmpty(duplicateValueMapping.translate)) {
+    //                 duplicateValueMapping.translate = []
+    //             }
+
+    //             duplicateValueMapping.translate.push({
+    //                 majorCrawler: majorCrawler,
+    //                 minorCrawler: minorCrawler,
+    //                 target: target,
+    //                 majorName: major.name.zhTW,
+    //                 key: key,
+    //                 lang: lang,
+    //                 majorValue: major[key][lang],
+    //                 minorValue: minor[key][lang]
+    //             })
+    //         }
+    //     }
+
+    //     return major
+    // }
+
+    // const mergeElementValue = (target, item, crawlers) => {
+    //     for (let key of ['attack', 'status']) {
+    //         for (let property of ['type', 'minValue', 'maxValue']) {
+
+    //             // Copy Value
+    //             if (Helper.isEmpty(major.element[key][property])
+    //                 && Helper.isNotEmpty(minor.element[key][property])
+    //             ) {
+    //                 major.element[key][property] = minor.element[key][property]
+    //             }
+
+    //             // Duplicate Value
+    //             if (Helper.isNotEmpty(major.element[key][property])
+    //                 && Helper.isNotEmpty(minor.element[key][property])
+    //                 && major.element[key][property] !== minor.element[key][property]
+    //             ) {
+    //                 if (Helper.isEmpty(duplicateValueMapping.element)) {
+    //                     duplicateValueMapping.element = []
+    //                 }
+
+    //                 duplicateValueMapping.element.push({
+    //                     majorCrawler: majorCrawler,
+    //                     minorCrawler: minorCrawler,
+    //                     target: target,
+    //                     majorName: major.name.zhTW,
+    //                     key: key,
+    //                     property: property,
+    //                     majorValue: major.element[key][property],
+    //                     minorValue: minor.element[key][property]
+    //                 })
+    //             }
+    //         }
+    //     }
+
+    //     return major
+    // }
+
+    // const mergeSharpnessValue = (target, item, crawlers) => {
+    //     for (let key of ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'purple']) {
+
+    //         // Copy Value
+    //         if (Helper.isEmpty(major.sharpness[key])
+    //             && Helper.isNotEmpty(minor.sharpness[key])
+    //         ) {
+    //             major.sharpness[key] = minor.sharpness[key]
+    //         }
+
+    //         // Duplicate Value
+    //         if (Helper.isNotEmpty(major.sharpness[key])
+    //             && Helper.isNotEmpty(minor.sharpness[key])
+    //             && major.sharpness[key] !== minor.sharpness[key]
+    //         ) {
+    //             if (Helper.isEmpty(duplicateValueMapping.sharpness)) {
+    //                 duplicateValueMapping.sharpness = []
+    //             }
+
+    //             duplicateValueMapping.sharpness.push({
+    //                 majorCrawler: majorCrawler,
+    //                 minorCrawler: minorCrawler,
+    //                 target: target,
+    //                 majorName: major.name.zhTW,
+    //                 key: key,
+    //                 majorValue: major.sharpness[key],
+    //                 minorValue: minor.sharpness[key]
+    //             })
+    //         }
+    //     }
+
+    //     return major
+    // }
+
+    // const mergeResistenceValue = (target, item, crawlers) => {
+    //     for (let key of ['fire', 'water', 'thunder', 'ice', 'dragon']) {
+
+    //         // Copy Value
+    //         if (Helper.isEmpty(major.resistence[key])
+    //             && Helper.isNotEmpty(minor.resistence[key])
+    //         ) {
+    //             major.resistence[key] = minor.resistence[key]
+    //         }
+
+    //         // Duplicate Value
+    //         if (Helper.isNotEmpty(major.resistence[key])
+    //             && Helper.isNotEmpty(minor.resistence[key])
+    //             && major.resistence[key] !== minor.resistence[key]
+    //         ) {
+    //             if (Helper.isEmpty(duplicateValueMapping.resistence)) {
+    //                 duplicateValueMapping.resistence = []
+    //             }
+
+    //             duplicateValueMapping.resistence.push({
+    //                 majorCrawler: majorCrawler,
+    //                 minorCrawler: minorCrawler,
+    //                 target: target,
+    //                 majorName: major.name.zhTW,
+    //                 key: key,
+    //                 majorValue: major.resistence[key],
+    //                 minorValue: minor.resistence[key]
+    //             })
+    //         }
+    //     }
+
+    //     return major
+    // }
+
+    // const mergeIncrementAndObtainValue = (target, item, crawlers) => {
+    //     for (let key of ['health', 'stamina', 'attack', 'defense']) {
+    //         for (let property of ['increment', 'obtain']) {
+
+    //             // Copy Value
+    //             if (Helper.isEmpty(major[key][property])
+    //                 && Helper.isNotEmpty(minor[key][property])
+    //             ) {
+    //                 major[key][property] = minor[key][property]
+    //             }
+
+    //             // Duplicate Value
+    //             if (Helper.isNotEmpty(major[key][property])
+    //                 && Helper.isNotEmpty(minor[key][property])
+    //                 && major[key][property] !== minor[key][property]
+    //             ) {
+    //                 if (Helper.isEmpty(duplicateValueMapping.petalace)) {
+    //                     duplicateValueMapping.petalace = []
+    //                 }
+
+    //                 duplicateValueMapping.petalace.push({
+    //                     majorCrawler: majorCrawler,
+    //                     minorCrawler: minorCrawler,
+    //                     target: target,
+    //                     majorName: major.name.zhTW,
+    //                     key: key,
+    //                     property: property,
+    //                     majorValue: major[key][property],
+    //                     minorValue: minor[key][property]
+    //                 })
+    //             }
+    //         }
+    //     }
+
+    //     return major
+    // }
+
+    // const mergeSlotsValue = (target, item, crawlers) => {
+    //     let maxIndex = 0
+
+    //     if (Helper.isEmpty(major.slots)) {
+    //         major.slots = []
+    //     } else {
+    //         major.slots = major.slots.filter(function (item) {
+    //             return Helper.isNotEmpty(item.size)
+    //         }).sort(function (aItem, bItem) {
+    //             return bItem.size - aItem.size // Desc
+    //         })
+
+    //         maxIndex = (major.slots.length > maxIndex)
+    //             ? major.slots.length : maxIndex
+    //     }
+
+    //     if (Helper.isEmpty(minor.slots)) {
+    //         minor.slots = []
+    //     } else {
+    //         minor.slots = minor.slots.filter(function (item) {
+    //             return Helper.isNotEmpty(item.size)
+    //         }).sort(function (aItem, bItem) {
+    //             return bItem.size - aItem.size // Desc
+    //         })
+
+    //         maxIndex = (minor.slots.length > maxIndex)
+    //             ? minor.slots.length : maxIndex
+    //     }
+
+    //     if (0 !== maxIndex) {
+    //         for (let index = 0; index < maxIndex; index++) {
+    //             if (Helper.isEmpty(major.slots[index])) {
+    //                 major.slots[index] = {}
+    //             }
+
+    //             if (Helper.isEmpty(minor.slots[index])) {
+    //                 minor.slots[index] = {}
+    //             }
+
+    //             // Copy Value
+    //             if (Helper.isEmpty(major.slots[index].size)
+    //                 && Helper.isNotEmpty(minor.slots[index].size)
+    //             ) {
+    //                 major.slots[index].size = minor.slots[index].size
+    //             }
+
+    //             // Duplicate Value
+    //             if (Helper.isNotEmpty(major.slots[index].size)
+    //                 && Helper.isNotEmpty(minor.slots[index].size)
+    //                 && major.slots[index].size !== minor.slots[index].size
+    //             ) {
+    //                 if (Helper.isEmpty(duplicateValueMapping.slots)) {
+    //                     duplicateValueMapping.slots = []
+    //                 }
+
+    //                 duplicateValueMapping.slots.push({
+    //                     majorCrawler: majorCrawler,
+    //                     minorCrawler: minorCrawler,
+    //                     target: target,
+    //                     majorName: major.name.zhTW,
+    //                     index: index,
+    //                     property: 'size',
+    //                     majorValue: major.slots[index].size,
+    //                     minorValue: minor.slots[index].size
+    //                 })
+    //             }
+    //         }
+    //     }
+
+    //     return major
+    // }
+
+    // const mergeSkillsValue = (target, item, crawlers, translateMapping) => {
+    //     major.skills = Helper.isNotEmpty(major.skills)
+    //         ? major.skills.filter(function (item) {
+    //             return Helper.isNotEmpty(item.name)
+    //         }) : []
+
+    //     minor.skills = Helper.isNotEmpty(minor.skills)
+    //         ? minor.skills.filter(function (item) {
+    //             return Helper.isNotEmpty(item.name)
+    //         }) : []
+
+    //     let mapping = {}
+
+    //     major.skills.forEach((item) => {
+    //         item.name = specialReplaceSkillPropertyName(item.name)
+
+    //         if (Helper.isEmpty(translateMapping[item.name])) {
+    //             untrackMergeMapping.skills[`${minorCrawler}:${item.name}`] = {
+    //                 crawler: 'kiranico',
+    //                 target: target,
+    //                 name: major.name,
+    //                 skillName: item.name
+    //             }
+
+    //             return
+    //         }
+
+    //         item.name = translateMapping[item.name]
+
+    //         mapping[item.name] = item
+    //     })
+
+    //     minor.skills.forEach((item) => {
+    //         item.name = specialReplaceSkillPropertyName(item.name)
+
+    //         if (Helper.isEmpty(translateMapping[item.name])) {
+    //             untrackMergeMapping.skills[`${minorCrawler}:${item.name}`] = {
+    //                 crawler: minorCrawler,
+    //                 target: target,
+    //                 name: major.name,
+    //                 skillName: item.name
+    //             }
+
+    //             return
+    //         }
+
+    //         item.name = translateMapping[item.name]
+
+    //         if (Helper.isEmpty(mapping[item.name])) {
+
+    //             // Duplicate Value
+    //             if (Helper.isEmpty(duplicateValueMapping.skills)) {
+    //                 duplicateValueMapping.skills = []
+    //             }
+
+    //             duplicateValueMapping.skills.push({
+    //                 majorCrawler: majorCrawler,
+    //                 minorCrawler: minorCrawler,
+    //                 target: target,
+    //                 majorName: major.name.zhTW,
+    //                 majorLostValue: item.name
+    //             })
+
+    //             mapping[item.name] = item
+    //         }
+
+    //         // Copy Value
+    //         if (Helper.isEmpty(mapping[item.name].level)
+    //             && Helper.isNotEmpty(item.level)
+    //         ) {
+    //             mapping[item.name].level = item.level
+    //         }
+    //     })
+
+    //     major.skills = Object.values(mapping)
+
+    //     return major
+    // }
+
+    // const mergeEnhanceValue = (target, item, crawlers, translateMapping) => {
+    //     if (Helper.isEmpty(major.enhance.limit)
+    //         && Helper.isNotEmpty(minor.enhance.limit)
+    //     ) {
+    //         major.enhance.limit = minor.enhance.limit
+    //     }
+
+    //     major.enhance.list = Helper.isNotEmpty(major.enhance.list)
+    //         ? major.enhance.list.filter(function (item) {
+    //             return Helper.isNotEmpty(item.name)
+    //         }) : []
+
+    //     minor.enhance.list = Helper.isNotEmpty(minor.enhance.list)
+    //         ? minor.enhance.list.filter(function (item) {
+    //             return Helper.isNotEmpty(item.name)
+    //         }) : []
+
+    //     let mapping = {}
+
+    //     major.enhance.list.forEach((item) => {
+    //         item.name = specialReplaceEnhancePropertyName(item.name)
+
+    //         if (Helper.isEmpty(translateMapping[item.name])) {
+    //             untrackMergeMapping.enhances[`${minorCrawler}:${item.name}`] = {
+    //                 crawler: 'kiranico',
+    //                 target: target,
+    //                 name: major.name,
+    //                 enhanceName: item.name
+    //             }
+
+    //             return
+    //         }
+
+    //         item.name = translateMapping[item.name]
+
+    //         mapping[item.name] = item
+    //     })
+
+    //     minor.enhance.list.forEach((item) => {
+    //         item.name = specialReplaceEnhancePropertyName(item.name)
+
+    //         if (Helper.isEmpty(translateMapping[item.name])) {
+    //             untrackMergeMapping.enhances[`${minorCrawler}:${item.name}`] = {
+    //                 majorCrawler: majorCrawler,
+    //                 minorCrawler: minorCrawler,
+    //                 target: target,
+    //                 name: major.name,
+    //                 enhanceName: item.name
+    //             }
+
+    //             return
+    //         }
+
+    //         item.name = translateMapping[item.name]
+
+    //         if (Helper.isEmpty(mapping[item.name])) {
+
+    //             // Duplicate Value
+    //             if (Helper.isEmpty(duplicateValueMapping.enhance)) {
+    //                 duplicateValueMapping.enhance = []
+    //             }
+
+    //             duplicateValueMapping.enhance.push({
+    //                 majorCrawler: majorCrawler,
+    //                 minorCrawler: minorCrawler,
+    //                 target: target,
+    //                 majorName: major.name.zhTW,
+    //                 majorLostValue: item.name
+    //             })
+
+    //             mapping[item.name] = item
+    //         }
+    //     })
+
+    //     major.enhance.list = Object.values(mapping)
+
+    //     return major
+    // }
+
+    // Generate Arrange Data
+    for (let target of Object.keys(metaDataMapping)) {
+        arrangeDataMapping[target] = {}
+
+        for (let itemId of Object.keys(metaDataMapping[target])) {
+            arrangeDataMapping[target][itemId] = mergeItem(target, metaDataMapping[target][itemId])
         }
-
-        return major
-    }
-
-    const mergeTranslateValue = (minorCrawler, target, major, minor, lang, keys) => {
-        for (let key of keys) {
-            if (Helper.isEmpty(major[key])) {
-                major[key] = {}
-            }
-
-            if (Helper.isEmpty(minor[key])) {
-                minor[key] = {}
-            }
-
-            // Copy Value
-            if (Helper.isEmpty(major[key][lang])
-                && Helper.isNotEmpty(minor[key][lang])
-            ) {
-                major[key][lang] = minor[key][lang]
-            }
-
-            // Duplicate Value
-            if (Helper.isNotEmpty(major[key][lang])
-                && Helper.isNotEmpty(minor[key][lang])
-                && major[key][lang] !== minor[key][lang]
-            ) {
-                if (Helper.isEmpty(duplicateValueList.translate)) {
-                    duplicateValueList.translate = []
-                }
-
-                duplicateValueList.translate.push({
-                    majorCrawler: majorCrawler,
-                    minorCrawler: minorCrawler,
-                    target: target,
-                    majorName: major.name.zhTW,
-                    key: key,
-                    lang: lang,
-                    majorValue: major[key][lang],
-                    minorValue: minor[key][lang]
-                })
-            }
-        }
-
-        return major
-    }
-
-    const mergeElementValue = (minorCrawler, target, major, minor) => {
-        for (let key of ['attack', 'status']) {
-            for (let property of ['type', 'minValue', 'maxValue']) {
-
-                // Copy Value
-                if (Helper.isEmpty(major.element[key][property])
-                    && Helper.isNotEmpty(minor.element[key][property])
-                ) {
-                    major.element[key][property] = minor.element[key][property]
-                }
-
-                // Duplicate Value
-                if (Helper.isNotEmpty(major.element[key][property])
-                    && Helper.isNotEmpty(minor.element[key][property])
-                    && major.element[key][property] !== minor.element[key][property]
-                ) {
-                    if (Helper.isEmpty(duplicateValueList.element)) {
-                        duplicateValueList.element = []
-                    }
-
-                    duplicateValueList.element.push({
-                        majorCrawler: majorCrawler,
-                        minorCrawler: minorCrawler,
-                        target: target,
-                        majorName: major.name.zhTW,
-                        key: key,
-                        property: property,
-                        majorValue: major.element[key][property],
-                        minorValue: minor.element[key][property]
-                    })
-                }
-            }
-        }
-
-        return major
-    }
-
-    const mergeSharpnessValue = (minorCrawler, target, major, minor) => {
-        for (let key of ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'purple']) {
-
-            // Copy Value
-            if (Helper.isEmpty(major.sharpness[key])
-                && Helper.isNotEmpty(minor.sharpness[key])
-            ) {
-                major.sharpness[key] = minor.sharpness[key]
-            }
-
-            // Duplicate Value
-            if (Helper.isNotEmpty(major.sharpness[key])
-                && Helper.isNotEmpty(minor.sharpness[key])
-                && major.sharpness[key] !== minor.sharpness[key]
-            ) {
-                if (Helper.isEmpty(duplicateValueList.sharpness)) {
-                    duplicateValueList.sharpness = []
-                }
-
-                duplicateValueList.sharpness.push({
-                    majorCrawler: majorCrawler,
-                    minorCrawler: minorCrawler,
-                    target: target,
-                    majorName: major.name.zhTW,
-                    key: key,
-                    majorValue: major.sharpness[key],
-                    minorValue: minor.sharpness[key]
-                })
-            }
-        }
-
-        return major
-    }
-
-    const mergeResistenceValue = (minorCrawler, target, major, minor) => {
-        for (let key of ['fire', 'water', 'thunder', 'ice', 'dragon']) {
-
-            // Copy Value
-            if (Helper.isEmpty(major.resistence[key])
-                && Helper.isNotEmpty(minor.resistence[key])
-            ) {
-                major.resistence[key] = minor.resistence[key]
-            }
-
-            // Duplicate Value
-            if (Helper.isNotEmpty(major.resistence[key])
-                && Helper.isNotEmpty(minor.resistence[key])
-                && major.resistence[key] !== minor.resistence[key]
-            ) {
-                if (Helper.isEmpty(duplicateValueList.resistence)) {
-                    duplicateValueList.resistence = []
-                }
-
-                duplicateValueList.resistence.push({
-                    majorCrawler: majorCrawler,
-                    minorCrawler: minorCrawler,
-                    target: target,
-                    majorName: major.name.zhTW,
-                    key: key,
-                    majorValue: major.resistence[key],
-                    minorValue: minor.resistence[key]
-                })
-            }
-        }
-
-        return major
-    }
-
-    const mergeIncrementAndObtainValue = (minorCrawler, target, major, minor) => {
-        for (let key of ['health', 'stamina', 'attack', 'defense']) {
-            for (let property of ['increment', 'obtain']) {
-
-                // Copy Value
-                if (Helper.isEmpty(major[key][property])
-                    && Helper.isNotEmpty(minor[key][property])
-                ) {
-                    major[key][property] = minor[key][property]
-                }
-
-                // Duplicate Value
-                if (Helper.isNotEmpty(major[key][property])
-                    && Helper.isNotEmpty(minor[key][property])
-                    && major[key][property] !== minor[key][property]
-                ) {
-                    if (Helper.isEmpty(duplicateValueList.petalace)) {
-                        duplicateValueList.petalace = []
-                    }
-
-                    duplicateValueList.petalace.push({
-                        majorCrawler: majorCrawler,
-                        minorCrawler: minorCrawler,
-                        target: target,
-                        majorName: major.name.zhTW,
-                        key: key,
-                        property: property,
-                        majorValue: major[key][property],
-                        minorValue: minor[key][property]
-                    })
-                }
-            }
-        }
-
-        return major
-    }
-
-    const mergeSlotsValue = (minorCrawler, target, major, minor) => {
-        let maxIndex = 0
-
-        if (Helper.isEmpty(major.slots)) {
-            major.slots = []
-        } else {
-            major.slots = major.slots.filter(function (item) {
-                return Helper.isNotEmpty(item.size)
-            }).sort(function (aItem, bItem) {
-                return bItem.size - aItem.size // Desc
-            })
-
-            maxIndex = (major.slots.length > maxIndex)
-                ? major.slots.length : maxIndex
-        }
-
-        if (Helper.isEmpty(minor.slots)) {
-            minor.slots = []
-        } else {
-            minor.slots = minor.slots.filter(function (item) {
-                return Helper.isNotEmpty(item.size)
-            }).sort(function (aItem, bItem) {
-                return bItem.size - aItem.size // Desc
-            })
-
-            maxIndex = (minor.slots.length > maxIndex)
-                ? minor.slots.length : maxIndex
-        }
-
-        if (0 !== maxIndex) {
-            for (let index = 0; index < maxIndex; index++) {
-                if (Helper.isEmpty(major.slots[index])) {
-                    major.slots[index] = {}
-                }
-
-                if (Helper.isEmpty(minor.slots[index])) {
-                    minor.slots[index] = {}
-                }
-
-                // Copy Value
-                if (Helper.isEmpty(major.slots[index].size)
-                    && Helper.isNotEmpty(minor.slots[index].size)
-                ) {
-                    major.slots[index].size = minor.slots[index].size
-                }
-
-                // Duplicate Value
-                if (Helper.isNotEmpty(major.slots[index].size)
-                    && Helper.isNotEmpty(minor.slots[index].size)
-                    && major.slots[index].size !== minor.slots[index].size
-                ) {
-                    if (Helper.isEmpty(duplicateValueList.slots)) {
-                        duplicateValueList.slots = []
-                    }
-
-                    duplicateValueList.slots.push({
-                        majorCrawler: majorCrawler,
-                        minorCrawler: minorCrawler,
-                        target: target,
-                        majorName: major.name.zhTW,
-                        index: index,
-                        property: 'size',
-                        majorValue: major.slots[index].size,
-                        minorValue: minor.slots[index].size
-                    })
-                }
-            }
-        }
-
-        return major
-    }
-
-    const mergeSkillsValue = (minorCrawler, target, major, minor, translateMapping) => {
-        major.skills = Helper.isNotEmpty(major.skills)
-            ? major.skills.filter(function (item) {
-                return Helper.isNotEmpty(item.name)
-            }) : []
-
-        minor.skills = Helper.isNotEmpty(minor.skills)
-            ? minor.skills.filter(function (item) {
-                return Helper.isNotEmpty(item.name)
-            }) : []
-
-        let mapping = {}
-
-        major.skills.forEach((item) => {
-            item.name = specialReplaceSkillName(item.name)
-
-            if (Helper.isEmpty(translateMapping[item.name])) {
-                untrackMergeMapping.skills[`${minorCrawler}:${item.name}`] = {
-                    crawler: 'kiranico',
-                    target: target,
-                    name: major.name,
-                    skillName: item.name
-                }
-
-                return
-            }
-
-            item.name = translateMapping[item.name]
-
-            mapping[item.name] = item
-        })
-
-        minor.skills.forEach((item) => {
-            item.name = specialReplaceSkillName(item.name)
-
-            if (Helper.isEmpty(translateMapping[item.name])) {
-                untrackMergeMapping.skills[`${minorCrawler}:${item.name}`] = {
-                    crawler: minorCrawler,
-                    target: target,
-                    name: major.name,
-                    skillName: item.name
-                }
-
-                return
-            }
-
-            item.name = translateMapping[item.name]
-
-            if (Helper.isEmpty(mapping[item.name])) {
-
-                // Duplicate Value
-                if (Helper.isEmpty(duplicateValueList.skills)) {
-                    duplicateValueList.skills = []
-                }
-
-                duplicateValueList.skills.push({
-                    majorCrawler: majorCrawler,
-                    minorCrawler: minorCrawler,
-                    target: target,
-                    majorName: major.name.zhTW,
-                    majorLostValue: item.name
-                })
-
-                mapping[item.name] = item
-            }
-
-            // Copy Value
-            if (Helper.isEmpty(mapping[item.name].level)
-                && Helper.isNotEmpty(item.level)
-            ) {
-                mapping[item.name].level = item.level
-            }
-        })
-
-        major.skills = Object.values(mapping)
-
-        return major
-    }
-
-    const mergeEnhanceValue = (minorCrawler, target, major, minor, translateMapping) => {
-        if (Helper.isEmpty(major.enhance.limit)
-            && Helper.isNotEmpty(minor.enhance.limit)
-        ) {
-            major.enhance.limit = minor.enhance.limit
-        }
-
-        major.enhance.list = Helper.isNotEmpty(major.enhance.list)
-            ? major.enhance.list.filter(function (item) {
-                return Helper.isNotEmpty(item.name)
-            }) : []
-
-        minor.enhance.list = Helper.isNotEmpty(minor.enhance.list)
-            ? minor.enhance.list.filter(function (item) {
-                return Helper.isNotEmpty(item.name)
-            }) : []
-
-        let mapping = {}
-
-        major.enhance.list.forEach((item) => {
-            item.name = specialReplaceEnhanceName(item.name)
-
-            if (Helper.isEmpty(translateMapping[item.name])) {
-                untrackMergeMapping.enhances[`${minorCrawler}:${item.name}`] = {
-                    crawler: 'kiranico',
-                    target: target,
-                    name: major.name,
-                    enhanceName: item.name
-                }
-
-                return
-            }
-
-            item.name = translateMapping[item.name]
-
-            mapping[item.name] = item
-        })
-
-        minor.enhance.list.forEach((item) => {
-            item.name = specialReplaceEnhanceName(item.name)
-
-            if (Helper.isEmpty(translateMapping[item.name])) {
-                untrackMergeMapping.enhances[`${minorCrawler}:${item.name}`] = {
-                    majorCrawler: majorCrawler,
-                    minorCrawler: minorCrawler,
-                    target: target,
-                    name: major.name,
-                    enhanceName: item.name
-                }
-
-                return
-            }
-
-            item.name = translateMapping[item.name]
-
-            if (Helper.isEmpty(mapping[item.name])) {
-
-                // Duplicate Value
-                if (Helper.isEmpty(duplicateValueList.enhance)) {
-                    duplicateValueList.enhance = []
-                }
-
-                duplicateValueList.enhance.push({
-                    majorCrawler: majorCrawler,
-                    minorCrawler: minorCrawler,
-                    target: target,
-                    majorName: major.name.zhTW,
-                    majorLostValue: item.name
-                })
-
-                mapping[item.name] = item
-            }
-        })
-
-        major.enhance.list = Object.values(mapping)
-
-        return major
-    }
-
-    // Merge Target
-    for (let target of ['skills', 'enhances']) {
-        mergeTarget(target)
-
-        // Create Translate Mapping
-        for (let item of Object.values(arrangeDataMapping[target])) {
-            if (Helper.isEmpty(translateMapping[target])) {
-                translateMapping[target] = {}
-            }
-
-            for (let lang of Object.keys(item.name)) {
-                translateMapping[target][item.name[lang]] = item.name.zhTW
-            }
-        }
-    }
-
-    for (let target of ['weapons', 'armors', 'jewels', 'petalaces']) {
-        mergeTarget(target)
     }
 
     // Save Data
@@ -927,31 +959,31 @@ export const arrangeAction = () => {
     })
 
     Object.keys(untrackDataMapping).forEach((target) => {
-        Object.keys(untrackDataMapping[target]).forEach((crawlerName) => {
-            if (0 === untrackDataMapping[target][crawlerName].length) {
+        Object.keys(untrackDataMapping[target]).forEach((crawler) => {
+            if (0 === untrackDataMapping[target][crawler].length) {
                 return
             }
 
-            Helper.saveJSONAsCSV(`${combineRoot}/untrackData/${crawlerName}/${target}.csv`, untrackDataMapping[target][crawlerName])
+            Helper.saveJSONAsCSV(`${combineRoot}/untrackData/${crawler}/${target}.csv`, untrackDataMapping[target][crawler])
         })
     })
 
-    Object.keys(untrackMergeMapping).forEach((target) => {
-        let list = Object.values(untrackMergeMapping[target])
+    // Object.keys(untrackMergeMapping).forEach((target) => {
+    //     let list = Object.values(untrackMergeMapping[target])
 
-        if (0 === list.length) {
-            return
-        }
+    //     if (0 === list.length) {
+    //         return
+    //     }
 
-        Helper.saveJSONAsCSV(`${combineRoot}/untrackMerge/${target}.csv`, list)
-    })
+    //     Helper.saveJSONAsCSV(`${combineRoot}/untrackMerge/${target}.csv`, list)
+    // })
 
-    Object.keys(duplicateValueList).forEach((target) => {
-        Helper.saveJSONAsCSV(`${combineRoot}/duplicateValue/${target}.csv`, duplicateValueList[target])
-    })
+    // Object.keys(duplicateValueMapping).forEach((target) => {
+    //     Helper.saveJSONAsCSV(`${combineRoot}/duplicateValue/${target}.csv`, duplicateValueMapping[target])
+    // })
 }
 
-export const statisticsAction = () => {
+export const infoAction = () => {
 
     // Generate Result Format
     let result = {
@@ -985,138 +1017,144 @@ export const statisticsAction = () => {
     }
 
     // Load All Crawler Data
-    for (let crawlerName of crawlerNameList) {
-        console.log(`count:${crawlerName}`)
+    for (let crawler of crawlerList) {
+        console.log(`count:${crawler}`)
 
-        // Weapons
-        console.log(`count:${crawlerName}:weapons`)
+        for (let target of targetList) {
+            console.log(`count:${crawler}:${target}`)
 
-        let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/weapons.csv`)
-
-        if (Helper.isNotEmpty(weaponList)) {
-            result.weapons.all[crawlerName] = weaponList.length
-
-            for (let item of weaponList) {
-                let weaponType = item.type
-
-                if (Helper.isEmpty(result.weapons[weaponType].all[crawlerName])) {
-                    result.weapons[weaponType].all[crawlerName] = 0
-                }
-
-                result.weapons[weaponType].all[crawlerName] += 1
-
-                if (Helper.isNotEmpty(item.rare)) {
-                    let rare = `rare${item.rare}`
-
-                    if (Helper.isEmpty(result.weapons[weaponType][rare][crawlerName])) {
-                        result.weapons[weaponType][rare][crawlerName] = 0
-                    }
-
-                    result.weapons[weaponType][rare][crawlerName] += 1
-                }
-            }
-        } else {
-            for (let weaponType of weaponTypeList) {
-                let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/weapons/${weaponType}.csv`)
+            if ('weapons' === target) {
+                let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons.csv`)
 
                 if (Helper.isNotEmpty(weaponList)) {
-                    if (Helper.isEmpty(result.weapons.all[crawlerName])) {
-                        result.weapons.all[crawlerName] = 0
-                    }
-
-                    if (Helper.isEmpty(result.weapons[weaponType].all[crawlerName])) {
-                        result.weapons[weaponType].all[crawlerName] = 0
-                    }
-
-                    result.weapons.all[crawlerName] += weaponList.length
-                    result.weapons[weaponType].all[crawlerName] += weaponList.length
+                    result.weapons.all[crawler] = weaponList.length
 
                     for (let item of weaponList) {
+                        let weaponType = item.type
+
+                        if (Helper.isEmpty(result.weapons[weaponType].all[crawler])) {
+                            result.weapons[weaponType].all[crawler] = 0
+                        }
+
+                        result.weapons[weaponType].all[crawler] += 1
+
                         if (Helper.isNotEmpty(item.rare)) {
                             let rare = `rare${item.rare}`
 
-                            if (Helper.isEmpty(result.weapons[weaponType][rare])) {
-                                console.log(item)
+                            if (Helper.isEmpty(result.weapons[weaponType][rare][crawler])) {
+                                result.weapons[weaponType][rare][crawler] = 0
                             }
 
-                            if (Helper.isEmpty(result.weapons[weaponType][rare][crawlerName])) {
-                                result.weapons[weaponType][rare][crawlerName] = 0
-                            }
+                            result.weapons[weaponType][rare][crawler] += 1
+                        }
+                    }
 
-                            result.weapons[weaponType][rare][crawlerName] += 1
+                    continue
+                }
+
+                for (let weaponType of weaponTypeList) {
+                    let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons/${weaponType}.csv`)
+
+                    if (Helper.isNotEmpty(weaponList)) {
+                        if (Helper.isEmpty(result.weapons.all[crawler])) {
+                            result.weapons.all[crawler] = 0
+                        }
+
+                        if (Helper.isEmpty(result.weapons[weaponType].all[crawler])) {
+                            result.weapons[weaponType].all[crawler] = 0
+                        }
+
+                        result.weapons.all[crawler] += weaponList.length
+                        result.weapons[weaponType].all[crawler] += weaponList.length
+
+                        for (let item of weaponList) {
+                            if (Helper.isNotEmpty(item.rare)) {
+                                let rare = `rare${item.rare}`
+
+                                if (Helper.isEmpty(result.weapons[weaponType][rare])) {
+                                    console.log(item)
+                                }
+
+                                if (Helper.isEmpty(result.weapons[weaponType][rare][crawler])) {
+                                    result.weapons[weaponType][rare][crawler] = 0
+                                }
+
+                                result.weapons[weaponType][rare][crawler] += 1
+                            }
                         }
                     }
                 }
+
+                continue
             }
-        }
 
-        // Armors
-        console.log(`count:${crawlerName}:armors`)
-
-        let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/armors.csv`)
-
-        if (Helper.isNotEmpty(armorList)) {
-            result.armors.all[crawlerName] = armorList.length
-
-            for (let item of armorList) {
-                if (Helper.isNotEmpty(item.rare)) {
-                    let rare = `rare${item.rare}`
-
-                    if (Helper.isEmpty(result.armors[rare])) {
-                        console.log(item)
-                    }
-
-                    if (Helper.isEmpty(result.armors[rare][crawlerName])) {
-                        result.armors[rare][crawlerName] = 0
-                    }
-
-                    result.armors[rare][crawlerName] += 1
-                }
-            }
-        } else {
-            for (let rare of rareList) {
-                let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/armors/${rare}.csv`)
+            if ('armors' === target) {
+                let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors.csv`)
 
                 if (Helper.isNotEmpty(armorList)) {
-                    if (Helper.isEmpty(result.armors.all[crawlerName])) {
-                        result.armors.all[crawlerName] = 0
+                    result.armors.all[crawler] = armorList.length
+
+                    for (let item of armorList) {
+                        if (Helper.isNotEmpty(item.rare)) {
+                            let rare = `rare${item.rare}`
+
+                            if (Helper.isEmpty(result.armors[rare])) {
+                                console.log(item)
+                            }
+
+                            if (Helper.isEmpty(result.armors[rare][crawler])) {
+                                result.armors[rare][crawler] = 0
+                            }
+
+                            result.armors[rare][crawler] += 1
+                        }
                     }
 
-                    result.armors.all[crawlerName] += armorList.length
-                    result.armors[rare][crawlerName] = armorList.length
+                    continue
                 }
-            }
-        }
 
-        // Jewels
-        console.log(`count:${crawlerName}:jewels`)
+                for (let rare of rareList) {
+                    let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors/${rare}.csv`)
 
-        let jewelList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/jewels.csv`)
+                    if (Helper.isNotEmpty(armorList)) {
+                        if (Helper.isEmpty(result.armors.all[crawler])) {
+                            result.armors.all[crawler] = 0
+                        }
 
-        if (Helper.isNotEmpty(jewelList)) {
-            result.jewels.all[crawlerName] = jewelList.length
-
-            for (let item of jewelList) {
-                if (Helper.isNotEmpty(item.size)) {
-                    let size = `size${item.size}`
-
-                    if (Helper.isEmpty(result.jewels[size][crawlerName])) {
-                        result.jewels[size][crawlerName] = 0
+                        result.armors.all[crawler] += armorList.length
+                        result.armors[rare][crawler] = armorList.length
                     }
-
-                    result.jewels[size][crawlerName] += 1
                 }
+
+                continue
             }
-        }
 
-        // Petalaces, Enhances & Skills
-        for (let target of ['petalaces', 'enhances', 'skills']) {
-            console.log(`count:${crawlerName}:${target}`)
+            if ('jewels' === target) {
+                let jewelList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/jewels.csv`)
 
-            let targetList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawlerName}/${target}.csv`)
+                if (Helper.isNotEmpty(jewelList)) {
+                    result.jewels.all[crawler] = jewelList.length
+
+                    for (let item of jewelList) {
+                        if (Helper.isNotEmpty(item.size)) {
+                            let size = `size${item.size}`
+
+                            if (Helper.isEmpty(result.jewels[size][crawler])) {
+                                result.jewels[size][crawler] = 0
+                            }
+
+                            result.jewels[size][crawler] += 1
+                        }
+                    }
+                }
+
+                continue
+            }
+
+            let targetList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/${target}.csv`)
 
             if (Helper.isNotEmpty(targetList)) {
-                result[target][crawlerName] = targetList.length
+                result[target][crawler] = targetList.length
             }
         }
     }
@@ -1129,5 +1167,5 @@ export const statisticsAction = () => {
 
 export default {
     arrangeAction,
-    statisticsAction
+    infoAction
 }

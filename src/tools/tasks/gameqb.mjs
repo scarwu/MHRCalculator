@@ -7,12 +7,12 @@
 
 import Helper from '../liberaries/helper.mjs'
 import {
-    defaultWeapon,
-    defaultArmor,
-    defaultPetalace,
-    defaultJewel,
-    defaultEnhance,
-    defaultSkill,
+    defaultWeaponItem,
+    defaultArmorItem,
+    defaultPetalaceItem,
+    defaultJewelItem,
+    defaultEnhanceItem,
+    defaultSkillItem,
     autoExtendListQuantity,
     normalizeText,
     weaponTypeList,
@@ -84,7 +84,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             mappingKey = `${series}:${name}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
+                mapping[mappingKey] = Helper.deepCopy(defaultWeaponItem)
             }
 
             mapping[mappingKey].series = {
@@ -276,7 +276,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                             enhanceMappingKey = enhanceName
 
                             if (Helper.isEmpty(enhanceMapping[enhanceMappingKey])) {
-                                enhanceMapping[enhanceMappingKey] = Helper.deepCopy(defaultEnhance)
+                                enhanceMapping[enhanceMappingKey] = Helper.deepCopy(defaultEnhanceItem)
                             }
 
                             enhanceMapping[enhanceMappingKey].name = {
@@ -415,7 +415,7 @@ export const fetchArmorsAction = async () => {
             mappingKey = `${series}:${name}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultArmor)
+                mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
             }
 
             let defense = itemDom(node).find('td').eq(1).text().trim()
@@ -500,7 +500,7 @@ export const fetchArmorsAction = async () => {
             mappingKey = `${series}:${name}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultArmor)
+                mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
             }
 
             if ('-' !== itemDom(node).find('td').eq(1).text().trim()) {
@@ -623,7 +623,7 @@ export const fetchPetalacesAction = async () => {
         mappingKey = name
 
         if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultPetalace)
+            mapping[mappingKey] = Helper.deepCopy(defaultPetalaceItem)
         }
 
         mapping[mappingKey].name = {
@@ -706,7 +706,7 @@ export const fetchJewelsAction = async () => {
         mappingKey = name
 
         if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultJewel)
+            mapping[mappingKey] = Helper.deepCopy(defaultJewelItem)
         }
 
         mapping[mappingKey].name = {
@@ -774,7 +774,7 @@ export const fetchSkillsAction = async () => {
             mappingKey = `${name}:${level}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultSkill)
+                mapping[mappingKey] = Helper.deepCopy(defaultSkillItem)
             }
 
             mapping[mappingKey].name = {
@@ -793,7 +793,7 @@ export const fetchSkillsAction = async () => {
     Helper.saveJSONAsCSV(`${fileRoot}/skills.csv`, Object.values(mapping))
 }
 
-export const statisticsAction = () => {
+export const infoAction = () => {
 
     // Generate Result Format
     let result = {
@@ -915,7 +915,7 @@ export const fetchAllAction = () => {
         fetchJewelsAction(),
         fetchSkillsAction()
     ]).then(() => {
-        statisticsAction()
+        infoAction()
     })
 }
 
@@ -926,5 +926,5 @@ export default {
     fetchPetalacesAction,
     fetchJewelsAction,
     fetchSkillsAction,
-    statisticsAction
+    infoAction
 }

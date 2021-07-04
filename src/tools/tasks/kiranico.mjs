@@ -7,12 +7,12 @@
 
 import Helper from '../liberaries/helper.mjs'
 import {
-    defaultWeapon,
-    defaultArmor,
-    // defaultPetalace,
-    defaultJewel,
-    defaultEnhance,
-    defaultSkill,
+    defaultWeaponItem,
+    defaultArmorItem,
+    // defaultPetalaceItem,
+    defaultJewelItem,
+    defaultEnhanceItem,
+    defaultSkillItem,
     autoExtendListQuantity,
     normalizeText,
     weaponTypeList,
@@ -101,7 +101,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             mappingKey = `${weaponType}:${name}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultWeapon)
+                mapping[mappingKey] = Helper.deepCopy(defaultWeaponItem)
             }
 
             mapping[mappingKey].series = {
@@ -348,7 +348,7 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
             langKeyMapping[uniqueKey] = mappingKey
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultArmor)
+                mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
             }
 
             mapping[mappingKey].series = {
@@ -513,7 +513,7 @@ export const fetchJewelsAction = async () => {
         mappingKey = name
 
         if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultJewel)
+            mapping[mappingKey] = Helper.deepCopy(defaultJewelItem)
         }
 
         // Set Lang Mapping
@@ -600,7 +600,7 @@ export const fetchEnhancesAction = async () => {
         mappingKey = name
 
         if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultEnhance)
+            mapping[mappingKey] = Helper.deepCopy(defaultEnhanceItem)
         }
 
         // Set Lang Mapping
@@ -696,7 +696,7 @@ export const fetchSkillsAction = async () => {
             mappingKey = `${name}:${level}`
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultSkill)
+                mapping[mappingKey] = Helper.deepCopy(defaultSkillItem)
             }
 
             // Set Lang Mapping
@@ -767,7 +767,7 @@ export const fetchSkillsAction = async () => {
     Helper.saveJSONAsCSV(`${fileRoot}/skills.csv`, Object.values(mapping))
 }
 
-export const statisticsAction = () => {
+export const infoAction = () => {
 
     // Generate Result Format
     let result = {
@@ -883,7 +883,7 @@ export const fetchAllAction = () => {
         fetchEnhancesAction(),
         fetchSkillsAction()
     ]).then(() => {
-        statisticsAction()
+        infoAction()
     })
 }
 
@@ -894,5 +894,5 @@ export default {
     fetchJewelsAction,
     fetchEnhancesAction,
     fetchSkillsAction,
-    statisticsAction
+    infoAction
 }

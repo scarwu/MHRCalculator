@@ -595,7 +595,7 @@ export const fetchEnhancesAction = async () => {
 
         // Get Data
         let name = normalizeText(rowNode.find('a p').eq(0).text().trim())
-        let description = rowNode.find('a p').eq(1).text().trim()
+        let description = normalizeText(rowNode.find('a p').eq(1).text().trim())
 
         mappingKey = name
 
@@ -639,7 +639,7 @@ export const fetchEnhancesAction = async () => {
 
             // Get Data
             let name = normalizeText(rowNode.find('a p').eq(0).text().trim())
-            let description = rowNode.find('a p').eq(1).text().trim()
+            let description = normalizeText(rowNode.find('a p').eq(1).text().trim())
 
             // Set Lang Mapping
             let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
@@ -685,13 +685,13 @@ export const fetchSkillsAction = async () => {
 
         rowNode.find('td').eq(2).find('div').each((index, node) => {
             if (0 === index) {
-                description = listDom(node).text()
+                description = normalizeText(listDom(node).text())
 
                 return
             }
 
             let level = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[1]
-            let effect = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[2]
+            let effect = normalizeText(listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[2])
 
             mappingKey = `${name}:${level}`
 
@@ -746,13 +746,13 @@ export const fetchSkillsAction = async () => {
 
             rowNode.find('td').eq(2).find('div').each((index, node) => {
                 if (0 === index) {
-                    description = listDom(node).text()
+                    description = normalizeText(listDom(node).text())
 
                     return
                 }
 
                 let level = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[1]
-                let effect = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[2]
+                let effect = normalizeText(listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[2])
 
                 let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
                 let mappingKey = langKeyMapping[`${uniqueKey}:${level}`]

@@ -329,7 +329,7 @@ export const fetchArmorsAction = async () => {
 
             for (let entry of Object.entries(seriesList)) {
                 let seriesIndex = parseFloat(entry[0])
-                let series = entry[1]
+                let series = normalizeText(entry[1])
                 let gender = 'general'
 
                 if (2 === seriesList.length) {
@@ -624,7 +624,7 @@ export const fetchEnhancesAction = async () => {
 
             // Get Data
             let name = normalizeText(rowNode.find('td').eq(0).text().trim())
-            let description = rowNode.find('td').eq(1).text().trim()
+            let description = normalizeText(rowNode.find('td').eq(1).text().trim())
 
             mappingKey = name
 
@@ -671,7 +671,7 @@ export const fetchSkillsAction = async () => {
 
             // Get Data
             let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
-            let description = rowNode.find('td').eq(1).text().trim()
+            let description = normalizeText(rowNode.find('td').eq(1).text().trim())
 
             // Fetch Detail Page
             fetchPageUrl = rowNode.find('td').eq(0).find('a').attr('href')
@@ -692,7 +692,7 @@ export const fetchSkillsAction = async () => {
 
                 // Get Data
                 let level = skillNode.find('td').eq(0).text().trim()
-                let effect = skillNode.find('td').eq(1).text().trim()
+                let effect = normalizeText(skillNode.find('td').eq(1).text().trim())
 
                 mappingKey = `${name}:${level}`
 

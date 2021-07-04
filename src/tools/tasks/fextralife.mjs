@@ -389,7 +389,7 @@ export const fetchArmorsAction = async () => {
     for (let rowIndex = 0; rowIndex < listDom('div.col-sm-3 h3.special + div.row a.wiki_link').length; rowIndex++) {
         let rowNode = listDom('div.col-sm-3 h3.special + div.row a.wiki_link').eq(rowIndex)
 
-        let series = rowNode.text().trim()
+        let series = normalizeText(rowNode.text().trim())
 
         // Fetch Detail Page
         fetchPageUrl = urls.domain + rowNode.attr('href')
@@ -653,7 +653,7 @@ export const fetchSkillsAction = async () => {
             let tempText = normalizeText(skillNode.text().trim())
 
             let level = tempText.match(/^Level (\d)\: (.*?)$/)[1]
-            let effect = tempText.match(/^Level (\d)\: (.*?)$/)[2]
+            let effect = normalizeText(tempText.match(/^Level (\d)\: (.*?)$/)[2])
 
             mappingKey = `${name}:${level}`
 

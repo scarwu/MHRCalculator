@@ -10,7 +10,6 @@
 import Helper from './helper.mjs'
 
 export const defaultWeaponItem = {
-    id: null,
     series: null,
     name: null,
     rare: null,
@@ -55,7 +54,6 @@ export const defaultWeaponItem = {
 }
 
 export const defaultArmorItem = {
-    id: null,
     series: null,
     name: null,
     rare: null,
@@ -84,7 +82,6 @@ export const defaultArmorItem = {
 }
 
 export const defaultJewelItem = {
-    id: null,
     name: null,
     rare: null,
     size: null,
@@ -97,7 +94,6 @@ export const defaultJewelItem = {
 }
 
 export const defaultPetalaceItem = {
-    id: null,
     name: null,
     rare: null,
     health: {
@@ -119,13 +115,11 @@ export const defaultPetalaceItem = {
 }
 
 export const defaultEnhanceItem = {
-    id: null,
     name: null,
     description: null
 }
 
 export const defaultSkillItem = {
-    id: null,
     name: null,
     description: null,
     level: null,
@@ -200,27 +194,29 @@ export const autoExtendListQuantity = (list) => {
 }
 
 export const normalizeText = (text) => {
-    return text
+    return text.trim()
         .replace(/ /g, ' ')
         .replace(/(│|├|└)*/g, '').replace(/(┃|┣|┗|　)*/g, '')
 
-        .replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III').replace('Ⅳ', 'IV').replace('Ⅴ', 'V')
+        .replace(/Ⅰ/g, 'I').replace(/Ⅱ/g, 'II').replace(/Ⅲ/g, 'III').replace(/Ⅳ/g, 'IV').replace(/Ⅴ/g, 'V')
 
-        .replace('Ａ', 'A').replace('Ｂ', 'B').replace('Ｃ', 'C').replace('Ｄ', 'D').replace('Ｅ', 'E')
-        .replace('Ｆ', 'F').replace('Ｇ', 'G').replace('Ｈ', 'H').replace('Ｉ', 'I').replace('Ｊ', 'J')
-        .replace('Ｋ', 'K').replace('Ｌ', 'L').replace('Ｍ', 'M').replace('Ｎ', 'N').replace('Ｏ', 'O')
-        .replace('Ｐ', 'P').replace('Ｑ', 'Q').replace('Ｒ', 'R').replace('Ｓ', 'S').replace('Ｔ', 'T')
-        .replace('Ｕ', 'U').replace('Ｖ', 'V').replace('Ｗ', 'W').replace('Ｘ', 'X').replace('Ｙ', 'Y')
-        .replace('Ｚ', 'Z')
+        .replace(/Ａ/g, 'A').replace(/Ｂ/g, 'B').replace(/Ｃ/g, 'C').replace(/Ｄ/g, 'D').replace(/Ｅ/g, 'E')
+        .replace(/Ｆ/g, 'F').replace(/Ｇ/g, 'G').replace(/Ｈ/g, 'H').replace(/Ｉ/g, 'I').replace(/Ｊ/g, 'J')
+        .replace(/Ｋ/g, 'K').replace(/Ｌ/g, 'L').replace(/Ｍ/g, 'M').replace(/Ｎ/g, 'N').replace(/Ｏ/g, 'O')
+        .replace(/Ｐ/g, 'P').replace(/Ｑ/g, 'Q').replace(/Ｒ/g, 'R').replace(/Ｓ/g, 'S').replace(/Ｔ/g, 'T')
+        .replace(/Ｕ/g, 'U').replace(/Ｖ/g, 'V').replace(/Ｗ/g, 'W').replace(/Ｘ/g, 'X').replace(/Ｙ/g, 'Y')
+        .replace(/Ｚ/g, 'Z')
 
-        .replace('ａ', 'a').replace('ｂ', 'b').replace('ｃ', 'c').replace('ｄ', 'd').replace('ｅ', 'e')
-        .replace('ｆ', 'f').replace('ｇ', 'g').replace('ｈ', 'h').replace('ｉ', 'i').replace('ｊ', 'j')
-        .replace('ｋ', 'k').replace('ｌ', 'l').replace('ｍ', 'm').replace('ｎ', 'n').replace('ｏ', 'o')
-        .replace('ｐ', 'p').replace('ｑ', 'q').replace('ｒ', 'r').replace('ｓ', 's').replace('ｔ', 't')
-        .replace('ｕ', 'u').replace('ｖ', 'v').replace('ｗ', 'w').replace('ｘ', 'x').replace('ｙ', 'y')
-        .replace('ｚ', 'z')
+        .replace(/ａ/g, 'a').replace(/ｂ/g, 'b').replace(/ｃ/g, 'c').replace(/ｄ/g, 'd').replace(/ｅ/g, 'e')
+        .replace(/ｆ/g, 'f').replace(/ｇ/g, 'g').replace(/ｈ/g, 'h').replace(/ｉ/g, 'i').replace(/ｊ/g, 'j')
+        .replace(/ｋ/g, 'k').replace(/ｌ/g, 'l').replace(/ｍ/g, 'm').replace(/ｎ/g, 'n').replace(/ｏ/g, 'o')
+        .replace(/ｐ/g, 'p').replace(/ｑ/g, 'q').replace(/ｒ/g, 'r').replace(/ｓ/g, 's').replace(/ｔ/g, 't')
+        .replace(/ｕ/g, 'u').replace(/ｖ/g, 'v').replace(/ｗ/g, 'w').replace(/ｘ/g, 'x').replace(/ｙ/g, 'y')
+        .replace(/ｚ/g, 'z')
 
-        .replace('＝', '=').replace('･', '・')
+        .replace(/１/g, '1').replace(/２/g, '2').replace(/３/g, '3').replace(/４/g, '4').replace(/５/g, '5')
+        .replace(/６/g, '6').replace(/７/g, '7').replace(/８/g, '8').replace(/９/g, '9').replace(/０/g, '0')
+        .replace(/＋/g, '+') .replace(/－/g, '-') .replace(/＝/g, '=').replace(/･/g, '・')
 }
 
 export const weaponTypeList = [

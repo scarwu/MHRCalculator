@@ -293,7 +293,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                                 let enhanceDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
                                 if (Helper.isNotEmpty(enhanceDom)) {
-                                    enhanceMapping[enhanceMappingKey].description = enhanceDom('p').eq(0).text()
+                                    enhanceMapping[enhanceMappingKey].description = normalizeText(enhanceDom('p').eq(0).text())
                                 } else {
                                     console.log(fetchPageUrl, fetchPageName, 'Err')
                                 }
@@ -762,14 +762,14 @@ export const fetchSkillsAction = async () => {
         }
 
         let name = normalizeText(itemDom('.post-title-single').text().trim())
-        let description = itemDom('.entry-content p').text().trim()
+        let description = normalizeText(itemDom('.entry-content p').text().trim())
 
         // Table 1
         let tempNode = itemDom('.wp-block-table .has-fixed-layout').eq(0).find('tbody tr')
 
         tempNode.each((index, node) => {
             let level = itemDom(node).find('td').eq(0).text().trim()
-            let effect = itemDom(node).find('td').eq(1).text().trim()
+            let effect = normalizeText(itemDom(node).find('td').eq(1).text().trim())
 
             mappingKey = `${name}:${level}`
 

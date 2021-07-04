@@ -37,6 +37,12 @@ export const targetList = [
     'skills'
 ]
 
+export const langList = [
+    'zhTW',
+    'jaJP',
+    'enUS'
+]
+
 const specialReplaceItemName = (text, lang, rare) => {
     let replacementList = [
 
@@ -263,6 +269,7 @@ export const arrangeAction = () => {
     let untrackMergeMapping = {}
     let duplicateValueMapping = {}
 
+    let idNameMapping = {}
     let translateIdMapping = {}
 
     let crawlerInfo = {
@@ -351,6 +358,7 @@ export const arrangeAction = () => {
 
     // Generate Meta Data
     for (let target of Object.keys(rawDataMapping)) {
+        console.log(`meta:${target}`)
 
         // Major Crawler Handle
         let majorCrawler = crawlerInfo.major
@@ -359,28 +367,39 @@ export const arrangeAction = () => {
 
             // Special Replace Name
             majorCrawler.langs.forEach((lang) => {
-                item.name[lang] = specialReplaceItemName(item.name[lang])
+                item.name[lang] = specialReplaceItemName(item.name[lang], lang, item.rare)
             })
 
             // Create Item Id By zhTW Name
             let itemId = null
+            let itemIdWithoutLevel = null
 
             if ('skills' === target) {
                 itemId = `${target}:id:${md5(item.name.zhTW)}:${item.level}`
+                idNameMapping[itemId] = item.name.zhTW
+
+                itemIdWithoutLevel = `${target}:id:${md5(item.name.zhTW)}`
+                idNameMapping[itemIdWithoutLevel] = item.name.zhTW
             } else {
                 itemId = `${target}:id:${md5(item.name.zhTW)}`
+                idNameMapping[itemId] = item.name.zhTW
             }
 
+            // Create Translate Id
             majorCrawler.langs.forEach((lang) => {
                 let translateId = null
+                let translateIdWithoutLevel = null
 
                 if ('skills' === target) {
-                    translateId = `${target}:name:${lang}:${md5(item.name[lang])}:${item.level}`
-                } else {
-                    translateId = `${target}:name:${lang}:${md5(item.name[lang])}`
-                }
+                    translateId = `${target}:name:${md5(item.name[lang])}:${item.level}`
+                    translateIdMapping[translateId] = itemId
 
-                translateIdMapping[translateId] = itemId
+                    translateIdWithoutLevel = `${target}:name:${md5(item.name[lang])}`
+                    translateIdMapping[translateIdWithoutLevel] = itemIdWithoutLevel
+                } else {
+                    translateId = `${target}:name:${md5(item.name[lang])}`
+                    translateIdMapping[translateId] = itemId
+                }
             })
 
             if (Helper.isEmpty(metaDataMapping[target])) {
@@ -399,14 +418,14 @@ export const arrangeAction = () => {
             rawDataMapping[target][minorCrawler.name].forEach((item) => {
                 let lang = minorCrawler.lang
 
-                item.name[lang] = specialReplaceItemName(item.name[lang])
+                item.name[lang] = specialReplaceItemName(item.name[lang], lang, item.rare)
 
                 let translateId = null
 
                 if ('skills' === target) {
-                    translateId = `${target}:name:${lang}:${md5(item.name[lang])}:${item.level}`
+                    translateId = `${target}:name:${md5(item.name[lang])}:${item.level}`
                 } else {
-                    translateId = `${target}:name:${lang}:${md5(item.name[lang])}`
+                    translateId = `${target}:name:${md5(item.name[lang])}`
                 }
 
                 // Record UntrackDataMapping
@@ -439,52 +458,84 @@ export const arrangeAction = () => {
         })
     }
 
-    const mergeItem = (target, crawlers) => {
+    const getPropertySkillTranslateName = (name) => {
+        name = specialReplaceSkillPropertyName(name)
+
+        let translateId = `skills:name:${md5(name)}`
+
+        if (Helper.isEmpty(translateIdMapping[translateId])) {
+            return null
+        }
+
+        if (Helper.isEmpty(idNameMapping[translateIdMapping[translateId]])) {
+            return null
+        }
+
+        return idNameMapping[translateIdMapping[translateId]]
+    }
+
+    const getPropertyEnhanceTranslateName = (name) => {
+        name = specialReplaceEnhancePropertyName(name)
+
+        let translateId = `enhances:name:${md5(name)}`
+
+        if (Helper.isEmpty(translateIdMapping[translateId])) {
+            return null
+        }
+
+        if (Helper.isEmpty(idNameMapping[translateIdMapping[translateId]])) {
+            return null
+        }
+
+        return idNameMapping[translateIdMapping[translateId]]
+    }
+
+    const mergeItem = (target, itemId, crawlerMapping) => {
         let item = null
 
         switch (target) {
         case 'weapons':
             item = Helper.deepCopy(defaultWeaponItem)
-            item = mergeNormalValue(target, item, crawlers, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
-            item = mergeTranslateValue(target, item, crawlers, ['series', 'name'])
-            item = mergeElementValue(target, item, crawlers)
-            item = mergeSharpnessValue(target, item, crawlers)
-            item = mergeSlotsValue(target, item, crawlers)
-            item = mergeEnhanceValue(target, item, crawlers)
+            item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['series', 'name'])
+            item = mergeElementValue(target, itemId, item, crawlerMapping)
+            item = mergeSharpnessValue(target, itemId, item, crawlerMapping)
+            item = mergeSlotsValue(target, itemId, item, crawlerMapping)
+            item = mergeEnhanceValue(target, itemId, item, crawlerMapping)
 
             return Helper.deepCopy(item)
         case 'armors':
             item = Helper.deepCopy(defaultArmorItem)
-            item = mergeNormalValue(target, item, crawlers, ['rare', 'type', 'gender', 'minDefense', 'maxDefense'])
-            item = mergeTranslateValue(target, item, crawlers, ['series', 'name'])
-            item = mergeResistenceValue(target, item, crawlers)
-            item = mergeSlotsValue(target, item, crawlers)
-            item = mergeSkillsValue(target, item, crawlers)
+            item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'type', 'gender', 'minDefense', 'maxDefense'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['series', 'name'])
+            item = mergeResistenceValue(target, itemId, item, crawlerMapping)
+            item = mergeSlotsValue(target, itemId, item, crawlerMapping)
+            item = mergeSkillsValue(target, itemId, item, crawlerMapping)
 
             return Helper.deepCopy(item)
         case 'jewels':
             item = Helper.deepCopy(defaultJewelItem)
-            item = mergeNormalValue(target, item, crawlers, ['rare', 'size'])
-            item = mergeTranslateValue(target, item, crawlers, ['name'])
-            item = mergeSkillsValue(target, item, crawlers)
+            item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'size'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name'])
+            item = mergeSkillsValue(target, itemId, item, crawlerMapping)
 
             return Helper.deepCopy(item)
         case 'petalaces':
             item = Helper.deepCopy(defaultPetalaceItem)
-            item = mergeNormalValue(target, item, crawlers, ['rare'])
-            item = mergeTranslateValue(target, item, crawlers, ['name'])
-            item = mergeIncrementAndObtainValue(target, item, crawlers, ['name'])
+            item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name'])
+            item = mergeIncrementAndObtainValue(target, itemId, item, crawlerMapping, ['name'])
 
             return Helper.deepCopy(item)
         case 'enhances':
             item = Helper.deepCopy(defaultEnhanceItem)
-            item = mergeTranslateValue(target, item, crawlers, ['name', 'description'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name', 'description'])
 
             return Helper.deepCopy(item)
         case 'skills':
             item = Helper.deepCopy(defaultSkillItem)
-            item = mergeNormalValue(target, item, crawlers, ['level'])
-            item = mergeTranslateValue(target, item, crawlers, ['name', 'description', 'effect'])
+            item = mergeNormalValue(target, itemId, item, crawlerMapping, ['level'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name', 'description', 'effect'])
 
             return Helper.deepCopy(item)
         default:
@@ -492,460 +543,743 @@ export const arrangeAction = () => {
         }
     }
 
-    // const mergeNormalValue = (target, item, crawlers, keys) => {
-    //     for (let key of keys) {
-
-    //         // Copy Value
-    //         if (Helper.isEmpty(major[key])
-    //             && Helper.isNotEmpty(minor[key])
-    //         ) {
-    //             major[key] = minor[key]
-    //         }
-
-    //         // Duplicate Value
-    //         if (Helper.isNotEmpty(major[key])
-    //             && Helper.isNotEmpty(minor[key])
-    //             && major[key] !== minor[key]
-    //         ) {
-    //             if (Helper.isEmpty(duplicateValueMapping.normal)) {
-    //                 duplicateValueMapping.normal = []
-    //             }
-
-    //             duplicateValueMapping.normal.push({
-    //                 majorCrawler: majorCrawler,
-    //                 minorCrawler: minorCrawler,
-    //                 target: target,
-    //                 majorName: major.name.zhTW,
-    //                 key: key,
-    //                 majorValue: major[key],
-    //                 minorValue: minor[key]
-    //             })
-    //         }
-    //     }
-
-    //     return major
-    // }
-
-    // const mergeTranslateValue = (target, item, crawlers, lang, keys) => {
-    //     for (let key of keys) {
-    //         if (Helper.isEmpty(major[key])) {
-    //             major[key] = {}
-    //         }
-
-    //         if (Helper.isEmpty(minor[key])) {
-    //             minor[key] = {}
-    //         }
-
-    //         // Copy Value
-    //         if (Helper.isEmpty(major[key][lang])
-    //             && Helper.isNotEmpty(minor[key][lang])
-    //         ) {
-    //             major[key][lang] = minor[key][lang]
-    //         }
-
-    //         // Duplicate Value
-    //         if (Helper.isNotEmpty(major[key][lang])
-    //             && Helper.isNotEmpty(minor[key][lang])
-    //             && major[key][lang] !== minor[key][lang]
-    //         ) {
-    //             if (Helper.isEmpty(duplicateValueMapping.translate)) {
-    //                 duplicateValueMapping.translate = []
-    //             }
-
-    //             duplicateValueMapping.translate.push({
-    //                 majorCrawler: majorCrawler,
-    //                 minorCrawler: minorCrawler,
-    //                 target: target,
-    //                 majorName: major.name.zhTW,
-    //                 key: key,
-    //                 lang: lang,
-    //                 majorValue: major[key][lang],
-    //                 minorValue: minor[key][lang]
-    //             })
-    //         }
-    //     }
-
-    //     return major
-    // }
-
-    // const mergeElementValue = (target, item, crawlers) => {
-    //     for (let key of ['attack', 'status']) {
-    //         for (let property of ['type', 'minValue', 'maxValue']) {
-
-    //             // Copy Value
-    //             if (Helper.isEmpty(major.element[key][property])
-    //                 && Helper.isNotEmpty(minor.element[key][property])
-    //             ) {
-    //                 major.element[key][property] = minor.element[key][property]
-    //             }
-
-    //             // Duplicate Value
-    //             if (Helper.isNotEmpty(major.element[key][property])
-    //                 && Helper.isNotEmpty(minor.element[key][property])
-    //                 && major.element[key][property] !== minor.element[key][property]
-    //             ) {
-    //                 if (Helper.isEmpty(duplicateValueMapping.element)) {
-    //                     duplicateValueMapping.element = []
-    //                 }
-
-    //                 duplicateValueMapping.element.push({
-    //                     majorCrawler: majorCrawler,
-    //                     minorCrawler: minorCrawler,
-    //                     target: target,
-    //                     majorName: major.name.zhTW,
-    //                     key: key,
-    //                     property: property,
-    //                     majorValue: major.element[key][property],
-    //                     minorValue: minor.element[key][property]
-    //                 })
-    //             }
-    //         }
-    //     }
-
-    //     return major
-    // }
-
-    // const mergeSharpnessValue = (target, item, crawlers) => {
-    //     for (let key of ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'purple']) {
-
-    //         // Copy Value
-    //         if (Helper.isEmpty(major.sharpness[key])
-    //             && Helper.isNotEmpty(minor.sharpness[key])
-    //         ) {
-    //             major.sharpness[key] = minor.sharpness[key]
-    //         }
-
-    //         // Duplicate Value
-    //         if (Helper.isNotEmpty(major.sharpness[key])
-    //             && Helper.isNotEmpty(minor.sharpness[key])
-    //             && major.sharpness[key] !== minor.sharpness[key]
-    //         ) {
-    //             if (Helper.isEmpty(duplicateValueMapping.sharpness)) {
-    //                 duplicateValueMapping.sharpness = []
-    //             }
-
-    //             duplicateValueMapping.sharpness.push({
-    //                 majorCrawler: majorCrawler,
-    //                 minorCrawler: minorCrawler,
-    //                 target: target,
-    //                 majorName: major.name.zhTW,
-    //                 key: key,
-    //                 majorValue: major.sharpness[key],
-    //                 minorValue: minor.sharpness[key]
-    //             })
-    //         }
-    //     }
-
-    //     return major
-    // }
-
-    // const mergeResistenceValue = (target, item, crawlers) => {
-    //     for (let key of ['fire', 'water', 'thunder', 'ice', 'dragon']) {
-
-    //         // Copy Value
-    //         if (Helper.isEmpty(major.resistence[key])
-    //             && Helper.isNotEmpty(minor.resistence[key])
-    //         ) {
-    //             major.resistence[key] = minor.resistence[key]
-    //         }
-
-    //         // Duplicate Value
-    //         if (Helper.isNotEmpty(major.resistence[key])
-    //             && Helper.isNotEmpty(minor.resistence[key])
-    //             && major.resistence[key] !== minor.resistence[key]
-    //         ) {
-    //             if (Helper.isEmpty(duplicateValueMapping.resistence)) {
-    //                 duplicateValueMapping.resistence = []
-    //             }
-
-    //             duplicateValueMapping.resistence.push({
-    //                 majorCrawler: majorCrawler,
-    //                 minorCrawler: minorCrawler,
-    //                 target: target,
-    //                 majorName: major.name.zhTW,
-    //                 key: key,
-    //                 majorValue: major.resistence[key],
-    //                 minorValue: minor.resistence[key]
-    //             })
-    //         }
-    //     }
-
-    //     return major
-    // }
-
-    // const mergeIncrementAndObtainValue = (target, item, crawlers) => {
-    //     for (let key of ['health', 'stamina', 'attack', 'defense']) {
-    //         for (let property of ['increment', 'obtain']) {
-
-    //             // Copy Value
-    //             if (Helper.isEmpty(major[key][property])
-    //                 && Helper.isNotEmpty(minor[key][property])
-    //             ) {
-    //                 major[key][property] = minor[key][property]
-    //             }
-
-    //             // Duplicate Value
-    //             if (Helper.isNotEmpty(major[key][property])
-    //                 && Helper.isNotEmpty(minor[key][property])
-    //                 && major[key][property] !== minor[key][property]
-    //             ) {
-    //                 if (Helper.isEmpty(duplicateValueMapping.petalace)) {
-    //                     duplicateValueMapping.petalace = []
-    //                 }
-
-    //                 duplicateValueMapping.petalace.push({
-    //                     majorCrawler: majorCrawler,
-    //                     minorCrawler: minorCrawler,
-    //                     target: target,
-    //                     majorName: major.name.zhTW,
-    //                     key: key,
-    //                     property: property,
-    //                     majorValue: major[key][property],
-    //                     minorValue: minor[key][property]
-    //                 })
-    //             }
-    //         }
-    //     }
-
-    //     return major
-    // }
-
-    // const mergeSlotsValue = (target, item, crawlers) => {
-    //     let maxIndex = 0
-
-    //     if (Helper.isEmpty(major.slots)) {
-    //         major.slots = []
-    //     } else {
-    //         major.slots = major.slots.filter(function (item) {
-    //             return Helper.isNotEmpty(item.size)
-    //         }).sort(function (aItem, bItem) {
-    //             return bItem.size - aItem.size // Desc
-    //         })
-
-    //         maxIndex = (major.slots.length > maxIndex)
-    //             ? major.slots.length : maxIndex
-    //     }
-
-    //     if (Helper.isEmpty(minor.slots)) {
-    //         minor.slots = []
-    //     } else {
-    //         minor.slots = minor.slots.filter(function (item) {
-    //             return Helper.isNotEmpty(item.size)
-    //         }).sort(function (aItem, bItem) {
-    //             return bItem.size - aItem.size // Desc
-    //         })
-
-    //         maxIndex = (minor.slots.length > maxIndex)
-    //             ? minor.slots.length : maxIndex
-    //     }
-
-    //     if (0 !== maxIndex) {
-    //         for (let index = 0; index < maxIndex; index++) {
-    //             if (Helper.isEmpty(major.slots[index])) {
-    //                 major.slots[index] = {}
-    //             }
-
-    //             if (Helper.isEmpty(minor.slots[index])) {
-    //                 minor.slots[index] = {}
-    //             }
-
-    //             // Copy Value
-    //             if (Helper.isEmpty(major.slots[index].size)
-    //                 && Helper.isNotEmpty(minor.slots[index].size)
-    //             ) {
-    //                 major.slots[index].size = minor.slots[index].size
-    //             }
-
-    //             // Duplicate Value
-    //             if (Helper.isNotEmpty(major.slots[index].size)
-    //                 && Helper.isNotEmpty(minor.slots[index].size)
-    //                 && major.slots[index].size !== minor.slots[index].size
-    //             ) {
-    //                 if (Helper.isEmpty(duplicateValueMapping.slots)) {
-    //                     duplicateValueMapping.slots = []
-    //                 }
-
-    //                 duplicateValueMapping.slots.push({
-    //                     majorCrawler: majorCrawler,
-    //                     minorCrawler: minorCrawler,
-    //                     target: target,
-    //                     majorName: major.name.zhTW,
-    //                     index: index,
-    //                     property: 'size',
-    //                     majorValue: major.slots[index].size,
-    //                     minorValue: minor.slots[index].size
-    //                 })
-    //             }
-    //         }
-    //     }
-
-    //     return major
-    // }
-
-    // const mergeSkillsValue = (target, item, crawlers, translateMapping) => {
-    //     major.skills = Helper.isNotEmpty(major.skills)
-    //         ? major.skills.filter(function (item) {
-    //             return Helper.isNotEmpty(item.name)
-    //         }) : []
-
-    //     minor.skills = Helper.isNotEmpty(minor.skills)
-    //         ? minor.skills.filter(function (item) {
-    //             return Helper.isNotEmpty(item.name)
-    //         }) : []
-
-    //     let mapping = {}
-
-    //     major.skills.forEach((item) => {
-    //         item.name = specialReplaceSkillPropertyName(item.name)
-
-    //         if (Helper.isEmpty(translateMapping[item.name])) {
-    //             untrackMergeMapping.skills[`${minorCrawler}:${item.name}`] = {
-    //                 crawler: 'kiranico',
-    //                 target: target,
-    //                 name: major.name,
-    //                 skillName: item.name
-    //             }
-
-    //             return
-    //         }
-
-    //         item.name = translateMapping[item.name]
-
-    //         mapping[item.name] = item
-    //     })
-
-    //     minor.skills.forEach((item) => {
-    //         item.name = specialReplaceSkillPropertyName(item.name)
-
-    //         if (Helper.isEmpty(translateMapping[item.name])) {
-    //             untrackMergeMapping.skills[`${minorCrawler}:${item.name}`] = {
-    //                 crawler: minorCrawler,
-    //                 target: target,
-    //                 name: major.name,
-    //                 skillName: item.name
-    //             }
-
-    //             return
-    //         }
-
-    //         item.name = translateMapping[item.name]
-
-    //         if (Helper.isEmpty(mapping[item.name])) {
-
-    //             // Duplicate Value
-    //             if (Helper.isEmpty(duplicateValueMapping.skills)) {
-    //                 duplicateValueMapping.skills = []
-    //             }
-
-    //             duplicateValueMapping.skills.push({
-    //                 majorCrawler: majorCrawler,
-    //                 minorCrawler: minorCrawler,
-    //                 target: target,
-    //                 majorName: major.name.zhTW,
-    //                 majorLostValue: item.name
-    //             })
-
-    //             mapping[item.name] = item
-    //         }
-
-    //         // Copy Value
-    //         if (Helper.isEmpty(mapping[item.name].level)
-    //             && Helper.isNotEmpty(item.level)
-    //         ) {
-    //             mapping[item.name].level = item.level
-    //         }
-    //     })
-
-    //     major.skills = Object.values(mapping)
-
-    //     return major
-    // }
-
-    // const mergeEnhanceValue = (target, item, crawlers, translateMapping) => {
-    //     if (Helper.isEmpty(major.enhance.limit)
-    //         && Helper.isNotEmpty(minor.enhance.limit)
-    //     ) {
-    //         major.enhance.limit = minor.enhance.limit
-    //     }
-
-    //     major.enhance.list = Helper.isNotEmpty(major.enhance.list)
-    //         ? major.enhance.list.filter(function (item) {
-    //             return Helper.isNotEmpty(item.name)
-    //         }) : []
-
-    //     minor.enhance.list = Helper.isNotEmpty(minor.enhance.list)
-    //         ? minor.enhance.list.filter(function (item) {
-    //             return Helper.isNotEmpty(item.name)
-    //         }) : []
-
-    //     let mapping = {}
-
-    //     major.enhance.list.forEach((item) => {
-    //         item.name = specialReplaceEnhancePropertyName(item.name)
-
-    //         if (Helper.isEmpty(translateMapping[item.name])) {
-    //             untrackMergeMapping.enhances[`${minorCrawler}:${item.name}`] = {
-    //                 crawler: 'kiranico',
-    //                 target: target,
-    //                 name: major.name,
-    //                 enhanceName: item.name
-    //             }
-
-    //             return
-    //         }
-
-    //         item.name = translateMapping[item.name]
-
-    //         mapping[item.name] = item
-    //     })
-
-    //     minor.enhance.list.forEach((item) => {
-    //         item.name = specialReplaceEnhancePropertyName(item.name)
-
-    //         if (Helper.isEmpty(translateMapping[item.name])) {
-    //             untrackMergeMapping.enhances[`${minorCrawler}:${item.name}`] = {
-    //                 majorCrawler: majorCrawler,
-    //                 minorCrawler: minorCrawler,
-    //                 target: target,
-    //                 name: major.name,
-    //                 enhanceName: item.name
-    //             }
-
-    //             return
-    //         }
-
-    //         item.name = translateMapping[item.name]
-
-    //         if (Helper.isEmpty(mapping[item.name])) {
-
-    //             // Duplicate Value
-    //             if (Helper.isEmpty(duplicateValueMapping.enhance)) {
-    //                 duplicateValueMapping.enhance = []
-    //             }
-
-    //             duplicateValueMapping.enhance.push({
-    //                 majorCrawler: majorCrawler,
-    //                 minorCrawler: minorCrawler,
-    //                 target: target,
-    //                 majorName: major.name.zhTW,
-    //                 majorLostValue: item.name
-    //             })
-
-    //             mapping[item.name] = item
-    //         }
-    //     })
-
-    //     major.enhance.list = Object.values(mapping)
-
-    //     return major
-    // }
+    const mergeNormalValue = (target, itemId, item, crawlerMapping, keys) => {
+        for (let key of keys) {
+            let countMapping = {}
+            let valueMapping = {}
+
+            for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+                if (Helper.isEmpty(crawlerItem[key])) {
+                    continue
+                }
+
+                // Set Default Value
+                if (Helper.isEmpty(item[key])) {
+                    item[key] = crawlerItem[key]
+                }
+
+                // Set Count & Value
+                if (Helper.isEmpty(countMapping[crawlerItem[key]])) {
+                    countMapping[crawlerItem[key]] = 0
+                }
+
+                countMapping[crawlerItem[key]]++
+                valueMapping[crawlerName] = crawlerItem[key]
+            }
+
+            // Dosen't need Copy
+            if (0 === Object.keys(countMapping).length) {
+                continue
+            }
+
+            // Assign Final Value by Max Count
+            let maxCount = 0
+
+            for (let [value, count] of Object.entries(countMapping)) {
+                if (maxCount < count) {
+                    maxCount = count
+                    item[key] = value
+                }
+            }
+
+            // Record DuplicationValueMapping
+            if (Object.keys(countMapping).length > 1) {
+                if (Helper.isEmpty(duplicateValueMapping.normal)) {
+                    duplicateValueMapping.normal = []
+                }
+
+                duplicateValueMapping.normal.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    key: key,
+                    valueMapping: valueMapping
+                })
+            }
+        }
+
+        return item
+    }
+
+    const mergeTranslateValue = (target, itemId, item, crawlerMapping, keys) => {
+        for (let key of keys) {
+            for (let lang of langList) {
+                let countMapping = {}
+                let valueMapping = {}
+
+                for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+                    if (Helper.isEmpty(crawlerItem[key])
+                        || Helper.isEmpty(crawlerItem[key][lang])
+                    ) {
+                        continue
+                    }
+
+                    // Set Default Value
+                    if (Helper.isEmpty(item[key])) {
+                        item[key] = {}
+                    }
+
+                    if (Helper.isEmpty(item[key][lang])) {
+                        item[key][lang] = crawlerItem[key][lang]
+                    }
+
+                    // Set Count & Value
+                    if (Helper.isEmpty(countMapping[crawlerItem[key][lang]])) {
+                        countMapping[crawlerItem[key][lang]] = 0
+                    }
+
+                    countMapping[crawlerItem[key][lang]]++
+                    valueMapping[crawlerName] = crawlerItem[key][lang]
+                }
+
+                // Dosen't need Copy
+                if (0 === Object.keys(countMapping).length) {
+                    continue
+                }
+
+                // Assign Final Value by Max Count
+                let maxCount = 0
+
+                for (let [value, count] of Object.entries(countMapping)) {
+                    if (maxCount < count) {
+                        maxCount = count
+                        item[key][lang] = value
+                    }
+                }
+
+                // Record DuplicationValueMapping
+                if (Object.keys(countMapping).length > 1) {
+                    if (Helper.isEmpty(duplicateValueMapping.translate)) {
+                        duplicateValueMapping.translate = []
+                    }
+
+                    duplicateValueMapping.translate.push({
+                        target: target,
+                        name: idNameMapping[itemId],
+                        key: key,
+                        lang: lang,
+                        valueMapping: valueMapping
+                    })
+                }
+            }
+        }
+
+        return item
+    }
+
+    const mergeElementValue = (target, itemId, item, crawlerMapping) => {
+        for (let key of ['attack', 'status']) {
+            for (let property of ['type', 'minValue', 'maxValue']) {
+                let countMapping = {}
+                let valueMapping = {}
+
+                for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+                    if (Helper.isEmpty(crawlerItem.element[key])
+                        || Helper.isEmpty(crawlerItem.element[key][property])
+                    ) {
+                        continue
+                    }
+
+                    // Set Default Value
+                    if (Helper.isEmpty(item.element[key])) {
+                        item.element[key] = {}
+                    }
+
+                    if (Helper.isEmpty(item.element[key][property])) {
+                        item.element[key][property] = crawlerItem.element[key][property]
+                    }
+
+                    // Set Count & Value
+                    if (Helper.isEmpty(countMapping[crawlerItem.element[key][property]])) {
+                        countMapping[crawlerItem.element[key][property]] = 0
+                    }
+
+                    countMapping[crawlerItem.element[key][property]]++
+                    valueMapping[crawlerName] = crawlerItem.element[key][property]
+                }
+
+                // Dosen't need Copy
+                if (0 === Object.keys(countMapping).length) {
+                    continue
+                }
+
+                // Assign Final Value by Max Count
+                let maxCount = 0
+
+                for (let [value, count] of Object.entries(countMapping)) {
+                    if (maxCount < count) {
+                        maxCount = count
+                        item.element[key][property] = value
+                    }
+                }
+
+                // Record DuplicationValueMapping
+                if (Object.keys(countMapping).length > 1) {
+                    if (Helper.isEmpty(duplicateValueMapping.element)) {
+                        duplicateValueMapping.element = []
+                    }
+
+                    duplicateValueMapping.element.push({
+                        target: target,
+                        name: idNameMapping[itemId],
+                        key: key,
+                        property: property,
+                        valueMapping: valueMapping
+                    })
+                }
+            }
+        }
+
+        return item
+    }
+
+    const mergeSharpnessValue = (target, itemId, item, crawlerMapping) => {
+        for (let key of ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'purple']) {
+            let countMapping = {}
+            let valueMapping = {}
+
+            for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+                if (Helper.isEmpty(crawlerItem.sharpness[key])) {
+                    continue
+                }
+
+                // Set Default Value
+                if (Helper.isEmpty(item.sharpness[key])) {
+                    item.sharpness[key] = crawlerItem.sharpness[key]
+                }
+
+                // Set Count & Value
+                if (Helper.isEmpty(countMapping[crawlerItem.sharpness[key]])) {
+                    countMapping[crawlerItem.sharpness[key]] = 0
+                }
+
+                countMapping[crawlerItem.sharpness[key]]++
+                valueMapping[crawlerName] = crawlerItem.sharpness[key]
+            }
+
+            // Dosen't need Copy
+            if (0 === Object.keys(countMapping).length) {
+                continue
+            }
+
+            // Assign Final Value by Max Count
+            let maxCount = 0
+
+            for (let [value, count] of Object.entries(countMapping)) {
+                if (maxCount < count) {
+                    maxCount = count
+                    item.sharpness[key] = value
+                }
+            }
+
+            // Record DuplicationValueMapping
+            if (Object.keys(countMapping).length > 1) {
+                if (Helper.isEmpty(duplicateValueMapping.sharpness)) {
+                    duplicateValueMapping.sharpness = []
+                }
+
+                duplicateValueMapping.sharpness.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    key: key,
+                    valueMapping: valueMapping
+                })
+            }
+        }
+
+        return item
+    }
+
+    const mergeResistenceValue = (target, itemId, item, crawlerMapping) => {
+        for (let key of ['fire', 'water', 'thunder', 'ice', 'dragon']) {
+            let countMapping = {}
+            let valueMapping = {}
+
+            for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+                if (Helper.isEmpty(crawlerItem.resistence[key])) {
+                    continue
+                }
+
+                // Set Default Value
+                if (Helper.isEmpty(item.resistence[key])) {
+                    item.resistence[key] = crawlerItem.resistence[key]
+                }
+
+                // Set Count & Value
+                if (Helper.isEmpty(countMapping[crawlerItem.resistence[key]])) {
+                    countMapping[crawlerItem.resistence[key]] = 0
+                }
+
+                countMapping[crawlerItem.resistence[key]]++
+                valueMapping[crawlerName] = crawlerItem.resistence[key]
+            }
+
+            // Dosen't need Copy
+            if (0 === Object.keys(countMapping).length) {
+                continue
+            }
+
+            // Assign Final Value by Max Count
+            let maxCount = 0
+
+            for (let [value, count] of Object.entries(countMapping)) {
+                if (maxCount < count) {
+                    maxCount = count
+                    item.resistence[key] = value
+                }
+            }
+
+            // Record DuplicationValueMapping
+            if (Object.keys(countMapping).length > 1) {
+                if (Helper.isEmpty(duplicateValueMapping.resistence)) {
+                    duplicateValueMapping.resistence = []
+                }
+
+                duplicateValueMapping.resistence.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    key: key,
+                    valueMapping: valueMapping
+                })
+            }
+        }
+
+        return item
+    }
+
+    const mergeIncrementAndObtainValue = (target, itemId, item, crawlerMapping) => {
+        for (let key of ['health', 'stamina', 'attack', 'defense']) {
+            for (let property of ['increment', 'obtain']) {
+                let countMapping = {}
+                let valueMapping = {}
+
+                for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+                    if (Helper.isEmpty(crawlerItem[key])
+                        || Helper.isEmpty(crawlerItem[key][lang])
+                    ) {
+                        continue
+                    }
+
+                    // Set Default Value
+                    if (Helper.isEmpty(item[key])) {
+                        item[key] = {}
+                    }
+
+                    if (Helper.isEmpty(item[key][property])) {
+                        item[key][property] = crawlerItem[key][property]
+                    }
+
+                    // Set Count & Value
+                    if (Helper.isEmpty(countMapping[crawlerItem[key][property]])) {
+                        countMapping[crawlerItem[key][property]] = 0
+                    }
+
+                    countMapping[crawlerItem[key][property]]++
+                    valueMapping[crawlerName] = crawlerItem[key][property]
+                }
+
+                // Dosen't need Copy
+                if (0 === Object.keys(countMapping).length) {
+                    continue
+                }
+
+                // Assign Final Value by Max Count
+                let maxCount = 0
+
+                for (let [value, count] of Object.entries(countMapping)) {
+                    if (maxCount < count) {
+                        maxCount = count
+                        item[key][property] = value
+                    }
+                }
+
+                // Record DuplicationValueMapping
+                if (Object.keys(countMapping).length > 1) {
+                    if (Helper.isEmpty(duplicateValueMapping.iao)) {
+                        duplicateValueMapping.iao = []
+                    }
+
+                    duplicateValueMapping.iao.push({
+                        target: target,
+                        name: idNameMapping[itemId],
+                        key: key,
+                        property: property,
+                        valueMapping: valueMapping
+                    })
+                }
+            }
+        }
+
+        return item
+    }
+
+    const mergeSlotsValue = (target, itemId, item, crawlerMapping) => {
+        let countMapping = {}
+        let valueMapping = {}
+
+        for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+            if (Helper.isEmpty(crawlerItem.slots)) {
+                continue
+            }
+
+            crawlerItem.slots = crawlerItem.slots.filter(function (slotItem) {
+                return Helper.isNotEmpty(slotItem.size)
+            }).sort(function (slotItemA, slotItemB) {
+                return slotItemB.size - slotItemA.size // Desc
+            })
+
+            if (0 === crawlerItem.slots.length) {
+                continue
+            }
+
+            // Set Default Value
+            if (Helper.isEmpty(item.slots)) {
+                item.slots = crawlerItem.slots
+            }
+
+            let value = JSON.stringify(crawlerItem.slots)
+
+            // Set Count & Value
+            if (Helper.isEmpty(countMapping[value])) {
+                countMapping[value] = 0
+            }
+
+            countMapping[value]++
+            valueMapping[crawlerName] = crawlerItem.slots.map((slotItem) => {
+                return slotItem.size
+            }).join(',')
+        }
+
+        // Need Copy
+        if (0 !== Object.keys(countMapping).length) {
+
+            // Assign Final Value by Max Count
+            let maxCount = 0
+
+            for (let [value, count] of Object.entries(countMapping)) {
+                if (maxCount < count) {
+                    maxCount = count
+                    item.slots = JSON.parse(value)
+                }
+            }
+
+            // Record DuplicationValueMapping
+            if (Object.keys(countMapping).length > 1) {
+                if (Helper.isEmpty(duplicateValueMapping.slots)) {
+                    duplicateValueMapping.slots = []
+                }
+
+                duplicateValueMapping.slots.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    valueMapping: valueMapping
+                })
+            }
+        }
+
+        return item
+    }
+
+    const mergeSkillsValue = (target, itemId, item, crawlerMapping) => {
+        let countMapping = {}
+        let valueMapping = {}
+
+        // Generate Skill Mapping
+        for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+            if (Helper.isEmpty(crawlerItem.skills)) {
+                continue
+            }
+
+            let skillList = []
+
+            crawlerItem.skills.forEach((skillItem) => {
+                if (Helper.isEmpty(skillItem.name)) {
+                    return
+                }
+
+                let skillName = getPropertySkillTranslateName(skillItem.name)
+
+                // Record untrackMergeMapping
+                if (Helper.isEmpty(skillName)) {
+                    if (Helper.isEmpty(untrackMergeMapping.skills)) {
+                        untrackMergeMapping.skills = []
+                    }
+
+                    untrackMergeMapping.skills.push({
+                        target: target,
+                        name: idNameMapping[itemId],
+                        crawlerName: crawlerName,
+                        skillName: skillItem.name
+                    })
+
+                    return
+                }
+
+                skillList.push(skillName)
+            })
+
+            skillList.sort()
+
+            let value = JSON.stringify(skillList)
+
+            // Set Count & Value
+            if (Helper.isEmpty(countMapping[value])) {
+                countMapping[value] = 0
+            }
+
+            countMapping[value]++
+            valueMapping[crawlerName] = skillList.join(',')
+        }
+
+        // Need Copy
+        if (0 !== Object.keys(countMapping).length) {
+
+            // Assign Final Value by Max Count
+            let maxCount = 0
+
+            for (let [value, count] of Object.entries(countMapping)) {
+                if (maxCount < count) {
+                    maxCount = count
+
+                    item.skills = {}
+
+                    JSON.parse(value).forEach((skillName) => {
+                        item.skills[skillName] = null
+                    })
+                }
+            }
+
+            // Filling
+            for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+                if (Helper.isEmpty(crawlerItem.skills)) {
+                    continue
+                }
+
+                crawlerItem.skills.forEach((skillItem) => {
+                    if (Helper.isEmpty(skillItem.name)) {
+                        return
+                    }
+
+                    let skillName = getPropertySkillTranslateName(skillItem.name)
+
+                    // Just Skipped
+                    if (Helper.isEmpty(skillName)) {
+                        return
+                    }
+
+                    skillItem.name = skillName
+
+                    if (Helper.isEmpty(item.skills[skillItem.name])) {
+                        item.skills[skillItem.name] = skillItem
+                    }
+
+                    if (Helper.isEmpty(item.skills[skillItem.name].level)
+                        && Helper.isNotEmpty(skillItem.level)
+                    ) {
+                        item.skills[skillItem.name].level = skillItem.level
+                    }
+                })
+            }
+
+            item.skills = Object.values(item.skills)
+
+            // Find Lost Level
+            item.skills.forEach((skillItem) => {
+                if (Helper.isNotEmpty(skillItem.level)) {
+                    return
+                }
+
+                if (Helper.isEmpty(untrackMergeMapping.skillLevel)) {
+                    untrackMergeMapping.skillLevel = []
+                }
+
+                untrackMergeMapping.skillLevel.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    crawlerName: crawlerName,
+                    skillName: skillItem.name
+                })
+            })
+
+            // Sorting
+            item.skills = item.skills.sort(function (aItem, bItem) {
+                if (Helper.isEmpty(aItem.level)) {
+                    aItem.level = 0
+                }
+
+                if (Helper.isEmpty(bItem.level)) {
+                    bItem.level = 0
+                }
+
+                return bItem.level - aItem.level // Desc
+            })
+
+            // Record DuplicationValueMapping
+            if (Object.keys(countMapping).length > 1) {
+                if (Helper.isEmpty(duplicateValueMapping.skills)) {
+                    duplicateValueMapping.skills = []
+                }
+
+                duplicateValueMapping.skills.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    valueMapping: valueMapping
+                })
+            }
+        }
+
+        return item
+    }
+
+    const mergeEnhanceValue = (target, itemId, item, crawlerMapping) => {
+        let countMapping = null
+        let valueMapping = null
+
+        // For Enhance Amount
+        countMapping = {}
+        valueMapping = {}
+
+        for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+            if (Helper.isEmpty(crawlerItem.enhance.amount)) {
+                continue
+            }
+
+            // Set Default Value
+            if (Helper.isEmpty(item.enhance.amount)) {
+                item.enhance.amount = crawlerItem.enhance.amount
+            }
+
+            // Set Count & Value
+            if (Helper.isEmpty(countMapping[crawlerItem.enhance.amount])) {
+                countMapping[crawlerItem.enhance.amount] = 0
+            }
+
+            countMapping[crawlerItem.enhance.amount]++
+            valueMapping[crawlerName] = crawlerItem.enhance.amount
+        }
+
+        // Need Copy
+        if (0 !== Object.keys(countMapping).length) {
+
+            // Assign Final Value by Max Count
+            let maxCount = 0
+
+            for (let [value, count] of Object.entries(countMapping)) {
+                if (maxCount < count) {
+                    maxCount = count
+                    item.enhance.amount = value
+                }
+            }
+
+            // Record DuplicationValueMapping
+            if (Object.keys(countMapping).length > 1) {
+                if (Helper.isEmpty(duplicateValueMapping.enhanceAmount)) {
+                    duplicateValueMapping.enhanceAmount = []
+                }
+
+                duplicateValueMapping.enhanceAmount.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    valueMapping: valueMapping
+                })
+            }
+        }
+
+        // For Enhance List
+        countMapping = {}
+        valueMapping = {}
+
+        // Generate Enhance Mapping
+        for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+            if (Helper.isEmpty(crawlerItem.enhance.list)) {
+                continue
+            }
+
+            let enhanceList = []
+
+            crawlerItem.enhance.list.forEach((enhanceItem) => {
+                if (Helper.isEmpty(enhanceItem.name)) {
+                    return
+                }
+
+                let enhanceName = getPropertyEnhanceTranslateName(enhanceItem.name)
+
+                // Record untrackMergeMapping
+                if (Helper.isEmpty(enhanceName)) {
+                    if (Helper.isEmpty(untrackMergeMapping.enhanceList)) {
+                        untrackMergeMapping.enhanceList = []
+                    }
+
+                    untrackMergeMapping.enhanceList.push({
+                        target: target,
+                        name: idNameMapping[itemId],
+                        crawlerName: crawlerName,
+                        enhanceName: enhanceItem.name
+                    })
+
+                    return
+                }
+
+                enhanceList.push(enhanceName)
+            })
+
+            enhanceList.sort()
+
+            let value = JSON.stringify(enhanceList)
+
+            // Set Count & Value
+            if (Helper.isEmpty(countMapping[value])) {
+                countMapping[value] = 0
+            }
+
+            countMapping[value]++
+            valueMapping[crawlerName] = enhanceList.join(',')
+        }
+
+        // Need Copy
+        if (0 !== Object.keys(countMapping).length) {
+
+            // Assign Final Value by Max Count
+            let maxCount = 0
+
+            for (let [value, count] of Object.entries(countMapping)) {
+                if (maxCount < count) {
+                    maxCount = count
+
+                    item.enhance.list = {}
+
+                    JSON.parse(value).forEach((enhanceName) => {
+                        item.enhance.list[enhanceName] = null
+                    })
+                }
+            }
+
+            item.enhance.list = Object.values(item.enhance.list)
+
+            // Record DuplicationValueMapping
+            if (Object.keys(countMapping).length > 1) {
+                if (Helper.isEmpty(duplicateValueMapping.enhanceList)) {
+                    duplicateValueMapping.enhanceList = []
+                }
+
+                duplicateValueMapping.enhanceList.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    valueMapping: valueMapping
+                })
+            }
+        }
+
+        return item
+    }
 
     // Generate Arrange Data
     for (let target of Object.keys(metaDataMapping)) {
+        console.log(`arrange:${target}`)
+
         arrangeDataMapping[target] = {}
 
         for (let itemId of Object.keys(metaDataMapping[target])) {
-            arrangeDataMapping[target][itemId] = mergeItem(target, metaDataMapping[target][itemId])
+            arrangeDataMapping[target][itemId] = mergeItem(target, itemId, metaDataMapping[target][itemId])
         }
     }
 
@@ -968,19 +1302,19 @@ export const arrangeAction = () => {
         })
     })
 
-    // Object.keys(untrackMergeMapping).forEach((target) => {
-    //     let list = Object.values(untrackMergeMapping[target])
+    Object.keys(untrackMergeMapping).forEach((target) => {
+        let list = Object.values(untrackMergeMapping[target])
 
-    //     if (0 === list.length) {
-    //         return
-    //     }
+        if (0 === list.length) {
+            return
+        }
 
-    //     Helper.saveJSONAsCSV(`${combineRoot}/untrackMerge/${target}.csv`, list)
-    // })
+        Helper.saveJSONAsCSV(`${combineRoot}/untrackMerge/${target}.csv`, list)
+    })
 
-    // Object.keys(duplicateValueMapping).forEach((target) => {
-    //     Helper.saveJSONAsCSV(`${combineRoot}/duplicateValue/${target}.csv`, duplicateValueMapping[target])
-    // })
+    Object.keys(duplicateValueMapping).forEach((target) => {
+        Helper.saveJSONAsCSV(`${combineRoot}/duplicateValue/${target}.csv`, duplicateValueMapping[target])
+    })
 }
 
 export const infoAction = () => {
@@ -1161,7 +1495,7 @@ export const infoAction = () => {
 
     // Result
     for (let target of Object.keys(result)) {
-        console.log(target, '=', result[target], '\n')
+        console.log(target, '=', result[target])
     }
 }
 

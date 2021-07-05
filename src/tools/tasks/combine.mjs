@@ -26,11 +26,11 @@ import {
 const crawlerRoot = 'temp/crawler'
 const combineRoot = 'temp/combine'
 
-export const crawlerList = [
+const crawlerList = [
     'gameqb', 'game8', 'kiranico', 'fextralife'
 ]
 
-export const targetList = [
+const targetList = [
     'weapons',
     'armors',
     'petalaces',
@@ -39,7 +39,7 @@ export const targetList = [
     'skills'
 ]
 
-export const langList = [
+const langList = [
     'zhTW',
     'jaJP',
     'enUS'

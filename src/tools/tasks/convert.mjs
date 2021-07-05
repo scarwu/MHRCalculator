@@ -26,11 +26,10 @@ import {
 const crawlerRoot = 'temp/crawler'
 const convertRoot = 'files'
 
-export const crawlerList = [
-    'gameqb', 'game8', 'kiranico', 'fextralife'
-]
+const datasetRoot = '../assets/scripts/datasets'
+const langRoot = '../assets/scripts/langs'
 
-export const targetList = [
+const targetList = [
     'weapons',
     'armors',
     'petalaces',
@@ -39,10 +38,18 @@ export const targetList = [
     'skills'
 ]
 
-export const langList = [
+const langList = [
     'zhTW',
     'jaJP',
     'enUS'
+]
+
+const charPools = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 ]
 
 export const runAction = () => {
@@ -59,7 +66,100 @@ export const runAction = () => {
         }
     })
 
+    // Load Unique Id Mapping
+    let hashCodeMapping = Helper.loadJSON(`${convertRoot}/hashCodeMapping.json`)
 
+    if (Helper.isEmpty(hashCodeMapping)) {
+        hashCodeMapping = {}
+    }
+
+    // Init Used Code Maping By Unique Id Mapping
+    let usedCodeMapping = {}
+
+    Object.values(hashCodeMapping).forEach((code) => {
+        usedCodeMapping[code] = true
+    })
+
+    const createCode = (text) => {
+        if (Helper.isEmpty(text)) {
+            return null
+        }
+
+        let hash = md5(text)
+
+        if (Helper.isNotEmpty(hashCodeMapping[hash])) {
+            return hashCodeMapping[hash]
+        }
+
+        let code = null
+
+        while (true) {
+            code = '_'
+
+            for (let i = 0; i < charPools.length; i++) {
+                code += charPools[rand() % charPools.length]
+            }
+
+            if (Helper.isEmpty(usedCodeMapping[code])) {
+                hashCodeMapping[hash] = code
+                usedCodeMapping[code] = true
+
+                break
+            }
+        }
+
+        return code
+    }
+
+    let datasetMapping = {}
+    let datasetLangMapping = {}
+
+    // Handle Skills
+    let bundleSkills = []
+
+    rawDataMapping.skills.forEach((skillItem) => {
+
+    })
+
+    // Handle Enhances
+    rawDataMapping.enhances.forEach((enhanceItem) => {
+
+    })
+
+    // Handle Petalaces
+    rawDataMapping.petalaces.forEach((petalaceItem) => {
+
+    })
+
+    // Handle Jewels
+    rawDataMapping.jewels.forEach((jewelItem) => {
+
+    })
+
+    // Handle Armors
+    let bundleArmors = []
+
+    rawDataMapping.armors.forEach((armorItem) => {
+
+    })
+
+    // Handle Weapons
+    rawDataMapping.weapons.forEach((skillItem) => {
+
+    })
+
+    // Save Datasets
+    Object.keys(datasetMapping).forEach((target) => {
+        Helper.saveJSON(`${datasetRoot}/${target}.json`, datasetMapping[target])
+    })
+
+    // Save Dataset Langs
+    Object.keys(datasetLangMapping).forEach((lang) => {
+        Helper.saveJSON(`${langRoot}/${lang}/dataset.json`, datasetLangMapping[lang])
+    })
+
+    // Save Unique Id Mapping
+    Helper.saveJSON(`${convertRoot}/hashCodeMapping.json`, hashCodeMapping)
 }
 
 export const infoAction = () => {
@@ -186,6 +286,10 @@ export const infoAction = () => {
     }
 
     // Load All Crawler Data
+    const crawlerList = [
+        'gameqb', 'game8', 'kiranico', 'fextralife'
+    ]
+
     for (let crawler of crawlerList) {
         console.log(`count:${crawler}`)
 

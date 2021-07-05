@@ -20,14 +20,14 @@ export default function IconButton(props) {
         Helper.debug('Component: Common -> IconButton')
 
         return (
-            <div className="mhwc-icon_button">
-                <div className="mhwc-body">
-                    <a className="mhwc-icon" onClick={onClick}>
+            <div className="mhrc-icon_button">
+                <div className="mhrc-body">
+                    <a className="mhrc-icon" onClick={onClick}>
                         <i className={`fa fa-${iconName}`}></i>
                     </a>
                 </div>
 
-                <div className="mhwc-label">
+                <div className="mhrc-label">
                     <span>{altName}</span>
                 </div>
             </div>

@@ -8,15 +8,15 @@
  */
 
 // Common Components
-.mhwc-basic_input,
-.mhwc-basic_selector
+.mhrc-basic_input,
+.mhrc-basic_selector
     position: relative
     display: inline-block
     width: 100%
     +font-size(1.2)
 
-    .mhwc-select,
-    .mhwc-input
+    .mhrc-select,
+    .mhrc-input
         -webkit-appearance: none
         appearance: none
         display: inline-block
@@ -29,10 +29,10 @@
         background-color: #eee
         +border-radius(3px)
 
-    .mhwc-input
+    .mhrc-input
         padding: 0 4px
 
-    .mhwc-select
+    .mhrc-select
         padding: 0 4px
         padding-right: 20px
 
@@ -42,11 +42,11 @@
             background-image: url(data:image/pngbase64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAMCAYAAABSgIzaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NDZFNDEwNjlGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NDZFNDEwNkFGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0NkU0MTA2N0Y3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0NkU0MTA2OEY3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuGsgwQAAAA5SURBVHjaYvz//z8DOYCJgUxAf42MQIzTk0D/M+KzkRGPoQSdykiKJrBGpOhgJFYTWNEIiEeAAAMAzNENEOH+do8AAAAASUVORK5CYII=)
 }
 
-.mhwc-icon_input,
-.mhwc-icon_selector,
-.mhwc-icon_switch,
-.mhwc-icon_button,
-.mhwc-icon_tab
+.mhrc-icon_input,
+.mhrc-icon_selector,
+.mhrc-icon_switch,
+.mhrc-icon_button,
+.mhrc-icon_tab
     transition-property: background-color
     transition-duration: 0.1s
 
@@ -54,7 +54,7 @@
     display: inline-block
     +font-size(1.2)
 
-    .mhwc-body
+    .mhrc-body
         display: block
         line-height: 20px
         text-align: center
@@ -62,15 +62,15 @@
         background-color: #ccc
         +border-radius(3px)
 
-        .mhwc-icon
+        .mhrc-icon
             display: inline-block
             vertical-align: top
             width: 20px
             height: 20px
             color: white
 
-        .mhwc-select,
-        .mhwc-input
+        .mhrc-select,
+        .mhrc-input
             -webkit-appearance: none
             -moz-appearance: none
             display: inline-block
@@ -82,10 +82,10 @@
             line-height: 20px
             +border-radius(3px)
 
-        .mhwc-input
+        .mhrc-input
             padding: 0 4px
 
-        .mhwc-select
+        .mhrc-select
             padding: 0 4px
             padding-right: 20px
 
@@ -94,7 +94,7 @@
                 background-repeat: no-repeat
                 background-image: url(data:image/pngbase64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAMCAYAAABSgIzaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NDZFNDEwNjlGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NDZFNDEwNkFGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0NkU0MTA2N0Y3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0NkU0MTA2OEY3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuGsgwQAAAA5SURBVHjaYvz//z8DOYCJgUxAf42MQIzTk0D/M+KzkRGPoQSdykiKJrBGpOhgJFYTWNEIiEeAAAMAzNENEOH+do8AAAAASUVORK5CYII=)
 
-    .mhwc-label
+    .mhrc-label
         +nowrap()
         position: absolute
         display: none
@@ -112,33 +112,33 @@
         +border-radius(3px)
 
     &:hover
-        .mhwc-body
+        .mhrc-body
             background-color: #666
 
-        .mhwc-label
+        .mhrc-label
             display: block
 }
 
-.mhwc-icon_tab
-    .mhwc-body
+.mhrc-icon_tab
+    .mhrc-body
         background-color: #999
         +border-radius(3px 3px 0 0)
 
-        .mhwc-icon
+        .mhrc-icon
             height: 30px
             padding-bottom: 10px
 
     .is-active
         background-color: #fff !important
 
-        .mhwc-icon
+        .mhrc-icon
             color: #999
 
         &:hover
             background-color: #fff
 }
 
-.mhwc-sharpness_bar
+.mhrc-sharpness_bar
     position: relative
     border: 1px solid black
     width: 100%
@@ -146,14 +146,14 @@
     background-color: black
     +font-size(0)
 
-    .mhwc-steps
+    .mhrc-steps
         position: absolute
         top: 0
         left: 0
         right: 0
         bottom: 0
 
-        .mhwc-step
+        .mhrc-step
             float: left
             display: block
             height: 100%
@@ -179,14 +179,14 @@
             &:nth-child(7)
                 background-color: purple
 
-    .mhwc-mask
+    .mhrc-mask
         position: absolute
         top: 0
         right: 0
         height: 100%
         background-color: black
 
-.mhwc-list
+.mhrc-list
     overflow-y: scroll
     overflow-x: hidden
 
@@ -197,7 +197,7 @@
     // &::-webkit-scrollbar-thumb
     //     background: rgba(0, 0, 0, 0.1)
 
-.mhwc-item
+.mhrc-item
     margin: 0 5px 10px 5px
     padding: 0 2.5px 5px 2.5px
     border: 1px solid #999
@@ -208,113 +208,113 @@
             flex-basis: calc(100% / 12 * #{$i} - 5px)
             max-width: calc(100% / 12 * #{$i} - 5px)
 
-    .mhwc-name,
-    .mhwc-content,
-    .mhwc-value
+    .mhrc-name,
+    .mhrc-content,
+    .mhrc-value
         overflow: hidden
 
-    .mhwc-content,
-    .mhwc-value
+    .mhrc-content,
+    .mhrc-value
         border: 1px solid #999
         +border-radius(5px)
 
-    .mhwc-name
+    .mhrc-name
         +nowrap()
         margin: 5px 2.5px 0 2.5px
         padding: 4px 0 5px 0
         height: 30px
 
-        > .mhwc-basic_input
+        > .mhrc-basic_input
             width: initial
             vertical-align: top
 
-            .mhwc-input
+            .mhrc-input
                 background-color: #ddd
 
-    .mhwc-content
+    .mhrc-content
         display: flex
         flex-wrap: wrap
         margin: 5px 2.5px 0 2.5px
         padding: 0 2.5px 5px 2.5px
 
-    .mhwc-value
+    .mhrc-value
         margin: 5px 2.5px 0 2.5px
         padding: 4px 5px 5px 5px
         min-height: 32px
         +nowrap()
 
-        > .mhwc-basic_input,
-        > .mhwc-basic_selector
+        > .mhrc-basic_input,
+        > .mhrc-basic_selector
             margin-top: 1px
             vertical-align: top
 
-            .mhwc-select,
-            .mhwc-input
+            .mhrc-select,
+            .mhrc-input
                 width: 100%
 
-    .mhwc-icons_bundle
+    .mhrc-icons_bundle
         margin-top: 1px
         height: 20px
         float: right
 
-        .mhwc-basic_input,
-        .mhwc-basic_selector,
-        .mhwc-icon_input,
-        .mhwc-icon_selector,
-        .mhwc-icon_button
+        .mhrc-basic_input,
+        .mhrc-basic_selector,
+        .mhrc-icon_input,
+        .mhrc-icon_selector,
+        .mhrc-icon_button
             margin-left: 2px
             vertical-align: top
 
-    .mhwc-sharpness
-        .mhwc-sharpness_bar
+    .mhrc-sharpness
+        .mhrc-sharpness_bar
             height: 11px
 
-        .mhwc-sharpness_bar:nth-child(2)
+        .mhrc-sharpness_bar:nth-child(2)
             margin-top: -1px
 
-    .mhwc-description
+    .mhrc-description
         +wrap()
 
         ul
             margin: 0
 
-    .mhwc-input-ev
-        .mhwc-basic_input
+    .mhrc-input-ev
+        .mhrc-basic_input
             margin-left: 2px
             margin-right: 2px
 
-            .mhwc-input
+            .mhrc-input
                 width: 50px
                 background-color: #eee !important
 
-.mhwc-item-2-step
+.mhrc-item-2-step
     background-color: #eee
 
-    .mhwc-content
+    .mhrc-content
         background-color: #fff
 
-    .mhwc-value
+    .mhrc-value
         background-color: #fff
 
-.mhwc-item-3-step
+.mhrc-item-3-step
     background-color: #ccc
 
-    > .mhwc-name
-        .mhwc-icons_bundle
-            .mhwc-icon_selector,
-            .mhwc-icon_button
-                .mhwc-body
+    > .mhrc-name
+        .mhrc-icons_bundle
+            .mhrc-icon_selector,
+            .mhrc-icon_button
+                .mhrc-body
                     background-color: #999
 
                 &:hover
-                    .mhwc-body
+                    .mhrc-body
                         background-color: #666
 
-    .mhwc-content
+    .mhrc-content
         background-color: #eee
 
-        .mhwc-content
+        .mhrc-content
             background-color: #fff
 
-    .mhwc-value
+    .mhrc-value
         background-color: #fff

@@ -20,7 +20,7 @@ export default function IconTab(props) {
         Helper.debug('Component: Common -> IconTab')
 
         let className = [
-            'mhwc-body'
+            'mhrc-body'
         ]
 
         if (isActive) {
@@ -28,14 +28,14 @@ export default function IconTab(props) {
         }
 
         return (
-            <div className="mhwc-icon_tab">
+            <div className="mhrc-icon_tab">
                 <a className={className.join(' ')} onClick={onClick}>
-                    <div className="mhwc-icon">
+                    <div className="mhrc-icon">
                         <i className={`fa fa-${iconName}`}></i>
                     </div>
                 </a>
 
-                <div className="mhwc-label">
+                <div className="mhrc-label">
                     <span>{altName}</span>
                 </div>
             </div>

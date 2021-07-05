@@ -96,13 +96,13 @@ export default function App(props) {
      * Render Functions
      */
     return (
-        <div key={stateLang} id="mhwc-app" className="container-fluid">
-            <div className="mhwc-header">
-                <a className="mhwc-title" href="./">
+        <div key={stateLang} id="mhrc-app" className="container-fluid">
+            <div className="mhrc-header">
+                <a className="mhrc-title" href="./">
                     <h1>{_('title')}</h1>
                 </a>
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="link" altName={_('exportBundle')}
                         onClick={handleBundleExport} />
@@ -119,14 +119,14 @@ export default function App(props) {
                 </div>
             </div>
 
-            <div className="row mhwc-container">
+            <div className="row mhrc-container">
                 <ConditionOptions />
                 <CandidateBundles />
                 <EquipsDisplayer />
                 <CharacterStatus />
             </div>
 
-            <div className="row mhwc-footer">
+            <div className="row mhrc-footer">
                 <div className="col-12">
                     <span>Copyright (c) Scar Wu</span>
                 </div>

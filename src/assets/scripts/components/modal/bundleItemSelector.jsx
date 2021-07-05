@@ -136,18 +136,18 @@ export default function BundleItemSelector(props) {
         }
 
         return (
-            <div key={bundleId} className="mhwc-item mhwc-item-2-step">
-                <div className="col-12 mhwc-name">
+            <div key={bundleId} className="mhrc-item mhrc-item-2-step">
+                <div className="col-12 mhrc-name">
                     <BasicInput placeholder={_('inputName')} bypassRef={refName} />
 
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="floppy-o" altName={_('save')}
                             onClick={() => {handleBundleSave(null)}} />
                     </div>
                 </div>
 
-                <div className="col-12 mhwc-content">
+                <div className="col-12 mhrc-content">
                     {Object.keys(stateCurrentEquips).map((equipType, index) => {
                         if (Helper.isEmpty(stateCurrentEquips[equipType])) {
                             return false
@@ -160,7 +160,7 @@ export default function BundleItemSelector(props) {
                                 equipInfo = CommonState.getter.getCustomWeapon()
 
                                 return Helper.isNotEmpty(equipInfo) ? (
-                                    <div key={equipType} className="col-6 mhwc-value">
+                                    <div key={equipType} className="col-6 mhrc-value">
                                         <span>{_(equipInfo.name)}: {_(equipInfo.type)}</span>
                                     </div>
                                 ) : false
@@ -179,7 +179,7 @@ export default function BundleItemSelector(props) {
                         }
 
                         return Helper.isNotEmpty(equipInfo) ? (
-                            <div key={index} className="col-6 mhwc-value">
+                            <div key={index} className="col-6 mhrc-value">
                                 <span>{_(equipInfo.name)}</span>
                             </div>
                         ) : false
@@ -191,12 +191,12 @@ export default function BundleItemSelector(props) {
 
     let renderItem = (data, index) => {
         return (
-            <div key={`${data.id}:${index}`} className="mhwc-item mhwc-item-2-step">
-                <div className="col-12 mhwc-name">
+            <div key={`${data.id}:${index}`} className="mhrc-item mhrc-item-2-step">
+                <div className="col-12 mhrc-name">
                     <BasicInput placeholder={_('inputName')} defaultValue={data.name}
                         bypassRef={refNameList.current[index]} />
 
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => {handleBundlePickUp(index)}} />
@@ -208,7 +208,7 @@ export default function BundleItemSelector(props) {
                             onClick={() => {handleBundleSave(index)}} />
                     </div>
                 </div>
-                <div className="col-12 mhwc-content">
+                <div className="col-12 mhrc-content">
                     {Object.keys(data.equips).map((equipType, index) => {
                         if (Helper.isEmpty(data.equips[equipType])) {
                             return false
@@ -221,7 +221,7 @@ export default function BundleItemSelector(props) {
                                 equipInfo = data.customWeapon
 
                                 return Helper.isNotEmpty(equipInfo) ? (
-                                    <div key={equipType} className="col-6 mhwc-value">
+                                    <div key={equipType} className="col-6 mhrc-value">
                                         <span>{_(equipInfo.name)}: {_(equipInfo.type)}</span>
                                     </div>
                                 ) : false
@@ -240,7 +240,7 @@ export default function BundleItemSelector(props) {
                         }
 
                         return Helper.isNotEmpty(equipInfo) ? (
-                            <div key={index} className="col-6 mhwc-value">
+                            <div key={index} className="col-6 mhrc-value">
                                 <span>{_(equipInfo.name)}</span>
                             </div>
                         ) : false
@@ -251,19 +251,19 @@ export default function BundleItemSelector(props) {
     }
 
     return stateIsShow ? (
-        <div className="mhwc-selector" ref={refModal} onClick={handleFastWindowClose}>
-            <div className="mhwc-modal">
-                <div className="mhwc-panel">
-                    <span className="mhwc-title">{_('bundleList')}</span>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
+            <div className="mhrc-modal">
+                <div className="mhrc-panel">
+                    <span className="mhrc-title">{_('bundleList')}</span>
 
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={ModalState.setter.hideBundleItemSelector} />
                     </div>
                 </div>
-                <div className="mhwc-list">
-                    <div className="mhwc-wrapper">
+                <div className="mhrc-list">
+                    <div className="mhrc-wrapper">
                         {renderDefaultItem()}
                         {stateReservedBundles.map(renderItem)}
                     </div>

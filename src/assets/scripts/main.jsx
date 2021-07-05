@@ -48,4 +48,4 @@ ReactDOM.render((
         <EquipItemSelector />
         <BundleItemSelector />
     </Router>
-), document.getElementById('mhwc'))
+), document.getElementById('mhrc'))

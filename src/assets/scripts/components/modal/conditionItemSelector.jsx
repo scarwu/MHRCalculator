@@ -41,11 +41,11 @@ const handleModeChange = (event) => {
  */
 const renderSetItem = (set) => {
     return (
-        <div key={set.id} className="mhwc-item mhwc-item-2-step">
-            <div className="col-12 mhwc-name">
+        <div key={set.id} className="mhrc-item mhrc-item-2-step">
+            <div className="col-12 mhrc-name">
                 <span>{_(set.name)}</span>
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     {set.isSelect ? (
                         <IconButton
                             iconName="minus" altName={_('remove')}
@@ -57,16 +57,16 @@ const renderSetItem = (set) => {
                     )}
                 </div>
             </div>
-            <div className="col-12 mhwc-content">
+            <div className="col-12 mhrc-content">
                 {set.skills.map((skill, index) => {
                     let skillInfo = SkillDataset.getInfo(skill.id)
 
                     return Helper.isNotEmpty(skillInfo) ? (
                         <Fragment key={index}>
-                            <div className="col-12 mhwc-name">
+                            <div className="col-12 mhrc-name">
                                 <span>({skill.require}) {_(skillInfo.name)} Lv.{skill.level}</span>
                             </div>
-                            <div className="col-12 mhwc-value mhwc-description">
+                            <div className="col-12 mhrc-value mhrc-description">
                                 <span>{_(skillInfo.list[0].description)}</span>
                             </div>
                         </Fragment>
@@ -79,11 +79,11 @@ const renderSetItem = (set) => {
 
 const renderSkillItem = (skill) => {
     return (
-        <div key={skill.id} className="mhwc-item mhwc-item-2-step">
-            <div className="col-12 mhwc-name">
+        <div key={skill.id} className="mhrc-item mhrc-item-2-step">
+            <div className="col-12 mhrc-name">
                 <span>{_(skill.name)}</span>
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     {skill.isSelect ? (
                         <IconButton
                             iconName="minus" altName={_('remove')}
@@ -95,18 +95,18 @@ const renderSkillItem = (skill) => {
                     )}
                 </div>
             </div>
-            <div className="col-12 mhwc-content">
+            <div className="col-12 mhrc-content">
                 {skill.list.map((item, index) => {
                     return (
                         <Fragment key={index}>
-                            <div className="col-2 mhwc-name">
+                            <div className="col-2 mhrc-name">
                                 {item.isHidden ? (
                                     <span>(Lv.{item.level})</span>
                                 ) : (
                                     <span>Lv.{item.level}</span>
                                 )}
                             </div>
-                            <div className="col-10 mhwc-value mhwc-description">
+                            <div className="col-10 mhrc-value mhrc-description">
                                 <span>{_(item.description)}</span>
                             </div>
                         </Fragment>
@@ -323,12 +323,12 @@ export default function ConditionItemSelector(props) {
     }, [stateMode, stateSortedList, stateSegment])
 
     return (stateIsShow && Helper.isNotEmpty(stateBypassData)) ? (
-        <div className="mhwc-selector" ref={refModal} onClick={handleFastWindowClose}>
-            <div className="mhwc-modal">
-                <div className="mhwc-panel">
-                    <span className="mhwc-title">{_(stateMode + 'List')}</span>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
+            <div className="mhrc-modal">
+                <div className="mhrc-panel">
+                    <span className="mhrc-title">{_(stateMode + 'List')}</span>
 
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
                             defaultValue={stateSegment} onChange={handleSegmentInput} />
@@ -340,8 +340,8 @@ export default function ConditionItemSelector(props) {
                             onClick={ModalState.setter.hideConditionItemSelector} />
                     </div>
                 </div>
-                <div className="mhwc-list">
-                    <div className="mhwc-wrapper">
+                <div className="mhrc-list">
+                    <div className="mhrc-wrapper">
                         {getContent()}
                     </div>
                 </div>

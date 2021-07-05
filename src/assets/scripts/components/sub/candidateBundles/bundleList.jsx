@@ -180,8 +180,8 @@ export default function BundleList(props) {
 
         if (0 === stateComputedResult.list.length) {
             return (
-                <div className="mhwc-item mhwc-item-3-step">
-                    <div className="col-12 mhwc-name">
+                <div className="mhrc-item mhrc-item-3-step">
+                    <div className="col-12 mhrc-name">
                         <span>{_('noResult')}</span>
                     </div>
                 </div>
@@ -333,10 +333,10 @@ export default function BundleList(props) {
             })
 
             return (
-                <div key={bundle.hash} className="mhwc-item mhwc-item-3-step">
-                    <div className="col-12 mhwc-name">
+                <div key={bundle.hash} className="mhrc-item mhrc-item-3-step">
+                    <div className="col-12 mhrc-name">
                         <span>{_('bundle')}: {bundleIndex + 1} / {bundleList.length}</span>
-                        <div className="mhwc-icons_bundle">
+                        <div className="mhrc-icons_bundle">
                             <IconButton
                                 iconName="check" altName={_('equip')}
                                 onClick={() => {handleBundlePickUp(bundle, bundleRequired)}} />
@@ -344,21 +344,21 @@ export default function BundleList(props) {
                     </div>
 
                     {Helper.isNotEmpty(bundle.meta.sortBy) ? (
-                        <div className="col-12 mhwc-content">
-                            <div className="col-4 mhwc-name">
+                        <div className="col-12 mhrc-content">
+                            <div className="col-4 mhrc-name">
                                 <span>{_(bundle.meta.sortBy.key + 'Sort')}</span>
                             </div>
-                            <div className="col-8 mhwc-value">
+                            <div className="col-8 mhrc-value">
                                 <span>{bundle.meta.sortBy.value}</span>
                             </div>
                         </div>
                     ) : false}
 
-                    <div className="col-12 mhwc-content">
-                        <div className="col-12 mhwc-name">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-12 mhrc-name">
                             <span>{_('requiredEquips')}</span>
                         </div>
-                        <div className="col-12 mhwc-content">
+                        <div className="col-12 mhrc-content">
                             {bundleEquips.map((equip) => {
                                 let isNotRequire = true
 
@@ -393,10 +393,10 @@ export default function BundleList(props) {
                                         equipInfo = equip.customWeapon
 
                                         return Helper.isNotEmpty(equipInfo) ? (
-                                            <div key={equip.type} className="col-6 mhwc-value">
+                                            <div key={equip.type} className="col-6 mhrc-value">
                                                 <span>{_(equipInfo.name)}: {_(equipInfo.type)}</span>
 
-                                                <div className="mhwc-icons_bundle">
+                                                <div className="mhrc-icons_bundle">
                                                     {isNotRequire ? (
                                                         <IconButton
                                                             iconName="arrow-left" altName={_('include')}
@@ -420,10 +420,10 @@ export default function BundleList(props) {
                                 }
 
                                 return Helper.isNotEmpty(equipInfo) ? (
-                                    <div key={equip.type} className="col-6 mhwc-value">
+                                    <div key={equip.type} className="col-6 mhrc-value">
                                         <span>{_(equipInfo.name)}</span>
 
-                                        <div className="mhwc-icons_bundle">
+                                        <div className="mhrc-icons_bundle">
                                             {isNotRequire ? (
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
@@ -437,11 +437,11 @@ export default function BundleList(props) {
                     </div>
 
                     {(0 !== bundleJewels.length) ? (
-                        <div key={bundleIndex + '_' + jewelPackageIndex} className="col-12 mhwc-content">
-                            <div className="col-12 mhwc-name">
+                        <div key={bundleIndex + '_' + jewelPackageIndex} className="col-12 mhrc-content">
+                            <div className="col-12 mhrc-name">
                                 <span>{_('requiredJewels')}</span>
                                 {1 < jewelPackageCount ? (
-                                    <div className="mhwc-icons_bundle">
+                                    <div className="mhrc-icons_bundle">
                                         <IconSwitch
                                             defaultValue={jewelPackageIndex}
                                             options={bundle.jewelPackages.map((jewelMapping, packageIndex) => {
@@ -456,12 +456,12 @@ export default function BundleList(props) {
                                     </div>
                                 ) : false}
                             </div>
-                            <div className="col-12 mhwc-content">
+                            <div className="col-12 mhrc-content">
                                 {bundleJewels.map((jewel) => {
                                     let jewelInfo = JewelDataset.getInfo(jewel.id)
 
                                     return (Helper.isNotEmpty(jewelInfo)) ? (
-                                        <div key={jewel.id} className="col-6 mhwc-value">
+                                        <div key={jewel.id} className="col-6 mhrc-value">
                                             <span>{`[${jewelInfo.size}] ${_(jewelInfo.name)} x ${jewel.count}`}</span>
                                         </div>
                                     ) : false
@@ -471,11 +471,11 @@ export default function BundleList(props) {
                     ) : false}
 
                     {(0 !== remainingSlotCountMapping.all) ? (
-                        <div className="col-12 mhwc-content">
-                            <div className="col-12 mhwc-name">
+                        <div className="col-12 mhrc-content">
+                            <div className="col-12 mhrc-name">
                                 <span>{_('remainingSlot')}</span>
                             </div>
-                            <div className="col-12 mhwc-content">
+                            <div className="col-12 mhrc-content">
                                 {Object.keys(remainingSlotCountMapping).map((slotSize) => {
                                     if ('all' === slotSize) {
                                         return
@@ -484,7 +484,7 @@ export default function BundleList(props) {
                                     let slotCount = remainingSlotCountMapping[slotSize]
 
                                     return (slotCount > 0) ? (
-                                        <div key={slotSize} className="col-4 mhwc-value">
+                                        <div key={slotSize} className="col-4 mhrc-value">
                                             <span>{`[${slotSize}] x ${slotCount}`}</span>
                                         </div>
                                     ) : false
@@ -494,23 +494,23 @@ export default function BundleList(props) {
                     ) : false}
 
                     {(0 !== additionalSets.length) ? (
-                        <div className="col-12 mhwc-content">
-                            <div className="col-12 mhwc-name">
+                        <div className="col-12 mhrc-content">
+                            <div className="col-12 mhrc-name">
                                 <span>{_('additionalSets')}</span>
                             </div>
-                            <div className="col-12 mhwc-content">
+                            <div className="col-12 mhrc-content">
                                 {additionalSets.map((set) => {
                                     let setInfo = SetDataset.getInfo(set.id)
 
                                     return (
-                                        <div key={set.id} className="col-6 mhwc-value">
+                                        <div key={set.id} className="col-6 mhrc-value">
                                             <span>
                                                 {`${_(setInfo.name)}`}{setInfo.skills.slice(0, set.step).map((skill) => {
                                                     return ` (${skill.require})`
                                                 })}
                                             </span>
                                             {(-1 === requiredSetIds.indexOf(setInfo.id)) ? (
-                                                <div className="mhwc-icons_bundle">
+                                                <div className="mhrc-icons_bundle">
                                                     <IconButton
                                                         iconName="arrow-left" altName={_('include')}
                                                         onClick={() => {CommonState.setter.addRequiredSet(setInfo.id)}} />
@@ -524,19 +524,19 @@ export default function BundleList(props) {
                     ) : false}
 
                     {(0 !== additionalSkills.length) ? (
-                        <div className="col-12 mhwc-content">
-                            <div className="col-12 mhwc-name">
+                        <div className="col-12 mhrc-content">
+                            <div className="col-12 mhrc-name">
                                 <span>{_('additionalSkills')}</span>
                             </div>
-                            <div className="col-12 mhwc-content">
+                            <div className="col-12 mhrc-content">
                                 {additionalSkills.map((skill) => {
                                     let skillInfo = SkillDataset.getInfo(skill.id)
 
                                     return (Helper.isNotEmpty(skillInfo)) ? (
-                                        <div key={skill.id} className="col-6 mhwc-value">
+                                        <div key={skill.id} className="col-6 mhrc-value">
                                             <span>{`${_(skillInfo.name)} Lv.${skill.level}`}</span>
                                             {(-1 === requiredSkillIds.indexOf(skillInfo.id)) ? (
-                                                <div className="mhwc-icons_bundle">
+                                                <div className="mhrc-icons_bundle">
                                                     <IconButton
                                                         iconName="arrow-left" altName={_('include')}
                                                         onClick={() => {CommonState.setter.addRequiredSkill(skillInfo.id)}} />

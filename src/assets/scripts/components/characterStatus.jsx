@@ -707,134 +707,134 @@ export default function CharacterStatus(props) {
     }
 
     return (
-        <div className="col mhwc-status">
-            <div className="mhwc-panel">
-                <span className="mhwc-title">{_('status')}</span>
+        <div className="col mhrc-status">
+            <div className="mhrc-panel">
+                <span className="mhrc-title">{_('status')}</span>
             </div>
 
-            <div className="mhwc-list">
-                <div className="mhwc-item mhwc-item-3-step">
-                    <div className="col-12 mhwc-name">
+            <div className="mhrc-list">
+                <div className="mhrc-item mhrc-item-3-step">
+                    <div className="col-12 mhrc-name">
                         <span>{_('benefitAnalysis')}</span>
                     </div>
-                    <div className="col-12 mhwc-content">
-                        <div className="col-3 mhwc-name">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-3 mhrc-name">
                             <span>{_('physicalAttack')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.physicalAttack}</span>
                         </div>
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('elementAttack')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.elementAttack}</span>
                         </div>
 
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('physicalCriticalAttack')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.physicalCriticalAttack}</span>
                         </div>
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('elementCriticalAttack')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.elementCriticalAttack}</span>
                         </div>
 
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('physicalEV')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.physicalExpectedValue}</span>
                         </div>
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('elementEV')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.elementExpectedValue}</span>
                         </div>
 
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('totalEV')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.expectedValue}</span>
                         </div>
                     </div>
-                    <div className="col-12 mhwc-content">
-                        <div className="col-6 mhwc-name mhwc-input-ev">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-6 mhrc-name mhrc-input-ev">
                             <span>{_('perPhysicalAttackEV')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <BasicInput defaultValue={stateTuning.physicalAttack}
                                 bypassRef={refTuningPhysicalAttack} onChange={handleTuningChange} />
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perPhysicalAttackExpectedValue}</span>
                         </div>
-                        <div className="col-6 mhwc-name mhwc-input-ev">
+                        <div className="col-6 mhrc-name mhrc-input-ev">
                             <span>{_('perCriticalRateEV')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <BasicInput defaultValue={stateTuning.physicalCriticalRate}
                                 bypassRef={refTuningPhysicalCriticalRate} onChange={handleTuningChange} />
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perPhysicalCriticalRateExpectedValue}</span>
                         </div>
-                        <div className="col-6 mhwc-name mhwc-input-ev">
+                        <div className="col-6 mhrc-name mhrc-input-ev">
                             <span>{_('perCriticalMultipleEV')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <BasicInput defaultValue={stateTuning.physicalCriticalMultiple}
                                 bypassRef={refTuningPhysicalCriticalMultiple} onChange={handleTuningChange} />
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perPhysicalCriticalMultipleExpectedValue}</span>
                         </div>
-                        <div className="col-6 mhwc-name mhwc-input-ev">
+                        <div className="col-6 mhrc-name mhrc-input-ev">
                             <span>{_('perElementAttackEV')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <BasicInput defaultValue={stateTuning.elementAttack}
                                 bypassRef={refTuningElementAttack} onChange={handleTuningChange} />
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perElementAttackExpectedValue}</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="mhwc-item mhwc-item-3-step">
-                    <div className="col-12 mhwc-name">
+                <div className="mhrc-item mhrc-item-3-step">
+                    <div className="col-12 mhrc-name">
                         <span>{_('property')}</span>
                     </div>
-                    <div className="col-12 mhwc-content">
-                        <div className="col-3 mhwc-name">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-3 mhrc-name">
                             <span>{_('health')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{status.health}</span>
                         </div>
 
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('stamina')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{status.stamina}</span>
                         </div>
                     </div>
 
-                    <div className="col-12 mhwc-content">
+                    <div className="col-12 mhrc-content">
                         {Helper.isNotEmpty(status.sharpness) ? (
                             <Fragment>
-                                <div className="col-3 mhwc-name">
+                                <div className="col-3 mhrc-name">
                                     <span>{_('sharpness')}</span>
                                 </div>
-                                <div className="col-9 mhwc-value mhwc-sharpness">
+                                <div className="col-9 mhrc-value mhrc-sharpness">
                                     <SharpnessBar
                                         key={Helper.jsonHash(originalSharpness) + ':1'}
                                         data={originalSharpness} />
@@ -845,24 +845,24 @@ export default function CharacterStatus(props) {
                             </Fragment>
                         ) : false}
 
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('attack')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{status.attack}</span>
                         </div>
 
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('criticalRate')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{status.critical.rate}%</span>
                         </div>
 
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('criticalMultiple')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             {(0 <= status.critical.rate) ? (
                                 <span>{status.critical.multiple.positive}x</span>
                             ) : (
@@ -874,10 +874,10 @@ export default function CharacterStatus(props) {
                             && Helper.isNotEmpty(status.element.attack)
                         ) ? (
                             <Fragment>
-                                <div className="col-3 mhwc-name">
+                                <div className="col-3 mhrc-name">
                                     <span>{_('element')}: {_(status.element.attack.type)}</span>
                                 </div>
-                                <div className="col-3 mhwc-value">
+                                <div className="col-3 mhrc-value">
                                     {status.element.attack.isHidden ? (
                                         <span>({status.element.attack.value})</span>
                                     ) : (
@@ -891,10 +891,10 @@ export default function CharacterStatus(props) {
                             && Helper.isNotEmpty(status.element.status)
                         ) ? (
                             <Fragment>
-                                <div className="col-3 mhwc-name">
+                                <div className="col-3 mhrc-name">
                                     <span>{_('element')}: {_(status.element.status.type)}</span>
                                 </div>
-                                <div className="col-3 mhwc-value">
+                                <div className="col-3 mhrc-value">
                                     {status.element.status.isHidden ? (
                                         <span>({status.element.status.value})</span>
                                     ) : (
@@ -906,31 +906,31 @@ export default function CharacterStatus(props) {
 
                         {(Helper.isNotEmpty(status.elderseal)) ? (
                             <Fragment>
-                                <div className="col-3 mhwc-name">
+                                <div className="col-3 mhrc-name">
                                     <span>{_('elderseal')}</span>
                                 </div>
-                                <div className="col-3 mhwc-value">
+                                <div className="col-3 mhrc-value">
                                     <span>{_(status.elderseal.affinity)}</span>
                                 </div>
                             </Fragment>
                         ) : false}
                     </div>
 
-                    <div className="col-12 mhwc-content">
-                        <div className="col-3 mhwc-name">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-3 mhrc-name">
                             <span>{_('defense')}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             <span>{status.defense}</span>
                         </div>
 
                         {Constant.resistances.map((elementType) => {
                             return (
                                 <Fragment key={elementType}>
-                                    <div className="col-3 mhwc-name">
+                                    <div className="col-3 mhrc-name">
                                         <span>{_('resistance')}: {_(elementType)}</span>
                                     </div>
-                                    <div className="col-3 mhwc-value">
+                                    <div className="col-3 mhrc-value">
                                         <span>{status.resistance[elementType]}</span>
                                     </div>
                                 </Fragment>
@@ -940,8 +940,8 @@ export default function CharacterStatus(props) {
                 </div>
 
                 {(0 !== status.sets.length) ? (
-                    <div className="mhwc-item mhwc-item-3-step">
-                        <div className="col-12 mhwc-name">
+                    <div className="mhrc-item mhrc-item-3-step">
+                        <div className="col-12 mhrc-name">
                             <span>{_('set')}</span>
                         </div>
                         {status.sets.map((data, index) => {
@@ -951,11 +951,11 @@ export default function CharacterStatus(props) {
                             return (Helper.isNotEmpty(setInfo)
                                 && Helper.isNotEmpty(skillInfo))
                             ? (
-                                <div key={`${index}:${data.id}`} className="col-12 mhwc-content">
-                                    <div className="col-12 mhwc-name">
+                                <div key={`${index}:${data.id}`} className="col-12 mhrc-content">
+                                    <div className="col-12 mhrc-name">
                                         <span>{_(setInfo.name)} ({data.require})</span>
                                     </div>
-                                    <div className="col-12 mhwc-value">
+                                    <div className="col-12 mhrc-value">
                                         <span>{_(skillInfo.name)} Lv.{data.skill.level}</span>
                                     </div>
                                 </div>
@@ -965,8 +965,8 @@ export default function CharacterStatus(props) {
                 ) : false}
 
                 {(0 !== status.skills.length) ? (
-                    <div className="mhwc-item mhwc-item-3-step">
-                        <div className="col-12 mhwc-name">
+                    <div className="mhrc-item mhrc-item-3-step">
+                        <div className="col-12 mhrc-name">
                             <span>{_('skill')}</span>
                         </div>
                         {status.skills.sort((skillA, skillB) => {
@@ -975,11 +975,11 @@ export default function CharacterStatus(props) {
                             let skillInfo = SkillDataset.getInfo(data.id)
 
                             return (Helper.isNotEmpty(skillInfo)) ? (
-                                <div key={data.id} className="col-12 mhwc-content">
-                                    <div className="col-12 mhwc-name">
+                                <div key={data.id} className="col-12 mhrc-content">
+                                    <div className="col-12 mhrc-name">
                                         <span>{_(skillInfo.name)} Lv.{data.level}</span>
 
-                                        <div className="mhwc-icons_bundle">
+                                        <div className="mhrc-icons_bundle">
                                             {Helper.isNotEmpty(passiveSkills[data.id]) ? (
                                                 <IconButton
                                                     iconName={passiveSkills[data.id].isActive ? 'eye' : 'eye-slash'}
@@ -988,7 +988,7 @@ export default function CharacterStatus(props) {
                                             ) : false}
                                         </div>
                                     </div>
-                                    <div className="col-12 mhwc-value mhwc-description">
+                                    <div className="col-12 mhrc-value mhrc-description">
                                         <span>{_(data.description)}</span>
                                     </div>
                                 </div>

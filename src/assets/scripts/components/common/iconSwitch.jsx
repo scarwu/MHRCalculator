@@ -50,19 +50,19 @@ export default function IconSwitch(props) {
         }
 
         return (
-            <div className="mhwc-icon_switch">
-                <div className="mhwc-body">
-                    <a className="mhwc-icon" onClick={handlePrev}>
+            <div className="mhrc-icon_switch">
+                <div className="mhrc-body">
+                    <a className="mhrc-icon" onClick={handlePrev}>
                         <i className="fa fa-chevron-left"></i>
                     </a>
-                    <select className="mhwc-select" value={defaultValue} onChange={handleChange}>
+                    <select className="mhrc-select" value={defaultValue} onChange={handleChange}>
                         {options.map((option) => {
                             return (
                                 <option key={option.key} value={option.key}>{option.value}</option>
                             )
                         })}
                     </select>
-                    <a className="mhwc-icon" onClick={handleNext}>
+                    <a className="mhrc-icon" onClick={handleNext}>
                         <i className="fa fa-chevron-right"></i>
                     </a>
                 </div>

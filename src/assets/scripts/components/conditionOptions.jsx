@@ -58,11 +58,11 @@ export default function ConditionOptions(props) {
     }, [])
 
     return (
-        <div className="col mhwc-conditions">
-            <div className="mhwc-panel">
-                <span className="mhwc-title">{_('requireCondition')}</span>
+        <div className="col mhrc-conditions">
+            <div className="mhrc-panel">
+                <span className="mhrc-title">{_('requireCondition')}</span>
 
-                <div className="mhwc-icons_bundle-left">
+                <div className="mhrc-icons_bundle-left">
                     <IconTab
                         iconName="circle-o" altName={_('tab') + ' 1'}
                         isActive={0 === stateTempData.conditionOptions.index}
@@ -81,14 +81,14 @@ export default function ConditionOptions(props) {
                         onClick={() => {handleSwitchTempData(3)}} />
                 </div>
 
-                <div className="mhwc-icons_bundle-right">
+                <div className="mhrc-icons_bundle-right">
                     <IconButton
                         iconName="refresh" altName={_('reset')}
                         onClick={handleRequireConditionRefresh} />
                 </div>
             </div>
 
-            <div className="mhwc-list">
+            <div className="mhrc-list">
                 <EquipList />
                 <SetList />
                 <SkillList />

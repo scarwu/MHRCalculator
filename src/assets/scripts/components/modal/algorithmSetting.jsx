@@ -167,12 +167,12 @@ export default function AlgorithmSetting(props) {
      * Render Functions
      */
     return stateIsShow ? (
-        <div className="mhwc-selector" ref={refModal} onClick={handleFastWindowClose}>
-            <div className="mhwc-modal">
-                <div className="mhwc-panel">
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
+            <div className="mhrc-modal">
+                <div className="mhrc-panel">
                     <strong>{_('algorithmSetting')}</strong>
 
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
                             defaultValue={stateSegment} onChange={handleSegmentInput} />
@@ -184,35 +184,35 @@ export default function AlgorithmSetting(props) {
                             onClick={ModalState.setter.hideAlgorithmSetting} />
                     </div>
                 </div>
-                <div className="mhwc-list">
-                    <div className="mhwc-wrapper">
-                        <div className="mhwc-item mhwc-item-2-step">
-                            <div className="col-12 mhwc-name">
+                <div className="mhrc-list">
+                    <div className="mhrc-wrapper">
+                        <div className="mhrc-item mhrc-item-2-step">
+                            <div className="col-12 mhrc-name">
                                 <span>{_('strategy')}</span>
                             </div>
-                            <div className="col-12 mhwc-content">
-                                <div className="col-6 mhwc-name">
+                            <div className="col-12 mhrc-content">
+                                <div className="col-6 mhrc-name">
                                     <span>{_('resultLimit')}</span>
                                 </div>
-                                <div className="col-6 mhwc-value">
+                                <div className="col-6 mhrc-value">
                                     <BasicInput
                                         iconName="list-alt"
                                         defaultValue={stateAlgorithmParams.limit}
                                         onChange={handleLimitChange} />
                                 </div>
-                                <div className="col-6 mhwc-name">
+                                <div className="col-6 mhrc-name">
                                     <span>{_('sortBy')}</span>
                                 </div>
-                                <div className="col-6 mhwc-value">
+                                <div className="col-6 mhrc-value">
                                     <BasicSelector
                                         iconName="sort-amount-desc"
                                         defaultValue={stateAlgorithmParams.sort}
                                         options={getSortList()} onChange={handleSortChange} />
                                 </div>
-                                <div className="col-6 mhwc-name">
+                                <div className="col-6 mhrc-name">
                                     <span>{_('sortOrder')}</span>
                                 </div>
-                                <div className="col-6 mhwc-value">
+                                <div className="col-6 mhrc-value">
                                     <BasicSelector
                                         iconName="sort-amount-desc"
                                         defaultValue={stateAlgorithmParams.order}
@@ -222,16 +222,16 @@ export default function AlgorithmSetting(props) {
                         </div>
 
                         {'all' === stateMode || 'armorFactor' === stateMode || 'byRequiredConditions' === stateMode ? (
-                            <div className="mhwc-item mhwc-item-2-step">
-                                <div className="col-12 mhwc-name">
+                            <div className="mhrc-item mhrc-item-2-step">
+                                <div className="col-12 mhrc-name">
                                     <span>{_('armorFactor')}</span>
                                 </div>
-                                <div className="col-12 mhwc-content">
+                                <div className="col-12 mhrc-content">
                                     {armorRareList.map((rare) => {
                                         return (
-                                            <div key={rare} className="col-6 mhwc-value">
+                                            <div key={rare} className="col-6 mhrc-value">
                                                 <span>{_('rare') + `: ${rare}`}</span>
-                                                <div className="mhwc-icons_bundle">
+                                                <div className="mhrc-icons_bundle">
                                                     {stateAlgorithmParams.usingFactor.armor['rare' + rare] ? (
                                                         <IconButton
                                                             iconName="star"
@@ -252,16 +252,16 @@ export default function AlgorithmSetting(props) {
                         ) : false}
 
                         {'all' === stateMode || 'jewelFactor' === stateMode || 'byRequiredConditions' === stateMode ? (
-                            <div className="mhwc-item mhwc-item-2-step">
-                                <div className="col-12 mhwc-name">
+                            <div className="mhrc-item mhrc-item-2-step">
+                                <div className="col-12 mhrc-name">
                                     <span>{_('jewelFactor')}</span>
                                 </div>
-                                <div className="col-12 mhwc-content">
+                                <div className="col-12 mhrc-content">
                                     {jewelSizeList.map((size) => {
                                         return (
-                                            <div key={size} className="col-6 mhwc-value">
+                                            <div key={size} className="col-6 mhrc-value">
                                                 <span>{_('size') + `: ${size}`}</span>
-                                                <div className="mhwc-icons_bundle">
+                                                <div className="mhrc-icons_bundle">
                                                     {stateAlgorithmParams.usingFactor.jewel['size' + size] ? (
                                                         <IconButton
                                                             iconName="star"

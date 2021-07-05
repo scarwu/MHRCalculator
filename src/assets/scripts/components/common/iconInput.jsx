@@ -20,12 +20,12 @@ export default function IconInput(props) {
         Helper.debug('Component: Common -> IconInput')
 
         return (
-            <div className="mhwc-icon_input">
-                <div className="mhwc-body">
-                    <div className="mhwc-icon">
+            <div className="mhrc-icon_input">
+                <div className="mhrc-body">
+                    <div className="mhrc-icon">
                         <i className={`fa fa-${iconName}`}></i>
                     </div>
-                    <input className="mhwc-input" type="text"
+                    <input className="mhrc-input" type="text"
                         defaultValue={defaultValue}
                         placeholder={placeholder}
                         onBlur={onChange}

@@ -20,8 +20,8 @@ export default function BasicSelector(props) {
         Helper.debug('Component: Common -> BasicSelector')
 
         return (
-            <div className="mhwc-basic_selector">
-                <select className="mhwc-select" value={defaultValue} onChange={onChange}>
+            <div className="mhrc-basic_selector">
+                <select className="mhrc-select" value={defaultValue} onChange={onChange}>
                     {options.map((option) => {
                         return (
                             <option key={option.key} value={option.key}>{option.value}</option>

@@ -20,12 +20,12 @@ export default function IconSelector(props) {
         Helper.debug('Component: Common -> IconSelector')
 
         return (
-            <div className="mhwc-icon_selector">
-                <div className="mhwc-body">
-                    <div className="mhwc-icon">
+            <div className="mhrc-icon_selector">
+                <div className="mhrc-body">
+                    <div className="mhrc-icon">
                         <i className={`fa fa-${iconName}`}></i>
                     </div>
-                    <select className="mhwc-select" value={defaultValue} onChange={onChange}>
+                    <select className="mhrc-select" value={defaultValue} onChange={onChange}>
                         {options.map((option) => {
                             return (
                                 <option key={option.key} value={option.key}>{option.value}</option>

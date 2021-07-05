@@ -52,11 +52,11 @@ const getChangelog = () => {
         let [all, title, content] = log.trim().match(/^\<h3.+\>(.+)\<\/h3\>(.+)$/)
 
         return (
-            <div key={index} className="mhwc-item mhwc-item-2-step">
-                <div className="col-12 mhwc-name">
+            <div key={index} className="mhrc-item mhrc-item-2-step">
+                <div className="col-12 mhrc-name">
                     <span>{title}</span>
                 </div>
-                <div className="col-12 mhwc-value mhwc-description"
+                <div className="col-12 mhrc-value mhrc-description"
                      dangerouslySetInnerHTML={{__html: content}}></div>
             </div>
         )
@@ -97,19 +97,19 @@ export default function Changelog(props) {
     }, [])
 
     return stateIsShow ? (
-        <div className="mhwc-selector" ref={refModal} onClick={handleFastWindowClose}>
-            <div className="mhwc-modal mhwc-slim-modal">
-                <div className="mhwc-panel">
-                    <span className="mhwc-title">{_('changelog')}</span>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
+            <div className="mhrc-modal mhrc-slim-modal">
+                <div className="mhrc-panel">
+                    <span className="mhrc-title">{_('changelog')}</span>
 
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={ModalState.setter.hideChangelog} />
                     </div>
                 </div>
-                <div className="mhwc-list">
-                    <div className="mhwc-wrapper">
+                <div className="mhrc-list">
+                    <div className="mhrc-wrapper">
                         {getChangelog()}
                     </div>
                 </div>

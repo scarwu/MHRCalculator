@@ -56,15 +56,15 @@ const renderSkillItem = (skill, enableSkillIdList) => {
     })
 
     return (
-        <div key={skillInfo.id} className="col-12 mhwc-content">
-            <div className="col-12 mhwc-name">
+        <div key={skillInfo.id} className="col-12 mhrc-content">
+            <div className="col-12 mhrc-name">
                 {(currentSkillLevel === totalSkillLevel) ? (
                     <span>{_(skillInfo.name)} Lv.{skill.level} / {currentSkillLevel}</span>
                 ) : (
                     <span>{_(skillInfo.name)} Lv.{skill.level} / {currentSkillLevel} ({totalSkillLevel})</span>
                 )}
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="minus-circle" altName={_('down')}
                         onClick={() => {CommonState.setter.decreaseRequiredSkillLevel(skill.id)}} />
@@ -76,7 +76,7 @@ const renderSkillItem = (skill, enableSkillIdList) => {
                         onClick={() => {CommonState.setter.removeRequiredSkill(skill.id)}} />
                 </div>
             </div>
-            <div className="col-12 mhwc-value mhwc-description">
+            <div className="col-12 mhrc-value mhrc-description">
                 <span>
                     {(0 !== skill.level)
                         ? _(skillInfo.list[skill.level - 1].description)
@@ -147,10 +147,10 @@ export default function SkillList(props) {
         })
 
         return (
-            <div className="mhwc-item mhwc-item-3-step">
-                <div className="col-12 mhwc-name">
+            <div className="mhrc-item mhrc-item-3-step">
+                <div className="col-12 mhrc-name">
                     <span>{_('skill')}</span>
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="plus" altName={_('add')}
                             onClick={handleShowSkillItemSelector} />

@@ -209,7 +209,7 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
 
     if (Helper.isEmpty(jewelInfo)) {
         return (
-            <div key={`${equipType}:${slotIndex}:${slotSize}`} className="mhwc-icons_bundle">
+            <div key={`${equipType}:${slotIndex}:${slotSize}`} className="mhrc-icons_bundle">
                 <IconButton
                     iconName="plus" altName={_('add')}
                     onClick={() => {ModalState.setter.showEquipItemSelector(selectorData)}} />
@@ -220,7 +220,7 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
     return (
         <Fragment key={`${equipType}:${slotIndex}:${slotSize}`}>
             <span>[{jewelInfo.size}] {_(jewelInfo.name)}</span>
-            <div className="mhwc-icons_bundle">
+            <div className="mhrc-icons_bundle">
                 <IconButton
                     iconName="exchange" altName={_('change')}
                     onClick={() => {ModalState.setter.showEquipItemSelector(selectorData)}} />
@@ -284,10 +284,10 @@ export default function CustomWeapon(props) {
         }
 
         return (
-            <div key="customWeapon" className="mhwc-item mhwc-item-3-step">
-                <div className="col-12 mhwc-name">
+            <div key="customWeapon" className="mhrc-item mhrc-item-3-step">
+                <div className="col-12 mhrc-name">
                     <span>{_('customWeapon')}</span>
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         {isNotRequire ? (
                             <IconButton
                                 iconName="arrow-left" altName={_('include')}
@@ -302,11 +302,11 @@ export default function CustomWeapon(props) {
                     </div>
                 </div>
 
-                <div className="col-12 mhwc-content">
-                    <div className="col-3 mhwc-name">
+                <div className="col-12 mhrc-content">
+                    <div className="col-3 mhrc-name">
                         <span>{_('type')}</span>
                     </div>
-                    <div className="col-9 mhwc-value">
+                    <div className="col-9 mhrc-value">
                         <BasicSelector
                             defaultValue={getValue(stateCustomWeapon.type)}
                             options={getTypeList()} onChange={(event) => {
@@ -317,10 +317,10 @@ export default function CustomWeapon(props) {
                             }} />
                     </div>
 
-                    <div className="col-3 mhwc-name">
+                    <div className="col-3 mhrc-name">
                         <span>{_('rare')}</span>
                     </div>
-                    <div className="col-3 mhwc-value">
+                    <div className="col-3 mhrc-value">
                         <BasicSelector
                             defaultValue={getValue(stateCustomWeapon.rare)}
                             options={getRareList()} onChange={(event) => {
@@ -330,10 +330,10 @@ export default function CustomWeapon(props) {
                             }} />
                     </div>
 
-                    <div className="col-3 mhwc-name">
+                    <div className="col-3 mhrc-name">
                         <span>{_('attack')}</span>
                     </div>
-                    <div className="col-3 mhwc-value">
+                    <div className="col-3 mhrc-value">
                         <BasicInput
                             key={stateCustomWeapon.attack}
                             defaultValue={stateCustomWeapon.attack} onChange={(event) => {
@@ -344,10 +344,10 @@ export default function CustomWeapon(props) {
                             }} />
                     </div>
 
-                    <div className="col-3 mhwc-name">
+                    <div className="col-3 mhrc-name">
                         <span>{_('sharpness')}</span>
                     </div>
-                    <div className="col-3 mhwc-value">
+                    <div className="col-3 mhrc-value">
                         {(-1 === ['lightBowgun', 'heavyBowgun', 'bow'].indexOf(stateCustomWeapon.type)) ? (
                             <BasicSelector
                                 defaultValue={getSharpnessStep(stateCustomWeapon.sharpness)}
@@ -360,10 +360,10 @@ export default function CustomWeapon(props) {
                         ) : false}
                     </div>
 
-                    <div className="col-3 mhwc-name">
+                    <div className="col-3 mhrc-name">
                         <span>{_('criticalRate')}</span>
                     </div>
-                    <div className="col-3 mhwc-value">
+                    <div className="col-3 mhrc-value">
                         <BasicInput
                             key={stateCustomWeapon.criticalRate}
                             defaultValue={stateCustomWeapon.criticalRate} onChange={() => {
@@ -374,10 +374,10 @@ export default function CustomWeapon(props) {
                             }} />
                     </div>
 
-                    <div className="col-3 mhwc-name">
+                    <div className="col-3 mhrc-name">
                         <span>{_('elderseal')}</span>
                     </div>
-                    <div className="col-3 mhwc-value">
+                    <div className="col-3 mhrc-value">
                         {('dragon' === getElementType(stateCustomWeapon.element.attack)) ? (
                             <BasicSelector
                                 defaultValue={getValue(stateCustomWeapon.elderseal.affinity)}
@@ -390,10 +390,10 @@ export default function CustomWeapon(props) {
                         ) : false}
                     </div>
 
-                    <div className="col-3 mhwc-name">
+                    <div className="col-3 mhrc-name">
                         <span>{_('defense')}</span>
                     </div>
-                    <div className="col-3 mhwc-value">
+                    <div className="col-3 mhrc-value">
                         <BasicInput
                             key={stateCustomWeapon.defense}
                             defaultValue={stateCustomWeapon.defense} onChange={() => {
@@ -405,11 +405,11 @@ export default function CustomWeapon(props) {
                     </div>
                 </div>
 
-                <div className="col-12 mhwc-content">
-                    <div className="col-3 mhwc-name">
+                <div className="col-12 mhrc-content">
+                    <div className="col-3 mhrc-name">
                         <span>{_('element')}: 1</span>
                     </div>
-                    <div className="col-3 mhwc-value">
+                    <div className="col-3 mhrc-value">
                         <BasicSelector
                             defaultValue={getElementType(stateCustomWeapon.element.attack)}
                             options={getAttackElementList()} onChange={(event) => {
@@ -419,7 +419,7 @@ export default function CustomWeapon(props) {
                                 CommonState.setter.setCustomWeaponElementType('attack', value)
                             }} />
                     </div>
-                    <div className="col-6 mhwc-value">
+                    <div className="col-6 mhrc-value">
                         {('none' !== getElementType(stateCustomWeapon.element.attack)) ? (
                             <BasicInput
                                 key={stateCustomWeapon.element.attack.minValue}
@@ -431,10 +431,10 @@ export default function CustomWeapon(props) {
                                 }} />
                         ) : false}
                     </div>
-                    <div className="col-3 mhwc-name">
+                    <div className="col-3 mhrc-name">
                         <span>{_('element')}: 2</span>
                     </div>
-                    <div className="col-3 mhwc-value">
+                    <div className="col-3 mhrc-value">
                         <BasicSelector
                             defaultValue={getElementType(stateCustomWeapon.element.status)}
                             options={getStatusElementList()} onChange={(event) => {
@@ -444,7 +444,7 @@ export default function CustomWeapon(props) {
                                 CommonState.setter.setCustomWeaponElementType('status', value)
                             }} />
                     </div>
-                    <div className="col-6 mhwc-value">
+                    <div className="col-6 mhrc-value">
                         {('none' !== getElementType(stateCustomWeapon.element.status)) ? (
                             <BasicInput
                                 key={stateCustomWeapon.element.status.minValue}
@@ -458,15 +458,15 @@ export default function CustomWeapon(props) {
                     </div>
                 </div>
 
-                <div className="col-12 mhwc-content">
+                <div className="col-12 mhrc-content">
                     {[...Array(stateCustomWeapon.slots.length + 1 <= 3
                         ? stateCustomWeapon.slots.length + 1 : 3).keys()].map((index) => {
                         return (
                             <Fragment key={index}>
-                                <div className="col-3 mhwc-name">
+                                <div className="col-3 mhrc-name">
                                     <span>{_('slot')}: {index + 1}</span>
                                 </div>
-                                <div className="col-3 mhwc-value">
+                                <div className="col-3 mhrc-value">
                                     <BasicSelector
                                         defaultValue={getSlotSize(stateCustomWeapon.slots[index])}
                                         options={getSlotSizeList()} onChange={(event) => {
@@ -476,7 +476,7 @@ export default function CustomWeapon(props) {
                                             CommonState.setter.setCustomWeaponSlot(index, value)
                                         }} />
                                 </div>
-                                <div className="col-6 mhwc-value">
+                                <div className="col-6 mhrc-value">
                                     {('none' !== getSlotSize(stateCustomWeapon.slots[index])) ? (
                                         renderJewelOption(
                                             equipType, index,
@@ -490,11 +490,11 @@ export default function CustomWeapon(props) {
                     })}
                 </div>
 
-                <div className="col-12 mhwc-content">
-                    <div className="col-3 mhwc-name">
+                <div className="col-12 mhrc-content">
+                    <div className="col-3 mhrc-name">
                         <span>{_('skill')}</span>
                     </div>
-                    <div className="col-9 mhwc-value">
+                    <div className="col-9 mhrc-value">
                         <BasicSelector
                             defaultValue={getSkillId(stateCustomWeapon.skills[0])}
                             options={getSkillList()} onChange={(event) => {
@@ -505,10 +505,10 @@ export default function CustomWeapon(props) {
                             }} />
                     </div>
 
-                    <div className="col-3 mhwc-name">
+                    <div className="col-3 mhrc-name">
                         <span>{_('set')}</span>
                     </div>
-                    <div className="col-9 mhwc-value">
+                    <div className="col-9 mhrc-value">
                         <BasicSelector
                             defaultValue={getSetId(stateCustomWeapon.set)}
                             options={getSetList()} onChange={(event) => {

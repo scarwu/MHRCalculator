@@ -229,11 +229,11 @@ export default function CandidateBundles(props) {
     let tabIndex = stateTempData.candidateBundles.index
 
     return (
-        <div className="col mhwc-bundles">
-            <div className="mhwc-panel">
-                <span className="mhwc-title">{_('candidateBundle')}</span>
+        <div className="col mhrc-bundles">
+            <div className="mhrc-panel">
+                <span className="mhrc-title">{_('candidateBundle')}</span>
 
-                <div className="mhwc-icons_bundle-left">
+                <div className="mhrc-icons_bundle-left">
                     <IconTab
                         iconName={Helper.isNotEmpty(stateTasks[0]) ? 'cog fa-spin' : 'circle-o'}
                         altName={_('tab') + ' 1'}
@@ -256,7 +256,7 @@ export default function CandidateBundles(props) {
                         onClick={() => {handleSwitchTempData(3)}} />
                 </div>
 
-                <div className="mhwc-icons_bundle-right">
+                <div className="mhrc-icons_bundle-right">
                     <IconButton
                         iconName="refresh" altName={_('reset')}
                         onClick={CommonState.setter.cleanComputedResult} />
@@ -269,35 +269,35 @@ export default function CandidateBundles(props) {
                 </div>
             </div>
 
-            <div key="list" className="mhwc-list">
+            <div key="list" className="mhrc-list">
                 {Helper.isNotEmpty(stateTasks[tabIndex]) ? (
                     <Fragment>
-                        <div className="mhwc-item mhwc-item-3-step">
-                            <div className="col-12 mhwc-name">
+                        <div className="mhrc-item mhrc-item-3-step">
+                            <div className="col-12 mhrc-name">
                                 <span>{_('searching')} ...</span>
-                                <div className="mhwc-icons_bundle">
+                                <div className="mhrc-icons_bundle">
                                     <IconButton
                                         iconName="times" altName={_('cancel')}
                                         onClick={handleCandidateBundlesCancel} />
                                 </div>
                             </div>
-                            <div className="col-12 mhwc-content">
-                                <div className="col-3 mhwc-name">
+                            <div className="col-12 mhrc-content">
+                                <div className="col-3 mhrc-name">
                                     <span>{_('bundleCount')}</span>
                                 </div>
-                                <div className="col-3 mhwc-value">
+                                <div className="col-3 mhrc-value">
                                     <span>{stateTasks[tabIndex].bundleCount}</span>
                                 </div>
-                                <div className="col-3 mhwc-name">
+                                <div className="col-3 mhrc-name">
                                     <span>{_('searchPercent')}</span>
                                 </div>
-                                <div className="col-3 mhwc-value">
+                                <div className="col-3 mhrc-value">
                                     <span>{stateTasks[tabIndex].searchPercent} %</span>
                                 </div>
-                                <div className="col-3 mhwc-name">
+                                <div className="col-3 mhrc-name">
                                     <span>{_('timeRemaining')}</span>
                                 </div>
-                                <div className="col-9 mhwc-value">
+                                <div className="col-9 mhrc-value">
                                     <span>{convertTimeFormat(stateTasks[tabIndex].timeRemaining)}</span>
                                 </div>
                             </div>

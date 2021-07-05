@@ -221,8 +221,8 @@ export default function QuickSetting(props) {
         let jewelFactor = stateAlgorithmParams.usingFactor.jewel
 
         return (
-            <div className="mhwc-item mhwc-item-3-step">
-                <div className="col-12 mhwc-name">
+            <div className="mhrc-item mhrc-item-3-step">
+                <div className="col-12 mhrc-name">
                     <span>{_('quickSetting')}</span>
                 </div>
 
@@ -230,12 +230,12 @@ export default function QuickSetting(props) {
                     return rareA > rareB ? 1 : -1
                 }).map((rare) => {
                     return (
-                        <div key={rare} className="col-12 mhwc-content">
-                            <div className="col-12 mhwc-name">
+                        <div key={rare} className="col-12 mhrc-content">
+                            <div className="col-12 mhrc-name">
                                 <span>{_('armorFactor')}: R{rare}</span>
                             </div>
 
-                            <div className="col-12 mhwc-content">
+                            <div className="col-12 mhrc-content">
                                 {Object.keys(armorSeriesMapping[rare]).sort((seriesIdA, seriesIdB) => {
                                     return _(seriesIdA) > _(seriesIdB) ? 1 : -1
                                 }).map((seriesId) => {
@@ -243,9 +243,9 @@ export default function QuickSetting(props) {
                                         ? armorFactor[seriesId] : true
 
                                     return (
-                                        <div key={seriesId} className="col-6 mhwc-value">
+                                        <div key={seriesId} className="col-6 mhrc-value">
                                             <span>{_(armorSeriesMapping[rare][seriesId].name)}</span>
-                                            <div className="mhwc-icons_bundle">
+                                            <div className="mhrc-icons_bundle">
                                                 {isInclude ? (
                                                     <IconButton
                                                         iconName="star"
@@ -267,12 +267,12 @@ export default function QuickSetting(props) {
                 }) : false}
 
                 {0 !== Object.keys(charmSeriesMapping).length ? (
-                    <div className="col-12 mhwc-content">
-                        <div className="col-12 mhwc-name">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-12 mhrc-name">
                             <span>{_('charmFactor')}</span>
                         </div>
 
-                        <div className="col-12 mhwc-content">
+                        <div className="col-12 mhrc-content">
                             {Object.keys(charmSeriesMapping).sort((seriesIdA, seriesIdB) => {
                                 return _(seriesIdA) > _(seriesIdB) ? 1 : -1
                             }).map((seriesId) => {
@@ -289,9 +289,9 @@ export default function QuickSetting(props) {
                                 })
 
                                 return (
-                                    <div key={seriesId} className="col-6 mhwc-value">
+                                    <div key={seriesId} className="col-6 mhrc-value">
                                         <span>{_(charmSeriesMapping[seriesId].series)}</span>
-                                        <div className="mhwc-icons_bundle">
+                                        <div className="mhrc-icons_bundle">
                                             <BasicSelector
                                                 iconName="sort-numeric-asc"
                                                 defaultValue={selectLevel}
@@ -310,12 +310,12 @@ export default function QuickSetting(props) {
                     return sizeA > sizeB ? 1 : -1
                 }).map((size) => {
                     return (
-                        <div key={size} className="col-12 mhwc-content">
-                            <div className="col-12 mhwc-name">
+                        <div key={size} className="col-12 mhrc-content">
+                            <div className="col-12 mhrc-name">
                                 <span>{_('jewelFactor')}: [{size}]</span>
                             </div>
 
-                            <div className="col-12 mhwc-content">
+                            <div className="col-12 mhrc-content">
                                 {Object.keys(jewelMapping[size]).sort((jewelIdA, jewelIdB) => {
                                     return _(jewelIdA) > _(jewelIdB) ? 1 : -1
                                 }).map((jewelId) => {
@@ -333,10 +333,10 @@ export default function QuickSetting(props) {
                                     })
 
                                     return (
-                                        <div key={jewelId} className="col-6 mhwc-value">
+                                        <div key={jewelId} className="col-6 mhrc-value">
                                             <span>{_(jewelMapping[size][jewelId].name)}</span>
 
-                                            <div className="mhwc-icons_bundle">
+                                            <div className="mhrc-icons_bundle">
                                                 <BasicSelector
                                                     iconName="sort-numeric-asc"
                                                     defaultValue={selectLevel}

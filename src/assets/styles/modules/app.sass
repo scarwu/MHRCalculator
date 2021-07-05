@@ -7,14 +7,14 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-.mhwc-header
+.mhrc-header
     position: relative
     padding: 0 10px
     height: $header-height
     background-color: #333
     text-align: center
 
-    .mhwc-title
+    .mhrc-title
         display: inline-block
         color: #ccc
 
@@ -28,36 +28,36 @@
             font-weight: bold
             +font-size(2.4)
 
-    .mhwc-icons_bundle
+    .mhrc-icons_bundle
         position: absolute
         top: 0
         right: 10px
         padding-top: 20px
         height: $header-height
 
-        .mhwc-icon_selector,
-        .mhwc-icon_button
+        .mhrc-icon_selector,
+        .mhrc-icon_button
             margin-left: 2px
             vertical-align: top
 
-            .mhwc-body
+            .mhrc-body
                 background-color: #999
 
             &:hover
-                .mhwc-body
+                .mhrc-body
                     background-color: #666
 
-.mhwc-container
+.mhrc-container
     height: calc(100vh - (#{$header-height} + #{$footer-height}))
 
-    > .mhwc-conditions,
-    > .mhwc-bundles,
-    > .mhwc-equips,
-    > .mhwc-status
+    > .mhrc-conditions,
+    > .mhrc-bundles,
+    > .mhrc-equips,
+    > .mhrc-status
         position: relative
         height: calc(100vh - (#{$header-height} + #{$footer-height} + #{$panel-height}))
 
-        .mhwc-panel
+        .mhrc-panel
             position: relative
             height: $panel-height
             line-height: $panel-height
@@ -65,48 +65,48 @@
             background-color: #666
             color: #fff
 
-            .mhwc-title
+            .mhrc-title
                 +font-size(1.6)
 
-            .mhwc-icons_bundle-left,
-            .mhwc-icons_bundle-right
+            .mhrc-icons_bundle-left,
+            .mhrc-icons_bundle-right
                 position: absolute
                 top: 0
                 padding-top: 10px
                 height: $panel-height
 
-                .mhwc-icon_tab,
-                .mhwc-icon_button
+                .mhrc-icon_tab,
+                .mhrc-icon_button
                     vertical-align: top
 
-                    .mhwc-body
+                    .mhrc-body
                         background-color: #999
 
                     &:hover
-                        .mhwc-body
+                        .mhrc-body
                             background-color: #333
 
-            .mhwc-icons_bundle-left
+            .mhrc-icons_bundle-left
                 left: 10px
 
-                .mhwc-icon_tab
+                .mhrc-icon_tab
                     margin-right: 2px
 
-                    .mhwc-label
+                    .mhrc-label
                         left: 22px
                         right: initial
 
-            .mhwc-icons_bundle-right
+            .mhrc-icons_bundle-right
                 right: 10px
 
-                .mhwc-icon_button
+                .mhrc-icon_button
                     margin-left: 2px
 
-        .mhwc-list
+        .mhrc-list
             height: calc(100vh - (#{$header-height} + #{$footer-height} + #{$panel-height}))
             padding-top: 5px
 
-.mhwc-footer
+.mhrc-footer
     padding: 0 10px
     height: $footer-height
     background-color: #333

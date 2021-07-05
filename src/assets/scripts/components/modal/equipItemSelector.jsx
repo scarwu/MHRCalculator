@@ -78,11 +78,11 @@ const renderWeaponItem = (weapon, bypassData) => {
     }
 
     return (
-        <div key={weapon.id} className="mhwc-item mhwc-item-2-step">
-            <div className="col-12 mhwc-name">
+        <div key={weapon.id} className="mhrc-item mhrc-item-2-step">
+            <div className="col-12 mhrc-name">
                 <span>{_(weapon.name)}</span>
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     {(false === weapon.isSelect) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
@@ -90,34 +90,34 @@ const renderWeaponItem = (weapon, bypassData) => {
                     ) : false}
                 </div>
             </div>
-            <div className="col-12 mhwc-content">
-                <div className="col-3 mhwc-name">
+            <div className="col-12 mhrc-content">
+                <div className="col-3 mhrc-name">
                     <span>{_('series')}</span>
                 </div>
-                <div className="col-9 mhwc-value">
+                <div className="col-9 mhrc-value">
                     <span>{_(weapon.series)}</span>
                 </div>
 
-                <div className="col-3 mhwc-name">
+                <div className="col-3 mhrc-name">
                     <span>{_('attack')}</span>
                 </div>
-                <div className="col-3 mhwc-value">
+                <div className="col-3 mhrc-value">
                     <span>{weapon.attack}</span>
                 </div>
 
-                <div className="col-3 mhwc-name">
+                <div className="col-3 mhrc-name">
                     <span>{_('criticalRate')}</span>
                 </div>
-                <div className="col-3 mhwc-value">
+                <div className="col-3 mhrc-value">
                     <span>{weapon.criticalRate}</span>
                 </div>
 
                 {Helper.isNotEmpty(weapon.sharpness) ? (
                     <Fragment>
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('sharpness')}</span>
                         </div>
-                        <div className="col-9 mhwc-value mhwc-sharpness">
+                        <div className="col-9 mhrc-value mhrc-sharpness">
                             <SharpnessBar data={originalSharpness} />
                             <SharpnessBar data={enhancedSharpness} />
                         </div>
@@ -126,10 +126,10 @@ const renderWeaponItem = (weapon, bypassData) => {
 
                 {Helper.isNotEmpty(weapon.element.attack) ? (
                     <Fragment>
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_(weapon.element.attack.type)}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             {weapon.element.attack.isHidden ? (
                                 <span>({weapon.element.attack.minValue}-{weapon.element.attack.maxValue})</span>
                             ) : (
@@ -141,10 +141,10 @@ const renderWeaponItem = (weapon, bypassData) => {
 
                 {Helper.isNotEmpty(weapon.element.status) ? (
                     <Fragment>
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_(weapon.element.status.type)}</span>
                         </div>
-                        <div className="col-3 mhwc-value">
+                        <div className="col-3 mhrc-value">
                             {weapon.element.status.isHidden ? (
                                 <span>({weapon.element.status.minValue}-{weapon.element.status.maxValue})</span>
                             ) : (
@@ -154,26 +154,26 @@ const renderWeaponItem = (weapon, bypassData) => {
                     </Fragment>
                 ) : false}
 
-                <div className="col-3 mhwc-name">
+                <div className="col-3 mhrc-name">
                     <span>{_('elderseal')}</span>
                 </div>
-                <div className="col-3 mhwc-value">
+                <div className="col-3 mhrc-value">
                     {Helper.isNotEmpty(weapon.elderseal) ? (
                         <span>{_(weapon.elderseal.affinity)}</span>
                     ) : false}
                 </div>
 
-                <div className="col-3 mhwc-name">
+                <div className="col-3 mhrc-name">
                     <span>{_('defense')}</span>
                 </div>
-                <div className="col-3 mhwc-value">
+                <div className="col-3 mhrc-value">
                     <span>{weapon.defense}</span>
                 </div>
 
-                <div className="col-3 mhwc-name">
+                <div className="col-3 mhrc-name">
                     <span>{_('slot')}</span>
                 </div>
-                <div className="col-3 mhwc-value">
+                <div className="col-3 mhrc-value">
                     {weapon.slots.map((slot, index) => {
                         return (
                             <span key={index}>[{slot.size}]</span>
@@ -186,10 +186,10 @@ const renderWeaponItem = (weapon, bypassData) => {
 
                     return Helper.isNotEmpty(skillInfo) ? (
                         <Fragment key={index}>
-                            <div className="col-12 mhwc-name">
+                            <div className="col-12 mhrc-name">
                                 <span>{_(skillInfo.name)} Lv.{skill.level}</span>
                             </div>
-                            <div className="col-12 mhwc-value mhwc-description">
+                            <div className="col-12 mhrc-value mhrc-description">
                                 <span>{_(skillInfo.list[skill.level - 1].description)}</span>
                             </div>
                         </Fragment>
@@ -208,11 +208,11 @@ const renderArmorItem = (armor, bypassData) => {
     bypassData.equipType = armor.type
 
     return (
-        <div key={armor.id} className="mhwc-item mhwc-item-2-step">
-            <div className="col-12 mhwc-name">
+        <div key={armor.id} className="mhrc-item mhrc-item-2-step">
+            <div className="col-12 mhrc-name">
                 <span>{_(armor.name)}</span>
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     {(false === armor.isSelect) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
@@ -220,38 +220,38 @@ const renderArmorItem = (armor, bypassData) => {
                     ) : false}
                 </div>
             </div>
-            <div className="col-12 mhwc-content">
-                <div className="col-3 mhwc-name">
+            <div className="col-12 mhrc-content">
+                <div className="col-3 mhrc-name">
                     <span>{_('series')}</span>
                 </div>
-                <div className="col-9 mhwc-value">
+                <div className="col-9 mhrc-value">
                     <span>{_(armor.series)}</span>
                 </div>
 
-                <div className="col-3 mhwc-name">
+                <div className="col-3 mhrc-name">
                     <span>{_('defense')}</span>
                 </div>
-                <div className="col-3 mhwc-value">
+                <div className="col-3 mhrc-value">
                     <span>{armor.defense}</span>
                 </div>
 
                 {Constant.resistances.map((resistanceType) => {
                     return (
                         <Fragment key={resistanceType}>
-                            <div className="col-3 mhwc-name">
+                            <div className="col-3 mhrc-name">
                                 <span>{_('resistance')}: {_(resistanceType)}</span>
                             </div>
-                            <div className="col-3 mhwc-value">
+                            <div className="col-3 mhrc-value">
                                 <span>{armor.resistance[resistanceType]}</span>
                             </div>
                         </Fragment>
                     )
                 })}
 
-                <div className="col-3 mhwc-name">
+                <div className="col-3 mhrc-name">
                     <span>{_('slot')}</span>
                 </div>
-                <div className="col-9 mhwc-value">
+                <div className="col-9 mhrc-value">
                     {armor.slots.map((slot, index) => {
                         return (
                             <span key={index}>[{slot.size}]</span>
@@ -261,10 +261,10 @@ const renderArmorItem = (armor, bypassData) => {
 
                 {Helper.isEmpty(setInfo) ? (
                     <Fragment>
-                        <div className="col-3 mhwc-name">
+                        <div className="col-3 mhrc-name">
                             <span>{_('set')}</span>
                         </div>
-                        <div className="col-9 mhwc-value">
+                        <div className="col-9 mhrc-value">
                             <span>{_(setInfo.name)}</span>
                         </div>
                     </Fragment>
@@ -275,10 +275,10 @@ const renderArmorItem = (armor, bypassData) => {
 
                     return Helper.isNotEmpty(skillInfo) ? (
                         <Fragment key={index}>
-                            <div className="col-12 mhwc-name">
+                            <div className="col-12 mhrc-name">
                                 <span>{_(skillInfo.name)} Lv.{skill.level}</span>
                             </div>
-                            <div className="col-12 mhwc-value mhwc-description">
+                            <div className="col-12 mhrc-value mhrc-description">
                                 <span>{_(skillInfo.list[skill.level - 1].description)}</span>
                             </div>
                         </Fragment>
@@ -291,11 +291,11 @@ const renderArmorItem = (armor, bypassData) => {
 
 const renderCharmItem = (charm, bypassData) => {
     return (
-        <div key={charm.id} className="mhwc-item mhwc-item-2-step">
-            <div className="col-12 mhwc-name">
+        <div key={charm.id} className="mhrc-item mhrc-item-2-step">
+            <div className="col-12 mhrc-name">
                 <span>{_(charm.name)}</span>
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     {(false === charm.isSelect) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
@@ -303,16 +303,16 @@ const renderCharmItem = (charm, bypassData) => {
                     ) : false}
                 </div>
             </div>
-            <div className="col-12 mhwc-content">
+            <div className="col-12 mhrc-content">
                 {charm.skills.map((skill, index) => {
                     let skillInfo = SkillDataset.getInfo(skill.id)
 
                     return Helper.isNotEmpty(skillInfo) ? (
                         <Fragment key={index}>
-                            <div className="col-12 mhwc-name">
+                            <div className="col-12 mhrc-name">
                                 <span>{_(skillInfo.name)} Lv.{skill.level}</span>
                             </div>
-                            <div className="col-12 mhwc-value mhwc-description">
+                            <div className="col-12 mhrc-value mhrc-description">
                                 <span>{_(skillInfo.list[skill.level - 1].description)}</span>
                             </div>
                         </Fragment>
@@ -325,11 +325,11 @@ const renderCharmItem = (charm, bypassData) => {
 
 const renderJewelItem = (jewel, bypassData) => {
     return (
-        <div key={jewel.id} className="mhwc-item mhwc-item-2-step">
-            <div className="col-12 mhwc-name">
+        <div key={jewel.id} className="mhrc-item mhrc-item-2-step">
+            <div className="col-12 mhrc-name">
                 <span>[{jewel.size}] {_(jewel.name)}</span>
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     {(false === jewel.isSelect) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
@@ -337,16 +337,16 @@ const renderJewelItem = (jewel, bypassData) => {
                     ) : false}
                 </div>
             </div>
-            <div className="col-12 mhwc-content">
+            <div className="col-12 mhrc-content">
                 {jewel.skills.map((skill, index) => {
                     let skillInfo = SkillDataset.getInfo(skill.id)
 
                     return Helper.isNotEmpty(skillInfo) ? (
                         <Fragment key={index}>
-                            <div className="col-12 mhwc-name">
+                            <div className="col-12 mhrc-name">
                                 <span>{_(skillInfo.name)} Lv.{skill.level}</span>
                             </div>
-                            <div className="col-12 mhwc-value mhwc-description">
+                            <div className="col-12 mhrc-value mhrc-description">
                                 <span>{_(skillInfo.list[skill.level - 1].description)}</span>
                             </div>
                         </Fragment>
@@ -359,11 +359,11 @@ const renderJewelItem = (jewel, bypassData) => {
 
 const renderEnhanceItem = (enhance, bypassData) => {
     return (
-        <div key={enhance.id} className="mhwc-item mhwc-item-2-step">
-            <div className="col-12 mhwc-name">
+        <div key={enhance.id} className="mhrc-item mhrc-item-2-step">
+            <div className="col-12 mhrc-name">
                 <span>{_(enhance.name)}</span>
 
-                <div className="mhwc-icons_bundle">
+                <div className="mhrc-icons_bundle">
                     {(false === enhance.isSelect) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
@@ -371,14 +371,14 @@ const renderEnhanceItem = (enhance, bypassData) => {
                     ) : false}
                 </div>
             </div>
-            <div className="col-12 mhwc-content">
+            <div className="col-12 mhrc-content">
                 {enhance.list.map((item, index) => {
                     return (
                         <Fragment key={index}>
-                            <div className="col-2 mhwc-name">
+                            <div className="col-2 mhrc-name">
                                 <span>Lv.{item.level}</span>
                             </div>
-                            <div className="col-10 mhwc-value mhwc-description">
+                            <div className="col-10 mhrc-value mhrc-description">
                                 <span>{_(item.description)}</span>
                             </div>
                         </Fragment>
@@ -738,12 +738,12 @@ export default function EquipItemSelector(props) {
     ])
 
     return (stateIsShow && Helper.isNotEmpty(stateBypassData)) ? (
-        <div className="mhwc-selector" ref={refModal} onClick={handleFastWindowClose}>
-            <div className="mhwc-modal">
-                <div className="mhwc-panel">
-                    <span className="mhwc-title">{_(stateMode + 'List')}</span>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
+            <div className="mhrc-modal">
+                <div className="mhrc-panel">
+                    <span className="mhrc-title">{_(stateMode + 'List')}</span>
 
-                    <div className="mhwc-icons_bundle">
+                    <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
                              defaultValue={stateSegment} onChange={handleSegmentInput} />
@@ -765,8 +765,8 @@ export default function EquipItemSelector(props) {
                             onClick={ModalState.setter.hideEquipItemSelector} />
                     </div>
                 </div>
-                <div className="mhwc-list">
-                    <div className="mhwc-wrapper">
+                <div className="mhrc-list">
+                    <div className="mhrc-wrapper">
                         {getContent}
                     </div>
                 </div>

@@ -20,8 +20,8 @@ export default function BasicInput(props) {
         Helper.debug('Component: Common -> BasicInput')
 
         return (
-            <div className="mhwc-basic_input">
-                <input className="mhwc-input" type="text" ref={bypassRef}
+            <div className="mhrc-basic_input">
+                <input className="mhrc-input" type="text" ref={bypassRef}
                     defaultValue={defaultValue}
                     placeholder={placeholder}
                     onBlur={onChange}

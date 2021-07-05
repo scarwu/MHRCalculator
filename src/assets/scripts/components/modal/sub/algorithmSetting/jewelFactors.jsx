@@ -144,12 +144,12 @@ export default function JewelFactors(props) {
 
             for (let blockIndex = 0; blockIndex < Math.ceil(jewelIds.length / 10); blockIndex++) {
                 blocks.push(
-                    <div key={size + '_' + blockIndex} className="mhwc-item mhwc-item-2-step">
-                        <div className="col-12 mhwc-name">
+                    <div key={size + '_' + blockIndex} className="mhrc-item mhrc-item-2-step">
+                        <div className="col-12 mhrc-name">
                             <span>{_('jewelFactor')}: [{size}]</span>
                         </div>
 
-                        <div className="col-12 mhwc-content">
+                        <div className="col-12 mhrc-content">
                             {jewelIds.slice(blockIndex * 10, (blockIndex + 1) * 10).map((jewelId) => {
                                 let selectLevel = Helper.isNotEmpty(jewelFactor[jewelId])
                                     ? jewelFactor[jewelId] : -1
@@ -165,10 +165,10 @@ export default function JewelFactors(props) {
                                 })
 
                                 return (
-                                    <div key={jewelId} className="col-6 mhwc-value">
+                                    <div key={jewelId} className="col-6 mhrc-value">
                                         <span>{_(jewelSizeMapping[size][jewelId].name)}</span>
 
-                                        <div className="mhwc-icons_bundle">
+                                        <div className="mhrc-icons_bundle">
                                             <BasicSelector
                                                 iconName="sort-numeric-asc"
                                                 defaultValue={selectLevel}

@@ -20,18 +20,18 @@ export default function SharpnessBar(props) {
         Helper.debug('Component: Common -> SharpnessBar')
 
         return (
-            <div className="mhwc-sharpness_bar">
-                <div className="mhwc-steps">
+            <div className="mhrc-sharpness_bar">
+                <div className="mhrc-steps">
                     {['red', 'orange', 'yellow', 'green', 'blue', 'white', 'purple'].map((step) => {
                         return (
-                            <div key={step} className="mhwc-step" style={{
+                            <div key={step} className="mhrc-step" style={{
                                 width: (data.steps[step] / 4) + '%'
                             }}></div>
                         )
                     })}
                 </div>
 
-                <div className="mhwc-mask" style={{
+                <div className="mhrc-mask" style={{
                     width: ((400 - data.value) / 4) + '%'
                 }}></div>
             </div>

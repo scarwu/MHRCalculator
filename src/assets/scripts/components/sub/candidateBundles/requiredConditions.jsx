@@ -87,18 +87,18 @@ export default function RequiredConditions(props) {
         })
 
         return (
-            <div className="mhwc-item mhwc-item-3-step">
-                <div className="col-12 mhwc-name">
+            <div className="mhrc-item mhrc-item-3-step">
+                <div className="col-12 mhrc-name">
                     <span>{_('conditions')}</span>
                 </div>
 
                 {0 !== currentRequiredEquips.length ? (
-                    <div className="col-12 mhwc-content">
-                        <div className="col-12 mhwc-name">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-12 mhrc-name">
                             <span>{_('equip')}</span>
                         </div>
 
-                        <div className="col-12 mhwc-content">
+                        <div className="col-12 mhrc-content">
                             {currentRequiredEquips.map((equip) => {
                                 let isNotRequire = true
 
@@ -133,10 +133,10 @@ export default function RequiredConditions(props) {
                                         equipInfo = equip.customWeapon
 
                                         return Helper.isNotEmpty(equipInfo) ? (
-                                            <div key={equip.type} className="col-6 mhwc-value">
+                                            <div key={equip.type} className="col-6 mhrc-value">
                                                 <span>{_(equipInfo.name)}: {_(equipInfo.type)}</span>
 
-                                                <div className="mhwc-icons_bundle">
+                                                <div className="mhrc-icons_bundle">
                                                     {isNotRequire ? (
                                                         <IconButton
                                                             iconName="arrow-left" altName={_('include')}
@@ -160,10 +160,10 @@ export default function RequiredConditions(props) {
                                 }
 
                                 return Helper.isNotEmpty(equipInfo) ? (
-                                    <div key={equip.type} className="col-6 mhwc-value">
+                                    <div key={equip.type} className="col-6 mhrc-value">
                                         <span>{_(equipInfo.name)}</span>
 
-                                        <div className="mhwc-icons_bundle">
+                                        <div className="mhrc-icons_bundle">
                                             {isNotRequire ? (
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
@@ -178,24 +178,24 @@ export default function RequiredConditions(props) {
                 ) : false}
 
                 {0 !== currentRequiredSets.length ? (
-                    <div className="col-12 mhwc-content">
-                        <div className="col-12 mhwc-name">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-12 mhrc-name">
                             <span>{_('set')}</span>
                         </div>
 
-                        <div className="col-12 mhwc-content">
+                        <div className="col-12 mhrc-content">
                             {currentRequiredSets.map((set) => {
                                 let setInfo = SetDataset.getInfo(set.id)
 
                                 return (
-                                    <div key={set.id} className="col-6 mhwc-value">
+                                    <div key={set.id} className="col-6 mhrc-value">
                                         <span>
                                             {`${_(setInfo.name)}`}{setInfo.skills.slice(0, set.step).map((skill) => {
                                                 return ` (${skill.require})`
                                             })}
                                         </span>
                                         {(-1 === requiredSetIds.indexOf(setInfo.id)) ? (
-                                            <div className="mhwc-icons_bundle">
+                                            <div className="mhrc-icons_bundle">
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
                                                     onClick={() => {CommonState.setter.addRequiredSet(setInfo.id)}} />
@@ -209,20 +209,20 @@ export default function RequiredConditions(props) {
                 ) : false}
 
                 {0 !== currentRequiredSkills.length ? (
-                    <div className="col-12 mhwc-content">
-                        <div className="col-12 mhwc-name">
+                    <div className="col-12 mhrc-content">
+                        <div className="col-12 mhrc-name">
                             <span>{_('skill')}</span>
                         </div>
 
-                        <div className="col-12 mhwc-content">
+                        <div className="col-12 mhrc-content">
                             {currentRequiredSkills.map((skill) => {
                                 let skillInfo = SkillDataset.getInfo(skill.id)
 
                                 return (Helper.isNotEmpty(skillInfo)) ? (
-                                    <div key={skill.id} className="col-6 mhwc-value">
+                                    <div key={skill.id} className="col-6 mhrc-value">
                                         <span>{`${_(skillInfo.name)} Lv.${skill.level}`}</span>
                                         {(-1 === requiredSkillIds.indexOf(skillInfo.id)) ? (
-                                            <div className="mhwc-icons_bundle">
+                                            <div className="mhrc-icons_bundle">
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
                                                     onClick={() => {CommonState.setter.addRequiredSkill(skillInfo.id)}} />

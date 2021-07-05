@@ -115,25 +115,216 @@ export const runAction = () => {
     let datasetLangMapping = {}
 
     // Handle Skills
-    let bundleSkills = []
+    let skillBundlesMapping = []
 
     rawDataMapping.skills.forEach((skillItem) => {
+        if (Helper.isEmpty(skillBundlesMapping[skillItem.name.zhTW])) {
+            skillBundlesMapping[skillItem.name.zhTW] = {}
+            skillBundlesMapping[skillItem.name.zhTW].name = skillItem.name
+            skillBundlesMapping[skillItem.name.zhTW].description = skillItem.description
+            skillBundlesMapping[skillItem.name.zhTW].list = {}
+        }
 
+        if (Helper.isEmpty(skillBundlesMapping[skillItem.name.zhTW].list[skillItem.level])) {
+            skillBundlesMapping[skillItem.name.zhTW].list[skillItem.level] = {
+                level: skillItem.level,
+                effect: skillItem.effect
+            }
+        }
+    })
+
+    Object.values(skillBundlesMapping).forEach((skillBundle) => {
+        skillBundle.list = Object.values(skillBundle.list)
+
+        // Get Id Code
+        let idCode = createCode(`skills:id:${skillBundle.name.zhTW}`)
+
+        skillBundle.id = idCode
+
+        // Get Translate Code & Create Dataset Lang Mapping
+        for (let property of ['name', 'description']) {
+            let translateCode = createCode(`skills:translate:${property}:${idCode}`)
+
+            Object.keys(skillBundle[property]).forEach((lang) => {
+                if (Helper.isEmpty(datasetLangMapping[lang])) {
+                    datasetLangMapping[lang] = {}
+                }
+
+                datasetLangMapping[lang][translateCode] = skillBundle[property][lang]
+            })
+
+            skillBundle[property] = translateCode
+        }
+
+        skillBundle.list.map((skillItem) => {
+            let translateCode = createCode(`skills:translate:effect:${idCode}`)
+
+            Object.keys(skillItem.effect).forEach((lang) => {
+                if (Helper.isEmpty(datasetLangMapping[lang])) {
+                    datasetLangMapping[lang] = {}
+                }
+
+                datasetLangMapping[lang][translateCode] = skillItem.effect[lang]
+            })
+
+            skillItem.effect = translateCode
+
+            return skillItem
+        })
+
+        if (Helper.isEmpty(datasetMapping.skills)) {
+            datasetMapping.skills = []
+        }
+
+        datasetMapping.skills.push([
+            skillBundle.id,
+            skillBundle.name,
+            skillBundle.description,
+            // skillBundle.type,
+            // [
+            //     skillBundle.from.set,
+            //     skillBundle.from.jewel,
+            //     skillBundle.from.armor,
+            //     skillBundle.from.charm,
+            //     skillBundle.from.weapon
+            // ],
+            skillBundle.list.map((skillItem) => {
+                return [
+                    skillItem.level,
+                    skillItem.effect,
+                    // skillItem.reaction,
+                    // skillItem.isHidden
+                ]
+            })
+        ])
     })
 
     // Handle Enhances
     rawDataMapping.enhances.forEach((enhanceItem) => {
 
+        // Get Id Code
+        let idCode = createCode(`enhances:id:${enhanceItem.name.zhTW}`)
+
+        enhanceItem.id = idCode
+
+        // Get Translate Code & Create Dataset Lang Mapping
+        for (let property of ['name', 'description']) {
+            let translateCode = createCode(`enhances:translate:${property}:${idCode}`)
+
+            Object.keys(enhanceItem[property]).forEach((lang) => {
+                if (Helper.isEmpty(datasetLangMapping[lang])) {
+                    datasetLangMapping[lang] = {}
+                }
+
+                datasetLangMapping[lang][translateCode] = enhanceItem[property][lang]
+            })
+
+            enhanceItem[property] = translateCode
+        }
+
+        if (Helper.isEmpty(datasetMapping.enhances)) {
+            datasetMapping.enhances = []
+        }
+
+        datasetMapping.enhances.push([
+            enhanceItem.id,
+            enhanceItem.name,
+            enhanceItem.description
+        ])
     })
 
     // Handle Petalaces
     rawDataMapping.petalaces.forEach((petalaceItem) => {
 
+        // Get Id Code
+        let idCode = createCode(`petalaces:id:${petalaceItem.name.zhTW}`)
+
+        petalaceItem.id = idCode
+
+        // Get Translate Code & Create Dataset Lang Mapping
+        let translateCode = createCode(`petalaces:translate:name:${idCode}`)
+
+        Object.keys(petalaceItem.name).forEach((lang) => {
+            if (Helper.isEmpty(datasetLangMapping[lang])) {
+                datasetLangMapping[lang] = {}
+            }
+
+            datasetLangMapping[lang][translateCode] = petalaceItem.name[lang]
+        })
+
+        petalaceItem.name = translateCode
+
+        // Create Dataset Mapping
+        if (Helper.isEmpty(datasetMapping.petalaces)) {
+            datasetMapping.petalaces = []
+        }
+
+        datasetMapping.petalaces.push([
+            petalaceItem.id,
+            petalaceItem.name,
+            petalaceItem.rare,
+            [
+                petalaceItem.health.increment,
+                petalaceItem.health.obtain
+            ],
+            [
+                petalaceItem.stamina.increment,
+                petalaceItem.stamina.obtain
+            ],
+            [
+                petalaceItem.attack.increment,
+                petalaceItem.attack.obtain
+            ],
+            [
+                petalaceItem.defense.increment,
+                petalaceItem.defense.obtain
+            ]
+        ])
     })
 
     // Handle Jewels
     rawDataMapping.jewels.forEach((jewelItem) => {
 
+        // Get Id Code
+        let idCode = createCode(`jewels:id:${jewelItem.name.zhTW}`)
+
+        jewelItem.id = idCode
+
+        // Get Translate Code & Create Dataset Lang Mapping
+        let translateCode = createCode(`jewels:translate:name:${idCode}`)
+
+        Object.keys(jewelItem.name).forEach((lang) => {
+            if (Helper.isEmpty(datasetLangMapping[lang])) {
+                datasetLangMapping[lang] = {}
+            }
+
+            datasetLangMapping[lang][translateCode] = jewelItem.name[lang]
+        })
+
+        jewelItem.name = translateCode
+
+        // Find Code Id
+        jewelItem.skills.map((skillItem) => {
+            skillItem.name = createCode(`skills:id:${skillItem.name}`)
+
+            return skillItem
+        })
+
+        if (Helper.isEmpty(datasetMapping.jewels)) {
+            datasetMapping.jewels = []
+        }
+
+        datasetMapping.jewels.push([
+            jewelItem.id,
+            jewelItem.name,
+            jewelItem.rare,
+            jewelItem.skills.map((skillItem) => {
+                return [
+                    skillItem.name,
+                    skillItem.level
+                ]
+            })
+        ])
     })
 
     // Handle Armors
@@ -144,8 +335,89 @@ export const runAction = () => {
     })
 
     // Handle Weapons
-    rawDataMapping.weapons.forEach((skillItem) => {
+    rawDataMapping.weapons.forEach((weaponItem) => {
 
+        // Get Id Code
+        let idCode = createCode(`weapons:id:${weaponItem.name.zhTW}`)
+
+        weaponItem.id = idCode
+
+        // Get Translate Code & Create Dataset Lang Mapping
+        for (let property of ['series', 'name']) {
+            let translateCode = createCode(`weapons:translate:${property}:${idCode}`)
+
+            Object.keys(weaponItem[property]).forEach((lang) => {
+                if (Helper.isEmpty(datasetLangMapping[lang])) {
+                    datasetLangMapping[lang] = {}
+                }
+
+                datasetLangMapping[lang][translateCode] = weaponItem[property][lang]
+            })
+
+            weaponItem[property] = translateCode
+        }
+
+        // Find Code Id
+        weaponItem.skills.map((skillItem) => {
+            skillItem.name = createCode(`skills:id:${skillItem.name}`)
+
+            return skillItem
+        })
+
+        weaponItem.enhance.list.map((enhanceItem) => {
+            enhanceItem.name = createCode(`enhances:id:${enhanceItem.name}`)
+
+            return enhanceItem
+        })
+
+        if (Helper.isEmpty(datasetMapping.weapons)) {
+            datasetMapping.weapons = []
+        }
+
+        datasetMapping.weapons.push([
+            weaponItem.id,
+            weaponItem.series,
+            weaponItem.name,
+            weaponItem.rare,
+            weaponItem.type,
+            weaponItem.attack,
+            weaponItem.criticalRate,
+            weaponItem.defense,
+            [
+                [
+                    weaponItem.element.attack.type,
+                    weaponItem.element.attack.minValue,
+                    weaponItem.element.attack.maxValue
+                ],
+                [
+                    weaponItem.element.status.type,
+                    weaponItem.element.status.minValue,
+                    weaponItem.element.status.maxValue
+                ]
+            ],
+            [
+                weaponItem.sharpness.red,
+                weaponItem.sharpness.orange,
+                weaponItem.sharpness.yellow,
+                weaponItem.sharpness.green,
+                weaponItem.sharpness.blue,
+                weaponItem.sharpness.white,
+                weaponItem.sharpness.purple
+            ],
+            weaponItem.slots.map((slotItem) => {
+                return [
+                    slotItem.size
+                ]
+            }),
+            [
+                weaponItem.enhance.amount,
+                weaponItem.enhance.list.map((enhanceItem) => {
+                    return [
+                        enhanceItem.name
+                    ]
+                })
+            ]
+        ])
     })
 
     // Save Datasets

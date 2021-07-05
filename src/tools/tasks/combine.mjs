@@ -1,5 +1,7 @@
 /**
- * @package     MHW Calculator
+ * Combine Handler
+ *
+ * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
  * @copyright   Copyright (c) Scar Wu (https://scar.tw)
  * @link        https://github.com/scarwu/MHRCalculator
@@ -271,7 +273,6 @@ const specialReplaceEnhancePropertyName = (text, itemName = null) => {
 }
 
 export const runAction = () => {
-
     let rawDataMapping = {}
     let metaDataMapping = {}
     let arrangeDataMapping = {}
@@ -556,7 +557,7 @@ export const runAction = () => {
 
     const mergeNormalValue = (target, itemId, item, crawlerMapping, keys) => {
         for (let key of keys) {
-            let countMapping = {}
+            let voteMapping = {}
             let valueMapping = {}
 
             for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
@@ -570,39 +571,34 @@ export const runAction = () => {
                 }
 
                 // Set Count & Value
-                if (Helper.isEmpty(countMapping[crawlerItem[key]])) {
-                    countMapping[crawlerItem[key]] = 0
+                if (Helper.isEmpty(voteMapping[crawlerItem[key]])) {
+                    voteMapping[crawlerItem[key]] = {
+                        count: 0,
+                        value: crawlerItem[key]
+                    }
                 }
 
-                countMapping[crawlerItem[key]]++
+                voteMapping[crawlerItem[key]].count++
                 valueMapping[crawlerName] = crawlerItem[key]
             }
 
             // Dosen't need Copy
-            if (0 === Object.keys(countMapping).length) {
+            if (0 === Object.keys(voteMapping).length) {
                 continue
             }
 
             // Assign Final Value by Max Count
             let maxCount = 0
 
-            for (let [value, count] of Object.entries(countMapping)) {
-                if (maxCount < count) {
-                    maxCount = count
-
-                    if (-1 !== [
-                        'rare', 'attack', 'criticalRate', 'defense',
-                        'minDefense', 'maxDefense', 'size', 'level',
-                    ].indexOf(key)) {
-                        item[key] = parseFloat(value)
-                    } else {
-                        item[key] = value
-                    }
+            for (let voteItem of Object.values(voteMapping)) {
+                if (maxCount < voteItem.count) {
+                    maxCount = voteItem.count
+                    item[key] = voteItem.value
                 }
             }
 
             // Record DuplicationValueMapping
-            if (Object.keys(countMapping).length > 1) {
+            if (Object.keys(voteMapping).length > 1) {
                 if (Helper.isEmpty(duplicateValueMapping.normal)) {
                     duplicateValueMapping.normal = []
                 }
@@ -622,7 +618,7 @@ export const runAction = () => {
     const mergeTranslateValue = (target, itemId, item, crawlerMapping, keys) => {
         for (let key of keys) {
             for (let lang of langList) {
-                let countMapping = {}
+                let voteMapping = {}
                 let valueMapping = {}
 
                 for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
@@ -650,31 +646,34 @@ export const runAction = () => {
                     }
 
                     // Set Count & Value
-                    if (Helper.isEmpty(countMapping[crawlerItem[key][lang]])) {
-                        countMapping[crawlerItem[key][lang]] = 0
+                    if (Helper.isEmpty(voteMapping[crawlerItem[key][lang]])) {
+                        voteMapping[crawlerItem[key][lang]] = {
+                            count: 0,
+                            value: crawlerItem[key][lang]
+                        }
                     }
 
-                    countMapping[crawlerItem[key][lang]]++
+                    voteMapping[crawlerItem[key][lang]].count++
                     valueMapping[crawlerName] = crawlerItem[key][lang]
                 }
 
                 // Dosen't need Copy
-                if (0 === Object.keys(countMapping).length) {
+                if (0 === Object.keys(voteMapping).length) {
                     continue
                 }
 
                 // Assign Final Value by Max Count
                 let maxCount = 0
 
-                for (let [value, count] of Object.entries(countMapping)) {
-                    if (maxCount < count) {
-                        maxCount = count
-                        item[key][lang] = value
+                for (let voteItem of Object.values(voteMapping)) {
+                    if (maxCount < voteItem.count) {
+                        maxCount = voteItem.count
+                        item[key][lang] = voteItem.value
                     }
                 }
 
                 // Record DuplicationValueMapping
-                if (Object.keys(countMapping).length > 1) {
+                if (Object.keys(voteMapping).length > 1) {
                     if (Helper.isEmpty(duplicateValueMapping.translate)) {
                         duplicateValueMapping.translate = []
                     }
@@ -696,7 +695,7 @@ export const runAction = () => {
     const mergeElementValue = (target, itemId, item, crawlerMapping) => {
         for (let key of ['attack', 'status']) {
             for (let property of ['type', 'minValue', 'maxValue']) {
-                let countMapping = {}
+                let voteMapping = {}
                 let valueMapping = {}
 
                 for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
@@ -716,31 +715,34 @@ export const runAction = () => {
                     }
 
                     // Set Count & Value
-                    if (Helper.isEmpty(countMapping[crawlerItem.element[key][property]])) {
-                        countMapping[crawlerItem.element[key][property]] = 0
+                    if (Helper.isEmpty(voteMapping[crawlerItem.element[key][property]])) {
+                        voteMapping[crawlerItem.element[key][property]] = {
+                            count: 0,
+                            value: crawlerItem.element[key][property]
+                        }
                     }
 
-                    countMapping[crawlerItem.element[key][property]]++
+                    voteMapping[crawlerItem.element[key][property]].count++
                     valueMapping[crawlerName] = crawlerItem.element[key][property]
                 }
 
                 // Dosen't need Copy
-                if (0 === Object.keys(countMapping).length) {
+                if (0 === Object.keys(voteMapping).length) {
                     continue
                 }
 
                 // Assign Final Value by Max Count
                 let maxCount = 0
 
-                for (let [value, count] of Object.entries(countMapping)) {
-                    if (maxCount < count) {
-                        maxCount = count
-                        item.element[key][property] = value
+                for (let voteItem of Object.values(voteMapping)) {
+                    if (maxCount < voteItem.count) {
+                        maxCount = voteItem.count
+                        item.element[key][property] = voteItem.value
                     }
                 }
 
                 // Record DuplicationValueMapping
-                if (Object.keys(countMapping).length > 1) {
+                if (Object.keys(voteMapping).length > 1) {
                     if (Helper.isEmpty(duplicateValueMapping.element)) {
                         duplicateValueMapping.element = []
                     }
@@ -762,7 +764,7 @@ export const runAction = () => {
 
     const mergeSharpnessValue = (target, itemId, item, crawlerMapping) => {
         for (let key of ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'purple']) {
-            let countMapping = {}
+            let voteMapping = {}
             let valueMapping = {}
 
             for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
@@ -776,31 +778,34 @@ export const runAction = () => {
                 }
 
                 // Set Count & Value
-                if (Helper.isEmpty(countMapping[crawlerItem.sharpness[key]])) {
-                    countMapping[crawlerItem.sharpness[key]] = 0
+                if (Helper.isEmpty(voteMapping[crawlerItem.sharpness[key]])) {
+                    voteMapping[crawlerItem.sharpness[key]] = {
+                        count: 0,
+                        value: crawlerItem.sharpness[key]
+                    }
                 }
 
-                countMapping[crawlerItem.sharpness[key]]++
+                voteMapping[crawlerItem.sharpness[key]].count++
                 valueMapping[crawlerName] = crawlerItem.sharpness[key]
             }
 
             // Dosen't need Copy
-            if (0 === Object.keys(countMapping).length) {
+            if (0 === Object.keys(voteMapping).length) {
                 continue
             }
 
             // Assign Final Value by Max Count
             let maxCount = 0
 
-            for (let [value, count] of Object.entries(countMapping)) {
-                if (maxCount < count) {
-                    maxCount = count
-                    item.sharpness[key] = value
+            for (let voteItem of Object.values(voteMapping)) {
+                if (maxCount < voteItem.count) {
+                    maxCount = voteItem.count
+                    item.sharpness[key] = voteItem.value
                 }
             }
 
             // Record DuplicationValueMapping
-            if (Object.keys(countMapping).length > 1) {
+            if (Object.keys(voteMapping).length > 1) {
                 if (Helper.isEmpty(duplicateValueMapping.sharpness)) {
                     duplicateValueMapping.sharpness = []
                 }
@@ -820,7 +825,7 @@ export const runAction = () => {
 
     const mergeResistenceValue = (target, itemId, item, crawlerMapping) => {
         for (let key of ['fire', 'water', 'thunder', 'ice', 'dragon']) {
-            let countMapping = {}
+            let voteMapping = {}
             let valueMapping = {}
 
             for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
@@ -834,31 +839,34 @@ export const runAction = () => {
                 }
 
                 // Set Count & Value
-                if (Helper.isEmpty(countMapping[crawlerItem.resistence[key]])) {
-                    countMapping[crawlerItem.resistence[key]] = 0
+                if (Helper.isEmpty(voteMapping[crawlerItem.resistence[key]])) {
+                    voteMapping[crawlerItem.resistence[key]] = {
+                        count: 0,
+                        value: crawlerItem.resistence[key]
+                    }
                 }
 
-                countMapping[crawlerItem.resistence[key]]++
+                voteMapping[crawlerItem.resistence[key]].count++
                 valueMapping[crawlerName] = crawlerItem.resistence[key]
             }
 
             // Dosen't need Copy
-            if (0 === Object.keys(countMapping).length) {
+            if (0 === Object.keys(voteMapping).length) {
                 continue
             }
 
             // Assign Final Value by Max Count
             let maxCount = 0
 
-            for (let [value, count] of Object.entries(countMapping)) {
-                if (maxCount < count) {
-                    maxCount = count
-                    item.resistence[key] = value
+            for (let voteItem of Object.values(voteMapping)) {
+                if (maxCount < voteItem.count) {
+                    maxCount = voteItem.count
+                    item.resistence[key] = voteItem.value
                 }
             }
 
             // Record DuplicationValueMapping
-            if (Object.keys(countMapping).length > 1) {
+            if (Object.keys(voteMapping).length > 1) {
                 if (Helper.isEmpty(duplicateValueMapping.resistence)) {
                     duplicateValueMapping.resistence = []
                 }
@@ -879,7 +887,7 @@ export const runAction = () => {
     const mergeIncrementAndObtainValue = (target, itemId, item, crawlerMapping) => {
         for (let key of ['health', 'stamina', 'attack', 'defense']) {
             for (let property of ['increment', 'obtain']) {
-                let countMapping = {}
+                let voteMapping = {}
                 let valueMapping = {}
 
                 for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
@@ -899,31 +907,34 @@ export const runAction = () => {
                     }
 
                     // Set Count & Value
-                    if (Helper.isEmpty(countMapping[crawlerItem[key][property]])) {
-                        countMapping[crawlerItem[key][property]] = 0
+                    if (Helper.isEmpty(voteMapping[crawlerItem[key][property]])) {
+                        voteMapping[crawlerItem[key][property]] = {
+                            count: 0,
+                            value: crawlerItem[key][property]
+                        }
                     }
 
-                    countMapping[crawlerItem[key][property]]++
+                    voteMapping[crawlerItem[key][property]].count++
                     valueMapping[crawlerName] = crawlerItem[key][property]
                 }
 
                 // Dosen't need Copy
-                if (0 === Object.keys(countMapping).length) {
+                if (0 === Object.keys(voteMapping).length) {
                     continue
                 }
 
                 // Assign Final Value by Max Count
                 let maxCount = 0
 
-                for (let [value, count] of Object.entries(countMapping)) {
-                    if (maxCount < count) {
-                        maxCount = count
-                        item[key][property] = value
+                for (let voteItem of Object.values(voteMapping)) {
+                    if (maxCount < voteItem.count) {
+                        maxCount = voteItem.count
+                        item[key][property] = voteItem.value
                     }
                 }
 
                 // Record DuplicationValueMapping
-                if (Object.keys(countMapping).length > 1) {
+                if (Object.keys(voteMapping).length > 1) {
                     if (Helper.isEmpty(duplicateValueMapping.iao)) {
                         duplicateValueMapping.iao = []
                     }
@@ -943,7 +954,7 @@ export const runAction = () => {
     }
 
     const mergeSlotsValue = (target, itemId, item, crawlerMapping) => {
-        let countMapping = {}
+        let voteMapping = {}
         let valueMapping = {}
 
         for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
@@ -969,31 +980,34 @@ export const runAction = () => {
             let value = JSON.stringify(crawlerItem.slots)
 
             // Set Count & Value
-            if (Helper.isEmpty(countMapping[value])) {
-                countMapping[value] = 0
+            if (Helper.isEmpty(voteMapping[value])) {
+                voteMapping[value] = {
+                    count: 0,
+                    value: value
+                }
             }
 
-            countMapping[value]++
+            voteMapping[value].count++
             valueMapping[crawlerName] = crawlerItem.slots.map((slotItem) => {
                 return slotItem.size
             }).join(',')
         }
 
         // Need Copy
-        if (0 !== Object.keys(countMapping).length) {
+        if (0 !== Object.keys(voteMapping).length) {
 
             // Assign Final Value by Max Count
             let maxCount = 0
 
-            for (let [value, count] of Object.entries(countMapping)) {
-                if (maxCount < count) {
-                    maxCount = count
-                    item.slots = JSON.parse(value)
+            for (let voteItem of Object.values(voteMapping)) {
+                if (maxCount < voteItem.count) {
+                    maxCount = voteItem.count
+                    item.slots = JSON.parse(voteItem.value)
                 }
             }
 
             // Record DuplicationValueMapping
-            if (Object.keys(countMapping).length > 1) {
+            if (Object.keys(voteMapping).length > 1) {
                 if (Helper.isEmpty(duplicateValueMapping.slots)) {
                     duplicateValueMapping.slots = []
                 }
@@ -1011,7 +1025,7 @@ export const runAction = () => {
     }
 
     const mergeSkillsValue = (target, itemId, item, crawlerMapping) => {
-        let countMapping = {}
+        let voteMapping = {}
         let valueMapping = {}
 
         // Generate Skill Mapping
@@ -1054,27 +1068,30 @@ export const runAction = () => {
             let value = JSON.stringify(skillList)
 
             // Set Count & Value
-            if (Helper.isEmpty(countMapping[value])) {
-                countMapping[value] = 0
+            if (Helper.isEmpty(voteMapping[value])) {
+                voteMapping[value] = {
+                    count: 0,
+                    value: value
+                }
             }
 
-            countMapping[value]++
+            voteMapping[value].count++
             valueMapping[crawlerName] = skillList.join(',')
         }
 
         // Need Copy
-        if (0 !== Object.keys(countMapping).length) {
+        if (0 !== Object.keys(voteMapping).length) {
 
             // Assign Final Value by Max Count
             let maxCount = 0
 
-            for (let [value, count] of Object.entries(countMapping)) {
-                if (maxCount < count) {
-                    maxCount = count
+            for (let voteItem of Object.values(voteMapping)) {
+                if (maxCount < voteItem.count) {
+                    maxCount = voteItem.count
 
                     item.skills = {}
 
-                    JSON.parse(value).forEach((skillName) => {
+                    JSON.parse(voteItem.value).forEach((skillName) => {
                         item.skills[skillName] = null
                     })
                 }
@@ -1147,7 +1164,7 @@ export const runAction = () => {
             })
 
             // Record DuplicationValueMapping
-            if (Object.keys(countMapping).length > 1) {
+            if (Object.keys(voteMapping).length > 1) {
                 if (Helper.isEmpty(duplicateValueMapping.skills)) {
                     duplicateValueMapping.skills = []
                 }
@@ -1165,11 +1182,11 @@ export const runAction = () => {
     }
 
     const mergeEnhanceValue = (target, itemId, item, crawlerMapping) => {
-        let countMapping = null
+        let voteMapping = null
         let valueMapping = null
 
         // For Enhance Amount
-        countMapping = {}
+        voteMapping = {}
         valueMapping = {}
 
         for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
@@ -1183,29 +1200,32 @@ export const runAction = () => {
             }
 
             // Set Count & Value
-            if (Helper.isEmpty(countMapping[crawlerItem.enhance.amount])) {
-                countMapping[crawlerItem.enhance.amount] = 0
+            if (Helper.isEmpty(voteMapping[crawlerItem.enhance.amount])) {
+                voteMapping[crawlerItem.enhance.amount] = {
+                    count: 0,
+                    value: crawlerItem.enhance.amount
+                }
             }
 
-            countMapping[crawlerItem.enhance.amount]++
+            voteMapping[crawlerItem.enhance.amount].count++
             valueMapping[crawlerName] = crawlerItem.enhance.amount
         }
 
         // Need Copy
-        if (0 !== Object.keys(countMapping).length) {
+        if (0 !== Object.keys(voteMapping).length) {
 
             // Assign Final Value by Max Count
             let maxCount = 0
 
-            for (let [value, count] of Object.entries(countMapping)) {
-                if (maxCount < count) {
-                    maxCount = count
-                    item.enhance.amount = value
+            for (let voteItem of Object.values(voteMapping)) {
+                if (maxCount < voteItem.count) {
+                    maxCount = voteItem.count
+                    item.enhance.amount = voteItem.value
                 }
             }
 
             // Record DuplicationValueMapping
-            if (Object.keys(countMapping).length > 1) {
+            if (Object.keys(voteMapping).length > 1) {
                 if (Helper.isEmpty(duplicateValueMapping.enhanceAmount)) {
                     duplicateValueMapping.enhanceAmount = []
                 }
@@ -1220,7 +1240,7 @@ export const runAction = () => {
         }
 
         // For Enhance List
-        countMapping = {}
+        voteMapping = {}
         valueMapping = {}
 
         // Generate Enhance Mapping
@@ -1263,27 +1283,30 @@ export const runAction = () => {
             let value = JSON.stringify(enhanceList)
 
             // Set Count & Value
-            if (Helper.isEmpty(countMapping[value])) {
-                countMapping[value] = 0
+            if (Helper.isEmpty(voteMapping[value])) {
+                voteMapping[value] = {
+                    count: 0,
+                    value: value
+                }
             }
 
-            countMapping[value]++
+            voteMapping[value].count++
             valueMapping[crawlerName] = enhanceList.join(',')
         }
 
         // Need Copy
-        if (0 !== Object.keys(countMapping).length) {
+        if (0 !== Object.keys(voteMapping).length) {
 
             // Assign Final Value by Max Count
             let maxCount = 0
 
-            for (let [value, count] of Object.entries(countMapping)) {
-                if (maxCount < count) {
-                    maxCount = count
+            for (let voteItem of Object.values(voteMapping)) {
+                if (maxCount < voteItem.count) {
+                    maxCount = voteItem.count
 
                     item.enhance.list = {}
 
-                    JSON.parse(value).forEach((enhanceName) => {
+                    JSON.parse(voteItem.value).forEach((enhanceName) => {
                         item.enhance.list[enhanceName] = null
                     })
                 }
@@ -1318,7 +1341,7 @@ export const runAction = () => {
             item.enhance.list = Object.values(item.enhance.list)
 
             // Record DuplicationValueMapping
-            if (Object.keys(countMapping).length > 1) {
+            if (Object.keys(voteMapping).length > 1) {
                 if (Helper.isEmpty(duplicateValueMapping.enhanceList)) {
                     duplicateValueMapping.enhanceList = []
                 }

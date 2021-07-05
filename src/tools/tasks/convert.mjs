@@ -101,7 +101,7 @@ export const infoAction = () => {
         if ('weapons' === target) {
             let weaponList = Helper.loadCSVAsJSON(`${convertRoot}/weapons.csv`)
 
-            if (Helper.isEmpty(weaponList)) {
+            if (Helper.isNotEmpty(weaponList)) {
                 result.weapons.all.final = weaponList.length
 
                 for (let item of weaponList) {

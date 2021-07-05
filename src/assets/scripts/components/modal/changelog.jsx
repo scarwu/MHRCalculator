@@ -24,9 +24,9 @@ import IconButton from 'components/common/iconButton'
 import ModalState from 'states/modal'
 
 // Load Markdown
-import zhTWChangelog from 'files/md/langs/zhTW/changelog.md'
-import jaJPChangelog from 'files/md/langs/jaJP/changelog.md'
-import enUSChangelog from 'files/md/langs/enUS/changelog.md'
+import zhTWChangelog from 'langs/zhTW/changelog.md'
+import jaJPChangelog from 'langs/jaJP/changelog.md'
+import enUSChangelog from 'langs/enUS/changelog.md'
 
 /**
  * Variables

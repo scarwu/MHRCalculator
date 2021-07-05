@@ -11,7 +11,7 @@
 import Helper from 'core/helper'
 
 // Load Dataset
-import Weapons from 'files/json/datasets/weapons.json'
+import Weapons from 'datasets/weapons.json'
 
 let dataset = Weapons.map((weapon) => {
     return {

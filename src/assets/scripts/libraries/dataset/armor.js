@@ -11,7 +11,7 @@
 import Helper from 'core/helper'
 
 // Load Dataset
-import Armors from 'files/json/datasets/armors.json'
+import Armors from 'datasets/armors.json'
 
 let dataset = Armors.map((bundle) => {
     return bundle[1].map((item) => {

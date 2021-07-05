@@ -376,12 +376,12 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                 helm: [
                     '頭盔', '頭部', '【蒙面】', '綻放', '頭飾', '【頭巾】', '【武士盔】', '【元結】', '首腦',
                     '毛髮', '護頭', '帽', '兜帽', '之首', '禮帽',
-                    '包頭', '偽裝', '羽飾'
+                    '的包頭', '偽裝', '羽飾'
                 ],
                 chest: [
                     '鎧甲', '服飾', '【上衣】', '枝幹', '衣裝', '【上衣】', '【胸甲】', '【白衣】', '肌肉',
                     '羽織', '上身', '戰衣', '洋裝', '胸甲', '服裝',
-                    '鎧', '披風'
+                    '的鎧', '披風'
                 ],
                 arm: [
                     '腕甲', '拳套', '【手甲】', '枝葉', '手套', '【手甲】', '【臂甲】', '【花袖】', '雙手',
@@ -426,14 +426,18 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
             mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
 
             // Slots
-            JSON.parse(armorDom('dl.grid dd').eq(19).text()).forEach((slotSize) => {
-                if (0 === slotSize) {
+            JSON.parse(armorDom('dl.grid dd').eq(19).text()).forEach((slotCount, index) => {
+                if (0 === slotCount) {
                     return
                 }
 
-                mapping[mappingKey].slots.push({
-                    size: slotSize
-                })
+                let size = index + 1
+
+                for (let count = 0; count < slotCount; count++) {
+                    mapping[mappingKey].slots.push({
+                        size: size
+                    })
+                }
             })
 
             // Skills

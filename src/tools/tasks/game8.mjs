@@ -268,10 +268,14 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     mapping[mappingKey].type = weaponType
                     mapping[mappingKey].rare = parseFloat(rare)
                     mapping[mappingKey].attack = parseFloat(attack)
-                    mapping[mappingKey].defense = ('-' !== defense)
-                        ? parseFloat(defense) : null
-                    mapping[mappingKey].criticalRate = (0 !== parseFloat(criticalRate))
-                        ? parseFloat(criticalRate) : null
+                    mapping[mappingKey].defense = (
+                        '' !== defense && '-' !== defense
+                        && '−' !== defense && 0 !== parseFloat(defense)
+                    ) ? parseFloat(normalizeText(defense)) : null
+                    mapping[mappingKey].criticalRate = (
+                        '' !== criticalRate && '-' !== criticalRate
+                        && '−' !== criticalRate && 0 !== parseFloat(criticalRate)
+                    ) ? parseFloat(normalizeText(criticalRate)) : null
                 }
             }
         }

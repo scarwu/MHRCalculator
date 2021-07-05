@@ -135,12 +135,13 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 
             // Get Data
             let rare = normalizeText(weaponNode.eq(2).find('div').eq(1).text().trim()).replace('Rarity ', '')
-            let minDefense = ('--' !== weaponNode.eq(3).find('div').eq(0).text().trim())
-                ? weaponNode.eq(3).find('div').eq(0).text().trim() : null
+            let defense = weaponNode.eq(3).find('div').eq(0).text().trim()
+
+            defense = ('--' !== defense && '??' !== defense && '' !== defense) ? defense : null
 
             if ('Kulu Katana II' === name) {
                 rare = weaponNode.eq(1).find('div').eq(1).text().trim().replace('Rarity ', '')
-                minDefense = ('--' !== weaponNode.eq(3).find('div').eq(0).text().trim())
+                defense = ('--' !== weaponNode.eq(3).find('div').eq(0).text().trim())
                     ? weaponNode.eq(2).find('div').eq(0).text().trim() : null
             }
 
@@ -153,8 +154,8 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             }
 
             mapping[mappingKey].rare = parseInt(rare, 10)
-            mapping[mappingKey].minDefense = Helper.isNotEmpty(minDefense)
-                ? parseInt(minDefense, 10) : null
+            mapping[mappingKey].defense = Helper.isNotEmpty(defense)
+                ? parseInt(defense, 10) : null
 
             // Slots
             weaponNode.eq(3).find('div').eq(1).find('img').each((index, node) => {
@@ -183,6 +184,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             })
 
             let attackIndex = null
+            let sharpnessIndex = null
             let criticalRateIndex = null
             let elementIndex = null
             let enhanceIndex = null
@@ -195,6 +197,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             case 'hammer':
             case 'lance':
                 attackIndex = 4
+                sharpnessIndex = 5
                 criticalRateIndex = 6
                 elementIndex = 7
                 enhanceIndex = 8
@@ -203,6 +206,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             case 'huntingHorn':
             case 'switchAxe':
                 attackIndex = 4
+                sharpnessIndex = 5
                 criticalRateIndex = 6
                 elementIndex = 7
                 enhanceIndex = 9
@@ -210,6 +214,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 break
             case 'gunlance':
                 attackIndex = 4
+                sharpnessIndex = 5
                 criticalRateIndex = 6
                 elementIndex = 7
                 enhanceIndex = 10
@@ -218,6 +223,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             case 'chargeBlade':
             case 'insectGlaive':
                 attackIndex = 4
+                sharpnessIndex = 5
                 criticalRateIndex = 6
                 elementIndex = 7
                 enhanceIndex = 9
@@ -344,19 +350,78 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 })
             }
 
+            if (Helper.isNotEmpty(sharpnessIndex)) {
+                let sharpness = weaponNode.eq(sharpnessIndex).find('td').eq(1)
+                let sharpnessList = [
+                    'red',
+                    'orange',
+                    'yellow',
+                    'green',
+                    'blue',
+                    'white',
+                    'purple'
+                ]
+
+                sharpness.find('div.progress-bar').each((index, node) => {
+                    let value = weaponDom(node).css('width').replace('%', '')
+
+                    if ('' === value) {
+                        return
+                    }
+
+                    value = parseFloat(value) * 4
+
+                    if (0 === value) {
+                        return
+                    }
+
+                    mapping[mappingKey].sharpness[sharpnessList[index]] = value
+                })
+            }
 
             // Enhance
             let enhanceLimit = weaponNode.eq(enhanceIndex).find('td').eq(1).text().trim()
 
-            mapping[mappingKey].enhance.limit = parseFloat(enhanceLimit)
+            mapping[mappingKey].enhance.amount = ('??' !== enhanceLimit && '--' !== enhanceLimit && '' !== enhanceLimit)
+                ? parseFloat(enhanceLimit) : null
 
-            weaponNode.eq(enhanceIndex + 1).find('td').eq(1).find('a').each((index, node) => {
-                let name = weaponDom(node).text().trim()
+            let enhanceText = weaponNode.eq(enhanceIndex + 1).find('td').eq(1).html()
 
-                mapping[mappingKey].enhance.list.push({
-                    name: name
+            if (-1 !== enhanceText.indexOf('<br>')
+                && 'Plegis Needle I' !== name // Special Exception
+                && 'Bolt Chamber II' !== name // Special Exception
+                && 'Royal Bloom II' !== name // Special Exception
+                && 'Wind Thief Crossbow I' !== name // Special Exception
+                && 'Wind Thief Crossbow II' !== name // Special Exception
+                && 'Wind Thief Crossbow III' !== name // Special Exception
+                && 'Gale Crossbow' !== name // Special Exception
+            ) {
+                let enhanceSegments = enhanceText.split('<br>')
+
+                enhanceSegments.forEach((node) => {
+                    let name = normalizeText(weaponDom('<span>' + node + '</span>').text().trim())
+
+                    if ('' === name) {
+                        return
+                    }
+
+                    mapping[mappingKey].enhance.list.push({
+                        name: name
+                    })
                 })
-            })
+            } else {
+                weaponNode.eq(enhanceIndex + 1).find('td').eq(1).find('a').each((index, node) => {
+                    let name = normalizeText(weaponDom(node).text().trim())
+
+                    if ('' === name) {
+                        return
+                    }
+
+                    mapping[mappingKey].enhance.list.push({
+                        name: name
+                    })
+                })
+            }
         }
 
         let list = autoExtendListQuantity(Object.values(mapping))

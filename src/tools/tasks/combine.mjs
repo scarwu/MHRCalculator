@@ -208,7 +208,7 @@ const specialReplaceSkillPropertyName = (text) => {
     return text
 }
 
-const specialReplaceEnhancePropertyName = (text) => {
+const specialReplaceEnhancePropertyName = (text, itemName = null) => {
     let replacementList = [
 
         // kiranico
@@ -221,38 +221,45 @@ const specialReplaceEnhancePropertyName = (text) => {
         // { searchValue: 'デスタ', replaceValue: 'テスタ' },
 
         // fextralife
-        { searchValue: 'Fireblight Eploit', replaceValue: 'Fireblight Exploit' },
-        { searchValue: 'Smaill Monster Exploit', replaceValue: 'Small Monster Exploit' },
+        { searchValue: 'Affinty Boost I', replaceValue: 'Affinity Boost I' },
+        { searchValue: 'Affiinity Boost I', replaceValue: 'Affinity Boost I' },
+        { searchValue: 'Affiinity Boost I', replaceValue: 'Affinity Boost I' },
+        { searchValue: 'Affinity I', replaceValue: 'Affinity Boost I' },
+        { searchValue: 'Affinty Boost II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Affiinity Boost II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Affinity Bonus II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Affiinity Boost II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Affinity II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Affinty Boost III', replaceValue: 'Affinity Boost III' },
         { searchValue: 'Atack Boost I', replaceValue: 'Attack Boost I' },
+        { searchValue: 'Atttack Boost II', replaceValue: 'Attack Boost II' },
+        { searchValue: 'Defense Boost', replaceValue: 'Defense Boost I' }, // Azure Elder Sword I
         { searchValue: 'Defesnse Boost I', replaceValue: 'Defense Boost I' },
         { searchValue: 'Defemse Boost II', replaceValue: 'Defense Boost II' },
-        { searchValue: 'Affinty Boost I', replaceValue: 'Affinity Boost I' },
-        { searchValue: 'Affinty Boost II', replaceValue: 'Affinity Boost II' },
-        { searchValue: 'Affinty Boost III', replaceValue: 'Affinity Boost III' },
-        { searchValue: 'Affiinity Boost I', replaceValue: 'Affinity Boost I' },
-        { searchValue: 'Affiinity Boost II', replaceValue: 'Affinity Boost II' },
-        { searchValue: 'Silkbing Boost', replaceValue: 'Silkbind Boost' },
-        { searchValue: 'Burtal Strike', replaceValue: 'Brutal Strike' },
-        { searchValue: 'Affinity Bonus II', replaceValue: 'Affinity Boost II' },
-        { searchValue: 'Silk Boost', replaceValue: 'Silkbind Boost' },
-        { searchValue: 'Atttack Boost II', replaceValue: 'Attack Boost II' },
-        { searchValue: 'Affiinity Boost I', replaceValue: 'Affinity Boost I' },
-        { searchValue: 'Affiinity Boost II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Defense Boost IV', replaceValue: 'Defense Boost II' }, // For "Keen Edge I"
+        { searchValue: 'Poiston Boost I', replaceValue: 'Poison Boost I' },
+        { searchValue: 'Poiston Boost II', replaceValue: 'Poison Boost II' },
+        { searchValue: 'Boost Boost I', replaceValue: 'Blast Boost I' },
+        { searchValue: 'Ice Bloost II', replaceValue: 'Ice Boost II' },
         { searchValue: 'Anti-aquatic Species', replaceValue: 'Anti-Aquatic Species' },
         { searchValue: 'Anti-aquatic Species', replaceValue: 'Anti-Aquatic Species' },
         { searchValue: 'Anti-Aquatic', replaceValue: 'Anti-Aquatic Species' },
-        { searchValue: 'Silkbing Boost', replaceValue: 'Silkbind Boost' },
-        { searchValue: 'Spiribird Double', replaceValue: 'Spiribird Doubled' },
         { searchValue: 'Anti Aerial Species', replaceValue: 'Anti-Aerial Species' },
-        { searchValue: 'Affinity I', replaceValue: 'Affinity Boost I' },
-        { searchValue: 'Affinity II', replaceValue: 'Affinity Boost II' },
+        { searchValue: 'Fireblight Eploit', replaceValue: 'Fireblight Exploit' },
+        { searchValue: 'Smaill Monster Exploit', replaceValue: 'Small Monster Exploit' },
         { searchValue: 'Fire Blight Exploit', replaceValue: 'Fireblight Exploit' },
-        { searchValue: 'Poiston Boost I', replaceValue: 'Poison Boost I' },
-        { searchValue: 'Poiston Boost II', replaceValue: 'Poison Boost II' },
-        { searchValue: 'Ice Bloost II', replaceValue: 'Ice Boost II' },
+        { searchValue: 'Dragon Exploit', replaceValue: 'Wyvern Exploit' },
+        { searchValue: 'Burtal Strike', replaceValue: 'Brutal Strike' },
+        { searchValue: 'Spiribird Double', replaceValue: 'Spiribird Doubled' },
         { searchValue: 'Brutal Strke', replaceValue: 'Brutal Strike' },
-        { searchValue: 'Lasting Arch Shot', replaceValue: 'Lasting Arc Shot' }
+        { searchValue: 'Lasting Arch Shot', replaceValue: 'Lasting Arc Shot' },
+        { searchValue: 'Silkbing Boost', replaceValue: 'Silkbind Boost' },
+        { searchValue: 'Silk Boost', replaceValue: 'Silkbind Boost' },
+        { searchValue: 'Silkbing Boost', replaceValue: 'Silkbind Boost' },
+        { searchValue: 'SilkBind Boost', replaceValue: 'Silkbind Boost' }
     ]
+
+    text = text.replace(/x1$/, 'I').replace(/x2$/, 'II').replace(/x3$/, 'III').replace(/x4$/, 'IV')
 
     for (let item of replacementList) {
         if (text === item.searchValue) {

@@ -500,7 +500,10 @@ export const fetchArmorsAction = async () => {
             }
 
             // Skill
-            itemDom('table.wiki_table').eq(0).find('tbody tr').eq(11).find('td').eq(0).html().split('<br>').forEach((node) => {
+            let skillText = itemDom('table.wiki_table').eq(0).find('tbody tr').eq(11).find('td').eq(0).html()
+            let skillSegments = (-1 !== skillText.indexOf(',')) ? skillText.split(',') : skillText.split('<br>')
+
+            skillSegments.forEach((node) => {
                 let tempText = normalizeText(itemDom(node).text().trim())
                 let match = tempText.match(/^(.*?)x(\d)$/)
 

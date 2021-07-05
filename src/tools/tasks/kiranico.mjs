@@ -367,8 +367,8 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
             let minDefense = armorDom('dl.grid dd').eq(11).text().trim()
             let resistenceFire = armorDom('dl.grid dd').eq(12).text().trim()
             let resistenceWater = armorDom('dl.grid dd').eq(13).text().trim()
-            let resistenceThunder = armorDom('dl.grid dd').eq(14).text().trim()
-            let resistenceIce = armorDom('dl.grid dd').eq(15).text().trim()
+            let resistenceIce = armorDom('dl.grid dd').eq(14).text().trim()
+            let resistenceThunder = armorDom('dl.grid dd').eq(15).text().trim()
             let resistenceDragon = armorDom('dl.grid dd').eq(16).text().trim()
 
             let type = null
@@ -445,6 +445,16 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                     level: null
                 })
             })
+
+            if (0 < mapping[mappingKey].skills.length) {
+                let skillMapping = {}
+
+                mapping[mappingKey].skills.forEach((skillItem) => {
+                    skillMapping[skillItem.name] = skillItem
+                })
+
+                mapping[mappingKey].skills = Object.values(skillMapping)
+            }
         }
 
         // Get Other Lang

@@ -61,6 +61,7 @@ const specialReplaceItemName = (text, lang, rare) => {
         { lang: 'enUS', searchValue: 'Utsushi Greaves (H)', replaceValue: 'Utsushi Greaves (Hidden)' },
         { lang: 'enUS', searchValue: 'S. Studded', replaceValue: 'Shell-Studded' },
         { lang: 'enUS', searchValue: 'Shelled', replaceValue: 'Shell-Studded' },
+        { lang: 'enUS', searchValue: 'D. Stench', replaceValue: 'Death Stench' },
         { lang: 'enUS', searchValue: 'Kadachi Braces S', replaceValue: 'Tobi-Kadachi Braces S' },
         { lang: 'enUS', searchValue: 'Tobi-Tobi-Kadachi Braces S', replaceValue: 'Tobi-Kadachi Braces S' },
 
@@ -191,6 +192,7 @@ const specialReplaceSkillPropertyName = (text) => {
         // fextralife
         { searchValue: 'Agilator', replaceValue: 'Agitator' },
         { searchValue: 'Chamaleos Blessing', replaceValue: 'Chameleos Blessing' },
+        { searchValue: 'Aim Booster', replaceValue: 'Ballistics' },
         // { searchValue: 'Agilator', replaceValue: 'Agitator' },
         // { searchValue: 'Agilator', replaceValue: 'Agitator' },
         // { searchValue: 'Agilator', replaceValue: 'Agitator' },
@@ -237,9 +239,11 @@ const specialReplaceEnhancePropertyName = (text) => {
         { searchValue: 'Affiinity Boost I', replaceValue: 'Affinity Boost I' },
         { searchValue: 'Affiinity Boost II', replaceValue: 'Affinity Boost II' },
         { searchValue: 'Anti-aquatic Species', replaceValue: 'Anti-Aquatic Species' },
+        { searchValue: 'Anti-aquatic Species', replaceValue: 'Anti-Aquatic Species' },
+        { searchValue: 'Anti-Aquatic', replaceValue: 'Anti-Aquatic Species' },
         { searchValue: 'Silkbing Boost', replaceValue: 'Silkbind Boost' },
         { searchValue: 'Spiribird Double', replaceValue: 'Spiribird Doubled' },
-        { searchValue: 'Anti-Aerial Species', replaceValue: 'Anti Aerial Species' },
+        { searchValue: 'Anti Aerial Species', replaceValue: 'Anti-Aerial Species' },
         { searchValue: 'Affinity I', replaceValue: 'Affinity Boost I' },
         { searchValue: 'Affinity II', replaceValue: 'Affinity Boost II' },
         { searchValue: 'Fire Blight Exploit', replaceValue: 'Fireblight Exploit' },
@@ -247,7 +251,7 @@ const specialReplaceEnhancePropertyName = (text) => {
         { searchValue: 'Poiston Boost II', replaceValue: 'Poison Boost II' },
         { searchValue: 'Ice Bloost II', replaceValue: 'Ice Boost II' },
         { searchValue: 'Brutal Strke', replaceValue: 'Brutal Strike' },
-        { searchValue: 'Lasting Arch Shot', replaceValue: 'Lasting Arc Shot' },
+        { searchValue: 'Lasting Arch Shot', replaceValue: 'Lasting Arc Shot' }
     ]
 
     for (let item of replacementList) {
@@ -613,6 +617,14 @@ export const arrangeAction = () => {
                         continue
                     }
 
+                    // Special Append Char
+                    if (('description' === key || 'effect' === key)
+                        && ('jaJP' === lang || 'zhTW' === lang)
+                        && false === /。$/.test(crawlerItem[key][lang])
+                    ) {
+                        crawlerItem[key][lang] = crawlerItem[key][lang] + '。'
+                    }
+
                     // Set Default Value
                     if (Helper.isEmpty(item[key])) {
                         item[key] = {}
@@ -721,6 +733,7 @@ export const arrangeAction = () => {
                     duplicateValueMapping.element.push({
                         target: target,
                         name: idNameMapping[itemId],
+                        rare: item.rare,
                         key: key,
                         property: property,
                         valueMapping: valueMapping
@@ -780,6 +793,7 @@ export const arrangeAction = () => {
                 duplicateValueMapping.sharpness.push({
                     target: target,
                     name: idNameMapping[itemId],
+                    rare: item.rare,
                     key: key,
                     valueMapping: valueMapping
                 })
@@ -837,6 +851,7 @@ export const arrangeAction = () => {
                 duplicateValueMapping.resistence.push({
                     target: target,
                     name: idNameMapping[itemId],
+                    rare: item.rare,
                     key: key,
                     valueMapping: valueMapping
                 })
@@ -971,6 +986,7 @@ export const arrangeAction = () => {
                 duplicateValueMapping.slots.push({
                     target: target,
                     name: idNameMapping[itemId],
+                    rare: item.rare,
                     valueMapping: valueMapping
                 })
             }
@@ -1008,6 +1024,7 @@ export const arrangeAction = () => {
                         target: target,
                         name: idNameMapping[itemId],
                         crawlerName: crawlerName,
+                        orignalName: crawlerItem.name,
                         skillName: skillItem.name
                     })
 
@@ -1096,6 +1113,7 @@ export const arrangeAction = () => {
                     target: target,
                     name: idNameMapping[itemId],
                     crawlerName: crawlerName,
+                    orignalName: crawlerItem.name,
                     skillName: skillItem.name
                 })
             })
@@ -1122,6 +1140,7 @@ export const arrangeAction = () => {
                 duplicateValueMapping.skills.push({
                     target: target,
                     name: idNameMapping[itemId],
+                    rare: item.rare,
                     valueMapping: valueMapping
                 })
             }
@@ -1179,6 +1198,7 @@ export const arrangeAction = () => {
                 duplicateValueMapping.enhanceAmount.push({
                     target: target,
                     name: idNameMapping[itemId],
+                    rare: item.rare,
                     valueMapping: valueMapping
                 })
             }
@@ -1213,6 +1233,7 @@ export const arrangeAction = () => {
                         target: target,
                         name: idNameMapping[itemId],
                         crawlerName: crawlerName,
+                        orignalName: crawlerItem.name,
                         enhanceName: enhanceItem.name
                     })
 
@@ -1253,6 +1274,32 @@ export const arrangeAction = () => {
                 }
             }
 
+            // Filling
+            for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+                if (Helper.isEmpty(crawlerItem.enhance.list)) {
+                    continue
+                }
+
+                crawlerItem.enhance.list.forEach((enhanceItem) => {
+                    if (Helper.isEmpty(enhanceItem.name)) {
+                        return
+                    }
+
+                    let enhanceName = getPropertyEnhanceTranslateName(enhanceItem.name)
+
+                    // Just Skipped
+                    if (Helper.isEmpty(enhanceName)) {
+                        return
+                    }
+
+                    enhanceItem.name = enhanceName
+
+                    if (Helper.isEmpty(item.enhance.list[enhanceItem.name])) {
+                        item.enhance.list[enhanceItem.name] = enhanceItem
+                    }
+                })
+            }
+
             item.enhance.list = Object.values(item.enhance.list)
 
             // Record DuplicationValueMapping
@@ -1264,6 +1311,7 @@ export const arrangeAction = () => {
                 duplicateValueMapping.enhanceList.push({
                     target: target,
                     name: idNameMapping[itemId],
+                    rare: item.rare,
                     valueMapping: valueMapping
                 })
             }

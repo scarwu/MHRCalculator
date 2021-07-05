@@ -270,7 +270,7 @@ const specialReplaceEnhancePropertyName = (text, itemName = null) => {
     return text
 }
 
-export const arrangeAction = () => {
+export const runAction = () => {
 
     let rawDataMapping = {}
     let metaDataMapping = {}
@@ -589,7 +589,15 @@ export const arrangeAction = () => {
             for (let [value, count] of Object.entries(countMapping)) {
                 if (maxCount < count) {
                     maxCount = count
-                    item[key] = value
+
+                    if (-1 !== [
+                        'rare', 'attack', 'criticalRate', 'defense',
+                        'minDefense', 'maxDefense', 'size', 'level',
+                    ].indexOf(key)) {
+                        item[key] = parseFloat(value)
+                    } else {
+                        item[key] = value
+                    }
                 }
             }
 
@@ -1555,6 +1563,6 @@ export const infoAction = () => {
 }
 
 export default {
-    arrangeAction,
+    runAction,
     infoAction
 }

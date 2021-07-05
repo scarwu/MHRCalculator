@@ -1,4 +1,4 @@
-"<string>:{name}:zhTW","<string>:{name}:jaJP","<string>:{name}:enUS","<string>:{description}:zhTW","<string>:{description}:jaJP","<string>:{description}:enUS","<string>:level","<string>:{effect}:zhTW","<string>:{effect}:jaJP","<string>:{effect}:enUS"
+"<string>:{name}:zhTW","<string>:{name}:jaJP","<string>:{name}:enUS","<string>:{description}:zhTW","<string>:{description}:jaJP","<string>:{description}:enUS","<number>:level","<string>:{effect}:zhTW","<string>:{effect}:jaJP","<string>:{effect}:enUS"
 "攻擊","攻撃","Attack Boost","提高玩家的攻擊力。","プレイヤーの攻撃力を上げる。","Increases attack power.","1","攻擊力+3。","攻撃力+3。","Attack +3"
 "攻擊","攻撃","Attack Boost","提高玩家的攻擊力。","プレイヤーの攻撃力を上げる。","Increases attack power.","2","攻擊力+6。","攻撃力+6。","Attack +6"
 "攻擊","攻撃","Attack Boost","提高玩家的攻擊力。","プレイヤーの攻撃力を上げる。","Increases attack power.","3","攻擊力+9。","攻撃力+9。","Attack +9"

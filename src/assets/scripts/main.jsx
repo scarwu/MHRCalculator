@@ -32,7 +32,7 @@ if ('production' === Config.env) {
         scope.setLevel('error')
     })
     Sentry.init({
-        dsn: 'https://000580e8cc8a4f3bbf668d4acfc90da2@sentry.io/1400031',
+        dsn: 'https://b1176b2a7c654e8c97eb25fb599eb307@o235065.ingest.sentry.io/5849529',
         release: Config.buildTime
     })
 }

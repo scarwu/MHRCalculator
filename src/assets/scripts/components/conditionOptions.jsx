@@ -18,7 +18,6 @@ import _ from 'libraries/lang'
 
 // Load Components
 import EquipList from 'components/sub/conditionOptions/equipList'
-import SetList from 'components/sub/conditionOptions/setList'
 import SkillList from 'components/sub/conditionOptions/skillList'
 import IconButton from 'components/common/iconButton'
 import IconTab from 'components/common/iconTab'
@@ -31,7 +30,6 @@ import CommonState from 'states/common'
  */
 const handleRequireConditionRefresh = () => {
     CommonState.setter.cleanRequiredEquips()
-    CommonState.setter.cleanRequiredSets()
     CommonState.setter.cleanRequiredSkills()
 }
 
@@ -90,7 +88,6 @@ export default function ConditionOptions(props) {
 
             <div className="mhrc-list">
                 <EquipList />
-                <SetList />
                 <SkillList />
             </div>
         </div>

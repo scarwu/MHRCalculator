@@ -17,12 +17,12 @@ import Helper from 'core/helper'
 import _ from 'libraries/lang'
 import JewelDataset from 'libraries/dataset/jewel'
 import EnhanceDataset from 'libraries/dataset/enhance'
-import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 import CommonDataset from 'libraries/dataset/common'
 
 // Load Components
 import CustomWeapon from 'components/sub/equipsDisplayer/customWeapon'
+import CustomCharm from 'components/sub/equipsDisplayer/customCharm'
 import IconButton from 'components/common/iconButton'
 import IconTab from 'components/common/iconTab'
 import SharpnessBar from 'components/common/sharpnessBar'
@@ -387,9 +387,6 @@ const renderEquipBlock = (equipType, currentEquip, requiredEquip) => {
         )
     }
 
-    let setInfo = (Helper.isNotEmpty(equipInfo.set))
-        ? SetDataset.getInfo(equipInfo.set.id) : null
-
     return (
         <div key={selectorData.equipId} className="mhrc-item mhrc-item-3-step">
             <div className="col-12 mhrc-name">
@@ -439,17 +436,6 @@ const renderEquipBlock = (equipType, currentEquip, requiredEquip) => {
 
             {('weapon' !== equipType && 'charm' !== equipType)
                 ? renderArmorProperties(equipInfo) : false}
-
-            {(Helper.isNotEmpty(setInfo)) ? (
-                <div className="col-12 mhrc-content">
-                    <div className="col-3 mhrc-name">
-                        <span>{_('set')}</span>
-                    </div>
-                    <div className="col-9 mhrc-value">
-                        <span>{_(setInfo.name)}</span>
-                    </div>
-                </div>
-            ) : false}
 
             {(Helper.isNotEmpty(equipInfo.skills)
                 && 0 !== equipInfo.skills.length)

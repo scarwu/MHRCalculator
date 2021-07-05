@@ -19,7 +19,6 @@ import _ from 'libraries/lang'
 
 // Load Components
 import ArmorFactors from 'components/modal/sub/algorithmSetting/armorFactors'
-import CharmFactors from 'components/modal/sub/algorithmSetting/charmFactors'
 import JewelFactors from 'components/modal/sub/algorithmSetting/jewelFactors'
 import IconButton from 'components/common/iconButton'
 import IconSelector from 'components/common/iconSelector'
@@ -58,7 +57,6 @@ const getModeList = () => {
     return [
         { key: 'all',                   value: _('all') },
         { key: 'armorFactor',           value: _('armorFactor') },
-        { key: 'charmFactor',           value: _('charmFactor') },
         { key: 'jewelFactor',           value: _('jewelFactor') },
         { key: 'byRequiredConditions',  value: _('byRequiredConditions') }
     ]
@@ -283,10 +281,6 @@ export default function AlgorithmSetting(props) {
 
                         {'all' === stateMode || 'armorFactor' === stateMode || 'byRequiredConditions' === stateMode
                             ? <ArmorFactors segment={stateSegment}
-                                byRequiredConditions={'byRequiredConditions' === stateMode} />
-                            : false}
-                        {'all' === stateMode || 'charmFactor' === stateMode || 'byRequiredConditions' === stateMode
-                            ? <CharmFactors segment={stateSegment}
                                 byRequiredConditions={'byRequiredConditions' === stateMode} />
                             : false}
                         {'all' === stateMode || 'jewelFactor' === stateMode || 'byRequiredConditions' === stateMode

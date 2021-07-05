@@ -17,10 +17,9 @@ import Helper from 'core/helper'
 import _ from 'libraries/lang'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
-import CharmDataset from 'libraries/dataset/charm'
+import PetalaceDataset from 'libraries/dataset/petalace'
 import JewelDataset from 'libraries/dataset/jewel'
 import EnhanceDataset from 'libraries/dataset/enhance'
-import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 
 // Load Components
@@ -201,8 +200,6 @@ const renderWeaponItem = (weapon, bypassData) => {
 }
 
 const renderArmorItem = (armor, bypassData) => {
-    let setInfo = Helper.isNotEmpty(armor.set)
-        ? SetDataset.getInfo(armor.set.id) : false
 
     // Re-write BypassData
     bypassData.equipType = armor.type
@@ -259,17 +256,6 @@ const renderArmorItem = (armor, bypassData) => {
                     })}
                 </div>
 
-                {Helper.isEmpty(setInfo) ? (
-                    <Fragment>
-                        <div className="col-3 mhrc-name">
-                            <span>{_('set')}</span>
-                        </div>
-                        <div className="col-9 mhrc-value">
-                            <span>{_(setInfo.name)}</span>
-                        </div>
-                    </Fragment>
-                ) : false}
-
                 {armor.skills.map((skill, index) => {
                     let skillInfo = SkillDataset.getInfo(skill.id)
 
@@ -289,35 +275,22 @@ const renderArmorItem = (armor, bypassData) => {
     )
 }
 
-const renderCharmItem = (charm, bypassData) => {
+const renderPetalaceItem = (petalace, bypassData) => {
     return (
-        <div key={charm.id} className="mhrc-item mhrc-item-2-step">
+        <div key={petalace.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
-                <span>{_(charm.name)}</span>
+                <span>{_(petalace.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(false === charm.isSelect) ? (
+                    {(false === petalace.isSelect) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
-                            onClick={() => {handleItemPickUp(bypassData, charm.id)}} />
+                            onClick={() => {handleItemPickUp(bypassData, petalace.id)}} />
                     ) : false}
                 </div>
             </div>
             <div className="col-12 mhrc-content">
-                {charm.skills.map((skill, index) => {
-                    let skillInfo = SkillDataset.getInfo(skill.id)
 
-                    return Helper.isNotEmpty(skillInfo) ? (
-                        <Fragment key={index}>
-                            <div className="col-12 mhrc-name">
-                                <span>{_(skillInfo.name)} Lv.{skill.level}</span>
-                            </div>
-                            <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillInfo.list[skill.level - 1].description)}</span>
-                            </div>
-                        </Fragment>
-                    ) : false
-                })}
             </div>
         </div>
     )
@@ -487,12 +460,12 @@ export default function EquipItemSelector(props) {
                 return { key: rare, value: _('rare') + `: ${rare}` }
             })
             rare = (Helper.isNotEmpty(armoreInfo)) ? armoreInfo.rare : rareList[0].key
-        } else if ('charm' === stateBypassData.equipType) {
-            mode = 'charm'
-            sortedList = CharmDataset.getItems().map((charmInfo) => {
-                charmInfo.isSelect = (stateBypassData.equipId === charmInfo.id)
+        } else if ('petalace' === stateBypassData.equipType) {
+            mode = 'petalace'
+            sortedList = PetalaceDataset.getItems().map((petalaceInfo) => {
+                petalaceInfo.isSelect = (stateBypassData.equipId === petalaceInfo.id)
 
-                return charmInfo
+                return petalaceInfo
             })
         }
 
@@ -614,14 +587,6 @@ export default function EquipItemSelector(props) {
                 let text = _(data.name)
                 text += _(data.series)
 
-                if (Helper.isNotEmpty(data.set)) {
-                    let setInfo = SetDataset.getInfo(data.set.id)
-
-                    if (Helper.isNotEmpty(setInfo)) {
-                        text += _(setInfo.name)
-                    }
-                }
-
                 data.skills.forEach((data) => {
                     let skillInfo = SkillDataset.getInfo(data.id)
 
@@ -668,7 +633,7 @@ export default function EquipItemSelector(props) {
             }).sort((dataA, dataB) => {
                 return _(dataA.id) > _(dataB.id) ? 1 : -1
             }).map((data) => {
-                return renderCharmItem(data, bypassData)
+                return renderPetalaceItem(data, bypassData)
             })
         case 'jewel':
             return stateSortedList.filter((data) => {

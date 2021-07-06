@@ -18,7 +18,7 @@ import Helper from 'core/helper'
 import _ from 'libraries/lang'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
-import CharmDataset from 'libraries/dataset/charm'
+// import CharmDataset from 'libraries/dataset/charm'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -175,7 +175,7 @@ export default function BundleItemSelector(props) {
                         ) {
                             equipInfo = ArmorDataset.getInfo(stateCurrentEquips[equipType].id)
                         } else if ('charm' === equipType) {
-                            equipInfo = CharmDataset.getInfo(stateCurrentEquips[equipType].id)
+                            // equipInfo = CharmDataset.getInfo(stateCurrentEquips[equipType].id)
                         }
 
                         return Helper.isNotEmpty(equipInfo) ? (
@@ -236,7 +236,7 @@ export default function BundleItemSelector(props) {
                         ) {
                             equipInfo = ArmorDataset.getInfo(data.equips[equipType].id)
                         } else if ('charm' === equipType) {
-                            equipInfo = CharmDataset.getInfo(data.equips[equipType].id)
+                            // equipInfo = CharmDataset.getInfo(data.equips[equipType].id)
                         }
 
                         return Helper.isNotEmpty(equipInfo) ? (

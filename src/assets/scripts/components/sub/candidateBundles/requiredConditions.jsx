@@ -16,9 +16,9 @@ import Helper from 'core/helper'
 // Load Custom Libraries
 import _ from 'libraries/lang'
 import ArmorDataset from 'libraries/dataset/armor'
-import CharmDataset from 'libraries/dataset/charm'
+// import CharmDataset from 'libraries/dataset/charm'
 import SkillDataset from 'libraries/dataset/skill'
-import SetDataset from 'libraries/dataset/set'
+// import SetDataset from 'libraries/dataset/set'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -156,7 +156,7 @@ export default function RequiredConditions(props) {
                                 ) {
                                     equipInfo = ArmorDataset.getInfo(equip.id)
                                 } else if ('charm' === equip.type) {
-                                    equipInfo = CharmDataset.getInfo(equip.id)
+                                    // equipInfo = CharmDataset.getInfo(equip.id)
                                 }
 
                                 return Helper.isNotEmpty(equipInfo) ? (
@@ -177,7 +177,7 @@ export default function RequiredConditions(props) {
                     </div>
                 ) : false}
 
-                {0 !== currentRequiredSets.length ? (
+                {/* {0 !== currentRequiredSets.length ? (
                     <div className="col-12 mhrc-content">
                         <div className="col-12 mhrc-name">
                             <span>{_('set')}</span>
@@ -206,7 +206,7 @@ export default function RequiredConditions(props) {
                             })}
                         </div>
                     </div>
-                ) : false}
+                ) : false} */}
 
                 {0 !== currentRequiredSkills.length ? (
                     <div className="col-12 mhrc-content">

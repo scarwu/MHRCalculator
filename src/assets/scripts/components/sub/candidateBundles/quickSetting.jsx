@@ -16,7 +16,7 @@ import Helper from 'core/helper'
 // Load Custom Libraries
 import _ from 'libraries/lang'
 import ArmorDataset from 'libraries/dataset/armor'
-import CharmDataset from 'libraries/dataset/charm'
+// import CharmDataset from 'libraries/dataset/charm'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
 
@@ -37,7 +37,7 @@ export default function QuickSetting(props) {
      */
     const [stateAlgorithmParams, updateAlgorithmParams] = useState(CommonState.getter.getAlgorithmParams())
     const [stateRequiredEquips, updateRequiredEquips] = useState(CommonState.getter.getRequiredEquips())
-    const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
+    // const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
     const [stateRequiredSkills, updateRequiredSkills] = useState(CommonState.getter.getRequiredSkills())
 
     // Like Did Mount & Will Unmount Cycle
@@ -69,16 +69,16 @@ export default function QuickSetting(props) {
 
             return Helper.isEmpty(stateRequiredEquips[equipType])
         })
-        const setIds = stateRequiredSets.map((set) => {
-            return set.id
-        })
+        // const setIds = stateRequiredSets.map((set) => {
+        //     return set.id
+        // })
         const skillIds = stateRequiredSkills.map((skill) => {
             skillLevelMapping[skill.id] = skill.level
 
             return skill.id
         })
 
-        ArmorDataset.typesIs(equipTypes).setsIs(setIds).getItems().forEach((armorInfo) => {
+        ArmorDataset.typesIs(equipTypes).getItems().forEach((armorInfo) => {
             if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorInfo.rare]) {
                 return
             }
@@ -142,39 +142,39 @@ export default function QuickSetting(props) {
             }
         })
 
-        if (Helper.isEmpty(stateRequiredEquips.charm)) {
-            CharmDataset.hasSkills(skillIds).getItems().forEach((charmInfo) => {
-                let isSkip = false
+        // if (Helper.isEmpty(stateRequiredEquips.charm)) {
+        //     CharmDataset.hasSkills(skillIds).getItems().forEach((charmInfo) => {
+        //         let isSkip = false
 
-                charmInfo.skills.forEach((skill) => {
-                    if (true === isSkip) {
-                        return
-                    }
+        //         charmInfo.skills.forEach((skill) => {
+        //             if (true === isSkip) {
+        //                 return
+        //             }
 
-                    if (0 === skillLevelMapping[skill.id]) {
-                        isSkip = true
+        //             if (0 === skillLevelMapping[skill.id]) {
+        //                 isSkip = true
 
-                        return
-                    }
-                })
+        //                 return
+        //             }
+        //         })
 
-                if (true === isSkip) {
-                    return
-                }
+        //         if (true === isSkip) {
+        //             return
+        //         }
 
-                if (Helper.isEmpty(charmSeriesMapping[charmInfo.seriesId])) {
-                    charmSeriesMapping[charmInfo.seriesId] = {
-                        series: charmInfo.series,
-                        min: 1,
-                        max: 1
-                    }
-                }
+        //         if (Helper.isEmpty(charmSeriesMapping[charmInfo.seriesId])) {
+        //             charmSeriesMapping[charmInfo.seriesId] = {
+        //                 series: charmInfo.series,
+        //                 min: 1,
+        //                 max: 1
+        //             }
+        //         }
 
-                if (charmSeriesMapping[charmInfo.seriesId].max < charmInfo.level) {
-                    charmSeriesMapping[charmInfo.seriesId].max = charmInfo.level
-                }
-            })
-        }
+        //         if (charmSeriesMapping[charmInfo.seriesId].max < charmInfo.level) {
+        //             charmSeriesMapping[charmInfo.seriesId].max = charmInfo.level
+        //         }
+        //     })
+        // }
 
         JewelDataset.hasSkills(skillIds, true).getItems().forEach((jewelInfo) => {
             let isSkip = false
@@ -353,5 +353,11 @@ export default function QuickSetting(props) {
                 }) : false}
             </div>
         )
-    }, [data, stateAlgorithmParams, stateRequiredEquips, stateRequiredSets, stateRequiredSkills])
+    }, [
+        data,
+        stateAlgorithmParams,
+        stateRequiredEquips,
+        // stateRequiredSets,
+        stateRequiredSkills
+    ])
 }

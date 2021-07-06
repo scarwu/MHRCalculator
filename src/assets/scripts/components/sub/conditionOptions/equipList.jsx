@@ -17,7 +17,7 @@ import Helper from 'core/helper'
 import _ from 'libraries/lang'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
-import CharmDataset from 'libraries/dataset/charm'
+// import CharmDataset from 'libraries/dataset/charm'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -64,7 +64,7 @@ const renderEquipItem = (equipType, requiredEquip) => {
     ) {
         equipInfo = ArmorDataset.getInfo(requiredEquip.id)
     } else if ('charm' === equipType) {
-        equipInfo = CharmDataset.getInfo(requiredEquip.id)
+        // equipInfo = CharmDataset.getInfo(requiredEquip.id)
     } else {
         return false
     }

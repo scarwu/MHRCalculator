@@ -15,7 +15,7 @@ import Helper from 'core/helper'
 
 // Load Custom Libraries
 import _ from 'libraries/lang'
-import SetDataset from 'libraries/dataset/set'
+// import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 import WeaponDataset from 'libraries/dataset/weapon'
 import CommonDataset from 'libraries/dataset/common'
@@ -70,11 +70,11 @@ const generateEquipInfos = (equips) => {
 
     equipInfos.weapon = CommonDataset.getAppliedWeaponInfo(equips.weapon)
 
-    ['helm', 'chest', 'arm', 'waist', 'leg'].forEach((equipType) => {
+    for (let equipType of ['helm', 'chest', 'arm', 'waist', 'leg']) {
         equipInfos[equipType] = CommonDataset.getAppliedArmorInfo(equips[equipType])
-    })
+    }
 
-    equipInfos.charm = CommonDataset.getAppliedCharmInfo(equips.charm)
+    // equipInfos.charm = CommonDataset.getAppliedCharmInfo(equips.charm)
 
     return equipInfos
 }
@@ -82,7 +82,7 @@ const generateEquipInfos = (equips) => {
 const generatePassiveSkills = (equipInfos) => {
     let passiveSkills = {}
 
-    ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg', 'charm'].forEach((equipType) => {
+    for (let equipType of ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg', 'charm']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
             return
         }
@@ -102,14 +102,14 @@ const generatePassiveSkills = (equipInfos) => {
                 }
             }
         })
-    })
+    }
 
     return passiveSkills
 }
 
 const generateStatus = (equipInfos, passiveSkills) => {
     let status = Helper.deepCopy(Constant.default.status)
-
+    return status
     equipInfos = Helper.deepCopy(equipInfos)
 
     let weaponType = null
@@ -124,7 +124,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
     }
 
     // Resistance
-    ['helm', 'chest', 'arm', 'waist', 'leg'].forEach((equipType) => {
+    for (let equipType of ['helm', 'chest', 'arm', 'waist', 'leg']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
             return
         }
@@ -132,12 +132,12 @@ const generateStatus = (equipInfos, passiveSkills) => {
         Constant.resistances.forEach((elementType) => {
             status.resistance[elementType] += equipInfos[equipType].resistance[elementType]
         })
-    })
+    }
 
     // Defense & Set
     let setMapping = {}
 
-    ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg'].forEach((equipType) => {
+    for (let equipType of ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
             return
         }
@@ -153,12 +153,12 @@ const generateStatus = (equipInfos, passiveSkills) => {
         }
 
         status.defense += equipInfos[equipType].defense
-    })
+    }
 
     // Skills
     let allSkills = {}
 
-    ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg', 'charm'].forEach((equipType) => {
+    for (let equipType of ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg', 'charm']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
             return
         }
@@ -170,7 +170,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
 
             allSkills[skill.id] += skill.level
         })
-    })
+    }
 
     Object.keys(setMapping).forEach((setId) => {
         let setCount = setMapping[setId]
@@ -629,6 +629,7 @@ export default function CharacterStatus(props) {
         const equipInfos = generateEquipInfos(stateCurrentEquips)
         const passiveSkills = generatePassiveSkills(equipInfos)
         const status = generateStatus(equipInfos, passiveSkills)
+        console.log(status)
         const benefitAnalysis = generateBenefitAnalysis(equipInfos, status, stateTuning)
 
         updateEquipInfos(equipInfos)
@@ -939,7 +940,7 @@ export default function CharacterStatus(props) {
                     </div>
                 </div>
 
-                {(0 !== status.sets.length) ? (
+                {/* {(0 !== status.sets.length) ? (
                     <div className="mhrc-item mhrc-item-3-step">
                         <div className="col-12 mhrc-name">
                             <span>{_('set')}</span>
@@ -962,7 +963,7 @@ export default function CharacterStatus(props) {
                             ) : false
                         })}
                     </div>
-                ) : false}
+                ) : false} */}
 
                 {(0 !== status.skills.length) ? (
                     <div className="mhrc-item mhrc-item-3-step">

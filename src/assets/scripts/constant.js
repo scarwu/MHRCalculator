@@ -135,7 +135,6 @@ export default {
                     'rare6': false,
                     'rare5': false
                 },
-                charm: {},
                 jewel: {
                     'size4': true,
                     'size3': true,
@@ -176,6 +175,7 @@ export default {
                 arm: null,
                 waist: null,
                 leg: null,
+                petalace: null,
                 charm: null
             },
             skillLevelMapping: {},
@@ -237,6 +237,9 @@ export default {
             leg: {
                 id: null,
                 slotIds: []
+            },
+            petalace: {
+                id: null
             },
             charm: {
                 id: null

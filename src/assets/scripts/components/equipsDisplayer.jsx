@@ -333,7 +333,7 @@ const renderEquipBlock = (equipType, currentEquip, requiredEquip) => {
     ) {
         equipInfo = CommonDataset.getAppliedArmorInfo(currentEquip)
     } else if ('charm' === equipType) {
-        equipInfo = CommonDataset.getAppliedCharmInfo(currentEquip)
+        // equipInfo = CommonDataset.getAppliedCharmInfo(currentEquip)
     } else {
         return false
     }

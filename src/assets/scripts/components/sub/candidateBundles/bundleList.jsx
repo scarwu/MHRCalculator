@@ -17,10 +17,10 @@ import Helper from 'core/helper'
 import _ from 'libraries/lang'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
-import CharmDataset from 'libraries/dataset/charm'
+// import CharmDataset from 'libraries/dataset/charm'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
-import SetDataset from 'libraries/dataset/set'
+// import SetDataset from 'libraries/dataset/set'
 import CommonDataset from 'libraries/dataset/common'
 
 // Load Components
@@ -288,38 +288,38 @@ export default function BundleList(props) {
             }
 
             // Additional Sets & Skills
-            const additionalSets = Object.keys(bundle.setCountMapping).map((setId) => {
-                let setInfo = SetDataset.getInfo(setId)
+            // const additionalSets = Object.keys(bundle.setCountMapping).map((setId) => {
+            //     let setInfo = SetDataset.getInfo(setId)
 
-                if (Helper.isEmpty(setInfo)) {
-                    return false
-                }
+            //     if (Helper.isEmpty(setInfo)) {
+            //         return false
+            //     }
 
-                let setStep = setInfo.skills.filter((skill) => {
-                    return skill.require <= bundle.setCountMapping[setId]
-                }).length
+            //     let setStep = setInfo.skills.filter((skill) => {
+            //         return skill.require <= bundle.setCountMapping[setId]
+            //     }).length
 
-                return {
-                    id: setId,
-                    step: setStep
-                }
-            }).filter((set) => {
-                if (false === set) {
-                    return false
-                }
+            //     return {
+            //         id: setId,
+            //         step: setStep
+            //     }
+            // }).filter((set) => {
+            //     if (false === set) {
+            //         return false
+            //     }
 
-                if (-1 !== currentRequiredSetIds.indexOf(set.id)) {
-                    return false
-                }
+            //     if (-1 !== currentRequiredSetIds.indexOf(set.id)) {
+            //         return false
+            //     }
 
-                if (0 === set.step) {
-                    return false
-                }
+            //     if (0 === set.step) {
+            //         return false
+            //     }
 
-                return true
-            }).sort((setA, setB) => {
-                return setB.step - setA.step
-            })
+            //     return true
+            // }).sort((setA, setB) => {
+            //     return setB.step - setA.step
+            // })
 
             const additionalSkills = Object.keys(bundle.skillLevelMapping).map((skillId) => {
                 return {
@@ -416,7 +416,7 @@ export default function BundleList(props) {
                                 ) {
                                     equipInfo = ArmorDataset.getInfo(equip.id)
                                 } else if ('charm' === equip.type) {
-                                    equipInfo = CharmDataset.getInfo(equip.id)
+                                    // equipInfo = CharmDataset.getInfo(equip.id)
                                 }
 
                                 return Helper.isNotEmpty(equipInfo) ? (
@@ -493,7 +493,7 @@ export default function BundleList(props) {
                         </div>
                     ) : false}
 
-                    {(0 !== additionalSets.length) ? (
+                    {/* {(0 !== additionalSets.length) ? (
                         <div className="col-12 mhrc-content">
                             <div className="col-12 mhrc-name">
                                 <span>{_('additionalSets')}</span>
@@ -521,7 +521,7 @@ export default function BundleList(props) {
                                 })}
                             </div>
                         </div>
-                    ) : false}
+                    ) : false} */}
 
                     {(0 !== additionalSkills.length) ? (
                         <div className="col-12 mhrc-content">

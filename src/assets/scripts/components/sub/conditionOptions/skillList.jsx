@@ -15,7 +15,7 @@ import Helper from 'core/helper'
 
 // Load Custom Libraries
 import _ from 'libraries/lang'
-import SetDataset from 'libraries/dataset/set'
+// import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 
 // Load Components
@@ -92,7 +92,7 @@ export default function SkillList(props) {
     /**
      * Hooks
      */
-    const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
+    // const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
     const [stateRequiredSkills, updateRequiredSkills] = useState(CommonState.getter.getRequiredSkills())
 
     // Like Did Mount & Will Unmount Cycle
@@ -112,39 +112,39 @@ export default function SkillList(props) {
 
         let enableSkillIdList = []
 
-        stateRequiredSets.forEach((set) => {
-            let setInfo = SetDataset.getInfo(set.id)
+        // stateRequiredSets.forEach((set) => {
+        //     let setInfo = SetDataset.getInfo(set.id)
 
-            if (Helper.isEmpty(setInfo)) {
-                return
-            }
+        //     if (Helper.isEmpty(setInfo)) {
+        //         return
+        //     }
 
-            setInfo.skills.forEach((skill) => {
-                let skillInfo = SkillDataset.getInfo(skill.id)
+        //     setInfo.skills.forEach((skill) => {
+        //         let skillInfo = SkillDataset.getInfo(skill.id)
 
-                if (Helper.isEmpty(skillInfo)) {
-                    return
-                }
+        //         if (Helper.isEmpty(skillInfo)) {
+        //             return
+        //         }
 
-                skillInfo.list.forEach((item) => {
-                    if (Helper.isEmpty(item.reaction)
-                        || Helper.isEmpty(item.reaction.enableSkillLevel)
-                    ) {
-                        return
-                    }
+        //         skillInfo.list.forEach((item) => {
+        //             if (Helper.isEmpty(item.reaction)
+        //                 || Helper.isEmpty(item.reaction.enableSkillLevel)
+        //             ) {
+        //                 return
+        //             }
 
-                    if (Helper.isNotEmpty(item.reaction.enableSkillLevel.id)) {
-                        enableSkillIdList.push(item.reaction.enableSkillLevel.id)
-                    }
+        //             if (Helper.isNotEmpty(item.reaction.enableSkillLevel.id)) {
+        //                 enableSkillIdList.push(item.reaction.enableSkillLevel.id)
+        //             }
 
-                    if (Helper.isNotEmpty(item.reaction.enableSkillLevel.ids)) {
-                        item.reaction.enableSkillLevel.ids.forEach((skillId) => {
-                            enableSkillIdList.push(skillId)
-                        })
-                    }
-                })
-            })
-        })
+        //             if (Helper.isNotEmpty(item.reaction.enableSkillLevel.ids)) {
+        //                 item.reaction.enableSkillLevel.ids.forEach((skillId) => {
+        //                     enableSkillIdList.push(skillId)
+        //                 })
+        //             }
+        //         })
+        //     })
+        // })
 
         return (
             <div className="mhrc-item mhrc-item-3-step">
@@ -162,5 +162,8 @@ export default function SkillList(props) {
                 })}
              </div>
         )
-    }, [stateRequiredSkills, stateRequiredSets])
+    }, [
+        stateRequiredSkills,
+        // stateRequiredSets
+    ])
 }

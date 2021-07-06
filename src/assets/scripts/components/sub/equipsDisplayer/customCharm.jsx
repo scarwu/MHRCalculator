@@ -17,7 +17,7 @@ import Helper from 'core/helper'
 import _ from 'libraries/lang'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
-import SetDataset from 'libraries/dataset/set'
+// import SetDataset from 'libraries/dataset/set'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -126,16 +126,16 @@ const getSkillList = () => {
     ]
 }
 
-const getSetList = () => {
-    return [
-        { key: 'none', value: _('none') },
-        ...SetDataset.getItems().filter((setInfo) => {
-            return setInfo.from.weapon
-        }).map((setInfo) => {
-            return { key: setInfo.id, value: _(setInfo.name) }
-        })
-    ]
-}
+// const getSetList = () => {
+//     return [
+//         { key: 'none', value: _('none') },
+//         ...SetDataset.getItems().filter((setInfo) => {
+//             return setInfo.from.weapon
+//         }).map((setInfo) => {
+//             return { key: setInfo.id, value: _(setInfo.name) }
+//         })
+//     ]
+// }
 
 const getValue = (value) => {
     if (Helper.isEmpty(value)) {
@@ -505,7 +505,7 @@ export default function CustomWeapon(props) {
                             }} />
                     </div>
 
-                    <div className="col-3 mhrc-name">
+                    {/* <div className="col-3 mhrc-name">
                         <span>{_('set')}</span>
                     </div>
                     <div className="col-9 mhrc-value">
@@ -517,7 +517,7 @@ export default function CustomWeapon(props) {
 
                                 CommonState.setter.setCustomWeaponSet(value)
                             }} />
-                    </div>
+                    </div> */}
                 </div>
             </div>
         )

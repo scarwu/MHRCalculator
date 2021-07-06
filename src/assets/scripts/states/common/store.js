@@ -15,19 +15,98 @@ import Status from 'core/status'
 import Helper from 'core/helper'
 
 // Load Custom Libraries
-import SetDataset from 'libraries/dataset/set'
+// import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 
 // Load Constant
 import Constant from 'constant'
 
 // Load Json
-import TestData from 'files/json/testData.json'
+// import TestData from 'files/json/testData.json'
+
+const defaultData = {
+    "equips": {
+        "weapon": {
+            "id": null,
+            "enhances": []
+        },
+        "helm": {
+            "id": "龍王的獨眼α",
+            "slotIds": [
+                "耐衝珠"
+            ]
+        },
+        "chest": {
+            "id": "杜賓鎧甲β",
+            "slotIds": [
+                "痛擊珠"
+            ]
+        },
+        "arm": {
+            "id": "異種大型鋼爪α",
+            "slotIds": [
+                "達人珠"
+            ]
+        },
+        "waist": {
+            "id": "慘爪龍腰甲β",
+            "slotIds": [
+                "無擊珠"
+            ]
+        },
+        "leg": {
+            "id": "杜賓護腿β",
+            "slotIds": [
+                "達人珠"
+            ]
+        },
+        "charm": {
+            "id": "攻擊護石 III"
+        }
+    },
+    "requireEquips": {
+        "weapon": null,
+        "helm": null,
+        "chest": null,
+        "arm": null,
+        "waist": null,
+        "leg": null,
+        "charm": null
+    },
+    "requireSets": [],
+    "requireSkills": [
+        {
+            "id": "攻擊",
+            "level": 7
+        },
+        {
+            "id": "看破",
+            "level": 7
+        },
+        {
+            "id": "弱點特效",
+            "level": 3
+        },
+        {
+            "id": "減輕膽怯",
+            "level": 3
+        },
+        {
+            "id": "超會心",
+            "level": 3
+        },
+        {
+            "id": "無屬性強化",
+            "level": 1
+        }
+    ]
+}
+
 
 const statusMapping = {
     tempData:           'state:common:tempData',
     requiredEquips:     'state:common:requiredEquips',
-    requiredSets:       'state:common:requiredSets',
+    // requiredSets:       'state:common:requiredSets',
     requiredSkills:     'state:common:requiredSkills',
     currentEquips:      'state:common:currentEquips',
     algorithmParams:    'state:common:algorithmParams',
@@ -75,10 +154,10 @@ const initialState = {
             list: []
         }
     },
-    requiredEquips: Status.get(statusMapping.requiredEquips) || Helper.deepCopy(TestData.requireList[0]).equips,
-    requiredSets: Status.get(statusMapping.requiredSets) || Helper.deepCopy(TestData.requireList[0]).sets,
-    requiredSkills: Status.get(statusMapping.requiredSkills) || Helper.deepCopy(TestData.requireList[0]).skills,
-    currentEquips: Status.get(statusMapping.currentEquips) || Helper.deepCopy(TestData.equipsList[0]),
+    requiredEquips: Status.get(statusMapping.requiredEquips) || Helper.deepCopy(defaultData.requireEquips),
+    // requiredSets: Status.get(statusMapping.requiredSets) || Helper.deepCopy(defaultData.requireSets),
+    requiredSkills: Status.get(statusMapping.requiredSkills) || Helper.deepCopy(defaultData.requireSkills),
+    currentEquips: Status.get(statusMapping.currentEquips) || Helper.deepCopy(defaultData.equips),
     algorithmParams: Status.get(statusMapping.algorithmParams) || Helper.deepCopy(Constant.default.algorithmParams),
     computedResult: Status.get(statusMapping.computedResult) || null,
     reservedBundles: Status.get(statusMapping.reservedBundles) || [],
@@ -118,9 +197,10 @@ export default createStore((state = initialState, action) => {
                             arm: null,
                             waist: null,
                             leg: null,
+                            petalace: null,
                             charm: null
                         },
-                        requiredSets: [],
+                        // requiredSets: [],
                         requiredSkills: []
                     }
                 }
@@ -129,7 +209,7 @@ export default createStore((state = initialState, action) => {
 
                 tempData[target].list[tempData[target].index] = Helper.deepCopy({
                     requiredEquips: state.requiredEquips,
-                    requiredSets: state.requiredSets,
+                    // requiredSets: state.requiredSets,
                     requiredSkills: state.requiredSkills
                 })
                 tempData[target].index = index
@@ -137,7 +217,7 @@ export default createStore((state = initialState, action) => {
                 return Object.assign({}, state, {
                     tempData: tempData,
                     requiredEquips: bundle.requiredEquips,
-                    requiredSets: bundle.requiredSets,
+                    // requiredSets: bundle.requiredSets,
                     requiredSkills: bundle.requiredSkills
                 })
             case 'candidateBundles':
@@ -182,176 +262,176 @@ export default createStore((state = initialState, action) => {
             }
         })()
 
-    // Required Sets
-    case 'ADD_REQUIRED_SET':
-        return (() => {
-            let setInfo = SetDataset.getInfo(action.payload.setId)
+    // // Required Sets
+    // case 'ADD_REQUIRED_SET':
+    //     return (() => {
+    //         let setInfo = SetDataset.getInfo(action.payload.setId)
 
-            if (Helper.isEmpty(setInfo)) {
-                return state
-            }
+    //         if (Helper.isEmpty(setInfo)) {
+    //             return state
+    //         }
 
-            let requiredSets = Helper.deepCopy(state.requiredSets)
+    //         let requiredSets = Helper.deepCopy(state.requiredSets)
 
-            for (let index in requiredSets) {
-                if (action.payload.setId !== requiredSets[index].id) {
-                    continue
-                }
+    //         for (let index in requiredSets) {
+    //             if (action.payload.setId !== requiredSets[index].id) {
+    //                 continue
+    //             }
 
-                return state
-            }
+    //             return state
+    //         }
 
-            requiredSets.push({
-                id: action.payload.setId,
-                step: 1
-            })
+    //         requiredSets.push({
+    //             id: action.payload.setId,
+    //             step: 1
+    //         })
 
-            return Object.assign({}, state, {
-                requiredSets: requiredSets
-            })
-        })()
-    case 'REMOVE_REQUIRED_SET':
-        return (() => {
-            let setInfo = SetDataset.getInfo(action.payload.setId)
+    //         return Object.assign({}, state, {
+    //             requiredSets: requiredSets
+    //         })
+    //     })()
+    // case 'REMOVE_REQUIRED_SET':
+    //     return (() => {
+    //         let setInfo = SetDataset.getInfo(action.payload.setId)
 
-            if (Helper.isEmpty(setInfo)) {
-                return state
-            }
+    //         if (Helper.isEmpty(setInfo)) {
+    //             return state
+    //         }
 
-            let requiredSets = Helper.deepCopy(state.requiredSets)
-            let requiredSkills = Helper.deepCopy(state.requiredSkills)
+    //         let requiredSets = Helper.deepCopy(state.requiredSets)
+    //         let requiredSkills = Helper.deepCopy(state.requiredSkills)
 
-            let enableSkillIdList = []
+    //         let enableSkillIdList = []
 
-            setInfo.skills.forEach((skill) => {
-                let skillInfo = SkillDataset.getInfo(skill.id)
+    //         setInfo.skills.forEach((skill) => {
+    //             let skillInfo = SkillDataset.getInfo(skill.id)
 
-                if (Helper.isEmpty(skillInfo)) {
-                    return
-                }
+    //             if (Helper.isEmpty(skillInfo)) {
+    //                 return
+    //             }
 
-                skillInfo.list.forEach((item) => {
-                    if (Helper.isEmpty(item.reaction)
-                        || Helper.isEmpty(item.reaction.enableSkillLevel)
-                    ) {
-                        return
-                    }
+    //             skillInfo.list.forEach((item) => {
+    //                 if (Helper.isEmpty(item.reaction)
+    //                     || Helper.isEmpty(item.reaction.enableSkillLevel)
+    //                 ) {
+    //                     return
+    //                 }
 
-                    if (Helper.isNotEmpty(item.reaction.enableSkillLevel.id)) {
-                        enableSkillIdList.push(item.reaction.enableSkillLevel.id)
-                    }
+    //                 if (Helper.isNotEmpty(item.reaction.enableSkillLevel.id)) {
+    //                     enableSkillIdList.push(item.reaction.enableSkillLevel.id)
+    //                 }
 
-                    if (Helper.isNotEmpty(item.reaction.enableSkillLevel.ids)) {
-                        item.reaction.enableSkillLevel.ids.forEach((skillId) => {
-                            enableSkillIdList.push(skillId)
-                        })
-                    }
-                })
-            })
+    //                 if (Helper.isNotEmpty(item.reaction.enableSkillLevel.ids)) {
+    //                     item.reaction.enableSkillLevel.ids.forEach((skillId) => {
+    //                         enableSkillIdList.push(skillId)
+    //                     })
+    //                 }
+    //             })
+    //         })
 
-            requiredSkills.map((skill) => {
-                let skillInfo = SkillDataset.getInfo(skill.id)
+    //         requiredSkills.map((skill) => {
+    //             let skillInfo = SkillDataset.getInfo(skill.id)
 
-                if (Helper.isEmpty(skillInfo)) {
-                    return skill
-                }
+    //             if (Helper.isEmpty(skillInfo)) {
+    //                 return skill
+    //             }
 
-                if (-1 !== enableSkillIdList.indexOf(skill.id)) {
-                    let currentSkillLevel = 0
-                    let totalSkillLevel = 0
+    //             if (-1 !== enableSkillIdList.indexOf(skill.id)) {
+    //                 let currentSkillLevel = 0
+    //                 let totalSkillLevel = 0
 
-                    skillInfo.list.forEach((item) => {
-                        if (false === item.isHidden) {
-                            currentSkillLevel++
-                        }
+    //                 skillInfo.list.forEach((item) => {
+    //                     if (false === item.isHidden) {
+    //                         currentSkillLevel++
+    //                     }
 
-                        totalSkillLevel++
-                    })
+    //                     totalSkillLevel++
+    //                 })
 
-                    skill.level = (skill.level > currentSkillLevel)
-                        ? currentSkillLevel : skill.level
-                }
+    //                 skill.level = (skill.level > currentSkillLevel)
+    //                     ? currentSkillLevel : skill.level
+    //             }
 
-                return skill
-            })
+    //             return skill
+    //         })
 
-            for (let index in requiredSets) {
-                if (action.payload.setId !== requiredSets[index].id) {
-                    continue
-                }
+    //         for (let index in requiredSets) {
+    //             if (action.payload.setId !== requiredSets[index].id) {
+    //                 continue
+    //             }
 
-                requiredSets = requiredSets.filter((set) => {
-                    return set.id !== action.payload.setId
-                })
+    //             requiredSets = requiredSets.filter((set) => {
+    //                 return set.id !== action.payload.setId
+    //             })
 
-                return Object.assign({}, state, {
-                    requiredSets: requiredSets,
-                    requiredSkills: requiredSkills,
-                })
-            }
+    //             return Object.assign({}, state, {
+    //                 requiredSets: requiredSets,
+    //                 requiredSkills: requiredSkills,
+    //             })
+    //         }
 
-            return state
-        })()
-    case 'INCREASE_REQUIRED_SET_STEP':
-        return (() => {
-            let setInfo = SetDataset.getInfo(action.payload.setId)
+    //         return state
+    //     })()
+    // case 'INCREASE_REQUIRED_SET_STEP':
+    //     return (() => {
+    //         let setInfo = SetDataset.getInfo(action.payload.setId)
 
-            if (Helper.isEmpty(setInfo)) {
-                return state
-            }
+    //         if (Helper.isEmpty(setInfo)) {
+    //             return state
+    //         }
 
-            let requiredSets = Helper.deepCopy(state.requiredSets)
+    //         let requiredSets = Helper.deepCopy(state.requiredSets)
 
-            for (let index in requiredSets) {
-                if (action.payload.setId !== requiredSets[index].id) {
-                    continue
-                }
+    //         for (let index in requiredSets) {
+    //             if (action.payload.setId !== requiredSets[index].id) {
+    //                 continue
+    //             }
 
-                if (setInfo.skills.length === requiredSets[index].step) {
-                    return state
-                }
+    //             if (setInfo.skills.length === requiredSets[index].step) {
+    //                 return state
+    //             }
 
-                requiredSets[index].step += 1
+    //             requiredSets[index].step += 1
 
-                return Object.assign({}, state, {
-                    requiredSets: requiredSets
-                })
-            }
+    //             return Object.assign({}, state, {
+    //                 requiredSets: requiredSets
+    //             })
+    //         }
 
-            return state
-        })()
-    case 'DECREASE_REQUIRED_SET_STEP':
-        return (() => {
-            let setInfo = SetDataset.getInfo(action.payload.setId)
+    //         return state
+    //     })()
+    // case 'DECREASE_REQUIRED_SET_STEP':
+    //     return (() => {
+    //         let setInfo = SetDataset.getInfo(action.payload.setId)
 
-            if (Helper.isEmpty(setInfo)) {
-                return state
-            }
+    //         if (Helper.isEmpty(setInfo)) {
+    //             return state
+    //         }
 
-            let requiredSets = Helper.deepCopy(state.requiredSets)
+    //         let requiredSets = Helper.deepCopy(state.requiredSets)
 
-            for (let index in requiredSets) {
-                if (action.payload.setId !== requiredSets[index].id) {
-                    continue
-                }
+    //         for (let index in requiredSets) {
+    //             if (action.payload.setId !== requiredSets[index].id) {
+    //                 continue
+    //             }
 
-                if (1 === requiredSets[index].step) {
-                    return state
-                }
+    //             if (1 === requiredSets[index].step) {
+    //                 return state
+    //             }
 
-                requiredSets[index].step -= 1
+    //             requiredSets[index].step -= 1
 
-                return Object.assign({}, state, {
-                    requiredSets: requiredSets
-                })
-            }
+    //             return Object.assign({}, state, {
+    //                 requiredSets: requiredSets
+    //             })
+    //         }
 
-            return state
-        })()
-    case 'CLEAN_REQUIRED_SETS':
-        return Object.assign({}, state, {
-            requiredSets: []
-        })
+    //         return state
+    //     })()
+    // case 'CLEAN_REQUIRED_SETS':
+    //     return Object.assign({}, state, {
+    //         requiredSets: []
+    //     })
 
     // Required Skills
     case 'ADD_REQUIRED_SKILL':
@@ -415,36 +495,36 @@ export default createStore((state = initialState, action) => {
                 return state
             }
 
-            let requiredSets = Helper.deepCopy(state.requiredSets)
+            // let requiredSets = Helper.deepCopy(state.requiredSets)
             let requiredSkills = Helper.deepCopy(state.requiredSkills)
 
             let enableSkillIdList = []
 
-            requiredSets.forEach((set) => {
-                let setInfo = SetDataset.getInfo(set.id)
+            // requiredSets.forEach((set) => {
+            //     let setInfo = SetDataset.getInfo(set.id)
 
-                if (Helper.isEmpty(setInfo)) {
-                    return
-                }
+            //     if (Helper.isEmpty(setInfo)) {
+            //         return
+            //     }
 
-                setInfo.skills.forEach((skill) => {
-                    let skillInfo = SkillDataset.getInfo(skill.id)
+            //     setInfo.skills.forEach((skill) => {
+            //         let skillInfo = SkillDataset.getInfo(skill.id)
 
-                    if (Helper.isEmpty(skillInfo)) {
-                        return
-                    }
+            //         if (Helper.isEmpty(skillInfo)) {
+            //             return
+            //         }
 
-                    skillInfo.list.forEach((item) => {
-                        if (Helper.isEmpty(item.reaction)
-                            || Helper.isEmpty(item.reaction.enableSkillLevel)
-                        ) {
-                            return
-                        }
+            //         skillInfo.list.forEach((item) => {
+            //             if (Helper.isEmpty(item.reaction)
+            //                 || Helper.isEmpty(item.reaction.enableSkillLevel)
+            //             ) {
+            //                 return
+            //             }
 
-                        enableSkillIdList.push(item.reaction.enableSkillLevel.id)
-                    })
-                })
-            })
+            //             enableSkillIdList.push(item.reaction.enableSkillLevel.id)
+            //         })
+            //     })
+            // })
 
             for (let index in requiredSkills) {
                 if (action.payload.skillId !== requiredSkills[index].id) {

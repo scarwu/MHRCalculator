@@ -16,9 +16,9 @@ import Helper from 'core/helper'
 // Load Custom Libraries
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
-import SetDataset from 'libraries/dataset/set'
+// import SetDataset from 'libraries/dataset/set'
 import JewelDataset from 'libraries/dataset/jewel'
-import CharmDataset from 'libraries/dataset/charm'
+// import CharmDataset from 'libraries/dataset/charm'
 import CommonDataset from 'libraries/dataset/common'
 
 // Load Constant
@@ -68,7 +68,7 @@ class FittingAlgorithm {
         this.isInitFailed = false
 
         this.initConditionSkills(requiredSkills)
-        this.initConditionSets(requiredSets)
+        // this.initConditionSets(requiredSets)
         this.initConditionEquips(requiredEquips)
 
         if (this.isInitFailed) {
@@ -109,7 +109,7 @@ class FittingAlgorithm {
 
         // Sort Bundle List & Clean up
         return this.sortBundleList(bundleList).map((bundle) => {
-            delete bundle.meta.completedSets
+            // delete bundle.meta.completedSets
             delete bundle.meta.completedSkills
             delete bundle.meta.remainingSlotCountMapping
             delete bundle.meta.totalExpectedValue
@@ -287,28 +287,28 @@ class FittingAlgorithm {
     /**
      * Init Condition Sets
      */
-    initConditionSets = (requiredSets) => {
-        requiredSets.sort((setA, setB) => {
-            let setInfoA = SetDataset.getInfo(setA.id)
-            let setInfoB = SetDataset.getInfo(setB.id)
+    // initConditionSets = (requiredSets) => {
+    //     requiredSets.sort((setA, setB) => {
+    //         let setInfoA = SetDataset.getInfo(setA.id)
+    //         let setInfoB = SetDataset.getInfo(setB.id)
 
-            if (Helper.isEmpty(setInfoA) || Helper.isEmpty(setInfoB)) {
-                return 0
-            }
+    //         if (Helper.isEmpty(setInfoA) || Helper.isEmpty(setInfoB)) {
+    //             return 0
+    //         }
 
-            return setInfoB.skills.pop().require - setInfoA.skills.pop().require
-        }).forEach((set) => {
-            let setInfo = SetDataset.getInfo(set.id)
+    //         return setInfoB.skills.pop().require - setInfoA.skills.pop().require
+    //     }).forEach((set) => {
+    //         let setInfo = SetDataset.getInfo(set.id)
 
-            if (Helper.isEmpty(setInfo)) {
-                return
-            }
+    //         if (Helper.isEmpty(setInfo)) {
+    //             return
+    //         }
 
-            this.currentSetMapping[set.id] = {
-                require: setInfo.skills[set.step - 1].require
-            }
-        })
-    }
+    //         this.currentSetMapping[set.id] = {
+    //             require: setInfo.skills[set.step - 1].require
+    //         }
+    //     })
+    // }
 
     /**
      * Init Condition Equips
@@ -459,7 +459,7 @@ class FittingAlgorithm {
                 ) {
                     equipInfos = ArmorDataset.typeIs(equipType).hasSkill(skillId).getItems()
                 } else if ('charm' === equipType) {
-                    equipInfos = CharmDataset.hasSkill(skillId).getItems()
+                    // equipInfos = CharmDataset.hasSkill(skillId).getItems()
                 }
 
                 // Merge Candidate Equips
@@ -563,22 +563,22 @@ class FittingAlgorithm {
         }
 
         // Special Case: 2
-        if (0 < this.currentSetCount && this.isBundleSetsCompleted(bundle)) {
-            if ( 0 < this.currentSkillCount
-                && false === this.isBundleSkillsCompleted(bundle)
-            ) {
-                // Create Bundle With Jewels
-                let tempBundle = this.createBundleWithJewels(bundle)
+        // if (0 < this.currentSetCount && this.isBundleSetsCompleted(bundle)) {
+        //     if ( 0 < this.currentSkillCount
+        //         && false === this.isBundleSkillsCompleted(bundle)
+        //     ) {
+        //         // Create Bundle With Jewels
+        //         let tempBundle = this.createBundleWithJewels(bundle)
 
-                if (false !== tempBundle) {
-                    lastBundleMapping[this.getBundleHash(tempBundle)] = tempBundle
+        //         if (false !== tempBundle) {
+        //             lastBundleMapping[this.getBundleHash(tempBundle)] = tempBundle
 
-                    this.callback({
-                        bundleCount: Object.keys(lastBundleMapping).length
-                    })
-                }
-            }
-        }
+        //             this.callback({
+        //                 bundleCount: Object.keys(lastBundleMapping).length
+        //             })
+        //         }
+        //     }
+        // }
 
         let lastTypeIndex = Object.keys(candidateEquipPoolCount).length - 1
         let lastEquipIndex = candidateEquipPoolCount[lastTypeIndex].length -1
@@ -700,59 +700,59 @@ class FittingAlgorithm {
             }
 
             // Check Bundle Sets
-            if (this.isBundleSetsCompleted(bundle)) {
+            // if (this.isBundleSetsCompleted(bundle)) {
 
-                // Check Bundle Skills
-                if (this.isBundleSkillsCompleted(bundle)) {
-                    lastBundleMapping[this.getBundleHash(bundle)] = bundle
+            //     // Check Bundle Skills
+            //     if (this.isBundleSkillsCompleted(bundle)) {
+            //         lastBundleMapping[this.getBundleHash(bundle)] = bundle
 
-                    this.callback({
-                        bundleCount: Object.keys(lastBundleMapping).length
-                    })
+            //         this.callback({
+            //             bundleCount: Object.keys(lastBundleMapping).length
+            //         })
 
-                    Helper.log('FA: Last Bundle Count:', Object.keys(lastBundleMapping).length)
+            //         Helper.log('FA: Last Bundle Count:', Object.keys(lastBundleMapping).length)
 
-                    if (this.algorithmParams.limit <= Object.keys(lastBundleMapping).length) {
-                        break
-                    }
+            //         if (this.algorithmParams.limit <= Object.keys(lastBundleMapping).length) {
+            //             break
+            //         }
 
-                    findNextEquip()
+            //         findNextEquip()
 
-                    continue
-                }
+            //         continue
+            //     }
 
-                // Check Bundle Reach Expected
-                if (this.isBundleReachExpected(bundle)) {
+            //     // Check Bundle Reach Expected
+            //     if (this.isBundleReachExpected(bundle)) {
 
-                    // Create Bundle With Jewels
-                    bundle = this.createBundleWithJewels(bundle)
+            //         // Create Bundle With Jewels
+            //         bundle = this.createBundleWithJewels(bundle)
 
-                    if (false !== bundle) {
-                        lastBundleMapping[this.getBundleHash(bundle)] = bundle
+            //         if (false !== bundle) {
+            //             lastBundleMapping[this.getBundleHash(bundle)] = bundle
 
-                        this.callback({
-                            bundleCount: Object.keys(lastBundleMapping).length
-                        })
+            //             this.callback({
+            //                 bundleCount: Object.keys(lastBundleMapping).length
+            //             })
 
-                        Helper.log('FA: Last Bundle Count:', Object.keys(lastBundleMapping).length)
+            //             Helper.log('FA: Last Bundle Count:', Object.keys(lastBundleMapping).length)
 
-                        if (this.algorithmParams.limit <= Object.keys(lastBundleMapping).length) {
-                            break
-                        }
-                    }
+            //             if (this.algorithmParams.limit <= Object.keys(lastBundleMapping).length) {
+            //                 break
+            //             }
+            //         }
 
-                    findNextEquip()
+            //         findNextEquip()
 
-                    continue
-                }
+            //         continue
+            //     }
 
-                // Check Bundle Have a Future
-                if (false === this.isBundleHaveFuture(bundle, currentEquipTypes[typeIndex])) {
-                    findNextEquip()
+            //     // Check Bundle Have a Future
+            //     if (false === this.isBundleHaveFuture(bundle, currentEquipTypes[typeIndex])) {
+            //         findNextEquip()
 
-                    continue
-                }
-            }
+            //         continue
+            //     }
+            // }
 
             // Termination condition
             if (lastTypeIndex === typeIndex && lastEquipIndex === equipIndex) {
@@ -1117,29 +1117,29 @@ class FittingAlgorithm {
         }
 
         // Increase Set Count
-        let isSetRequireOverflow = false
+        // let isSetRequireOverflow = false
 
-        if (Helper.isNotEmpty(candidateEquip.setId)) {
-            if (Helper.isEmpty(bundle.setCountMapping[candidateEquip.setId])) {
-                bundle.setCountMapping[candidateEquip.setId] = 0
-            }
+        // if (Helper.isNotEmpty(candidateEquip.setId)) {
+        //     if (Helper.isEmpty(bundle.setCountMapping[candidateEquip.setId])) {
+        //         bundle.setCountMapping[candidateEquip.setId] = 0
+        //     }
 
-            bundle.setCountMapping[candidateEquip.setId] += 1
+        //     bundle.setCountMapping[candidateEquip.setId] += 1
 
-            if (Helper.isNotEmpty(this.currentSetMapping[candidateEquip.setId])) {
-                if (this.currentSetMapping[candidateEquip.setId].require < bundle.setCountMapping[candidateEquip.setId]) {
-                    isSetRequireOverflow = true
-                }
+        //     if (Helper.isNotEmpty(this.currentSetMapping[candidateEquip.setId])) {
+        //         if (this.currentSetMapping[candidateEquip.setId].require < bundle.setCountMapping[candidateEquip.setId]) {
+        //             isSetRequireOverflow = true
+        //         }
 
-                if (this.currentSetMapping[candidateEquip.setId].require === bundle.setCountMapping[candidateEquip.setId]) {
-                    bundle.meta.completedSets[candidateEquip.setId] = true
-                }
-            }
-        }
+        //         if (this.currentSetMapping[candidateEquip.setId].require === bundle.setCountMapping[candidateEquip.setId]) {
+        //             bundle.meta.completedSets[candidateEquip.setId] = true
+        //         }
+        //     }
+        // }
 
-        if (true === isSetRequireOverflow) {
-            return false
-        }
+        // if (true === isSetRequireOverflow) {
+        //     return false
+        // }
 
         // Increase Slot Count
         for (let size = 1; size <= 4; size++) {
@@ -1230,7 +1230,7 @@ class FittingAlgorithm {
         candidateEquip.type = ('charm' !== equipType && 'weapon' !== equipType) ? equipInfo.type : equipType
         candidateEquip.defense = Helper.isNotEmpty(equipInfo.defense) ? equipInfo.defense : 0
         candidateEquip.resistance = Helper.isNotEmpty(equipInfo.resistance) ? equipInfo.resistance : candidateEquip.resistance
-        candidateEquip.setId = Helper.isNotEmpty(equipInfo.set) ? equipInfo.set.id : null
+        // candidateEquip.setId = Helper.isNotEmpty(equipInfo.set) ? equipInfo.set.id : null
 
         if (Helper.isEmpty(equipInfo.skills)) {
             equipInfo.skills = []

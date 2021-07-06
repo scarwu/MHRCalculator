@@ -15,7 +15,7 @@ import Helper from 'core/helper'
 
 // Load Custom Libraries
 import _ from 'libraries/lang'
-import SetDataset from 'libraries/dataset/set'
+// import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 
 // Load Components
@@ -164,24 +164,24 @@ export default function ConditionItemSelector(props) {
         let unselectedList = []
 
         switch (stateBypassData.mode) {
-        case 'set':
-            idList = stateRequiredSets.map((set) => {
-                return set.id
-            })
+        // case 'set':
+        //     idList = stateRequiredSets.map((set) => {
+        //         return set.id
+        //     })
 
-            SetDataset.getItems().forEach((setInfo) => {
-                if (-1 !== idList.indexOf(setInfo.id)) {
-                    setInfo.isSelect = true
+        //     SetDataset.getItems().forEach((setInfo) => {
+        //         if (-1 !== idList.indexOf(setInfo.id)) {
+        //             setInfo.isSelect = true
 
-                    selectedList.push(setInfo)
-                } else {
-                    setInfo.isSelect = false
+        //             selectedList.push(setInfo)
+        //         } else {
+        //             setInfo.isSelect = false
 
-                    unselectedList.push(setInfo)
-                }
-            })
+        //             unselectedList.push(setInfo)
+        //         }
+        //     })
 
-            break
+        //     break
         case 'skill':
             idList = stateRequiredSkills.map((skill) => {
                 return skill.id

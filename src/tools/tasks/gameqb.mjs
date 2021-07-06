@@ -22,7 +22,7 @@ import {
     sizeList
 } from '../liberaries/mh.mjs'
 
-const fileRoot = 'temp/crawler/gameqb'
+const tempRoot = 'temp/crawler/gameqb'
 
 const urls = {
     weapons: { // 'https://mhr.gameqb.net/%e6%ad%a6%e5%99%a8/'
@@ -336,12 +336,12 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 
         let list = autoExtendListQuantity(Object.values(mapping))
 
-        Helper.saveJSONAsCSV(`${fileRoot}/weapons/${weaponType}.csv`, list)
+        Helper.saveJSONAsCSV(`${tempRoot}/weapons/${weaponType}.csv`, list)
 
         if (Helper.isEmpty(targetWeaponType)) {
             let enhanceList = autoExtendListQuantity(Object.values(enhanceMapping))
 
-            Helper.saveJSONAsCSV(`${fileRoot}/enhances.csv`, enhanceList)
+            Helper.saveJSONAsCSV(`${tempRoot}/enhances.csv`, enhanceList)
         }
     }
 }
@@ -537,7 +537,7 @@ export const fetchArmorsAction = async () => {
 
     let list = autoExtendListQuantity(Object.values(mapping))
 
-    Helper.saveJSONAsCSV(`${fileRoot}/armors.csv`, list)
+    Helper.saveJSONAsCSV(`${tempRoot}/armors.csv`, list)
 }
 
 export const fetchPetalacesAction = async () => {
@@ -642,7 +642,7 @@ export const fetchPetalacesAction = async () => {
         mapping[mappingKey].defense.obtain = parseFloat(defenseObtain)
     }
 
-    Helper.saveJSONAsCSV(`${fileRoot}/petalaces.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${tempRoot}/petalaces.csv`, Object.values(mapping))
 }
 
 export const fetchJewelsAction = async () => {
@@ -722,7 +722,7 @@ export const fetchJewelsAction = async () => {
         })
     }
 
-    Helper.saveJSONAsCSV(`${fileRoot}/jewels.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${tempRoot}/jewels.csv`, Object.values(mapping))
 }
 
 export const fetchSkillsAction = async () => {
@@ -792,7 +792,7 @@ export const fetchSkillsAction = async () => {
         })
     }
 
-    Helper.saveJSONAsCSV(`${fileRoot}/skills.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${tempRoot}/skills.csv`, Object.values(mapping))
 }
 
 export const infoAction = () => {
@@ -830,7 +830,7 @@ export const infoAction = () => {
 
     // Weapons
     for (let weaponType of weaponTypeList) {
-        let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons/${weaponType}.csv`)
+        let weaponList = Helper.loadCSVAsJSON(`${tempRoot}/weapons/${weaponType}.csv`)
 
         if (Helper.isNotEmpty(weaponList)) {
             if (Helper.isEmpty(result.weapons.all)) {
@@ -859,7 +859,7 @@ export const infoAction = () => {
     }
 
     // Armors
-    let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors.csv`)
+    let armorList = Helper.loadCSVAsJSON(`${tempRoot}/armors.csv`)
 
     if (Helper.isNotEmpty(armorList)) {
         result.armors.all = armorList.length
@@ -878,7 +878,7 @@ export const infoAction = () => {
     }
 
     // Jewels
-    let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewels.csv`)
+    let jewelList = Helper.loadCSVAsJSON(`${tempRoot}/jewels.csv`)
 
     if (Helper.isNotEmpty(jewelList)) {
         result.jewels.all = jewelList.length
@@ -898,7 +898,7 @@ export const infoAction = () => {
 
     // Petalaces, Enhances & Skills
     for (let target of ['petalaces', 'enhances', 'skills']) {
-        let targetList = Helper.loadCSVAsJSON(`${fileRoot}/${target}.csv`)
+        let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {
             result[target] = targetList.length

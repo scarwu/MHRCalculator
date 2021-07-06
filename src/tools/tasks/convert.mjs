@@ -11,23 +11,19 @@ import md5 from 'md5'
 
 import Helper from '../liberaries/helper.mjs'
 import {
-    defaultWeaponItem,
-    defaultArmorItem,
-    defaultPetalaceItem,
-    defaultJewelItem,
-    defaultEnhanceItem,
-    defaultSkillItem,
     autoExtendListQuantity,
     weaponTypeList,
     rareList,
     sizeList
 } from '../liberaries/mh.mjs'
 
-const crawlerRoot = 'temp/crawler'
-const convertRoot = 'files'
+const tempCrawlerRoot = 'temp/crawler'
+const tempConvertRoot = 'temp/convert'
 
-const datasetRoot = '../assets/scripts/datasets'
-const langRoot = '../assets/scripts/langs'
+const fileRoot = 'files'
+
+const assetsDatasetRoot = '../assets/scripts/datasets'
+const assetsLangRoot = '../assets/scripts/langs'
 
 const targetList = [
     'weapons',
@@ -44,7 +40,8 @@ const langList = [
     'enUS'
 ]
 
-const charPools = [
+const codeLength = 3
+const codeChars = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -59,7 +56,7 @@ export const runAction = () => {
     Object.values(targetList).forEach((target) => {
         console.log(`load:${target}`)
 
-        let list = Helper.loadCSVAsJSON(`${convertRoot}/${target}.csv`)
+        let list = Helper.loadCSVAsJSON(`${fileRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(list)) {
             rawDataMapping[target] = list
@@ -67,7 +64,7 @@ export const runAction = () => {
     })
 
     // Load Unique Id Mapping
-    let hashCodeMapping = Helper.loadJSON(`${convertRoot}/hashCodeMapping.json`)
+    let hashCodeMapping = Helper.loadJSON(`${fileRoot}/hashCodeMapping.json`)
 
     if (Helper.isEmpty(hashCodeMapping)) {
         hashCodeMapping = {}
@@ -96,8 +93,8 @@ export const runAction = () => {
         while (true) {
             code = '_'
 
-            for (let i = 0; i < charPools.length; i++) {
-                code += charPools[rand() % charPools.length]
+            for (let i = 0; i < codeLength; i++) {
+                code += codeChars[parseInt(Math.random() * codeChars.length, 10)]
             }
 
             if (Helper.isEmpty(usedCodeMapping[code])) {
@@ -113,11 +110,27 @@ export const runAction = () => {
 
     let datasetMapping = {}
     let datasetLangMapping = {}
+    let incompleteDataMapping = {}
 
     // Handle Skills
     let skillBundlesMapping = []
 
     rawDataMapping.skills.forEach((skillItem) => {
+
+        // Check Propeties Using as Unique Key
+        if (Helper.isEmpty(skillItem.name)
+            || Helper.isEmpty(skillItem.name.zhTW)
+            || Helper.isEmpty(skillItem.level)
+        ) {
+            if (Helper.isEmpty(incompleteDataMapping.skills)) {
+                incompleteDataMapping.skills = []
+            }
+
+            incompleteDataMapping.skills.push(skillItem)
+
+            return
+        }
+
         if (Helper.isEmpty(skillBundlesMapping[skillItem.name.zhTW])) {
             skillBundlesMapping[skillItem.name.zhTW] = {}
             skillBundlesMapping[skillItem.name.zhTW].name = skillItem.name
@@ -156,7 +169,10 @@ export const runAction = () => {
             skillBundle[property] = translateCode
         }
 
+        // Bundle List
         skillBundle.list.map((skillItem) => {
+
+            // Get Translate Code & Create Dataset Lang Mapping
             let translateCode = createCode(`skills:translate:effect:${idCode}`)
 
             Object.keys(skillItem.effect).forEach((lang) => {
@@ -172,6 +188,7 @@ export const runAction = () => {
             return skillItem
         })
 
+        // Create Dataset Mapping
         if (Helper.isEmpty(datasetMapping.skills)) {
             datasetMapping.skills = []
         }
@@ -202,6 +219,19 @@ export const runAction = () => {
     // Handle Enhances
     rawDataMapping.enhances.forEach((enhanceItem) => {
 
+        // Check Propeties Using as Unique Key
+        if (Helper.isEmpty(enhanceItem.name)
+            || Helper.isEmpty(enhanceItem.name.zhTW)
+        ) {
+            if (Helper.isEmpty(incompleteDataMapping.enhances)) {
+                incompleteDataMapping.enhances = []
+            }
+
+            incompleteDataMapping.enhances.push(enhanceItem)
+
+            return
+        }
+
         // Get Id Code
         let idCode = createCode(`enhances:id:${enhanceItem.name.zhTW}`)
 
@@ -222,6 +252,7 @@ export const runAction = () => {
             enhanceItem[property] = translateCode
         }
 
+        // Create Dataset Mapping
         if (Helper.isEmpty(datasetMapping.enhances)) {
             datasetMapping.enhances = []
         }
@@ -235,6 +266,19 @@ export const runAction = () => {
 
     // Handle Petalaces
     rawDataMapping.petalaces.forEach((petalaceItem) => {
+
+        // Check Propeties Using as Unique Key
+        if (Helper.isEmpty(petalaceItem.name)
+            || Helper.isEmpty(petalaceItem.name.zhTW)
+        ) {
+            if (Helper.isEmpty(incompleteDataMapping.petalaces)) {
+                incompleteDataMapping.petalaces = []
+            }
+
+            incompleteDataMapping.petalaces.push(petalaceItem)
+
+            return
+        }
 
         // Get Id Code
         let idCode = createCode(`petalaces:id:${petalaceItem.name.zhTW}`)
@@ -285,6 +329,24 @@ export const runAction = () => {
     // Handle Jewels
     rawDataMapping.jewels.forEach((jewelItem) => {
 
+        // Filter Empty Items
+        jewelItem.skills = jewelItem.skills.filter((skillItem) => {
+            return Helper.isNotEmpty(skillItem.name)
+        })
+
+        // Check Propeties Using as Unique Key
+        if (Helper.isEmpty(jewelItem.name)
+            || Helper.isEmpty(jewelItem.name.zhTW)
+        ) {
+            if (Helper.isEmpty(incompleteDataMapping.jewels)) {
+                incompleteDataMapping.jewels = []
+            }
+
+            incompleteDataMapping.jewels.push(jewelItem)
+
+            return
+        }
+
         // Get Id Code
         let idCode = createCode(`jewels:id:${jewelItem.name.zhTW}`)
 
@@ -303,13 +365,14 @@ export const runAction = () => {
 
         jewelItem.name = translateCode
 
-        // Find Code Id
-        jewelItem.skills.map((skillItem) => {
+        // Filter Empty
+        jewelItem.skills = jewelItem.skills.map((skillItem) => {
             skillItem.name = createCode(`skills:id:${skillItem.name}`)
 
             return skillItem
         })
 
+        // Create Dataset Mapping
         if (Helper.isEmpty(datasetMapping.jewels)) {
             datasetMapping.jewels = []
         }
@@ -328,14 +391,176 @@ export const runAction = () => {
     })
 
     // Handle Armors
-    let bundleArmors = []
+    let armorBundlesMapping = []
 
     rawDataMapping.armors.forEach((armorItem) => {
 
+        // Filter Empty Items
+        armorItem.slots = armorItem.slots.filter((slotItem) => {
+            return Helper.isNotEmpty(slotItem.size)
+        })
+
+        armorItem.skills = armorItem.skills.filter((skillItem) => {
+            return Helper.isNotEmpty(skillItem.name)
+        })
+
+        // Check Propeties Using as Unique Key
+        if (Helper.isEmpty(armorItem.name)
+            || Helper.isEmpty(armorItem.name.zhTW)
+            || Helper.isEmpty(armorItem.series)
+            || Helper.isEmpty(armorItem.series.zhTW)
+            || Helper.isEmpty(armorItem.type)
+        ) {
+            if (Helper.isEmpty(incompleteDataMapping.armors)) {
+                incompleteDataMapping.armors = []
+            }
+
+            incompleteDataMapping.armors.push(armorItem)
+
+            return
+        }
+
+        // Check Propeties Using as Unique Key
+        if (Helper.isEmpty(armorItem.series) || Helper.isEmpty(armorItem.series.zhTW)) {
+            console.log('untrackArmor', armorItem)
+
+            return
+        }
+
+        if (Helper.isEmpty(skillBundlesMapping[armorItem.series.zhTW])) {
+            armorBundlesMapping[armorItem.series.zhTW] = {}
+            armorBundlesMapping[armorItem.series.zhTW].series = armorItem.series
+            armorBundlesMapping[armorItem.series.zhTW].rare = armorItem.rare
+            armorBundlesMapping[armorItem.series.zhTW].gender = armorItem.gender
+            armorBundlesMapping[armorItem.series.zhTW].minDefense = armorItem.minDefense
+            armorBundlesMapping[armorItem.series.zhTW].maxDefense = armorItem.maxDefense
+            armorBundlesMapping[armorItem.series.zhTW].resistence = armorItem.resistence
+            armorBundlesMapping[armorItem.series.zhTW].list = {}
+        }
+
+        if (Helper.isEmpty(armorBundlesMapping[armorItem.series.zhTW].list[armorItem.type])) {
+            armorBundlesMapping[armorItem.series.zhTW].list[armorItem.type] = {
+                name: armorItem.name,
+                type: armorItem.type,
+                slots: armorItem.slots,
+                skills: armorItem.skills
+            }
+        }
+    })
+
+    Object.values(armorBundlesMapping).forEach((armorBundle) => {
+        armorBundle.list = Object.values(armorBundle.list)
+
+        // Get Id Code
+        let idCode = createCode(`armors:id:${armorBundle.series.zhTW}`)
+
+        armorBundle.id = idCode
+
+        // Get Translate Code & Create Dataset Lang Mapping
+        let translateCode = createCode(`armors:translate:series:${idCode}`)
+
+        Object.keys(armorBundle.series).forEach((lang) => {
+            if (Helper.isEmpty(datasetLangMapping[lang])) {
+                datasetLangMapping[lang] = {}
+            }
+
+            datasetLangMapping[lang][translateCode] = armorBundle.series[lang]
+        })
+
+        armorBundle.series = translateCode
+
+        // Bundle List
+        armorBundle.list.map((armorItem) => {
+
+            // Get Id Code
+            let idCode = createCode(`armors:id:${armorItem.name.zhTW}`)
+
+            armorItem.id = idCode
+
+            // Get Translate Code & Create Dataset Lang Mapping
+            let translateCode = createCode(`armors:translate:name:${idCode}`)
+
+            Object.keys(armorItem.name).forEach((lang) => {
+                if (Helper.isEmpty(datasetLangMapping[lang])) {
+                    datasetLangMapping[lang] = {}
+                }
+
+                datasetLangMapping[lang][translateCode] = armorItem.name[lang]
+            })
+
+            armorItem.name = translateCode
+
+            // Find Code Id
+            armorItem.skills = armorItem.skills.map((skillItem) => {
+                skillItem.name = createCode(`skills:id:${skillItem.name}`)
+
+                return skillItem
+            })
+
+            return armorItem
+        })
+
+        // Create Dataset Mapping
+        if (Helper.isEmpty(datasetMapping.armors)) {
+            datasetMapping.armors = []
+        }
+
+        datasetMapping.armors.push([
+            [
+                armorBundle.id,
+                armorBundle.series,
+                armorBundle.rare,
+                armorBundle.gender,
+                armorBundle.minDefense,
+                armorBundle.maxDefense,
+                [
+                    armorBundle.resistance.fire,
+                    armorBundle.resistance.water,
+                    armorBundle.resistance.thunder,
+                    armorBundle.resistance.ice,
+                    armorBundle.resistance.dragon
+                ]
+            ],
+            armorBundle.list.map((armorItem) => {
+                return [
+                    armorItem.id,
+                    armorItem.name,
+                    armorItem.slots.map((slotItem) => {
+                        return [
+                            slotItem.size
+                        ]
+                    }),
+                    armorItem.skills.map((skillItem) => {
+                        return [
+                            skillItem.name,
+                            skillItem.level
+                        ]
+                    })
+                ]
+            })
+        ])
     })
 
     // Handle Weapons
     rawDataMapping.weapons.forEach((weaponItem) => {
+
+        // Filter Empty Items
+        weaponItem.enhance.list = weaponItem.enhance.list.filter((enhanceItem) => {
+            return Helper.isNotEmpty(enhanceItem.name)
+        })
+
+        // Check Propeties Using as Unique Key
+        if (Helper.isEmpty(weaponItem.name)
+            || Helper.isEmpty(weaponItem.name.zhTW)
+        ) {
+            if (Helper.isEmpty(incompleteDataMapping.weapons)) {
+                incompleteDataMapping.weapons = []
+            }
+
+            incompleteDataMapping.weapons.push(weaponItem)
+
+            return
+        }
 
         // Get Id Code
         let idCode = createCode(`weapons:id:${weaponItem.name.zhTW}`)
@@ -358,18 +583,13 @@ export const runAction = () => {
         }
 
         // Find Code Id
-        weaponItem.skills.map((skillItem) => {
-            skillItem.name = createCode(`skills:id:${skillItem.name}`)
-
-            return skillItem
-        })
-
-        weaponItem.enhance.list.map((enhanceItem) => {
+        weaponItem.enhance.list = weaponItem.enhance.list.map((enhanceItem) => {
             enhanceItem.name = createCode(`enhances:id:${enhanceItem.name}`)
 
             return enhanceItem
         })
 
+        // Create Dataset Mapping
         if (Helper.isEmpty(datasetMapping.weapons)) {
             datasetMapping.weapons = []
         }
@@ -422,16 +642,25 @@ export const runAction = () => {
 
     // Save Datasets
     Object.keys(datasetMapping).forEach((target) => {
-        Helper.saveJSON(`${datasetRoot}/${target}.json`, datasetMapping[target])
+        Helper.saveJSON(`${assetsDatasetRoot}/${target}.json`, datasetMapping[target])
     })
 
     // Save Dataset Langs
     Object.keys(datasetLangMapping).forEach((lang) => {
-        Helper.saveJSON(`${langRoot}/${lang}/dataset.json`, datasetLangMapping[lang])
+        Helper.saveJSON(`${assetsLangRoot}/${lang}/dataset.json`, datasetLangMapping[lang])
     })
 
     // Save Unique Id Mapping
-    Helper.saveJSON(`${convertRoot}/hashCodeMapping.json`, hashCodeMapping)
+    Helper.saveJSON(`${fileRoot}/hashCodeMapping.json`, hashCodeMapping)
+
+    // Save Imcompelete Data
+    Helper.cleanFolder(tempConvertRoot)
+
+    Object.keys(incompleteDataMapping).forEach((target) => {
+        let list = autoExtendListQuantity(Object.values(incompleteDataMapping[target]))
+
+        Helper.saveJSONAsCSV(`${tempConvertRoot}/incompleteData/${target}.csv`, list)
+    })
 }
 
 export const infoAction = () => {
@@ -473,7 +702,7 @@ export const infoAction = () => {
         console.log(`count:final:${target}`)
 
         if ('weapons' === target) {
-            let weaponList = Helper.loadCSVAsJSON(`${convertRoot}/weapons.csv`)
+            let weaponList = Helper.loadCSVAsJSON(`${fileRoot}/weapons.csv`)
 
             if (Helper.isNotEmpty(weaponList)) {
                 result.weapons.all.final = weaponList.length
@@ -503,7 +732,7 @@ export const infoAction = () => {
         }
 
         if ('armors' === target) {
-            let armorList = Helper.loadCSVAsJSON(`${convertRoot}/armors.csv`)
+            let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors.csv`)
 
             if (Helper.isNotEmpty(armorList)) {
                 result.armors.all.final = armorList.length
@@ -529,7 +758,7 @@ export const infoAction = () => {
         }
 
         if ('jewels' === target) {
-            let jewelList = Helper.loadCSVAsJSON(`${convertRoot}/jewels.csv`)
+            let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewels.csv`)
 
             if (Helper.isNotEmpty(jewelList)) {
                 result.jewels.all.final = jewelList.length
@@ -550,7 +779,7 @@ export const infoAction = () => {
             continue
         }
 
-        let targetList = Helper.loadCSVAsJSON(`${convertRoot}/${target}.csv`)
+        let targetList = Helper.loadCSVAsJSON(`${fileRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {
             result[target].final = targetList.length
@@ -569,7 +798,7 @@ export const infoAction = () => {
             console.log(`count:${crawler}:${target}`)
 
             if ('weapons' === target) {
-                let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons.csv`)
+                let weaponList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/weapons.csv`)
 
                 if (Helper.isNotEmpty(weaponList)) {
                     result.weapons.all[crawler] = weaponList.length
@@ -598,7 +827,7 @@ export const infoAction = () => {
                 }
 
                 for (let weaponType of weaponTypeList) {
-                    let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons/${weaponType}.csv`)
+                    let weaponList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/weapons/${weaponType}.csv`)
 
                     if (Helper.isNotEmpty(weaponList)) {
                         if (Helper.isEmpty(result.weapons.all[crawler])) {
@@ -634,7 +863,7 @@ export const infoAction = () => {
             }
 
             if ('armors' === target) {
-                let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors.csv`)
+                let armorList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/armors.csv`)
 
                 if (Helper.isNotEmpty(armorList)) {
                     result.armors.all[crawler] = armorList.length
@@ -659,7 +888,7 @@ export const infoAction = () => {
                 }
 
                 for (let rare of rareList) {
-                    let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors/${rare}.csv`)
+                    let armorList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/armors/${rare}.csv`)
 
                     if (Helper.isNotEmpty(armorList)) {
                         if (Helper.isEmpty(result.armors.all[crawler])) {
@@ -675,7 +904,7 @@ export const infoAction = () => {
             }
 
             if ('jewels' === target) {
-                let jewelList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/jewels.csv`)
+                let jewelList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/jewels.csv`)
 
                 if (Helper.isNotEmpty(jewelList)) {
                     result.jewels.all[crawler] = jewelList.length
@@ -696,7 +925,7 @@ export const infoAction = () => {
                 continue
             }
 
-            let targetList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/${target}.csv`)
+            let targetList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/${target}.csv`)
 
             if (Helper.isNotEmpty(targetList)) {
                 result[target][crawler] = targetList.length

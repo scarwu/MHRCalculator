@@ -23,8 +23,8 @@ import {
     sizeList
 } from '../liberaries/mh.mjs'
 
-const crawlerRoot = 'temp/crawler'
-const combineRoot = 'temp/combine'
+const tempCrawlerRoot = 'temp/crawler'
+const tempCombineRoot = 'temp/combine'
 
 const crawlerList = [
     'gameqb', 'game8', 'kiranico', 'fextralife'
@@ -321,7 +321,7 @@ export const runAction = () => {
             console.log(`concat:${target}:${crawler}`)
 
             if ('weapons' === target) {
-                let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons.csv`)
+                let weaponList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/weapons.csv`)
 
                 if (Helper.isNotEmpty(weaponList)) {
                     rawDataMapping.weapons[crawler] = weaponList
@@ -330,7 +330,7 @@ export const runAction = () => {
                 }
 
                 for (let weaponType of weaponTypeList) {
-                    let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons/${weaponType}.csv`)
+                    let weaponList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/weapons/${weaponType}.csv`)
 
                     if (Helper.isNotEmpty(weaponList)) {
                         rawDataMapping.weapons[crawler] = rawDataMapping.weapons[crawler].concat(weaponList)
@@ -341,7 +341,7 @@ export const runAction = () => {
             }
 
             if ('armors' === target) {
-                let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors.csv`)
+                let armorList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/armors.csv`)
 
                 if (Helper.isNotEmpty(armorList)) {
                     rawDataMapping.armors[crawler] = armorList
@@ -350,7 +350,7 @@ export const runAction = () => {
                 }
 
                 for (let rare of rareList) {
-                    let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors/${rare}.csv`)
+                    let armorList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/armors/${rare}.csv`)
 
                     if (Helper.isNotEmpty(armorList)) {
                         rawDataMapping.armors[crawler] = rawDataMapping.armors[crawler].concat(armorList)
@@ -360,7 +360,7 @@ export const runAction = () => {
                 continue
             }
 
-            let targetList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/${target}.csv`)
+            let targetList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/${target}.csv`)
 
             if (Helper.isNotEmpty(targetList)) {
                 rawDataMapping[target][crawler] = targetList
@@ -1370,12 +1370,12 @@ export const runAction = () => {
     }
 
     // Save Data
-    Helper.cleanFolder(combineRoot)
+    Helper.cleanFolder(tempCombineRoot)
 
     Object.keys(arrangeDataMapping).forEach((target) => {
         let list = autoExtendListQuantity(Object.values(arrangeDataMapping[target]))
 
-        Helper.saveJSONAsCSV(`${combineRoot}/arrangeData/${target}.csv`, list)
+        Helper.saveJSONAsCSV(`${tempCombineRoot}/arrangeData/${target}.csv`, list)
     })
 
     Object.keys(untrackDataMapping).forEach((target) => {
@@ -1384,7 +1384,7 @@ export const runAction = () => {
                 return
             }
 
-            Helper.saveJSONAsCSV(`${combineRoot}/untrackData/${crawler}/${target}.csv`, untrackDataMapping[target][crawler])
+            Helper.saveJSONAsCSV(`${tempCombineRoot}/untrackData/${crawler}/${target}.csv`, untrackDataMapping[target][crawler])
         })
     })
 
@@ -1395,11 +1395,11 @@ export const runAction = () => {
             return
         }
 
-        Helper.saveJSONAsCSV(`${combineRoot}/untrackMerge/${target}.csv`, list)
+        Helper.saveJSONAsCSV(`${tempCombineRoot}/untrackMerge/${target}.csv`, list)
     })
 
     Object.keys(duplicateValueMapping).forEach((target) => {
-        Helper.saveJSONAsCSV(`${combineRoot}/duplicateValue/${target}.csv`, duplicateValueMapping[target])
+        Helper.saveJSONAsCSV(`${tempCombineRoot}/duplicateValue/${target}.csv`, duplicateValueMapping[target])
     })
 }
 
@@ -1444,7 +1444,7 @@ export const infoAction = () => {
             console.log(`count:${crawler}:${target}`)
 
             if ('weapons' === target) {
-                let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons.csv`)
+                let weaponList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/weapons.csv`)
 
                 if (Helper.isNotEmpty(weaponList)) {
                     result.weapons.all[crawler] = weaponList.length
@@ -1473,7 +1473,7 @@ export const infoAction = () => {
                 }
 
                 for (let weaponType of weaponTypeList) {
-                    let weaponList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/weapons/${weaponType}.csv`)
+                    let weaponList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/weapons/${weaponType}.csv`)
 
                     if (Helper.isNotEmpty(weaponList)) {
                         if (Helper.isEmpty(result.weapons.all[crawler])) {
@@ -1509,7 +1509,7 @@ export const infoAction = () => {
             }
 
             if ('armors' === target) {
-                let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors.csv`)
+                let armorList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/armors.csv`)
 
                 if (Helper.isNotEmpty(armorList)) {
                     result.armors.all[crawler] = armorList.length
@@ -1534,7 +1534,7 @@ export const infoAction = () => {
                 }
 
                 for (let rare of rareList) {
-                    let armorList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/armors/${rare}.csv`)
+                    let armorList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/armors/${rare}.csv`)
 
                     if (Helper.isNotEmpty(armorList)) {
                         if (Helper.isEmpty(result.armors.all[crawler])) {
@@ -1550,7 +1550,7 @@ export const infoAction = () => {
             }
 
             if ('jewels' === target) {
-                let jewelList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/jewels.csv`)
+                let jewelList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/jewels.csv`)
 
                 if (Helper.isNotEmpty(jewelList)) {
                     result.jewels.all[crawler] = jewelList.length
@@ -1571,7 +1571,7 @@ export const infoAction = () => {
                 continue
             }
 
-            let targetList = Helper.loadCSVAsJSON(`${crawlerRoot}/${crawler}/${target}.csv`)
+            let targetList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/${target}.csv`)
 
             if (Helper.isNotEmpty(targetList)) {
                 result[target][crawler] = targetList.length

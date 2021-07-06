@@ -221,7 +221,7 @@ function saveJSON(subPath, data) {
         })
     }
 
-    fs.writeFileSync(filePath, JSON.stringify(data))
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 4))
 
     return true
 }

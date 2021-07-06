@@ -421,18 +421,20 @@ export const runAction = () => {
         }
 
         if (Helper.isEmpty(skillBundlesMapping[armorItem.series.zhTW])) {
-            armorBundlesMapping[armorItem.series.zhTW] = {}
-            armorBundlesMapping[armorItem.series.zhTW].series = armorItem.series
-            armorBundlesMapping[armorItem.series.zhTW].rare = armorItem.rare
-            armorBundlesMapping[armorItem.series.zhTW].gender = armorItem.gender
-            armorBundlesMapping[armorItem.series.zhTW].minDefense = armorItem.minDefense
-            armorBundlesMapping[armorItem.series.zhTW].maxDefense = armorItem.maxDefense
-            armorBundlesMapping[armorItem.series.zhTW].resistance = armorItem.resistance
-            armorBundlesMapping[armorItem.series.zhTW].list = {}
+            armorBundlesMapping[armorItem.series.zhTW] = {
+                series: {},
+                items: {}
+            }
+            armorBundlesMapping[armorItem.series.zhTW].series.name = armorItem.series
+            armorBundlesMapping[armorItem.series.zhTW].series.rare = armorItem.rare
+            armorBundlesMapping[armorItem.series.zhTW].series.gender = armorItem.gender
+            armorBundlesMapping[armorItem.series.zhTW].series.minDefense = armorItem.minDefense
+            armorBundlesMapping[armorItem.series.zhTW].series.maxDefense = armorItem.maxDefense
+            armorBundlesMapping[armorItem.series.zhTW].series.resistance = armorItem.resistance
         }
 
-        if (Helper.isEmpty(armorBundlesMapping[armorItem.series.zhTW].list[armorItem.type])) {
-            armorBundlesMapping[armorItem.series.zhTW].list[armorItem.type] = {
+        if (Helper.isEmpty(armorBundlesMapping[armorItem.series.zhTW].items[armorItem.type])) {
+            armorBundlesMapping[armorItem.series.zhTW].items[armorItem.type] = {
                 name: armorItem.name,
                 type: armorItem.type,
                 slots: armorItem.slots,
@@ -442,28 +444,28 @@ export const runAction = () => {
     })
 
     Object.values(armorBundlesMapping).forEach((armorBundle) => {
-        armorBundle.list = Object.values(armorBundle.list)
+        armorBundle.items = Object.values(armorBundle.items)
 
         // Get Id Code
-        let idCode = createCode(`armors:id:${armorBundle.series.zhTW}`)
+        let idCode = createCode(`armors:id:${armorBundle.series.name.zhTW}`)
 
-        armorBundle.id = idCode
+        armorBundle.series.id = idCode
 
         // Get Translate Code & Create Dataset Lang Mapping
-        let translateCode = createCode(`armors:translate:series:${idCode}`)
+        let translateCode = createCode(`armors:translate:series:name:${idCode}`)
 
-        Object.keys(armorBundle.series).forEach((lang) => {
+        Object.keys(armorBundle.series.name).forEach((lang) => {
             if (Helper.isEmpty(datasetLangMapping[lang])) {
                 datasetLangMapping[lang] = {}
             }
 
-            datasetLangMapping[lang][translateCode] = armorBundle.series[lang]
+            datasetLangMapping[lang][translateCode] = armorBundle.series.name[lang]
         })
 
-        armorBundle.series = translateCode
+        armorBundle.series.name = translateCode
 
         // Bundle List
-        armorBundle.list.map((armorItem) => {
+        armorBundle.items.map((armorItem) => {
 
             // Get Id Code
             let idCode = createCode(`armors:id:${armorItem.name.zhTW}`)
@@ -471,7 +473,7 @@ export const runAction = () => {
             armorItem.id = idCode
 
             // Get Translate Code & Create Dataset Lang Mapping
-            let translateCode = createCode(`armors:translate:name:${idCode}`)
+            let translateCode = createCode(`armors:translate:item:name:${idCode}`)
 
             Object.keys(armorItem.name).forEach((lang) => {
                 if (Helper.isEmpty(datasetLangMapping[lang])) {
@@ -500,21 +502,21 @@ export const runAction = () => {
 
         datasetMapping.armors.push([
             [
-                armorBundle.id,
-                armorBundle.series,
-                armorBundle.rare,
-                armorBundle.gender,
-                armorBundle.minDefense,
-                armorBundle.maxDefense,
+                armorBundle.series.id,
+                armorBundle.series.name,
+                armorBundle.series.rare,
+                armorBundle.series.gender,
+                armorBundle.series.minDefense,
+                armorBundle.series.maxDefense,
                 [
-                    armorBundle.resistance.fire,
-                    armorBundle.resistance.water,
-                    armorBundle.resistance.thunder,
-                    armorBundle.resistance.ice,
-                    armorBundle.resistance.dragon
+                    armorBundle.series.resistance.fire,
+                    armorBundle.series.resistance.water,
+                    armorBundle.series.resistance.thunder,
+                    armorBundle.series.resistance.ice,
+                    armorBundle.series.resistance.dragon
                 ]
             ],
-            armorBundle.list.map((armorItem) => {
+            armorBundle.items.map((armorItem) => {
                 return [
                     armorItem.id,
                     armorItem.name,

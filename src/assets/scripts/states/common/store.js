@@ -28,40 +28,35 @@ const defaultData = {
     "equips": {
         "weapon": {
             "id": null,
+            "slotIds": [],
             "enhances": []
         },
         "helm": {
-            "id": "龍王的獨眼α",
-            "slotIds": [
-                "耐衝珠"
-            ]
+            "id": null,
+            "slotIds": []
         },
         "chest": {
-            "id": "杜賓鎧甲β",
-            "slotIds": [
-                "痛擊珠"
-            ]
+            "id": null,
+            "slotIds": []
         },
         "arm": {
-            "id": "異種大型鋼爪α",
-            "slotIds": [
-                "達人珠"
-            ]
+            "id": null,
+            "slotIds": []
         },
         "waist": {
-            "id": "慘爪龍腰甲β",
-            "slotIds": [
-                "無擊珠"
-            ]
+            "id": null,
+            "slotIds": []
         },
         "leg": {
-            "id": "杜賓護腿β",
-            "slotIds": [
-                "達人珠"
-            ]
+            "id": null,
+            "slotIds": []
+        },
+        "petalace": {
+            "id": null
         },
         "charm": {
-            "id": "攻擊護石 III"
+            "id": null,
+            "slotIds": []
         }
     },
     "requireEquips": {
@@ -105,13 +100,13 @@ const defaultData = {
 
 const statusMapping = {
     tempData:           'state:common:tempData',
-    requiredEquips:     'state:common:requiredEquips',
+    requiredEquipment:     'state:common:requiredEquipment',
     // requiredSets:       'state:common:requiredSets',
     requiredSkills:     'state:common:requiredSkills',
-    currentEquips:      'state:common:currentEquips',
+    playerEquipment:      'state:common:playerEquipment',
     algorithmParams:    'state:common:algorithmParams',
     computedResult:     'state:common:computedResult',
-    reservedBundles:    'state:common:reservedBundles',
+    reservedPlayerEquipment:    'state:common:reservedPlayerEquipment',
     customWeapon:       'state:common:customWeapon'
 }
 
@@ -154,14 +149,16 @@ const initialState = {
             list: []
         }
     },
-    requiredEquips: Status.get(statusMapping.requiredEquips) || Helper.deepCopy(defaultData.requireEquips),
-    // requiredSets: Status.get(statusMapping.requiredSets) || Helper.deepCopy(defaultData.requireSets),
-    requiredSkills: Status.get(statusMapping.requiredSkills) || Helper.deepCopy(defaultData.requireSkills),
-    currentEquips: Status.get(statusMapping.currentEquips) || Helper.deepCopy(defaultData.equips),
-    algorithmParams: Status.get(statusMapping.algorithmParams) || Helper.deepCopy(Constant.default.algorithmParams),
+
+    requiredEquips: Status.get(statusMapping.requiredEquips) || {},
+    // requiredSets: Status.get(statusMapping.requiredSets) || [],
+    requiredSkills: Status.get(statusMapping.requiredSkills) || [],
+
+    requiredConditions: Status.get(statusMapping.requiredConditions) || Helper.deepCopy(Constant.defaultRequiredConditions),
+    algorithmParams: Status.get(statusMapping.algorithmParams) || Helper.deepCopy(Constant.defaultAlgorithmParams),
     computedResult: Status.get(statusMapping.computedResult) || null,
-    reservedBundles: Status.get(statusMapping.reservedBundles) || [],
-    customWeapon: Status.get(statusMapping.customWeapon) || Helper.deepCopy(Constant.default.customWeapon)
+    playerEquipment: Status.get(statusMapping.playerEquipment) || Helper.deepCopy(Constant.defaultPlayerEquipment),
+    reservedPlayerEquipment: Status.get(statusMapping.reservedPlayerEquipment) || []
 }
 
 export default createStore((state = initialState, action) => {
@@ -190,7 +187,7 @@ export default createStore((state = initialState, action) => {
             case 'conditionOptions':
                 if (Helper.isEmpty(tempData[target].list[index])) {
                     tempData[target].list[index] = {
-                        requiredEquips: {
+                        requiredEquipment: {
                             weapon: null,
                             helm: null,
                             chest: null,
@@ -208,7 +205,7 @@ export default createStore((state = initialState, action) => {
                 bundle = Helper.deepCopy(tempData[target].list[index])
 
                 tempData[target].list[tempData[target].index] = Helper.deepCopy({
-                    requiredEquips: state.requiredEquips,
+                    requiredEquipment: state.requiredEquipment,
                     // requiredSets: state.requiredSets,
                     requiredSkills: state.requiredSkills
                 })
@@ -216,7 +213,7 @@ export default createStore((state = initialState, action) => {
 
                 return Object.assign({}, state, {
                     tempData: tempData,
-                    requiredEquips: bundle.requiredEquips,
+                    requiredEquipment: bundle.requiredEquipment,
                     // requiredSets: bundle.requiredSets,
                     requiredSkills: bundle.requiredSkills
                 })
@@ -241,7 +238,7 @@ export default createStore((state = initialState, action) => {
             case 'equipsDisplayer':
                 if (Helper.isEmpty(tempData[target].list[index])) {
                     tempData[target].list[index] = {
-                        currentEquips: {},
+                        playerEquipment: {},
                         customWeapon: Helper.deepCopy(Constant.default.customWeapon)
                     }
                 }
@@ -249,14 +246,14 @@ export default createStore((state = initialState, action) => {
                 bundle = Helper.deepCopy(tempData[target].list[index])
 
                 tempData[target].list[tempData[target].index] = Helper.deepCopy({
-                    currentEquips: state.currentEquips,
+                    playerEquipment: state.playerEquipment,
                     customWeapon: state.customWeapon
                 })
                 tempData[target].index = index
 
                 return Object.assign({}, state, {
                     tempData: tempData,
-                    currentEquips: bundle.currentEquips,
+                    playerEquipment: bundle.playerEquipment,
                     customWeapon: bundle.customWeapon
                 })
             }
@@ -586,33 +583,33 @@ export default createStore((state = initialState, action) => {
     // Required Equips
     case 'SET_REQUIRED_EQUIPS':
         return Object.assign({}, state, {
-            requiredEquips: (() => {
-                let requiredEquips = Helper.deepCopy(state.requiredEquips)
+            requiredEquipment: (() => {
+                let requiredEquipment = Helper.deepCopy(state.requiredEquipment)
 
                 if (Helper.isEmpty(action.payload.currentEquip)) {
-                    requiredEquips[action.payload.equipType] = null
+                    requiredEquipment[action.payload.equipType] = null
                 } else {
-                    requiredEquips[action.payload.equipType] = {
+                    requiredEquipment[action.payload.equipType] = {
                         id: action.payload.currentEquip.id
                     }
 
                     if (Helper.isNotEmpty(action.payload.currentEquip.enhances)) {
-                        requiredEquips[action.payload.equipType].enhances = action.payload.currentEquip.enhances
+                        requiredEquipment[action.payload.equipType].enhances = action.payload.currentEquip.enhances
                     } else {
-                        requiredEquips[action.payload.equipType].enhances = []
+                        requiredEquipment[action.payload.equipType].enhances = []
                     }
 
                     if ('customWeapon' === action.payload.currentEquip.id) {
-                        requiredEquips[action.payload.equipType].customWeapon = action.payload.currentEquip
+                        requiredEquipment[action.payload.equipType].customWeapon = action.payload.currentEquip
                     }
                 }
 
-                return requiredEquips
+                return requiredEquipment
             })()
         })
     case 'CLEAN_REQUIRED_EQUIPS':
         return Object.assign({}, state, {
-            requiredEquips: {
+            requiredEquipment: {
                 weapon: null,
                 helm: null,
                 chest: null,
@@ -627,31 +624,31 @@ export default createStore((state = initialState, action) => {
     case 'SET_CURRENT_EQUIP':
         return (() => {
             let data = action.payload.data
-            let currentEquips = Helper.deepCopy(state.currentEquips)
+            let playerEquipment = Helper.deepCopy(state.playerEquipment)
 
             if (Helper.isNotEmpty(data.enhanceIndex)) {
-                if (Helper.isEmpty(currentEquips.weapon.enhances)) {
-                    currentEquips.weapon.enhances = []
+                if (Helper.isEmpty(playerEquipment.weapon.enhances)) {
+                    playerEquipment.weapon.enhances = []
                 }
 
                 if (Helper.isNotEmpty(data.enhanceId)) {
-                    currentEquips.weapon.enhances[data.enhanceIndex] = {
+                    playerEquipment.weapon.enhances[data.enhanceIndex] = {
                         id: data.enhanceId,
                         level: Helper.isNotEmpty(data.enhanceLevel) ? data.enhanceLevel : 1
                     }
                 } else {
-                    currentEquips.weapon.enhances = currentEquips.weapon.enhances.filter((enhance, index) => {
+                    playerEquipment.weapon.enhances = playerEquipment.weapon.enhances.filter((enhance, index) => {
                         return index !== data.enhanceIndex
                     })
                 }
             } else if (Helper.isNotEmpty(data.slotIndex)) {
-                if (Helper.isEmpty(currentEquips.weapon.slotIds)) {
-                    currentEquips[data.equipType].slotIds = []
+                if (Helper.isEmpty(playerEquipment.weapon.slotIds)) {
+                    playerEquipment[data.equipType].slotIds = []
                 }
 
-                currentEquips[data.equipType].slotIds[data.slotIndex] = data.jewelId
+                playerEquipment[data.equipType].slotIds[data.slotIndex] = data.jewelId
             } else if ('weapon' === data.equipType) {
-                currentEquips.weapon = {
+                playerEquipment.weapon = {
                     id: data.equipId,
                     enhances: [],
                     slotIds: []
@@ -662,27 +659,27 @@ export default createStore((state = initialState, action) => {
                 || 'waist' === data.equipType
                 || 'leg' === data.equipType
             ) {
-                currentEquips[data.equipType] = {
+                playerEquipment[data.equipType] = {
                     id: data.equipId,
                     slotIds: []
                 }
             } else if ('charm' === data.equipType) {
-                currentEquips.charm = {
+                playerEquipment.charm = {
                     id: data.equipId
                 }
             }
 
             return Object.assign({}, state, {
-                currentEquips: currentEquips
+                playerEquipment: playerEquipment
             })
         })()
     case 'REPLACE_CURRENT_EQUIPS':
         return Object.assign({}, state, {
-            currentEquips: action.payload.data
+            playerEquipment: action.payload.data
         })
     case 'CLEAN_CURRENT_EQUIPS':
         return Object.assign({}, state, {
-            currentEquips: Helper.deepCopy(Constant.default.equips)
+            playerEquipment: Helper.deepCopy(Constant.default.equips)
         })
 
     // Algorithm Params
@@ -758,42 +755,42 @@ export default createStore((state = initialState, action) => {
     // Reserved Bundles
     case 'ADD_RESERVED_BUNDLE':
         return Object.assign({}, state, {
-            reservedBundles: (() => {
-                let reservedBundles = Helper.deepCopy(state.reservedBundles)
+            reservedPlayerEquipment: (() => {
+                let reservedPlayerEquipment = Helper.deepCopy(state.reservedPlayerEquipment)
 
-                reservedBundles.push(action.payload.data)
+                reservedPlayerEquipment.push(action.payload.data)
 
-                return reservedBundles
+                return reservedPlayerEquipment
             })()
         })
     case 'UPDATE_RESERVED_BUNDLE_NAME':
         return Object.assign({}, state, {
-            reservedBundles: (() => {
-                let reservedBundles = Helper.deepCopy(state.reservedBundles)
+            reservedPlayerEquipment: (() => {
+                let reservedPlayerEquipment = Helper.deepCopy(state.reservedPlayerEquipment)
 
-                if (Helper.isEmpty(reservedBundles[action.payload.index])) {
-                    return reservedBundles
+                if (Helper.isEmpty(reservedPlayerEquipment[action.payload.index])) {
+                    return reservedPlayerEquipment
                 }
 
-                reservedBundles[action.payload.index].name = action.payload.name
+                reservedPlayerEquipment[action.payload.index].name = action.payload.name
 
-                return reservedBundles
+                return reservedPlayerEquipment
             })()
         })
     case 'REMOVE_RESERVED_BUNDLE':
         return Object.assign({}, state, {
-            reservedBundles: (() => {
-                let reservedBundles = Helper.deepCopy(state.reservedBundles)
+            reservedPlayerEquipment: (() => {
+                let reservedPlayerEquipment = Helper.deepCopy(state.reservedPlayerEquipment)
 
-                if (Helper.isEmpty(reservedBundles[action.payload.index])) {
-                    return reservedBundles
+                if (Helper.isEmpty(reservedPlayerEquipment[action.payload.index])) {
+                    return reservedPlayerEquipment
                 }
 
-                reservedBundles = reservedBundles.filter((euqipBundle, index) => {
+                reservedPlayerEquipment = reservedPlayerEquipment.filter((euqipBundle, index) => {
                     return index !== action.payload.index
                 })
 
-                return reservedBundles
+                return reservedPlayerEquipment
             })()
         })
 
@@ -808,13 +805,13 @@ export default createStore((state = initialState, action) => {
         return (() => {
             let target = action.payload.target
             let value = action.payload.value
-            let currentEquips = Helper.deepCopy(state.currentEquips)
+            let playerEquipment = Helper.deepCopy(state.playerEquipment)
             let customWeapon = Helper.deepCopy(state.customWeapon)
 
             customWeapon[target] = value
 
             if ('rare' === target) {
-                currentEquips.weapon.enhances = []
+                playerEquipment.weapon.enhances = []
             }
 
             if ('type' === target) {
@@ -837,7 +834,7 @@ export default createStore((state = initialState, action) => {
             }
 
             return Object.assign({}, state, {
-                currentEquips: currentEquips,
+                playerEquipment: playerEquipment,
                 customWeapon: customWeapon
             })
         })()
@@ -933,29 +930,29 @@ export default createStore((state = initialState, action) => {
         return (() => {
             let index = action.payload.index
             let size = action.payload.size
-            let currentEquips = Helper.deepCopy(state.currentEquips)
+            let playerEquipment = Helper.deepCopy(state.playerEquipment)
             let customWeapon = Helper.deepCopy(state.customWeapon)
 
-            if (Helper.isEmpty(currentEquips.weapon.slotIds)) {
-                currentEquips.weapon.slotIds = []
+            if (Helper.isEmpty(playerEquipment.weapon.slotIds)) {
+                playerEquipment.weapon.slotIds = []
             }
 
             if (Helper.isEmpty(size)) {
-                currentEquips.weapon.slotIds = currentEquips.weapon.slotIds.filter((id, slotIndex) => {
+                playerEquipment.weapon.slotIds = playerEquipment.weapon.slotIds.filter((id, slotIndex) => {
                     return index !== slotIndex
                 })
                 customWeapon.slots = customWeapon.slots.filter((id, slotIndex) => {
                     return index !== slotIndex
                 })
             } else {
-                currentEquips.weapon.slotIds[index] = undefined
+                playerEquipment.weapon.slotIds[index] = undefined
                 customWeapon.slots[index] = {
                     size: size
                 }
             }
 
             return Object.assign({}, state, {
-                currentEquips: currentEquips,
+                playerEquipment: playerEquipment,
                 customWeapon: customWeapon
             })
         })()

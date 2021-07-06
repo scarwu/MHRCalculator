@@ -28,7 +28,7 @@ let langs = {
     enUS: Object.assign({}, enUSUI, enUSDataset)
 }
 
-let defaultLang = Constant.default.lang
+let defaultLang = Constant.defaultLang
 let browserLnag = navigator.language.replace('-', '')
 let currentLang = Status.get('sys:lang')
 

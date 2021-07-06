@@ -39,7 +39,7 @@ import Constant from 'constant'
  * Handle Functions
  */
 const handleEquipsDisplayerRefresh = () => {
-    CommonState.setter.cleanCurrentEquips()
+    CommonState.setter.cleanPlayerEquipment()
 }
 
 const handleSwitchTempData = (index) => {
@@ -69,7 +69,7 @@ const renderEnhanceBlock = (equipInfo) => {
                     {(usedSize < equipInfo.enhanceSize) ? (
                         <IconButton key={equipInfo.enhances.length} iconName="plus" altName={_('add')} onClick={() => {
                             ModalState.setter.showEquipItemSelector({
-                                equipType: equipInfo.type,
+                                equipmentPart: equipInfo.type,
                                 equipRare: equipInfo.rare,
                                 enhanceIndex: equipInfo.enhances.length,
                                 enhanceIds: equipInfo.enhances.map((enhance) => {
@@ -109,7 +109,7 @@ const renderEnhanceBlock = (equipInfo) => {
                             <div className="mhrc-icons_bundle">
                                 <IconButton key={`prev:${prevLevel}`} iconName="minus-circle" altName={_('down')} onClick={() => {
                                     CommonState.setter.setCurrentEquip({
-                                        equipType: equipInfo.type,
+                                        equipmentPart: equipInfo.type,
                                         enhanceIndex: index,
                                         enhanceId: enhance.id,
                                         enhanceLevel: prevLevel
@@ -117,7 +117,7 @@ const renderEnhanceBlock = (equipInfo) => {
                                 }} />
                                 <IconButton key={`next:${nextLevel}`} iconName="plus-circle" altName={_('up')} onClick={() => {
                                     CommonState.setter.setCurrentEquip({
-                                        equipType: equipInfo.type,
+                                        equipmentPart: equipInfo.type,
                                         enhanceIndex: index,
                                         enhanceId: enhance.id,
                                         enhanceLevel: nextLevel
@@ -125,7 +125,7 @@ const renderEnhanceBlock = (equipInfo) => {
                                 }} />
                                 <IconButton iconName="times" altName={_('clean')} onClick={() => {
                                     CommonState.setter.setCurrentEquip({
-                                        equipType: equipInfo.type,
+                                        equipmentPart: equipInfo.type,
                                         enhanceIndex: index,
                                         enhanceId: null
                                     })
@@ -139,16 +139,16 @@ const renderEnhanceBlock = (equipInfo) => {
     )
 }
 
-const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
+const renderJewelOption = (equipmentPart, slotIndex, slotSize, jewelInfo) => {
     let selectorData = {
-        equipType: equipType,
+        equipmentPart: equipmentPart,
         slotIndex: slotIndex,
         slotSize: slotSize,
         jewelId: (Helper.isNotEmpty(jewelInfo)) ? jewelInfo.id : null
     }
 
     let emptySelectorData = {
-        equipType: equipType,
+        equipmentPart: equipmentPart,
         slotIndex: slotIndex,
         slotSize: slotSize,
         jewelId: null
@@ -156,7 +156,7 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
 
     if (Helper.isEmpty(jewelInfo)) {
         return (
-            <Fragment key={`${equipType}:${slotIndex}`}>
+            <Fragment key={`${equipmentPart}:${slotIndex}`}>
                 <div className="col-3 mhrc-name">
                     <span>{_('slot')}: {slotIndex + 1} [{slotSize}]</span>
                 </div>
@@ -172,7 +172,7 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
     }
 
     return (
-        <Fragment key={`${equipType}:${slotIndex}`}>
+        <Fragment key={`${equipmentPart}:${slotIndex}`}>
             <div className="col-3 mhrc-name">
                 <span>{_('slot')}: {slotIndex + 1} [{slotSize}]</span>
             </div>
@@ -320,38 +320,40 @@ const renderArmorProperties = (equipInfo) => {
     )
 }
 
-const renderEquipBlock = (equipType, currentEquip, requiredEquip) => {
+const renderEquipBlock = (equipmentPart, currentEquip, requiredEquip) => {
     let equipInfo = null
 
-    if ('weapon' === equipType) {
+    if ('weapon' === equipmentPart) {
         equipInfo = CommonDataset.getAppliedWeaponInfo(currentEquip)
-    } else if ('helm' === equipType
-        || 'chest' === equipType
-        || 'arm' === equipType
-        || 'waist' === equipType
-        || 'leg' === equipType
+    } else if ('helm' === equipmentPart
+        || 'chest' === equipmentPart
+        || 'arm' === equipmentPart
+        || 'waist' === equipmentPart
+        || 'leg' === equipmentPart
     ) {
         equipInfo = CommonDataset.getAppliedArmorInfo(currentEquip)
-    } else if ('charm' === equipType) {
+    } else if ('petalace' === equipmentPart) {
+        // equipInfo = CommonDataset.getAppliedPetalaceInfo(currentEquip)
+    } else if ('charm' === equipmentPart) {
         // equipInfo = CommonDataset.getAppliedCharmInfo(currentEquip)
     } else {
         return false
     }
 
     let selectorData = {
-        equipType: equipType,
+        equipmentPart: equipmentPart,
         equipId: (Helper.isNotEmpty(equipInfo)) ? equipInfo.id : null
     }
 
     let emptySelectorData = {
-        equipType: equipType,
+        equipmentPart: equipmentPart,
         equipId: null
     }
 
     let isNotRequire = true
 
     if (Helper.isNotEmpty(requiredEquip)) {
-        if ('weapon' === equipType) {
+        if ('weapon' === equipmentPart) {
             isNotRequire = Helper.jsonHash({
                 id: currentEquip.id,
                 enhances: currentEquip.enhances
@@ -366,15 +368,15 @@ const renderEquipBlock = (equipType, currentEquip, requiredEquip) => {
 
     if (Helper.isEmpty(equipInfo)) {
         return (
-            <div key={equipType} className="mhrc-item mhrc-item-3-step">
+            <div key={equipmentPart} className="mhrc-item mhrc-item-3-step">
                 <div className="col-12 mhrc-name">
-                    <span>{_(equipType)}</span>
+                    <span>{_(equipmentPart)}</span>
                     <div className="mhrc-icons_bundle">
-                        {'weapon' === equipType ? (
+                        {'weapon' === equipmentPart ? (
                             <IconButton
                                 iconName="wrench" altName={_('customWeapon')}
                                 onClick={() => {CommonState.setter.setCurrentEquip({
-                                    equipType: 'weapon',
+                                    equipmentPart: 'weapon',
                                     equipId: 'customWeapon'
                                 })}} />
                         ) : false}
@@ -390,18 +392,18 @@ const renderEquipBlock = (equipType, currentEquip, requiredEquip) => {
     return (
         <div key={selectorData.equipId} className="mhrc-item mhrc-item-3-step">
             <div className="col-12 mhrc-name">
-                <span>{_(equipType)}: {_(equipInfo.name)}</span>
+                <span>{_(equipmentPart)}: {_(equipInfo.name)}</span>
                 <div className="mhrc-icons_bundle">
                     {isNotRequire ? (
                         <IconButton
                             iconName="arrow-left" altName={_('include')}
-                            onClick={() => {CommonState.setter.setRequiredEquips(equipType, currentEquip)}} />
+                            onClick={() => {CommonState.setter.setRequiredConditions(equipmentPart, currentEquip)}} />
                     ) : false}
-                    {'weapon' === equipType ? (
+                    {'weapon' === equipmentPart ? (
                         <IconButton
                             iconName="wrench" altName={_('customWeapon')}
                             onClick={() => {CommonState.setter.setCurrentEquip({
-                                equipType: 'weapon',
+                                equipmentPart: 'weapon',
                                 equipId: 'customWeapon'
                             })}} />
                     ) : false}
@@ -424,17 +426,17 @@ const renderEquipBlock = (equipType, currentEquip, requiredEquip) => {
                 <div className="col-12 mhrc-content">
                     {equipInfo.slots.map((data, index) => {
                         return renderJewelOption(
-                            equipType, index, data.size,
+                            equipmentPart, index, data.size,
                             JewelDataset.getInfo(data.jewel.id)
                         )
                     })}
                 </div>
             ) : false}
 
-            {('weapon' === equipType)
+            {('weapon' === equipmentPart)
                 ? renderWeaponProperties(equipInfo) : false}
 
-            {('weapon' !== equipType && 'charm' !== equipType)
+            {('weapon' !== equipmentPart && 'charm' !== equipmentPart)
                 ? renderArmorProperties(equipInfo) : false}
 
             {(Helper.isNotEmpty(equipInfo.skills)
@@ -469,15 +471,15 @@ export default function EquipsDisplayer(props) {
      * Hooks
      */
     const [stateTempData, updateTempData] = useState(CommonState.getter.getTempData())
-    const [stateCurrentEquips, updateCurrentEquips] = useState(CommonState.getter.getCurrentEquips())
-    const [stateRequiredEquips, updateRequiredEquips] = useState(CommonState.getter.getRequiredEquips())
+    const [statePlayerEquipment, updatePlayerEquipment] = useState(CommonState.getter.getPlayerEquipment())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(CommonState.getter.getRequiredConditions())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = CommonState.store.subscribe(() => {
             updateTempData(CommonState.getter.getTempData())
-            updateCurrentEquips(CommonState.getter.getCurrentEquips())
-            updateRequiredEquips(CommonState.getter.getRequiredEquips())
+            updatePlayerEquipment(CommonState.getter.getPlayerEquipment())
+            updateRequiredConditions(CommonState.getter.getRequiredConditions())
         })
 
         return () => {
@@ -488,24 +490,24 @@ export default function EquipsDisplayer(props) {
     const getContent = useMemo(() => {
         let blocks = []
 
-        Object.keys(stateCurrentEquips).forEach((equipType) => {
-            if (Helper.isNotEmpty(stateCurrentEquips[equipType])
-                && 'customWeapon' === stateCurrentEquips[equipType].id
+        Object.keys(statePlayerEquipment.current).forEach((equipmentPart) => {
+            if (Helper.isNotEmpty(statePlayerEquipment[equipmentPart])
+                && 'customWeapon' === statePlayerEquipment[equipmentPart].id
             ) {
                 blocks.push((
                     <CustomWeapon key="customWeapon" />
                 ))
             } else {
                 blocks.push(renderEquipBlock(
-                    equipType,
-                    stateCurrentEquips[equipType],
-                    stateRequiredEquips[equipType]
+                    equipmentPart,
+                    statePlayerEquipment[equipmentPart],
+                    stateRequiredConditions[equipmentPart]
                 ))
             }
         })
 
         return blocks
-    }, [stateCurrentEquips, stateRequiredEquips])
+    }, [statePlayerEquipment, stateRequiredConditions])
 
     return (
         <div className="col mhrc-equips">

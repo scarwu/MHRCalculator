@@ -22,9 +22,14 @@ import App from 'app'
 // Load Components
 import Changelog from 'components/modal/changelog'
 import AlgorithmSetting from 'components/modal/algorithmSetting'
-import ConditionItemSelector from 'components/modal/conditionItemSelector'
-import EquipItemSelector from 'components/modal/equipItemSelector'
-import BundleItemSelector from 'components/modal/bundleItemSelector'
+import WeaponItemSelector from 'components/modal/selector/weaponItem'
+import ArmorItemSelector from 'components/modal/selector/armorItem'
+import SetItemSelector from 'components/modal/selector/setItem'
+import PetalaceItemSelector from 'components/modal/selector/petalaceItem'
+import JewelItemSelector from 'components/modal/selector/jewelItem'
+import EnhanceItemSelector from 'components/modal/selector/enhanceItem'
+import SkillItemSelector from 'components/modal/selector/skillItem'
+import playerEquipmentSelector from 'components/modal/selector/playerEquipment'
 
 // Set Sentry Endpoint
 if ('production' === Config.env) {
@@ -32,7 +37,7 @@ if ('production' === Config.env) {
         scope.setLevel('error')
     })
     Sentry.init({
-        dsn: 'https://b1176b2a7c654e8c97eb25fb599eb307@o235065.ingest.sentry.io/5849529',
+        dsn: Config.sentryDsn,
         release: Config.buildTime
     })
 }
@@ -44,8 +49,13 @@ ReactDOM.render((
 
         <Changelog />
         <AlgorithmSetting />
-        <ConditionItemSelector />
-        <EquipItemSelector />
-        <BundleItemSelector />
+        <WeaponItemSelector />
+        <ArmorItemSelector />
+        <SetItemSelector />
+        <PetalaceItemSelector />
+        <JewelItemSelector />
+        <EnhanceItemSelector />
+        <SkillItemSelector />
+        <playerEquipmentSelector />
     </Router>
 ), document.getElementById('mhrc'))

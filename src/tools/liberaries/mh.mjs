@@ -233,3 +233,20 @@ export const rareList = [
 export const sizeList = [
     'size1', 'size2', 'size3'
 ]
+
+export const crawlerList = [
+    'gameqb', 'game8', 'kiranico', 'fextralife'
+]
+
+export const targetList = [
+    'weapons',
+    'armors',
+    'petalaces',
+    'jewels',
+    'enhances',
+    'skills'
+]
+
+export const langList = [
+    'zhTW', 'jaJP', 'enUS'
+]

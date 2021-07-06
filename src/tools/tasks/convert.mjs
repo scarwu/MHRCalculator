@@ -14,7 +14,8 @@ import {
     autoExtendListQuantity,
     weaponTypeList,
     rareList,
-    sizeList
+    sizeList,
+    targetList
 } from '../liberaries/mh.mjs'
 
 const tempCrawlerRoot = 'temp/crawler'
@@ -24,21 +25,6 @@ const fileRoot = 'files'
 
 const assetsDatasetRoot = '../assets/scripts/datasets'
 const assetsLangRoot = '../assets/scripts/langs'
-
-const targetList = [
-    'weapons',
-    'armors',
-    'petalaces',
-    'jewels',
-    'enhances',
-    'skills'
-]
-
-const langList = [
-    'zhTW',
-    'jaJP',
-    'enUS'
-]
 
 const codeLength = 3
 const codeChars = [
@@ -103,6 +89,8 @@ export const runAction = () => {
 
                 break
             }
+
+            console.log(`createCode:duplicate <${code}:${hash}> <${text}>`)
         }
 
         return code
@@ -113,6 +101,8 @@ export const runAction = () => {
     let incompleteDataMapping = {}
 
     // Handle Skills
+    console.log('handle:skills')
+
     let skillBundlesMapping = []
 
     rawDataMapping.skills.forEach((skillItem) => {
@@ -217,6 +207,8 @@ export const runAction = () => {
     })
 
     // Handle Enhances
+    console.log('handle:enhances')
+
     rawDataMapping.enhances.forEach((enhanceItem) => {
 
         // Check Propeties Using as Unique Key
@@ -327,6 +319,8 @@ export const runAction = () => {
     })
 
     // Handle Jewels
+    console.log('handle:jewels')
+
     rawDataMapping.jewels.forEach((jewelItem) => {
 
         // Filter Empty Items
@@ -391,6 +385,8 @@ export const runAction = () => {
     })
 
     // Handle Armors
+    console.log('handle:armors')
+
     let armorBundlesMapping = []
 
     rawDataMapping.armors.forEach((armorItem) => {
@@ -416,13 +412,6 @@ export const runAction = () => {
             }
 
             incompleteDataMapping.armors.push(armorItem)
-
-            return
-        }
-
-        // Check Propeties Using as Unique Key
-        if (Helper.isEmpty(armorItem.series) || Helper.isEmpty(armorItem.series.zhTW)) {
-            console.log('untrackArmor', armorItem)
 
             return
         }
@@ -542,9 +531,15 @@ export const runAction = () => {
     })
 
     // Handle Weapons
+    console.log('handle:weapons')
+
     rawDataMapping.weapons.forEach((weaponItem) => {
 
         // Filter Empty Items
+        weaponItem.slots = weaponItem.slots.filter((slotItem) => {
+            return Helper.isNotEmpty(slotItem.size)
+        })
+
         weaponItem.enhance.list = weaponItem.enhance.list.filter((enhanceItem) => {
             return Helper.isNotEmpty(enhanceItem.name)
         })

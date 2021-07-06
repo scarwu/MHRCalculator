@@ -20,30 +20,14 @@ import {
     autoExtendListQuantity,
     weaponTypeList,
     rareList,
-    sizeList
+    sizeList,
+    crawlerList,
+    targetList,
+    langList
 } from '../liberaries/mh.mjs'
 
 const tempCrawlerRoot = 'temp/crawler'
 const tempCombineRoot = 'temp/combine'
-
-const crawlerList = [
-    'gameqb', 'game8', 'kiranico', 'fextralife'
-]
-
-const targetList = [
-    'weapons',
-    'armors',
-    'petalaces',
-    'jewels',
-    'enhances',
-    'skills'
-]
-
-const langList = [
-    'zhTW',
-    'jaJP',
-    'enUS'
-]
 
 const specialReplaceItemName = (text, lang, rare) => {
     let replacementList = [

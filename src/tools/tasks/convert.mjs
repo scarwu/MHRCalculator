@@ -187,11 +187,12 @@ export const runAction = () => {
             skillBundle.id,
             skillBundle.name,
             skillBundle.description,
+            null, // skillBundle.type,
             skillBundle.list.map((skillItem) => {
                 return [
                     skillItem.level,
                     skillItem.effect,
-                    // skillItem.reaction
+                    null // skillItem.reaction
                 ]
             })
         ])
@@ -243,7 +244,8 @@ export const runAction = () => {
         datasetMapping.enhances.push([
             enhanceItem.id,
             enhanceItem.name,
-            enhanceItem.description
+            enhanceItem.description,
+            null // enhanceItem.reaction
         ])
     })
 
@@ -366,6 +368,7 @@ export const runAction = () => {
             jewelItem.id,
             jewelItem.name,
             jewelItem.rare,
+            jewelItem.size,
             jewelItem.skills.map((skillItem) => {
                 return [
                     skillItem.name,

@@ -18,13 +18,6 @@ import Skills from 'datasets/skills.json'
 //     1: name,
 //     2: description,
 //     3: type,
-//     4: from [
-//         0: set,
-//         1: jewel,
-//         2: armor,
-//         3: charm,
-//         4: weapon
-//     ],
 //     5: list [
 //         [
 //             0: level,
@@ -40,19 +33,11 @@ let dataset = Skills.map((skill) => {
         name: skill[1],
         description: skill[2],
         type: skill[3],
-        from: {
-            set: skill[4][0],
-            jewel: skill[4][1],
-            armor: skill[4][2],
-            charm: skill[4][3],
-            weapon: skill[4][4]
-        },
-        list: skill[5].map((item) => {
+        list: skill[4].map((item) => {
             return {
                 level: item[0],
-                description: item[1],
-                reaction: item[2],
-                isHidden: item[3]
+                effect: item[1],
+                reaction: item[2]
             }
         })
     }

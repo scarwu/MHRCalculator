@@ -66,32 +66,13 @@ class PetalaceDataset {
         list.forEach((data) => {
             this.mapping[data.id] = data
         })
-
-        // Filter Conditional
-        this.resetFilter()
     }
-
-    // resetFilter = () => {
-    //     this.filterSkillName = null
-    // }
 
     getIds = () => {
         return Object.keys(this.mapping)
     }
 
     getItems = () => {
-        let result = Object.values(this.mapping).filter((data) => {
-            // if (Helper.isNotEmpty(this.filterSkillName)) {
-            //     if (this.filterSkillName !== data.skill.id) {
-            //         return false
-            //     }
-            // }
-
-            return true
-        })
-
-        // this.resetFilter()
-
         return result
     }
 
@@ -107,13 +88,6 @@ class PetalaceDataset {
             delete this.mapping[id]
         }
     }
-
-    // Conditional Functions
-    // hasSkill = (name) => {
-    //     this.filterSkillName = name
-
-    //     return this
-    // }
 }
 
 export default new PetalaceDataset(dataset)

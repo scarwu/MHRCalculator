@@ -20,17 +20,15 @@ let dataset = Armors.map((bundle) => {
             series: bundle[0][1],
             rare: bundle[0][2],
             gender: bundle[0][3],
-            defense: bundle[0][4],
+            minDefense: bundle[0][4],
+            maxDefense: bundle[0][5],
             resistance: {
-                fire: bundle[0][5][0],
-                water: bundle[0][5][1],
-                thunder: bundle[0][5][2],
-                ice: bundle[0][5][3],
-                dragon: bundle[0][5][4]
+                fire: bundle[0][6][0],
+                water: bundle[0][6][1],
+                thunder: bundle[0][6][2],
+                ice: bundle[0][6][3],
+                dragon: bundle[0][6][4]
             },
-            set: (Helper.isNotEmpty(bundle[0][6])) ? {
-                id: bundle[0][6]
-            } : null,
             id: item[0],
             name: item[1],
             type: item[2],

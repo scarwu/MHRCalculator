@@ -32,16 +32,8 @@ let dataset = Enhances.map((enhance) => {
     return {
         id: enhance[0],
         name: enhance[1],
-        allowRares: enhance[2],
-        list: enhance[3].map((item) => {
-            return {
-                level: item[0],
-                description: item[1],
-                allowRares: item[2],
-                size: item[3],
-                reaction: item[4]
-            }
-        })
+        description: enhance[2],
+        reaction: enhance[3]
     }
 })
 
@@ -53,13 +45,6 @@ class EnhanceDataset {
         list.forEach((data) => {
             this.mapping[data.id] = data
         })
-
-        // Filter Conditional
-        this.resetFilter()
-    }
-
-    resetFilter = () => {
-        this.filterSkillName = null
     }
 
     getIds = () => {
@@ -67,18 +52,6 @@ class EnhanceDataset {
     }
 
     getItems = () => {
-        let result = Object.values(this.mapping).filter((data) => {
-            if (Helper.isNotEmpty(this.filterSkillName)) {
-                if (this.filterSkillName !== data.skill.id) {
-                    return false
-                }
-            }
-
-            return true
-        })
-
-        this.resetFilter()
-
         return result
     }
 
@@ -93,13 +66,6 @@ class EnhanceDataset {
         } else {
             delete this.mapping[id]
         }
-    }
-
-    // Conditional Functions
-    hasSkill = (name) => {
-        this.filterSkillName = name
-
-        return this
     }
 }
 

@@ -187,20 +187,11 @@ export const runAction = () => {
             skillBundle.id,
             skillBundle.name,
             skillBundle.description,
-            // skillBundle.type,
-            // [
-            //     skillBundle.from.set,
-            //     skillBundle.from.jewel,
-            //     skillBundle.from.armor,
-            //     skillBundle.from.charm,
-            //     skillBundle.from.weapon
-            // ],
             skillBundle.list.map((skillItem) => {
                 return [
                     skillItem.level,
                     skillItem.effect,
-                    // skillItem.reaction,
-                    // skillItem.isHidden
+                    // skillItem.reaction
                 ]
             })
         ])
@@ -436,7 +427,7 @@ export const runAction = () => {
             armorBundlesMapping[armorItem.series.zhTW].gender = armorItem.gender
             armorBundlesMapping[armorItem.series.zhTW].minDefense = armorItem.minDefense
             armorBundlesMapping[armorItem.series.zhTW].maxDefense = armorItem.maxDefense
-            armorBundlesMapping[armorItem.series.zhTW].resistence = armorItem.resistence
+            armorBundlesMapping[armorItem.series.zhTW].resistance = armorItem.resistance
             armorBundlesMapping[armorItem.series.zhTW].list = {}
         }
 
@@ -516,11 +507,11 @@ export const runAction = () => {
                 armorBundle.minDefense,
                 armorBundle.maxDefense,
                 [
-                    armorBundle.resistence.fire,
-                    armorBundle.resistence.water,
-                    armorBundle.resistence.thunder,
-                    armorBundle.resistence.ice,
-                    armorBundle.resistence.dragon
+                    armorBundle.resistance.fire,
+                    armorBundle.resistance.water,
+                    armorBundle.resistance.thunder,
+                    armorBundle.resistance.ice,
+                    armorBundle.resistance.dragon
                 ]
             ],
             armorBundle.list.map((armorItem) => {

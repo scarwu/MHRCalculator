@@ -368,21 +368,21 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
 
             let rare = armorDom('dl.grid dd').eq(5).text().trim()
             let minDefense = armorDom('dl.grid dd').eq(11).text().trim()
-            let resistenceFire = armorDom('dl.grid dd').eq(12).text().trim()
-            let resistenceWater = armorDom('dl.grid dd').eq(13).text().trim()
-            let resistenceIce = armorDom('dl.grid dd').eq(14).text().trim()
-            let resistenceThunder = armorDom('dl.grid dd').eq(15).text().trim()
-            let resistenceDragon = armorDom('dl.grid dd').eq(16).text().trim()
+            let resistanceFire = armorDom('dl.grid dd').eq(12).text().trim()
+            let resistanceWater = armorDom('dl.grid dd').eq(13).text().trim()
+            let resistanceIce = armorDom('dl.grid dd').eq(14).text().trim()
+            let resistanceThunder = armorDom('dl.grid dd').eq(15).text().trim()
+            let resistanceDragon = armorDom('dl.grid dd').eq(16).text().trim()
             let type = guessArmorType(name)
 
             mapping[mappingKey].type = type // special fix
             mapping[mappingKey].rare = parseFloat(rare) + 1 // special fix
             mapping[mappingKey].minDefense = parseFloat(minDefense)
-            mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
-            mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
-            mapping[mappingKey].resistence.thunder = parseFloat(resistenceThunder)
-            mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
-            mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
+            mapping[mappingKey].resistance.fire = parseFloat(resistanceFire)
+            mapping[mappingKey].resistance.water = parseFloat(resistanceWater)
+            mapping[mappingKey].resistance.thunder = parseFloat(resistanceThunder)
+            mapping[mappingKey].resistance.ice = parseFloat(resistanceIce)
+            mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
 
             // Slots
             JSON.parse(armorDom('dl.grid dd').eq(19).text()).forEach((slotCount, index) => {

@@ -823,25 +823,25 @@ export const runAction = () => {
             let valueMapping = {}
 
             for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
-                if (Helper.isEmpty(crawlerItem.resistence[key])) {
+                if (Helper.isEmpty(crawlerItem.resistance[key])) {
                     continue
                 }
 
                 // Set Default Value
-                if (Helper.isEmpty(item.resistence[key])) {
-                    item.resistence[key] = crawlerItem.resistence[key]
+                if (Helper.isEmpty(item.resistance[key])) {
+                    item.resistance[key] = crawlerItem.resistance[key]
                 }
 
                 // Set Count & Value
-                if (Helper.isEmpty(voteMapping[crawlerItem.resistence[key]])) {
-                    voteMapping[crawlerItem.resistence[key]] = {
+                if (Helper.isEmpty(voteMapping[crawlerItem.resistance[key]])) {
+                    voteMapping[crawlerItem.resistance[key]] = {
                         count: 0,
-                        value: crawlerItem.resistence[key]
+                        value: crawlerItem.resistance[key]
                     }
                 }
 
-                voteMapping[crawlerItem.resistence[key]].count++
-                valueMapping[crawlerName] = crawlerItem.resistence[key]
+                voteMapping[crawlerItem.resistance[key]].count++
+                valueMapping[crawlerName] = crawlerItem.resistance[key]
             }
 
             // Dosen't need Copy
@@ -855,17 +855,17 @@ export const runAction = () => {
             for (let voteItem of Object.values(voteMapping)) {
                 if (maxCount < voteItem.count) {
                     maxCount = voteItem.count
-                    item.resistence[key] = voteItem.value
+                    item.resistance[key] = voteItem.value
                 }
             }
 
             // Record DuplicationValueMapping
             if (Object.keys(voteMapping).length > 1) {
-                if (Helper.isEmpty(duplicateValueMapping.resistence)) {
-                    duplicateValueMapping.resistence = []
+                if (Helper.isEmpty(duplicateValueMapping.resistance)) {
+                    duplicateValueMapping.resistance = []
                 }
 
-                duplicateValueMapping.resistence.push({
+                duplicateValueMapping.resistance.push({
                     target: target,
                     name: idNameMapping[itemId],
                     rare: item.rare,

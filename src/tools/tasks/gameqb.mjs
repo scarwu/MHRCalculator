@@ -422,11 +422,11 @@ export const fetchArmorsAction = async () => {
             }
 
             let defense = itemDom(node).find('td').eq(1).text().trim()
-            let resistenceFire = itemDom(node).find('td').eq(2).text().trim()
-            let resistenceWater = itemDom(node).find('td').eq(3).text().trim()
-            let resistenceThunder = itemDom(node).find('td').eq(4).text().trim()
-            let resistenceIce = itemDom(node).find('td').eq(5).text().trim()
-            let resistenceDragon = itemDom(node).find('td').eq(6).text().trim()
+            let resistanceFire = itemDom(node).find('td').eq(2).text().trim()
+            let resistanceWater = itemDom(node).find('td').eq(3).text().trim()
+            let resistanceThunder = itemDom(node).find('td').eq(4).text().trim()
+            let resistanceIce = itemDom(node).find('td').eq(5).text().trim()
+            let resistanceDragon = itemDom(node).find('td').eq(6).text().trim()
             let type = guessArmorType(name)
 
             mapping[mappingKey].series = {
@@ -440,11 +440,11 @@ export const fetchArmorsAction = async () => {
             mapping[mappingKey].gender = gender
             mapping[mappingKey].minDefense = parseFloat(defense)
             mapping[mappingKey].maxDefense = null
-            mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
-            mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
-            mapping[mappingKey].resistence.thunder = parseFloat(resistenceThunder)
-            mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
-            mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
+            mapping[mappingKey].resistance.fire = parseFloat(resistanceFire)
+            mapping[mappingKey].resistance.water = parseFloat(resistanceWater)
+            mapping[mappingKey].resistance.thunder = parseFloat(resistanceThunder)
+            mapping[mappingKey].resistance.ice = parseFloat(resistanceIce)
+            mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
         })
 
         // Table 3

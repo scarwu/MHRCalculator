@@ -495,11 +495,11 @@ export const fetchArmorsAction = async () => {
             }
 
             let minDefense = rowNode.find('td').eq(1).text().trim()
-            let resistenceFire = rowNode.find('td').eq(3).text().trim()
-            let resistenceWater = rowNode.find('td').eq(4).text().trim()
-            let resistenceThunder = rowNode.find('td').eq(5).text().trim()
-            let resistenceIce = rowNode.find('td').eq(6).text().trim()
-            let resistenceDragon = rowNode.find('td').eq(7).text().trim()
+            let resistanceFire = rowNode.find('td').eq(3).text().trim()
+            let resistanceWater = rowNode.find('td').eq(4).text().trim()
+            let resistanceThunder = rowNode.find('td').eq(5).text().trim()
+            let resistanceIce = rowNode.find('td').eq(6).text().trim()
+            let resistanceDragon = rowNode.find('td').eq(7).text().trim()
 
             mappingKey = `${series}:${name}`
 
@@ -516,11 +516,11 @@ export const fetchArmorsAction = async () => {
             mapping[mappingKey].gender = null
             mapping[mappingKey].rare = parseFloat(rare)
             mapping[mappingKey].minDefense = parseFloat(minDefense)
-            mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
-            mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
-            mapping[mappingKey].resistence.thunder = parseFloat(resistenceThunder)
-            mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
-            mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
+            mapping[mappingKey].resistance.fire = parseFloat(resistanceFire)
+            mapping[mappingKey].resistance.water = parseFloat(resistanceWater)
+            mapping[mappingKey].resistance.thunder = parseFloat(resistanceThunder)
+            mapping[mappingKey].resistance.ice = parseFloat(resistanceIce)
+            mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
 
             rowNode.find('td').eq(2).find('img').each((index, node) => {
                 if ('/file/Monster-Hunter-Rise/gem_level_3_icon_monster_hunter_rise_wiki_guide_24px.png' === armorDom(node).attr('src')) {

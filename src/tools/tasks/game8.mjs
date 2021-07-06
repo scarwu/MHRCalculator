@@ -478,11 +478,11 @@ export const fetchArmorsAction = async () => {
                             // Get Data
                             let type = armorNode.find('td').eq(0).find('.align').text().trim()
                             let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
-                            let resistenceFire = armorNode.find('td').eq(1).text().trim()
-                            let resistenceWater = armorNode.find('td').eq(2).text().trim()
-                            let resistenceThunder = armorNode.find('td').eq(3).text().trim()
-                            let resistenceIce = armorNode.find('td').eq(4).text().trim()
-                            let resistenceDragon = armorNode.find('td').eq(5).text().trim()
+                            let resistanceFire = armorNode.find('td').eq(1).text().trim()
+                            let resistanceWater = armorNode.find('td').eq(2).text().trim()
+                            let resistanceThunder = armorNode.find('td').eq(3).text().trim()
+                            let resistanceIce = armorNode.find('td').eq(4).text().trim()
+                            let resistanceDragon = armorNode.find('td').eq(5).text().trim()
 
                             if (2 === seriesList.length) {
                                 name = name.split('/')[seriesIndex]
@@ -518,11 +518,11 @@ export const fetchArmorsAction = async () => {
                             }
 
                             mapping[mappingKey].type = type
-                            mapping[mappingKey].resistence.fire = parseFloat(resistenceFire)
-                            mapping[mappingKey].resistence.water = parseFloat(resistenceWater)
-                            mapping[mappingKey].resistence.thunder = parseFloat(resistenceThunder)
-                            mapping[mappingKey].resistence.ice = parseFloat(resistenceIce)
-                            mapping[mappingKey].resistence.dragon = parseFloat(resistenceDragon)
+                            mapping[mappingKey].resistance.fire = parseFloat(resistanceFire)
+                            mapping[mappingKey].resistance.water = parseFloat(resistanceWater)
+                            mapping[mappingKey].resistance.thunder = parseFloat(resistanceThunder)
+                            mapping[mappingKey].resistance.ice = parseFloat(resistanceIce)
+                            mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
                         }
                     }
                 }

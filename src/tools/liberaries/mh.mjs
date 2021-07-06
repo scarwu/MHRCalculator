@@ -61,7 +61,7 @@ export const defaultArmorItem = {
     gender: null,
     minDefense: null,
     maxDefense: null,
-    resistence: {
+    resistance: {
         fire: null,
         water: null,
         thunder: null,

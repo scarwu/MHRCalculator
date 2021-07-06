@@ -605,6 +605,15 @@ export const runAction = () => {
                 let voteMapping = {}
                 let valueMapping = {}
 
+                // Set Default Value
+                if (Helper.isEmpty(item[key])) {
+                    item[key] = {}
+                }
+
+                if (Helper.isEmpty(item[key][lang])) {
+                    item[key][lang] = null
+                }
+
                 for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
                     if (Helper.isEmpty(crawlerItem[key])
                         || Helper.isEmpty(crawlerItem[key][lang])
@@ -621,10 +630,6 @@ export const runAction = () => {
                     }
 
                     // Set Default Value
-                    if (Helper.isEmpty(item[key])) {
-                        item[key] = {}
-                    }
-
                     if (Helper.isEmpty(item[key][lang])) {
                         item[key][lang] = crawlerItem[key][lang]
                     }
@@ -682,6 +687,15 @@ export const runAction = () => {
                 let voteMapping = {}
                 let valueMapping = {}
 
+                // Set Default Value
+                if (Helper.isEmpty(item.element[key])) {
+                    item.element[key] = {}
+                }
+
+                if (Helper.isEmpty(item.element[key][property])) {
+                    item.element[key][property] = null
+                }
+
                 for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
                     if (Helper.isEmpty(crawlerItem.element[key])
                         || Helper.isEmpty(crawlerItem.element[key][property])
@@ -690,10 +704,6 @@ export const runAction = () => {
                     }
 
                     // Set Default Value
-                    if (Helper.isEmpty(item.element[key])) {
-                        item.element[key] = {}
-                    }
-
                     if (Helper.isEmpty(item.element[key][property])) {
                         item.element[key][property] = crawlerItem.element[key][property]
                     }
@@ -874,6 +884,15 @@ export const runAction = () => {
                 let voteMapping = {}
                 let valueMapping = {}
 
+                // Set Default Value
+                if (Helper.isEmpty(item[key])) {
+                    item[key] = {}
+                }
+
+                if (Helper.isEmpty(item[key][property])) {
+                    item[key][property] = null
+                }
+
                 for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
                     if (Helper.isEmpty(crawlerItem[key])
                         || Helper.isEmpty(crawlerItem[key][lang])
@@ -882,10 +901,6 @@ export const runAction = () => {
                     }
 
                     // Set Default Value
-                    if (Helper.isEmpty(item[key])) {
-                        item[key] = {}
-                    }
-
                     if (Helper.isEmpty(item[key][property])) {
                         item[key][property] = crawlerItem[key][property]
                     }

@@ -503,11 +503,11 @@ export const runAction = () => {
                 armorBundle.minDefense,
                 armorBundle.maxDefense,
                 [
-                    armorBundle.resistance.fire,
-                    armorBundle.resistance.water,
-                    armorBundle.resistance.thunder,
-                    armorBundle.resistance.ice,
-                    armorBundle.resistance.dragon
+                    armorBundle.resistence.fire,
+                    armorBundle.resistence.water,
+                    armorBundle.resistence.thunder,
+                    armorBundle.resistence.ice,
+                    armorBundle.resistence.dragon
                 ]
             ],
             armorBundle.list.map((armorItem) => {

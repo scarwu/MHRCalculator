@@ -220,6 +220,55 @@ export const normalizeText = (text) => {
         .replace(/．/g, '.').replace(/･/g, '・').replace(/（/g, '(').replace(/）/g, ')')
 }
 
+export const guessArmorType = (name) => {
+    let type = null
+    let typeKeywordMapping = {
+        helm: [
+            '頭盔', '頭部', '【蒙面】', '綻放', '頭飾', '【頭巾】', '【武士盔】', '【元結】', '首腦',
+            '毛髮', '護頭', '帽', '兜帽', '之首', '禮帽',
+            '的包頭', '偽裝', '羽飾', '【斗笠】', '【面具】', '面具', '假髮'
+        ],
+        chest: [
+            '鎧甲', '服飾', '【上衣】', '枝幹', '衣裝', '【上衣】', '【胸甲】', '【白衣】', '肌肉',
+            '羽織', '上身', '戰衣', '洋裝', '胸甲', '服裝',
+            '的鎧', '披風', '襯衫'
+        ],
+        arm: [
+            '腕甲', '拳套', '【手甲】', '枝葉', '手套', '【手甲】', '【臂甲】', '【花袖】', '雙手',
+            '臂甲', '護袖', '腕甲', '袖', '之臂', '護手'
+        ],
+        waist: [
+            '腰甲', '纏腰布', '【腰卷】', '葉片', '腰帶', '【腰卷】', '【腰具】', '【腰卷】', '臍帶',
+            '帶', '護腰具', '腰甲', '腰甲', '之腰', '腰甲'
+        ],
+        leg: [
+            '護腿', '涼鞋', '【綁腿】', '紮根', '鞋子', '【綁腿】', '【腿甲】', '【緋袴】', '腳跟',
+            '下裳', '腳', '靴', '長褲', '之足', '靴'
+        ]
+    }
+
+    for (let entry of Object.entries(typeKeywordMapping)) {
+        let typeName = entry[0]
+        let keywords = entry[1]
+
+        for (let keyword of keywords) {
+            if (-1 === name.indexOf(keyword)) {
+                continue
+            }
+
+            type = typeName
+
+            break
+        }
+
+        if (Helper.isNotEmpty(type)) {
+            break
+        }
+    }
+
+    return type
+}
+
 export const weaponTypeList = [
     'greatSword', 'swordAndShield', 'dualBlades', 'longSword',
     'hammer', 'huntingHorn', 'lance', 'gunlance', 'switchAxe', 'chargeBlade',

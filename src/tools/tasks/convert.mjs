@@ -400,6 +400,19 @@ export const runAction = () => {
             return Helper.isNotEmpty(skillItem.name)
         })
 
+        // If armor's minDefense is empty or 0, meaning it's a layered armor
+        if (Helper.isEmpty(armorItem.minDefense)
+            || 0 === armorItem.minDefense
+        ) {
+            if (Helper.isEmpty(incompleteDataMapping.armors)) {
+                incompleteDataMapping.armors = []
+            }
+
+            incompleteDataMapping.armors.push(armorItem)
+
+            return
+        }
+
         // Check Propeties Using as Unique Key
         if (Helper.isEmpty(armorItem.name)
             || Helper.isEmpty(armorItem.name.zhTW)

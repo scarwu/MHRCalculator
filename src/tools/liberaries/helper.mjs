@@ -237,13 +237,13 @@ function loadCSV(subPath) {
         let newRow = []
 
         while (true) {
-            let match = row.match(/^\"(.*?)\"(?:\,(\".*?\"(?:\,\".*?\")*))?$/)
+            let match = row.match(/^(\".*?\"|.*?)(?:\,((?:\".*?\"|.*?)(?:\,(?:\".*?\"|.*?))*))?$/)
 
             if (isEmpty(match)) {
                 break
             }
 
-            newRow.push(match[1])
+            newRow.push(match[1].replace(/^\"/, '').replace(/\"$/, ''))
 
             if ('' === match[2] || isEmpty(match[2])) {
                 break
@@ -267,7 +267,7 @@ function saveCSV(subPath, data) {
 
     fs.writeFileSync(filePath, data.map((row) => {
         return row.map((col) => {
-            return `"${col}"`
+            return isNotEmpty(col) && ('' !== col) ? `"${col}"` : col
         }).join(',')
     }).join('\n'))
 

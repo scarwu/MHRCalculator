@@ -7,9 +7,30 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
+import Helper from 'core/helper'
 import Store from './store'
 
+export const getModalData = (target) => {
+    if (Helper.isEmpty(Store.getState().modalHub[target])) {
+        return null
+    }
+
+    return Store.getState().modalHub[target]
+}
+
+export const getPlayerEquips = () => {
+    return Store.getState().playerEquips
+}
+
+export const getRequiredConditions = () => {
+    return Store.getState().requiredConditions
+}
+
 export default {
+    getModalData,
+    getPlayerEquips,
+    getRequiredConditions,
+
     getTempData: () => {
         return Store.getState().tempData
     },

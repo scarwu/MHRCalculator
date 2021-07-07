@@ -1,5 +1,5 @@
 /**
- * Changelog
+ * ChangeLog Modal
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -21,28 +21,28 @@ import _ from 'libraries/lang'
 import IconButton from 'components/common/iconButton'
 
 // Load State Control
-import ModalState from 'states/modal'
+import CommonState from 'states/common'
 
 // Load Markdown
-import zhTWChangelog from 'langs/zhTW/changelog.md'
-import jaJPChangelog from 'langs/jaJP/changelog.md'
-import enUSChangelog from 'langs/enUS/changelog.md'
+import zhTWChangeLog from 'langs/zhTW/changeLog.md'
+import jaJPChangeLog from 'langs/jaJP/changeLog.md'
+import enUSChangeLog from 'langs/enUS/changeLog.md'
 
 /**
  * Variables
  */
-const changelogMap = {
-    zhTW: zhTWChangelog,
-    jaJP: jaJPChangelog,
-    enUS: enUSChangelog
+const changeLogMapping = {
+    zhTW: zhTWChangeLog,
+    jaJP: jaJPChangeLog,
+    enUS: enUSChangeLog
 }
 
 /**
  * Handle Functions
  */
-const getChangelog = () => {
-    let changeLog = Helper.isNotEmpty(changelogMap[Status.get('sys:lang')])
-        ? changelogMap[Status.get('sys:lang')] : false
+const getChangeLog = () => {
+    let changeLog = Helper.isNotEmpty(changeLogMapping[Status.get('sys:lang')])
+        ? changeLogMapping[Status.get('sys:lang')] : false
 
     if (false === changeLog) {
         return false
@@ -57,27 +57,24 @@ const getChangelog = () => {
                     <span>{title}</span>
                 </div>
                 <div className="col-12 mhrc-value mhrc-description"
-                     dangerouslySetInnerHTML={{__html: content}}></div>
+                    dangerouslySetInnerHTML={{ __html: content }}></div>
             </div>
         )
     })
-
-    return Helper.isNotEmpty(changelogMap[Status.get('sys:lang')])
-        ? changelogMap[Status.get('sys:lang')] : false
 }
 
-export default function Changelog(props) {
+export default function ChangeLogModal(props) {
 
     /**
      * Hooks
      */
-    const [stateIsShow, updateIsShow] = useState(ModalState.getter.isShowChangelog())
+    const [stateModalData, updateModalData] = useState(CommonState.getter.getModalData('changeLog'))
     const refModal = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = ModalState.store.subscribe(() => {
-            updateIsShow(ModalState.getter.isShowChangelog())
+        const unsubscribe = CommonState.store.subscribe(() => {
+            updateModalData(CommonState.getter.getModalData('changeLog'))
         })
 
         return () => {
@@ -93,24 +90,24 @@ export default function Changelog(props) {
             return
         }
 
-        ModalState.setter.hideChangelog()
+        CommonState.setter.hideModal('changeLog')
     }, [])
 
-    return stateIsShow ? (
+    return Helper.isNotEmpty(stateModalData) ? (
         <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
             <div className="mhrc-modal mhrc-slim-modal">
                 <div className="mhrc-panel">
-                    <span className="mhrc-title">{_('changelog')}</span>
+                    <span className="mhrc-title">{_('changeLog')}</span>
 
                     <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={ModalState.setter.hideChangelog} />
+                            onClick={() => { CommonState.setter.hideModal('changeLog') }} />
                     </div>
                 </div>
                 <div className="mhrc-list">
                     <div className="mhrc-wrapper">
-                        {getChangelog()}
+                        {getChangeLog()}
                     </div>
                 </div>
             </div>

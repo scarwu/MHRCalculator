@@ -73,6 +73,8 @@ class PetalaceDataset {
     }
 
     getItems = () => {
+        let result = Object.values(this.mapping)
+
         return result
     }
 

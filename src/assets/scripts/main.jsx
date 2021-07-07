@@ -20,16 +20,16 @@ import Config from 'config'
 import App from 'app'
 
 // Load Components
-import Changelog from 'components/modal/changelog'
-import AlgorithmSetting from 'components/modal/algorithmSetting'
-import WeaponItemSelector from 'components/modal/selector/weaponItem'
-import ArmorItemSelector from 'components/modal/selector/armorItem'
-import SetItemSelector from 'components/modal/selector/setItem'
-import PetalaceItemSelector from 'components/modal/selector/petalaceItem'
-import JewelItemSelector from 'components/modal/selector/jewelItem'
-import EnhanceItemSelector from 'components/modal/selector/enhanceItem'
-import SkillItemSelector from 'components/modal/selector/skillItem'
-import playerEquipmentSelector from 'components/modal/selector/playerEquipment'
+import ChangeLogModal from 'components/modal/changeLog'
+import AlgorithmSettingModal from 'components/modal/algorithmSetting'
+import WeaponSelectorModal from 'components/modal/weaponSelector'
+import ArmorSelectorModal from 'components/modal/armorSelector'
+import SetSelectorModal from 'components/modal/setSelector'
+import PetalaceSelectorModal from 'components/modal/petalaceSelector'
+import JewelSelectorModal from 'components/modal/jewelSelector'
+import EnhanceSelectorModal from 'components/modal/enhanceSelector'
+import SkillSelectorModal from 'components/modal/skillSelector'
+import PlayerEquipSelectorModal from 'components/modal/playerEquipSelector'
 
 // Set Sentry Endpoint
 if ('production' === Config.env) {
@@ -47,15 +47,15 @@ ReactDOM.render((
     <Router key="router">
         <Route exact path="/:hash?" component={App} />
 
-        <Changelog />
-        <AlgorithmSetting />
-        <WeaponItemSelector />
-        <ArmorItemSelector />
-        <SetItemSelector />
-        <PetalaceItemSelector />
-        <JewelItemSelector />
-        <EnhanceItemSelector />
-        <SkillItemSelector />
-        <playerEquipmentSelector />
+        <ChangeLogModal />
+        {/* <AlgorithmSettingModal />
+        <WeaponSelectorModal />
+        <ArmorSelectorModal />
+        <SetSelectorModal /> */}
+        <PetalaceSelectorModal />
+        {/* <JewelSelectorModal />
+        <EnhanceSelectorModal />
+        <SkillSelectorModal />
+        <PlayerEquipSelectorModal /> */}
     </Router>
 ), document.getElementById('mhrc'))

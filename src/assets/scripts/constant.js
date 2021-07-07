@@ -13,7 +13,7 @@ export const langs = {
     enUS: 'English'
 }
 
-export const equipmentParts = [
+export const equipTypes = [
     'weapons',
     'helm',
     'chest',
@@ -273,7 +273,7 @@ export const defaultCustomCharm = {
     skills: []
 }
 
-export const defaultPlayerEquipment = {
+export const defaultPlayerEquips = {
     current: {
         weapon: {
             id: null,
@@ -360,14 +360,14 @@ export const defaultBenefitAnalysis = {
 }
 
 export const defaultRequiredConditions = {
-    playerEquipment: defaultPlayerEquipment,
+    equips: defaultPlayerEquips,
     sets: [],
     skills: []
 }
 
 export default {
     langs,
-    equipmentParts,
+    equipTypes,
     weaponTypes,
     armorTypes,
     sharpnessSteps,
@@ -381,7 +381,7 @@ export default {
     defaultBundle,
     defaultCustomWeapon,
     defaultCustomCharm,
-    defaultPlayerEquipment,
+    defaultPlayerEquips,
     defaultPlayerStatus,
     defaultBenefitAnalysis,
     defaultRequiredConditions

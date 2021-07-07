@@ -9,7 +9,7 @@
 
 // Load Libraries
 import React, { useState, useEffect, useCallback, useRef, createRef } from 'react'
-import MD5 from 'md5'
+import md5 from 'md5'
 
 // Load Core Libraries
 import Helper from 'core/helper'
@@ -94,7 +94,7 @@ export default function BundleItemSelector(props) {
             }
 
             CommonState.setter.addReservedBundle({
-                id: MD5(JSON.stringify(stateCurrentEquips)),
+                id: md5(JSON.stringify(stateCurrentEquips)),
                 name: name,
                 equips: stateCurrentEquips,
                 customWeapon: customWeapon
@@ -127,7 +127,7 @@ export default function BundleItemSelector(props) {
             return false
         }
 
-        let bundleId = MD5(JSON.stringify(stateCurrentEquips))
+        let bundleId = md5(JSON.stringify(stateCurrentEquips))
 
         for (let index in stateReservedBundles) {
             if (bundleId === stateReservedBundles[index].id) {

@@ -52,6 +52,8 @@ class EnhanceDataset {
     }
 
     getItems = () => {
+        let result = Object.values(this.mapping)
+
         return result
     }
 

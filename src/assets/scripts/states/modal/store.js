@@ -15,6 +15,8 @@ import Status from 'core/status'
 import Helper from 'core/helper'
 
 const statusMapping = {
+
+    // Need Remove
     changelog:              'state:modal:changelog',
     algorithmSetting:       'state:modal:algorithmSetting',
     bundleItemSelector:     'state:modal:bundleItemSelector',
@@ -47,6 +49,9 @@ const diffLogger = store => next => action => {
 
 // Initial State
 const initialState = {
+    modalHub: Status.get(statusMapping.modalHub) || {},
+
+    // Need Remove
     changelog: Status.get(statusMapping.changelog) || {
         isShow: false
     },

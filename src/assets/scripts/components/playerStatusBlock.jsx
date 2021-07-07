@@ -108,7 +108,7 @@ const generatePassiveSkills = (equipInfos) => {
 }
 
 const generateStatus = (equipInfos, passiveSkills) => {
-    let status = Helper.deepCopy(Constant.default.status)
+    let status = Helper.deepCopy(Constant.defaultPlayerStatus)
     return status
     equipInfos = Helper.deepCopy(equipInfos)
 
@@ -603,7 +603,7 @@ const getSharpnessMultiple = (data) => {
     }
 }
 
-export default function CharacterStatus(props) {
+export default function PlayerStatusBlock(props) {
 
     /**
      * Hooks
@@ -611,7 +611,7 @@ export default function CharacterStatus(props) {
     const [stateCustomWeapon, updateCustomWeapon] = useState(CommonState.getter.getCustomWeapon())
     const [stateCurrentEquips, updateCurrentEquips] = useState(CommonState.getter.getCurrentEquips())
     const [stateEquipInfos, updateEquipInfos] = useState({})
-    const [stateStatus, updateStatus] = useState(Helper.deepCopy(Constant.default.status))
+    const [stateStatus, updateStatus] = useState(Helper.deepCopy(Constant.defaultPlayerStatus))
     const [stateBenefitAnalysis, updateBenefitAnalysis] = useState(Helper.deepCopy(Constant.default.benefitAnalysis))
     const [statePassiveSkills, updatePassiveSkills] = useState({})
     const [stateTuning, updateTuning] = useState({

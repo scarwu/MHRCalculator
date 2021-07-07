@@ -22,12 +22,11 @@ import IconButton from 'components/common/iconButton'
 import IconSelector from 'components/common/iconSelector'
 import ConditionOptions from 'components/conditionOptions'
 import CandidateBundles from 'components/candidateBundles'
-import EquipsDisplayer from 'components/equipsDisplayer'
-import CharacterStatus from 'components/characterStatus'
+import PlayerEquipBlock from 'components/playerEquipBlock'
+import PlayerStatusBlock from 'components/playerStatusBlock'
 
 // Load State Control
 import CommonState from 'states/common'
-import ModalState from 'states/modal'
 
 // Load Config & Constant
 import Config from 'config'
@@ -35,7 +34,7 @@ import Constant from 'constant'
 
 if ('production' === Config.env) {
     if (Config.buildTime !== Status.get('sys:buildTime')) {
-        ModalState.setter.showChangelog()
+        CommonState.setter.showModal('changeLog')
     }
 
     Status.set('sys:buildTime', Config.buildTime)
@@ -107,8 +106,8 @@ export default function App(props) {
                         iconName="link" altName={_('exportBundle')}
                         onClick={handleBundleExport} />
                     <IconButton
-                        iconName="info" altName={_('changelog')}
-                        onClick={ModalState.setter.showChangelog} />
+                        iconName="info" altName={_('changeLog')}
+                        onClick={() => {CommonState.setter.showModal('changeLog')}} />
                     <IconButton
                         iconName="question" altName={_('readme')}
                         onClick={handleOpenReadme} />
@@ -120,10 +119,10 @@ export default function App(props) {
             </div>
 
             <div className="row mhrc-container">
-                <ConditionOptions />
-                <CandidateBundles />
-                <EquipsDisplayer />
-                <CharacterStatus />
+                {/* <ConditionOptions />
+                <CandidateBundles /> */}
+                <PlayerEquipBlock />
+                {/* <PlayerStatusBlock /> */}
             </div>
 
             <div className="row mhrc-footer">

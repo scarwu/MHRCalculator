@@ -24,9 +24,6 @@ import IconInput from 'components/common/iconInput'
 // Load State Control
 import CommonState from 'states/common'
 
-// Load Constant
-import Constant from 'constant'
-
 /**
  * Handle Functions
  */
@@ -52,7 +49,7 @@ const renderPetalaceItem = (petalaceItem, modalData) => {
                 <span>{_(petalaceItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(modalData.equipId !== petalaceItem.id) ? (
+                    {(petalaceItem.id !== modalData.equipId) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => { handleItemPickUp(petalaceItem.id, modalData) }} />
@@ -81,13 +78,7 @@ export default function PetalaceSelectorModal(props) {
             return
         }
 
-        let sortedList = []
-
-        sortedList = PetalaceDataset.getItems().map((petalaceInfo) => {
-            petalaceInfo.isSelect = (stateModalData.equipId === petalaceInfo.id)
-
-            return petalaceInfo
-        })
+        let sortedList = PetalaceDataset.getItems()
 
         updateSortedList(sortedList)
     }, [stateModalData])
@@ -154,7 +145,7 @@ export default function PetalaceSelectorModal(props) {
         stateSegment
     ])
 
-    return (Helper.isNotEmpty(stateModalData)) ? (
+    return Helper.isNotEmpty(stateModalData) ? (
         <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">

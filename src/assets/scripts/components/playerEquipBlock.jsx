@@ -375,7 +375,18 @@ const renderEquipPartBlock = (equipType, currentEquipItem, requiredEquip) => {
                         <IconButton
                             iconName="plus" altName={_('add')}
                             onClick={() => {
-                                CommonState.setter.showModal(equipType + 'Selector', {
+                                let modalName = equipType + 'Selector'
+
+                                if ('helm' === equipType
+                                    || 'chest' === equipType
+                                    || 'arm' === equipType
+                                    || 'waist' === equipType
+                                    || 'leg' === equipType
+                                ) {
+                                    modalName = 'armorSelector'
+                                }
+
+                                CommonState.setter.showModal(modalName, {
                                     target: 'playerEquips',
                                     equipType: equipType,
                                     equipId: (Helper.isNotEmpty(equipItemInfo)) ? equipItemInfo.id : null

@@ -85,7 +85,7 @@ export default function ChangeLogModal(props) {
     /**
      * Handle Functions
      */
-    const handleFastWindowClose = useCallback((event) => {
+    const handleFastCloseModal = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
@@ -94,7 +94,7 @@ export default function ChangeLogModal(props) {
     }, [])
 
     return Helper.isNotEmpty(stateModalData) ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal mhrc-slim-modal">
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_('changeLog')}</span>

@@ -103,7 +103,7 @@ export const runAction = () => {
     // Handle Skills
     console.log('handle:skills')
 
-    let skillBundlesMapping = []
+    let skillBundlesMapping = {}
 
     rawDataMapping.skills.forEach((skillItem) => {
 
@@ -160,7 +160,7 @@ export const runAction = () => {
         }
 
         // Bundle List
-        skillBundle.list.map((skillItem) => {
+        skillBundle.list = skillBundle.list.map((skillItem) => {
 
             // Get Translate Code & Create Dataset Lang Mapping
             let translateCode = createCode(`skills:translate:effect:${idCode}`)
@@ -381,7 +381,7 @@ export const runAction = () => {
     // Handle Armors
     console.log('handle:armors')
 
-    let armorBundlesMapping = []
+    let armorBundlesMapping = {}
 
     rawDataMapping.armors.forEach((armorItem) => {
 
@@ -423,7 +423,7 @@ export const runAction = () => {
             return
         }
 
-        if (Helper.isEmpty(skillBundlesMapping[armorItem.series.zhTW])) {
+        if (Helper.isEmpty(armorBundlesMapping[armorItem.series.zhTW])) {
             armorBundlesMapping[armorItem.series.zhTW] = {
                 series: {},
                 items: {}
@@ -467,8 +467,8 @@ export const runAction = () => {
 
         armorBundle.series.name = translateCode
 
-        // Bundle List
-        armorBundle.items.map((armorItem) => {
+        // Bundle Items
+        armorBundle.items = armorBundle.items.map((armorItem) => {
 
             // Get Id Code
             let idCode = createCode(`armors:id:${armorItem.name.zhTW}`)
@@ -523,6 +523,7 @@ export const runAction = () => {
                 return [
                     armorItem.id,
                     armorItem.name,
+                    armorItem.type,
                     armorItem.slots.map((slotItem) => {
                         return [
                             slotItem.size

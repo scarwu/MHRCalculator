@@ -48,14 +48,14 @@ ReactDOM.render((
         <Route exact path="/:hash?" component={App} />
 
         <ChangeLogModal />
-        {/* <AlgorithmSettingModal />
+        {/* <AlgorithmSettingModal /> */}
         <WeaponSelectorModal />
         <ArmorSelectorModal />
-        <SetSelectorModal /> */}
+        {/* <SetSelectorModal /> */}
         <PetalaceSelectorModal />
-        {/* <JewelSelectorModal />
-        <EnhanceSelectorModal />
-        <SkillSelectorModal />
-        <PlayerEquipSelectorModal /> */}
+        {/* <JewelSelectorModal /> */}
+        {/* <EnhanceSelectorModal /> */}
+        {/* <SkillSelectorModal /> */}
+        {/* <PlayerEquipSelectorModal /> */}
     </Router>
 ), document.getElementById('mhrc'))

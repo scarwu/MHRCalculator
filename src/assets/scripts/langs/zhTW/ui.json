@@ -160,5 +160,11 @@
     "additionalSets":           "額外套裝",
     "additionalSkills":         "額外技能",
     "noResult":                 "沒有相關結果",
-    "quickSetting":             "快速設定"
+    "quickSetting":             "快速設定",
+    "healthIncrement":          "體力上升幅度",
+    "healthObtain":             "體力獲取值",
+    "attackIncrement":          "攻擊上升幅度",
+    "attackObtain":             "攻擊獲取值",
+    "defenseIncrement":         "防禦上升幅度",
+    "defenseObtain":            "防禦獲取值"
 }

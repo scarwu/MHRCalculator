@@ -160,5 +160,11 @@
     "additionalSets":           "Additional Sets",
     "additionalSkills":         "Additional Skills",
     "noResult":                 "No Result",
-    "quickSetting":             "Quick Setting"
+    "quickSetting":             "Quick Setting",
+    "healthIncrement":          "Health Increment",
+    "healthObtain":             "Health Obtain",
+    "attackIncrement":          "Attack Increment",
+    "attackObtain":             "Attack Obtain",
+    "defenseIncrement":         "Defense Increment",
+    "defenseObtain":            "Defense Obtain"
 }

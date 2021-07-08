@@ -115,11 +115,7 @@ const renderWeaponItem = (weaponItem, modalData) => {
                             <span>{_(weaponItem.element.attack.type)}</span>
                         </div>
                         <div className="col-3 mhrc-value">
-                            {weaponItem.element.attack.isHidden ? (
-                                <span>({weaponItem.element.attack.minValue}-{weaponItem.element.attack.maxValue})</span>
-                            ) : (
-                                <span>{weaponItem.element.attack.minValue}-{weaponItem.element.attack.maxValue}</span>
-                            )}
+                            <span>{weaponItem.element.attack.minValue}-{weaponItem.element.attack.maxValue}</span>
                         </div>
                     </Fragment>
                 ) : false}
@@ -130,11 +126,7 @@ const renderWeaponItem = (weaponItem, modalData) => {
                             <span>{_(weaponItem.element.status.type)}</span>
                         </div>
                         <div className="col-3 mhrc-value">
-                            {weaponItem.element.status.isHidden ? (
-                                <span>({weaponItem.element.status.minValue}-{weaponItem.element.status.maxValue})</span>
-                            ) : (
-                                <span>{weaponItem.element.status.minValue}-{weaponItem.element.status.maxValue}</span>
-                            )}
+                            <span>{weaponItem.element.status.minValue}-{weaponItem.element.status.maxValue}</span>
                         </div>
                     </Fragment>
                 ) : false}
@@ -339,10 +331,10 @@ export default function WeaponSelectorModal(props) {
                             iconName="search" placeholder={_('inputKeyword')}
                              defaultValue={stateSegment} onChange={handleSegmentInput} />
                         <IconSelector
-                            iconName="globe" defaultValue={stateType}
+                            iconName="filter" defaultValue={stateType}
                             options={stateTypeList} onChange={handleTypeChange} />
                         <IconSelector
-                            iconName="globe" defaultValue={stateRare}
+                            iconName="filter" defaultValue={stateRare}
                             options={stateRareList} onChange={handleRareChange} />
                         <IconButton
                             iconName="times" altName={_('close')}

@@ -268,10 +268,10 @@ export default function ArmorSelectorModal(props) {
                             iconName="search" placeholder={_('inputKeyword')}
                             defaultValue={stateSegment} onChange={handleSegmentInput} />
                         <IconSelector
-                            iconName="globe" defaultValue={stateType}
+                            iconName="filter" defaultValue={stateType}
                             options={stateTypeList} onChange={handleTypeChange} />
                         <IconSelector
-                            iconName="globe" defaultValue={stateRare}
+                            iconName="filter" defaultValue={stateRare}
                             options={stateRareList} onChange={handleRareChange} />
                         <IconButton
                             iconName="times" altName={_('close')}

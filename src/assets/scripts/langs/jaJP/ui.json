@@ -160,5 +160,11 @@
     "additionalSets":           null,
     "additionalSkills":         null,
     "noResult":                 null,
-    "quickSetting":             null
+    "quickSetting":             null,
+    "healthIncrement":          null,
+    "healthObtain":             null,
+    "attackIncrement":          null,
+    "attackObtain":             null,
+    "defenseIncrement":         null,
+    "defenseObtain":            null
 }

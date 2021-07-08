@@ -57,7 +57,54 @@ const renderPetalaceItem = (petalaceItem, modalData) => {
                 </div>
             </div>
             <div className="col-12 mhrc-content">
+                <div className="col-3 mhrc-name">
+                    <span>{_('rare')}</span>
+                </div>
+                <div className="col-9 mhrc-value">
+                    <span>{petalaceItem.rare}</span>
+                </div>
 
+                <div className="col-3 mhrc-name">
+                    <span>{_('healthIncrement')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{petalaceItem.health.increment}</span>
+                </div>
+
+                <div className="col-3 mhrc-name">
+                    <span>{_('healthObtain')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{petalaceItem.health.obtain}</span>
+                </div>
+
+                <div className="col-3 mhrc-name">
+                    <span>{_('attackIncrement')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{petalaceItem.attack.increment}</span>
+                </div>
+
+                <div className="col-3 mhrc-name">
+                    <span>{_('attackObtain')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{petalaceItem.attack.obtain}</span>
+                </div>
+
+                <div className="col-3 mhrc-name">
+                    <span>{_('defenseIncrement')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{petalaceItem.defense.increment}</span>
+                </div>
+
+                <div className="col-3 mhrc-name">
+                    <span>{_('defenseObtain')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{petalaceItem.defense.obtain}</span>
+                </div>
             </div>
         </div>
     )
@@ -155,7 +202,6 @@ export default function PetalaceSelectorModal(props) {
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
                             defaultValue={stateSegment} onChange={handleSegmentInput} />
-
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => { CommonState.setter.hideModal('petalaceSelector') }} />

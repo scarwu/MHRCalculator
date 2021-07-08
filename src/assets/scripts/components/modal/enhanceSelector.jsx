@@ -1,5 +1,5 @@
 /**
- * Equip Item Selector
+ * Enhance Selector Modal
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -9,26 +9,16 @@
 
 import React, { Fragment, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-// Load Constant
-import Constant from 'constant'
-
 // Load Core
 import _ from 'core/lang'
 import Helper from 'core/helper'
 
 // Load Libraries
-import WeaponDataset from 'libraries/dataset/weapon'
-import ArmorDataset from 'libraries/dataset/armor'
-import PetalaceDataset from 'libraries/dataset/petalace'
-import JewelDataset from 'libraries/dataset/jewel'
 import EnhanceDataset from 'libraries/dataset/enhance'
-import SkillDataset from 'libraries/dataset/skill'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
-import IconSelector from 'components/common/iconSelector'
 import IconInput from 'components/common/iconInput'
-import SharpnessBar from 'components/common/sharpnessBar'
 
 // Load States
 import States from 'states'
@@ -36,299 +26,23 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (bypassData, itemId) => {
-    if (Helper.isNotEmpty(bypassData.enhanceIndex)) {
-        bypassData.enhanceId = itemId
-    } else if (Helper.isNotEmpty(bypassData.slotIndex)) {
-        bypassData.jewelId = itemId
+const handleItemPickUp = (modalData, itemId) => {
+    if (Helper.isNotEmpty(modalData.enhanceIndex)) {
+        modalData.enhanceId = itemId
+    } else if (Helper.isNotEmpty(modalData.slotIndex)) {
+        modalData.jewelId = itemId
     } else {
-        bypassData.equipId = itemId
+        modalData.equipId = itemId
     }
 
-    States.setter.setCurrentEquip(bypassData)
+    States.setter.setCurrentEquip(modalData)
     States.setter.hideEquipItemSelector()
 }
 
 /**
  * Render Functions
  */
-const renderWeaponItem = (weapon, bypassData) => {
-    let originalSharpness = null
-    let enhancedSharpness = null
-
-    if (Helper.isNotEmpty(weapon.sharpness)) {
-        originalSharpness = Helper.deepCopy(weapon.sharpness)
-        enhancedSharpness = Helper.deepCopy(weapon.sharpness)
-        enhancedSharpness.value += 50
-    }
-
-    if (Helper.isNotEmpty(weapon.element.attack)
-        && Helper.isEmpty(weapon.element.attack.maxValue)
-    ) {
-        weapon.element.attack.maxValue = '?'
-    }
-
-    if (Helper.isNotEmpty(weapon.element.status)
-        && Helper.isEmpty(weapon.element.status.maxValue)
-    ) {
-        weapon.element.status.maxValue = '?'
-    }
-
-    return (
-        <div key={weapon.id} className="mhrc-item mhrc-item-2-step">
-            <div className="col-12 mhrc-name">
-                <span>{_(weapon.name)}</span>
-
-                <div className="mhrc-icons_bundle">
-                    {(false === weapon.isSelect) ? (
-                        <IconButton
-                            iconName="check" altName={_('select')}
-                            onClick={() => {handleItemPickUp(bypassData, weapon.id)}} />
-                    ) : false}
-                </div>
-            </div>
-            <div className="col-12 mhrc-content">
-                <div className="col-3 mhrc-name">
-                    <span>{_('series')}</span>
-                </div>
-                <div className="col-9 mhrc-value">
-                    <span>{_(weapon.series)}</span>
-                </div>
-
-                <div className="col-3 mhrc-name">
-                    <span>{_('attack')}</span>
-                </div>
-                <div className="col-3 mhrc-value">
-                    <span>{weapon.attack}</span>
-                </div>
-
-                <div className="col-3 mhrc-name">
-                    <span>{_('criticalRate')}</span>
-                </div>
-                <div className="col-3 mhrc-value">
-                    <span>{weapon.criticalRate}</span>
-                </div>
-
-                {Helper.isNotEmpty(weapon.sharpness) ? (
-                    <Fragment>
-                        <div className="col-3 mhrc-name">
-                            <span>{_('sharpness')}</span>
-                        </div>
-                        <div className="col-9 mhrc-value mhrc-sharpness">
-                            <SharpnessBar data={originalSharpness} />
-                            <SharpnessBar data={enhancedSharpness} />
-                        </div>
-                    </Fragment>
-                ) : false}
-
-                {Helper.isNotEmpty(weapon.element.attack) ? (
-                    <Fragment>
-                        <div className="col-3 mhrc-name">
-                            <span>{_(weapon.element.attack.type)}</span>
-                        </div>
-                        <div className="col-3 mhrc-value">
-                            {weapon.element.attack.isHidden ? (
-                                <span>({weapon.element.attack.minValue}-{weapon.element.attack.maxValue})</span>
-                            ) : (
-                                <span>{weapon.element.attack.minValue}-{weapon.element.attack.maxValue}</span>
-                            )}
-                        </div>
-                    </Fragment>
-                ) : false}
-
-                {Helper.isNotEmpty(weapon.element.status) ? (
-                    <Fragment>
-                        <div className="col-3 mhrc-name">
-                            <span>{_(weapon.element.status.type)}</span>
-                        </div>
-                        <div className="col-3 mhrc-value">
-                            {weapon.element.status.isHidden ? (
-                                <span>({weapon.element.status.minValue}-{weapon.element.status.maxValue})</span>
-                            ) : (
-                                <span>{weapon.element.status.minValue}-{weapon.element.status.maxValue}</span>
-                            )}
-                        </div>
-                    </Fragment>
-                ) : false}
-
-                <div className="col-3 mhrc-name">
-                    <span>{_('elderseal')}</span>
-                </div>
-                <div className="col-3 mhrc-value">
-                    {Helper.isNotEmpty(weapon.elderseal) ? (
-                        <span>{_(weapon.elderseal.affinity)}</span>
-                    ) : false}
-                </div>
-
-                <div className="col-3 mhrc-name">
-                    <span>{_('defense')}</span>
-                </div>
-                <div className="col-3 mhrc-value">
-                    <span>{weapon.defense}</span>
-                </div>
-
-                <div className="col-3 mhrc-name">
-                    <span>{_('slot')}</span>
-                </div>
-                <div className="col-3 mhrc-value">
-                    {weapon.slots.map((slot, index) => {
-                        return (
-                            <span key={index}>[{slot.size}]</span>
-                        )
-                    })}
-                </div>
-
-                {weapon.skills.map((skill, index) => {
-                    let skillInfo = SkillDataset.getInfo(skill.id)
-
-                    return Helper.isNotEmpty(skillInfo) ? (
-                        <Fragment key={index}>
-                            <div className="col-12 mhrc-name">
-                                <span>{_(skillInfo.name)} Lv.{skill.level}</span>
-                            </div>
-                            <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillInfo.list[skill.level - 1].description)}</span>
-                            </div>
-                        </Fragment>
-                    ) : false
-                })}
-            </div>
-        </div>
-    )
-}
-
-const renderArmorItem = (armor, bypassData) => {
-
-    // Re-write BypassData
-    bypassData.equipType = armor.type
-
-    return (
-        <div key={armor.id} className="mhrc-item mhrc-item-2-step">
-            <div className="col-12 mhrc-name">
-                <span>{_(armor.name)}</span>
-
-                <div className="mhrc-icons_bundle">
-                    {(false === armor.isSelect) ? (
-                        <IconButton
-                            iconName="check" altName={_('select')}
-                            onClick={() => {handleItemPickUp(bypassData, armor.id)}} />
-                    ) : false}
-                </div>
-            </div>
-            <div className="col-12 mhrc-content">
-                <div className="col-3 mhrc-name">
-                    <span>{_('series')}</span>
-                </div>
-                <div className="col-9 mhrc-value">
-                    <span>{_(armor.series)}</span>
-                </div>
-
-                <div className="col-3 mhrc-name">
-                    <span>{_('defense')}</span>
-                </div>
-                <div className="col-3 mhrc-value">
-                    <span>{armor.defense}</span>
-                </div>
-
-                {Constant.resistances.map((resistanceType) => {
-                    return (
-                        <Fragment key={resistanceType}>
-                            <div className="col-3 mhrc-name">
-                                <span>{_('resistance')}: {_(resistanceType)}</span>
-                            </div>
-                            <div className="col-3 mhrc-value">
-                                <span>{armor.resistance[resistanceType]}</span>
-                            </div>
-                        </Fragment>
-                    )
-                })}
-
-                <div className="col-3 mhrc-name">
-                    <span>{_('slot')}</span>
-                </div>
-                <div className="col-9 mhrc-value">
-                    {armor.slots.map((slot, index) => {
-                        return (
-                            <span key={index}>[{slot.size}]</span>
-                        )
-                    })}
-                </div>
-
-                {armor.skills.map((skill, index) => {
-                    let skillInfo = SkillDataset.getInfo(skill.id)
-
-                    return Helper.isNotEmpty(skillInfo) ? (
-                        <Fragment key={index}>
-                            <div className="col-12 mhrc-name">
-                                <span>{_(skillInfo.name)} Lv.{skill.level}</span>
-                            </div>
-                            <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillInfo.list[skill.level - 1].description)}</span>
-                            </div>
-                        </Fragment>
-                    ) : false
-                })}
-            </div>
-        </div>
-    )
-}
-
-const renderPetalaceItem = (petalace, bypassData) => {
-    return (
-        <div key={petalace.id} className="mhrc-item mhrc-item-2-step">
-            <div className="col-12 mhrc-name">
-                <span>{_(petalace.name)}</span>
-
-                <div className="mhrc-icons_bundle">
-                    {(false === petalace.isSelect) ? (
-                        <IconButton
-                            iconName="check" altName={_('select')}
-                            onClick={() => {handleItemPickUp(bypassData, petalace.id)}} />
-                    ) : false}
-                </div>
-            </div>
-            <div className="col-12 mhrc-content">
-
-            </div>
-        </div>
-    )
-}
-
-const renderJewelItem = (jewel, bypassData) => {
-    return (
-        <div key={jewel.id} className="mhrc-item mhrc-item-2-step">
-            <div className="col-12 mhrc-name">
-                <span>[{jewel.size}] {_(jewel.name)}</span>
-
-                <div className="mhrc-icons_bundle">
-                    {(false === jewel.isSelect) ? (
-                        <IconButton
-                            iconName="check" altName={_('select')}
-                            onClick={() => {handleItemPickUp(bypassData, jewel.id)}} />
-                    ) : false}
-                </div>
-            </div>
-            <div className="col-12 mhrc-content">
-                {jewel.skills.map((skill, index) => {
-                    let skillInfo = SkillDataset.getInfo(skill.id)
-
-                    return Helper.isNotEmpty(skillInfo) ? (
-                        <Fragment key={index}>
-                            <div className="col-12 mhrc-name">
-                                <span>{_(skillInfo.name)} Lv.{skill.level}</span>
-                            </div>
-                            <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillInfo.list[skill.level - 1].description)}</span>
-                            </div>
-                        </Fragment>
-                    ) : false
-                })}
-            </div>
-        </div>
-    )
-}
-
-const renderEnhanceItem = (enhance, bypassData) => {
+const renderEnhanceItem = (enhance, modalData) => {
     return (
         <div key={enhance.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
@@ -338,7 +52,7 @@ const renderEnhanceItem = (enhance, bypassData) => {
                     {(false === enhance.isSelect) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
-                            onClick={() => {handleItemPickUp(bypassData, enhance.id)}} />
+                            onClick={() => {handleItemPickUp(modalData, enhance.id)}} />
                     ) : false}
                 </div>
             </div>
@@ -360,142 +74,52 @@ const renderEnhanceItem = (enhance, bypassData) => {
     )
 }
 
-export default function EquipItemSelector(props) {
+export default function EnhanceSelectorModal(props) {
 
     /**
      * Hooks
      */
-    const [stateIsShow, updateIsShow] = useState(States.getter.isShowEquipItemSelector())
-    const [stateBypassData, updateBypassData] = useState(States.getter.getEquipItemSelectorBypassData())
-    const [stateMode, updateMode] = useState(undefined)
+    const [stateModalData, updateModalData] = useState(States.getter.getModalData('enhanceSelector'))
     const [stateSortedList, updateSortedList] = useState([])
-    const [stateType, updateType] = useState(undefined)
-    const [stateRare, updateRare] = useState(undefined)
-    const [stateTypeList, updateTypeList] = useState([])
-    const [stateRareList, updateRareList] = useState([])
     const [stateSegment, updateSegment] = useState(undefined)
     const refModal = useRef()
 
     useEffect(() => {
-        if (Helper.isEmpty(stateBypassData)) {
+        if (Helper.isEmpty(stateModalData)) {
             return
         }
 
-        let mode = null
         let sortedList = []
-        let typeList = {}
-        let rareList = {}
-        let type = null
-        let rare = null
 
-        if (Helper.isNotEmpty(stateBypassData.enhanceIndex)) {
-            mode = 'enhance'
-            sortedList = EnhanceDataset.getItems().map((enhanceInfo) => {
-                enhanceInfo.isSelect = (stateBypassData.enhanceId === enhanceInfo.id)
+        sortedList = EnhanceDataset.getItems().map((enhanceInfo) => {
+            enhanceInfo.isSelect = (stateModalData.enhanceId === enhanceInfo.id)
 
-                return enhanceInfo
-            })
-        } else if (Helper.isNotEmpty(stateBypassData.slotIndex)) {
-            mode = 'jewel'
+            return enhanceInfo
+        })
 
-            for (let size = stateBypassData.slotSize; size >= 1; size--) {
-                for (let rare = 9; rare >= 5; rare--) {
-                    sortedList = sortedList.concat(
-                        JewelDataset.rareIs(rare).sizeIs(size).getItems().map((jewelInfo) => {
-                            jewelInfo.isSelect = (stateBypassData.jewelId === jewelInfo.id)
-
-                            return jewelInfo
-                        })
-                    )
-                }
-            }
-        } else if ('weapon' === stateBypassData.equipType) {
-            let weaponInfo = WeaponDataset.getInfo(stateBypassData.equipId)
-
-            typeList = Constant.weaponTypes.map((type) => {
-                return { key: type, value: _(type) }
-            })
-            type = (Helper.isNotEmpty(weaponInfo) && Helper.isNotEmpty(weaponInfo.type))
-                ? weaponInfo.type : typeList[0].key
-
-            mode = 'weapon'
-            sortedList =  WeaponDataset.getItems().map((weaponInfo) => {
-                rareList[weaponInfo.rare] = weaponInfo.rare
-
-                weaponInfo.isSelect = (stateBypassData.equipId === weaponInfo.id)
-
-                return weaponInfo
-            })
-
-            rareList = Object.values(rareList).reverse().map((rare) => {
-                return { key: rare, value: _('rare') + `: ${rare}` }
-            })
-            rare = (Helper.isNotEmpty(weaponInfo)) ? weaponInfo.rare : rareList[0].key
-        } else if ('helm' === stateBypassData.equipType
-            || 'chest' === stateBypassData.equipType
-            || 'arm' === stateBypassData.equipType
-            || 'waist' === stateBypassData.equipType
-            || 'leg' === stateBypassData.equipType
-        ) {
-            let armoreInfo = ArmorDataset.getInfo(stateBypassData.equipId)
-
-            typeList = Constant.armorTypes.map((type) => {
-                return { key: type, value: _(type) }
-            })
-            type = (Helper.isNotEmpty(stateBypassData.equipType))
-                ? stateBypassData.equipType : typeList[0].key
-
-            mode = 'armor'
-            sortedList = ArmorDataset.getItems().map((armorInfo) => {
-                rareList[armorInfo.rare] = armorInfo.rare
-
-                armorInfo.isSelect = (stateBypassData.equipId === armorInfo.id)
-
-                return armorInfo
-            })
-
-            rareList = Object.values(rareList).reverse().map((rare) => {
-                return { key: rare, value: _('rare') + `: ${rare}` }
-            })
-            rare = (Helper.isNotEmpty(armoreInfo)) ? armoreInfo.rare : rareList[0].key
-        } else if ('petalace' === stateBypassData.equipType) {
-            mode = 'petalace'
-            sortedList = PetalaceDataset.getItems().map((petalaceInfo) => {
-                petalaceInfo.isSelect = (stateBypassData.equipId === petalaceInfo.id)
-
-                return petalaceInfo
-            })
-        }
-
-        updateMode(mode)
         updateSortedList(sortedList)
-        updateTypeList(typeList)
-        updateRareList(rareList)
-        updateType(type)
-        updateRare(rare)
-    }, [stateBypassData])
+    }, [stateModalData])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeModel = States.store.subscribe(() => {
-            updateIsShow(States.getter.isShowEquipItemSelector())
-            updateBypassData(States.getter.getEquipItemSelectorBypassData())
+        const unsubscribe = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('enhanceSelector'))
         })
 
         return () => {
-            unsubscribeModel()
+            unsubscribe()
         }
     }, [])
 
     /**
      * Handle Functions
      */
-    const handleFastWindowClose = useCallback((event) => {
+    const handleFastClose = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
 
-        States.setter.hideEquipItemSelector()
+        States.setter.hideModal('enhanceSelector')
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -507,201 +131,46 @@ export default function EquipItemSelector(props) {
         updateSegment(segment)
     }, [])
 
-    const handleTypeChange = useCallback((event) => {
-        updateType(event.target.value)
-    }, [])
-
-    const handleRareChange = useCallback((event) => {
-        updateRare(parseInt(event.target.value, 10))
-    }, [])
-
     const getContent = useMemo(() => {
-        if (Helper.isEmpty(stateBypassData)) {
+        if (Helper.isEmpty(stateModalData)) {
             return false
         }
 
-        let bypassData = Helper.deepCopy(stateBypassData)
+        let modalData = Helper.deepCopy(stateModalData)
 
-        switch (stateMode) {
-        case 'weapon':
-            return stateSortedList.filter((data) => {
-                if (data.type !== stateType) {
-                    return false
-                }
+        return stateSortedList.filter((data) => {
 
-                if (data.rare !== stateRare) {
-                    return false
-                }
+            // Create Text
+            let text = _(data.name)
 
-                // Create Text
-                let text = _(data.name)
-                text += _(data.series)
-                text += _(data.type)
-
-                if (Helper.isNotEmpty(data.element)
-                    && Helper.isNotEmpty(data.element.attack)
-                ) {
-                    text += _(data.element.attack.type)
-                }
-
-                if (Helper.isNotEmpty(data.element)
-                    && Helper.isNotEmpty(data.element.status)
-                ) {
-                    text += _(data.element.status.type)
-                }
-
-                data.skills.forEach((data) => {
-                    let skillInfo = SkillDataset.getInfo(data.id)
-
-                    if (Helper.isNotEmpty(skillInfo)) {
-                        text += _(skillInfo.name)
-                    }
-                })
-
-                // Search Nameword
-                if (Helper.isNotEmpty(stateSegment)
-                    && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
-                ) {
-                    return false
-                }
-
-                return true
-            }).sort((dataA, dataB) => {
-                return _(dataA.id) > _(dataB.id) ? 1 : -1
-            }).map((data) => {
-                return renderWeaponItem(data, bypassData)
+            data.list.forEach((data) => {
+                text += _(data.description)
             })
-        case 'armor':
-            return stateSortedList.filter((data) => {
-                if (data.type !== stateType) {
-                    return false
-                }
 
-                if (data.rare !== stateRare) {
-                    return false
-                }
+            // Search Nameword
+            if (Helper.isNotEmpty(stateSegment)
+                && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
+            ) {
+                return false
+            }
 
-                // Create Text
-                let text = _(data.name)
-                text += _(data.series)
-
-                data.skills.forEach((data) => {
-                    let skillInfo = SkillDataset.getInfo(data.id)
-
-                    if (Helper.isNotEmpty(skillInfo)) {
-                        text += _(skillInfo.name)
-                    }
-                })
-
-                // Search Nameword
-                if (Helper.isNotEmpty(stateSegment)
-                    && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
-                ) {
-                    return false
-                }
-
-                return true
-            }).sort((dataA, dataB) => {
-                return _(dataA.id) > _(dataB.id) ? 1 : -1
-            }).map((data) => {
-                return renderArmorItem(data, bypassData)
-            })
-        case 'charm':
-            return stateSortedList.filter((data) => {
-
-                // Create Text
-                let text = _(data.name)
-
-                data.skills.forEach((data) => {
-                    let skillInfo = SkillDataset.getInfo(data.id)
-
-                    if (Helper.isNotEmpty(skillInfo)) {
-                        text += _(skillInfo.anem)
-                    }
-                })
-
-                // Search Nameword
-                if (Helper.isNotEmpty(stateSegment)
-                    && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
-                ) {
-                    return false
-                }
-
-                return true
-            }).sort((dataA, dataB) => {
-                return _(dataA.id) > _(dataB.id) ? 1 : -1
-            }).map((data) => {
-                return renderPetalaceItem(data, bypassData)
-            })
-        case 'jewel':
-            return stateSortedList.filter((data) => {
-
-                // Create Text
-                let text = _(data.name)
-
-                data.skills.forEach((skill) => {
-                    let skillInfo = SkillDataset.getInfo(skill.id)
-
-                    if (Helper.isNotEmpty(skillInfo)) {
-                        text += _(skillInfo.name)
-                    }
-                })
-
-                // Search Nameword
-                if (Helper.isNotEmpty(stateSegment)
-                    && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
-                ) {
-                    return false
-                }
-
-                return true
-            }).sort((dataA, dataB) => {
-                return _(dataA.id) > _(dataB.id) ? 1 : -1
-            }).map((data) => {
-                return renderJewelItem(data, bypassData)
-            })
-        case 'enhance':
-            return stateSortedList.filter((data) => {
-
-                // Create Text
-                let text = _(data.name)
-
-                data.list.forEach((data) => {
-                    text += _(data.description)
-                })
-
-                // Search Nameword
-                if (Helper.isNotEmpty(stateSegment)
-                    && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
-                ) {
-                    return false
-                }
-
-                return true
-            }).filter((data) => {
-                return -1 !== data.allowRares.indexOf(bypassData.equipRare)
-                    && -1 === bypassData.enhanceIds.indexOf(data.id)
-            }).sort((dataA, dataB) => {
-                return _(dataA.id) > _(dataB.id) ? 1 : -1
-            }).map((data) => {
-                return renderEnhanceItem(data, bypassData)
-            })
-        default:
-            return false
-        }
+            return true
+        }).filter((data) => {
+            return -1 !== data.allowRares.indexOf(modalData.equipRare)
+                && -1 === modalData.enhanceIds.indexOf(data.id)
+        }).sort((dataA, dataB) => {
+            return _(dataA.id) > _(dataB.id) ? 1 : -1
+        }).map((data) => {
+            return renderEnhanceItem(data, modalData)
+        })
     }, [
-        stateBypassData,
-        stateMode,
+        stateModalData,
         stateSortedList,
-        stateTypeList,
-        stateRareList,
-        stateType,
-        stateRare,
         stateSegment
     ])
 
-    return (stateIsShow && Helper.isNotEmpty(stateBypassData)) ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
+    return Helper.isNotEmpty(stateModalData) ? (
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_(stateMode + 'List')}</span>
@@ -710,22 +179,11 @@ export default function EquipItemSelector(props) {
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
                              defaultValue={stateSegment} onChange={handleSegmentInput} />
-
-                        {('weapon' === stateMode || 'armor' === stateMode) ? (
-                            <IconSelector
-                                iconName="globe" defaultValue={stateType}
-                                options={stateTypeList} onChange={handleTypeChange} />
-                        ) : false}
-
-                        {('weapon' === stateMode || 'armor' === stateMode) ? (
-                            <IconSelector
-                                iconName="globe" defaultValue={stateRare}
-                                options={stateRareList} onChange={handleRareChange} />
-                        ) : false}
-
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={States.setter.hideEquipItemSelector} />
+                            onClick={() => {
+                                States.setter.hideModal('enhanceSelector')
+                            }} />
                     </div>
                 </div>
                 <div className="mhrc-list">

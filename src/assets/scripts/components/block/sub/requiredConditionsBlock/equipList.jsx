@@ -14,6 +14,7 @@ import _ from 'core/lang'
 import Helper from 'core/helper'
 
 // Load Libraries
+import Misc from 'libraries/misc'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
 // import CharmDataset from 'libraries/dataset/charm'

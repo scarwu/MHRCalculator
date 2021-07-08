@@ -589,9 +589,9 @@ export default function PlayerEquipsBlock(props) {
                     <IconButton
                         iconName="refresh" altName={_('reset')}
                         onClick={handleEquipsDisplayerRefresh} />
-                    <IconButton
+                    {/* <IconButton
                         iconName="th-list" altName={_('bundleList')}
-                        onClick={States.setter.showBundleItemSelector} />
+                        onClick={States.setter.showBundleItemSelector} /> */}
                 </div>
             </div>
 

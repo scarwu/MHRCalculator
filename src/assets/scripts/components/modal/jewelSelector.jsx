@@ -113,19 +113,19 @@ export default function JewelSelectorModal(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeModel = States.store.subscribe(() => {
+        const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('jewelSelector'))
         })
 
         return () => {
-            unsubscribeModel()
+            unsubscribe()
         }
     }, [])
 
     /**
      * Handle Functions
      */
-    const handleFastCloseModal = useCallback((event) => {
+    const handleFastClose = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
@@ -182,7 +182,7 @@ export default function JewelSelectorModal(props) {
     ])
 
     return Helper.isNotEmpty(stateModalData) ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_('jewelList')}</span>

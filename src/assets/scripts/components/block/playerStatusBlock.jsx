@@ -36,44 +36,40 @@ import States from 'states'
 const generateEquipInfos = (equips) => {
     let equipInfos = {}
 
-    if (Helper.isNotEmpty(equips.weapon)
-        && 'customWeapon' === equips.weapon.id
-    ) {
-        let isCompleted = true
-        let customWeapon = States.getter.getCustomWeapon()
+    // if (Helper.isNotEmpty(equips.weapon)
+    //     && 'customWeapon' === equips.weapon.id
+    // ) {
+    //     let isCompleted = true
+    //     let customWeapon = States.getter.getCustomWeapon()
 
-        if (Helper.isEmpty(customWeapon.type)
-            || Helper.isEmpty(customWeapon.rare)
-            || Helper.isEmpty(customWeapon.attack)
-            || Helper.isEmpty(customWeapon.criticalRate)
-            || Helper.isEmpty(customWeapon.defense)
-        ) {
-            isCompleted = false
-        }
+    //     if (Helper.isEmpty(customWeapon.type)
+    //         || Helper.isEmpty(customWeapon.rare)
+    //         || Helper.isEmpty(customWeapon.attack)
+    //         || Helper.isEmpty(customWeapon.criticalRate)
+    //         || Helper.isEmpty(customWeapon.defense)
+    //     ) {
+    //         isCompleted = false
+    //     }
 
-        if (Helper.isNotEmpty(customWeapon.element.attack)
-            && Helper.isEmpty(customWeapon.element.attack.minValue)
-        ) {
-            isCompleted = false
-        }
+    //     if (Helper.isNotEmpty(customWeapon.element.attack)
+    //         && Helper.isEmpty(customWeapon.element.attack.minValue)
+    //     ) {
+    //         isCompleted = false
+    //     }
 
-        if (Helper.isNotEmpty(customWeapon.element.status)
-            && Helper.isEmpty(customWeapon.element.status.minValue)
-        ) {
-            isCompleted = false
-        }
+    //     if (Helper.isNotEmpty(customWeapon.element.status)
+    //         && Helper.isEmpty(customWeapon.element.status.minValue)
+    //     ) {
+    //         isCompleted = false
+    //     }
 
-        WeaponDataset.setInfo('customWeapon', (true === isCompleted)
-            ? Helper.deepCopy(customWeapon) : undefined)
-    }
+    //     WeaponDataset.setInfo('customWeapon', (true === isCompleted)
+    //         ? Helper.deepCopy(customWeapon) : undefined)
+    // }
 
-    equipInfos.weapon = Misc.getAppliedWeaponInfo(equips.weapon)
-
-    for (let equipType of ['helm', 'chest', 'arm', 'waist', 'leg']) {
-        equipInfos[equipType] = Misc.getAppliedArmorInfo(equips[equipType])
-    }
-
-    // equipInfos.charm = Misc.getAppliedCharmInfo(equips.charm)
+    Object.keys(equips).forEach((equipType) => {
+        equipInfos[equipType] = Misc.getEquipExtendInfo(equipType, equips[equipType])
+    })
 
     return equipInfos
 }
@@ -83,7 +79,7 @@ const generatePassiveSkills = (equipInfos) => {
 
     for (let equipType of ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg', 'charm']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
-            return
+            continue
         }
 
         equipInfos[equipType].skills.forEach((skill) => {
@@ -108,16 +104,18 @@ const generatePassiveSkills = (equipInfos) => {
 
 const generateStatus = (equipInfos, passiveSkills) => {
     let status = Helper.deepCopy(Constant.defaultPlayerStatus)
-    return status
+
     equipInfos = Helper.deepCopy(equipInfos)
 
     let weaponType = null
 
     if (Helper.isNotEmpty(equipInfos.weapon)) {
         status.critical.rate = equipInfos.weapon.criticalRate
-        status.sharpness = equipInfos.weapon.sharpness
+        status.sharpness = {
+            value: equipInfos.weapon.sharpness.minValue,
+            steps: equipInfos.weapon.sharpness.steps
+        }
         status.element = equipInfos.weapon.element
-        status.elderseal = equipInfos.weapon.elderseal
 
         weaponType = equipInfos.weapon.type
     }
@@ -125,10 +123,10 @@ const generateStatus = (equipInfos, passiveSkills) => {
     // Resistance
     for (let equipType of ['helm', 'chest', 'arm', 'waist', 'leg']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
-            return
+            continue
         }
 
-        Constant.resistances.forEach((elementType) => {
+        Constant.resistanceTypes.forEach((elementType) => {
             status.resistance[elementType] += equipInfos[equipType].resistance[elementType]
         })
     }
@@ -138,7 +136,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
 
     for (let equipType of ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
-            return
+            continue
         }
 
         if (Helper.isNotEmpty(equipInfos[equipType].set)) {
@@ -151,7 +149,14 @@ const generateStatus = (equipInfos, passiveSkills) => {
             setMapping[setId]++
         }
 
-        status.defense += equipInfos[equipType].defense
+        if ('weapon' === equipType) {
+            status.defense += Helper.isNotEmpty(equipInfos[equipType].defense)
+                ? equipInfos[equipType].defense : 0
+        } else {
+            status.defense += Helper.isNotEmpty(equipInfos[equipType].maxDefense)
+                ? equipInfos[equipType].maxDefense
+                : equipInfos[equipType].minDefense
+        }
     }
 
     // Skills
@@ -159,7 +164,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
 
     for (let equipType of ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg', 'charm']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
-            return
+            continue
         }
 
         equipInfos[equipType].skills.forEach((skill) => {
@@ -232,7 +237,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
         status.skills.push({
             id: skillId,
             level: skillLevel,
-            description: skillInfo.list[skillLevel - 1].description
+            effect: skillInfo.list[skillLevel - 1].effect
         })
 
         if ('passive' === skillInfo.type) {
@@ -297,6 +302,10 @@ const generateStatus = (equipInfos, passiveSkills) => {
 
                 status.sharpness.value += data.value
 
+                if (status.sharpness.value > status.sharpness.maxValue) {
+                    status.sharpness.value = status.sharpness.maxValue
+                }
+
                 break
             case 'elementAttack':
                 if (Helper.isEmpty(status.element)
@@ -322,7 +331,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
                 break
             case 'resistance':
                 if ('all' === data.type) {
-                    Constant.resistances.forEach((elementType) => {
+                    Constant.resistanceTypes.forEach((elementType) => {
                         status.resistance[elementType] += data.value
                     })
                 } else {
@@ -452,7 +461,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
 }
 
 const generateBenefitAnalysis = (equipInfos, status, tuning) => {
-    let benefitAnalysis = Helper.deepCopy(Constant.default.benefitAnalysis)
+    let benefitAnalysis = Helper.deepCopy(Constant.defaultBenefitAnalysis)
     let result = getBasicBenefitAnalysis(equipInfos, Helper.deepCopy(status), {})
 
     benefitAnalysis.physicalAttack = result.physicalAttack
@@ -607,11 +616,10 @@ export default function PlayerStatusBlock(props) {
     /**
      * Hooks
      */
-    const [stateCustomWeapon, updateCustomWeapon] = useState(States.getter.getCustomWeapon())
-    const [stateCurrentEquips, updateCurrentEquips] = useState(States.getter.getCurrentEquips())
+    const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
     const [stateEquipInfos, updateEquipInfos] = useState({})
     const [stateStatus, updateStatus] = useState(Helper.deepCopy(Constant.defaultPlayerStatus))
-    const [stateBenefitAnalysis, updateBenefitAnalysis] = useState(Helper.deepCopy(Constant.default.benefitAnalysis))
+    const [stateBenefitAnalysis, updateBenefitAnalysis] = useState(Helper.deepCopy(Constant.defaultBenefitAnalysis))
     const [statePassiveSkills, updatePassiveSkills] = useState({})
     const [stateTuning, updateTuning] = useState({
         physicalAttack: 5,
@@ -625,23 +633,21 @@ export default function PlayerStatusBlock(props) {
     const refTuningElementAttack = useRef()
 
     useEffect(() => {
-        const equipInfos = generateEquipInfos(stateCurrentEquips)
+        const equipInfos = generateEquipInfos(statePlayerEquips)
         const passiveSkills = generatePassiveSkills(equipInfos)
         const status = generateStatus(equipInfos, passiveSkills)
-        console.log(status)
         const benefitAnalysis = generateBenefitAnalysis(equipInfos, status, stateTuning)
 
         updateEquipInfos(equipInfos)
         updatePassiveSkills(passiveSkills)
         updateStatus(status)
         updateBenefitAnalysis(benefitAnalysis)
-    }, [stateCustomWeapon, stateCurrentEquips])
+    }, [statePlayerEquips])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
-            updateCustomWeapon(States.getter.getCustomWeapon())
-            updateCurrentEquips(States.getter.getCurrentEquips())
+            updatePlayerEquips(States.getter.getPlayerEquips())
         })
 
         return () => {
@@ -837,7 +843,10 @@ export default function PlayerStatusBlock(props) {
                                 <div className="col-9 mhrc-value mhrc-sharpness">
                                     <SharpnessBar
                                         key={Helper.jsonHash(originalSharpness) + ':1'}
-                                        data={originalSharpness} />
+                                        data={{
+                                            value: originalSharpness.minValue,
+                                            steps: originalSharpness.steps
+                                        }} />
                                     <SharpnessBar
                                         key={Helper.jsonHash(status.sharpness) + ':2'}
                                         data={status.sharpness} />
@@ -903,17 +912,6 @@ export default function PlayerStatusBlock(props) {
                                 </div>
                             </Fragment>
                         ) : false}
-
-                        {(Helper.isNotEmpty(status.elderseal)) ? (
-                            <Fragment>
-                                <div className="col-3 mhrc-name">
-                                    <span>{_('elderseal')}</span>
-                                </div>
-                                <div className="col-3 mhrc-value">
-                                    <span>{_(status.elderseal.affinity)}</span>
-                                </div>
-                            </Fragment>
-                        ) : false}
                     </div>
 
                     <div className="col-12 mhrc-content">
@@ -924,7 +922,7 @@ export default function PlayerStatusBlock(props) {
                             <span>{status.defense}</span>
                         </div>
 
-                        {Constant.resistances.map((elementType) => {
+                        {Constant.resistanceTypes.map((elementType) => {
                             return (
                                 <Fragment key={elementType}>
                                     <div className="col-3 mhrc-name">
@@ -989,7 +987,7 @@ export default function PlayerStatusBlock(props) {
                                         </div>
                                     </div>
                                     <div className="col-12 mhrc-value mhrc-description">
-                                        <span>{_(data.description)}</span>
+                                        <span>{_(data.effect)}</span>
                                     </div>
                                 </div>
                             ) : false

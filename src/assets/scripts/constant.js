@@ -330,7 +330,6 @@ export const defaultPlayerStatus = {
         attack: 1,
         status: 1
     },
-    elderseal: null,
     defense: 31, // 守護護符+10 守護之爪+20
     resistance: {
         fire: 0,

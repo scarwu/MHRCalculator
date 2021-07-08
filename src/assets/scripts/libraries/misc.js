@@ -16,6 +16,7 @@ import Helper from 'core/helper'
 // Load Libraries
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
+import SetDataset from 'libraries/dataset/set'
 import PetalaceDataset from 'libraries/dataset/petalace'
 import JewelDataset from 'libraries/dataset/jewel'
 import EnhanceDataset from 'libraries/dataset/enhance'

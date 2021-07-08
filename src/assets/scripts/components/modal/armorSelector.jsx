@@ -170,12 +170,12 @@ export default function ArmorSelectorModal(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeModel = States.store.subscribe(() => {
+        const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('armorSelector'))
         })
 
         return () => {
-            unsubscribeModel()
+            unsubscribe()
         }
     }, [])
 

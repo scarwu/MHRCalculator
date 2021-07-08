@@ -31,7 +31,7 @@ export default function BundleItemSelector(props) {
     /**
      * Hooks
      */
-    const [stateIsShow, updateIsShow] = useState(States.getter.isShowBundleItemSelector())
+    const [stateModalData, updateModalData] = useState(States.getter.getModalData('playerEquipSelector'))
     const [stateReservedBundles, updateReservedBundles] = useState(States.getter.getReservedBundles())
     const [stateCurrentEquips, updateCurrentEquips] = useState(States.getter.getCurrentEquips())
     const refModal = useRef()
@@ -40,27 +40,23 @@ export default function BundleItemSelector(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeCommon = States.store.subscribe(() => {
+        const unsubscribe = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('playerEquipSelector'))
             updateReservedBundles(States.getter.getReservedBundles())
             updateCurrentEquips(States.getter.getCurrentEquips())
 
             refNameList.current = States.getter.getReservedBundles().map(() => createRef())
         })
 
-        const unsubscribeModal = States.store.subscribe(() => {
-            updateIsShow(States.getter.isShowBundleItemSelector())
-        })
-
         return () => {
-            unsubscribeCommon()
-            unsubscribeModal()
+            unsubscribe()
         }
     }, [])
 
     /**
      * Handle Functions
      */
-    const handleFastWindowClose = useCallback((event) => {
+    const handleFastClose = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
@@ -245,8 +241,8 @@ export default function BundleItemSelector(props) {
         )
     }
 
-    return stateIsShow ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastWindowClose}>
+    return Helper.isNotEmpty(stateModalData) ? (
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_('bundleList')}</span>
@@ -254,7 +250,9 @@ export default function BundleItemSelector(props) {
                     <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={States.setter.hideBundleItemSelector} />
+                            onClick={() => {
+                                States.setter.hideModal('playerEquipSelector')
+                            }} />
                     </div>
                 </div>
                 <div className="mhrc-list">

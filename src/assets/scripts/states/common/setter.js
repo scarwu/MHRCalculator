@@ -9,6 +9,7 @@
 
 import Store from './store'
 
+// Modal Hub
 export const showModal = (target, bypassData = null) => {
     Store.dispatch({
         type: 'SHOW_MODAL',
@@ -28,6 +29,7 @@ export const hideModal = (target) => {
     })
 }
 
+// Temp Data
 export const switchTempData = (target, index) => {
     Store.dispatch({
         type: 'SWITCH_TEMP_DATA',
@@ -35,6 +37,13 @@ export const switchTempData = (target, index) => {
             target: target,
             index: index
         }
+    })
+}
+
+// Player Equips
+export const cleanPlayerEquips = () => {
+    Store.dispatch({
+        type: 'CLEAN_PLAYER_EQUIP'
     })
 }
 
@@ -48,25 +57,32 @@ export const setPlayerEquip = (equipType, equipId) => {
     })
 }
 
-export const setPlayerEquipSlot = (equipType, jewelId, slotIndex) => {
+export const setPlayerEquipJewel = (equipType, idIndex, jewelId) => {
     Store.dispatch({
-        type: 'SET_PLAYER_EQUIP_SLOT',
+        type: 'SET_PLAYER_EQUIP_JEWEL',
         payload: {
             equipType: equipType,
-            jewelId: jewelId,
-            slotIndex: slotIndex
+            idIndex: idIndex,
+            jewelId: jewelId
         }
     })
 }
 
-export const setPlayerEquipEnhance = (equipType, enhanceId, enhancceIndex) => {
+export const setPlayerEquipEnhance = (equipType, idIndex, enhanceId) => {
     Store.dispatch({
         type: 'SET_PLAYER_EQUIP_ENHANCE',
         payload: {
             equipType: equipType,
-            enhanceId: enhanceId,
-            enhancceIndex: enhancceIndex
+            idIndex: idIndex,
+            enhanceId: enhanceId
         }
+    })
+}
+
+// Required Conditions
+export const cleanRequiredConditions = () => {
+    Store.dispatch({
+        type: 'CLEAN_REQUIRED_CONDITIONS'
     })
 }
 
@@ -80,13 +96,13 @@ export const setRequiredConditionsEquip = (equipType, equipId) => {
     })
 }
 
-export const setRequiredConditionsEquipSlot = (equipType, jewelId, slotIndex) => {
+export const setRequiredConditionsEquipJewel = (equipType, jewelId, idIndex) => {
     Store.dispatch({
-        type: 'SET_REQUIRED_CONDITIONS_EQUIP_SLOT',
+        type: 'SET_REQUIRED_CONDITIONS_EQUIP_JEWEL',
         payload: {
             equipType: equipType,
             jewelId: jewelId,
-            slotIndex: slotIndex
+            idIndex: idIndex
         }
     })
 }
@@ -113,12 +129,14 @@ export default {
 
     switchTempData,
 
+    cleanPlayerEquips,
     setPlayerEquip,
-    setPlayerEquipSlot,
+    setPlayerEquipJewel,
     setPlayerEquipEnhance,
 
+    cleanRequiredConditions,
     setRequiredConditionsEquip,
-    setRequiredConditionsEquipSlot,
+    setRequiredConditionsEquipJewel,
 
     addRequiredConditionsSkill,
     removeRequiredConditionsSkill,

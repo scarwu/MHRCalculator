@@ -32,7 +32,7 @@ import Constant from 'constant'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (modalData, itemId) => {
+const handleItemPickUp = (itemId, modalData) => {
     if ('playerEquips' === modalData.target) {
         CommonState.setter.setPlayerEquip(modalData.equipType, itemId)
     }

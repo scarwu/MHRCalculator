@@ -274,42 +274,39 @@ export const defaultCustomCharm = {
 }
 
 export const defaultPlayerEquips = {
-    current: {
-        weapon: {
-            id: null,
-            enhances: {},
-            slotIds: []
-        },
-        helm: {
-            id: null,
-            slotIds: []
-        },
-        chest: {
-            id: null,
-            slotIds: []
-        },
-        arm: {
-            id: null,
-            slotIds: []
-        },
-        waist: {
-            id: null,
-            slotIds: []
-        },
-        leg: {
-            id: null,
-            slotIds: []
-        },
-        petalace: {
-            id: null
-        },
-        charm: {
-            id: null
-        }
+    weapon: {
+        id: null,
+        jewelIds: [],
+        enhanceIds: [],
+        custom: defaultCustomWeapon
     },
-    custom: {
-        weapon: defaultCustomWeapon,
-        charm: defaultCustomCharm
+    helm: {
+        id: null,
+        jewelIds: []
+    },
+    chest: {
+        id: null,
+        jewelIds: []
+    },
+    arm: {
+        id: null,
+        jewelIds: []
+    },
+    waist: {
+        id: null,
+        jewelIds: []
+    },
+    leg: {
+        id: null,
+        jewelIds: []
+    },
+    petalace: {
+        id: null
+    },
+    charm: {
+        id: null,
+        jewelIds: [],
+        custom: defaultCustomCharm
     }
 }
 

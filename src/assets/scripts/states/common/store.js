@@ -92,6 +92,8 @@ const initialState = {
 
 export default createStore((state = initialState, action) => {
     switch (action.type) {
+
+        // Modal Hub
         case 'SHOW_MODAL':
             return (() => {
                 let modalHub = Helper.deepCopy(state.modalHub)
@@ -116,7 +118,7 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
-        // Switch Temp Data
+        // Temp Data
         case 'SWITCH_TEMP_DATA':
             return (() => {
                 let target = action.payload.target
@@ -206,6 +208,105 @@ export default createStore((state = initialState, action) => {
                             playerEquips: bundle.playerEquips
                         })
                 }
+            })()
+
+        // Player Equips
+        case 'CLEAN_PLAYER_EQUIP':
+            return (() => {
+                return Object.assign({}, state, {
+                    playerEquips: Helper.deepCopy(Constant.defaultPlayerEquips)
+                })
+            })()
+        case 'SET_PLAYER_EQUIP':
+            return (() => {
+                let playerEquips = Helper.deepCopy(state.playerEquips)
+                let equipType = action.payload.equipType
+                let equipId = action.payload.equipId
+
+                if (Helper.isEmpty(playerEquips[equipType])) {
+                    return state
+                }
+
+                playerEquips[equipType] = Helper.deepCopy(Constant.defaultPlayerEquips[equipType])
+                playerEquips[equipType].id = equipId
+
+                return Object.assign({}, state, {
+                    playerEquips: playerEquips
+                })
+            })()
+
+        case 'SET_PLAYER_EQUIP_JEWEL':
+            return (() => {
+                let playerEquips = Helper.deepCopy(state.playerEquips)
+                let equipType = action.payload.equipType
+                let jewelId = action.payload.jewelId
+                let idIndex = action.payload.idIndex
+
+                if (Helper.isEmpty(playerEquips[equipType].jewelIds[idIndex])) {
+                    return state
+                }
+
+                playerEquips[equipType].jewelIds[idIndex] = jewelId
+
+                return Object.assign({}, state, {
+                    playerEquips: playerEquips
+                })
+            })()
+
+        case 'SET_PLAYER_EQUIP_ENHANCE':
+            return (() => {
+                let playerEquips = Helper.deepCopy(state.playerEquips)
+                let equipType = action.payload.equipType
+                let enhanceId = action.payload.enhanceId
+                let idIndex = action.payload.idIndex
+
+                if (Helper.isEmpty(playerEquips[equipType].enhanceIds[idIndex])) {
+                    return state
+                }
+
+                playerEquips[equipType].enhanceIds[idIndex] = enhanceId
+
+                return Object.assign({}, state, {
+                    playerEquips: playerEquips
+                })
+            })()
+
+
+        // Required Conditions
+        case 'SET_REQUIRED_CONDITIONS_EQUIP':
+            return (() => {
+                let requiredConditions = Helper.deepCopy(state.requiredConditions)
+                let equipType = action.payload.equipType
+                let equipId = action.payload.equipId
+
+                if (Helper.isEmpty(requiredConditions.equips[equipType])) {
+                    return state
+                }
+
+                requiredConditions.equips[equipType] = Helper.deepCopy(Constant.defaultPlayerEquips[equipType])
+                requiredConditions.equips[equipType].id = equipId
+
+                return Object.assign({}, state, {
+                    requiredConditions: requiredConditions
+                })
+            })()
+
+        case 'SET_REQUIRED_CONDITIONS_EQUIP_JEWEL':
+            return (() => {
+                let requiredConditions = Helper.deepCopy(state.requiredConditions)
+                let equipType = action.payload.equipType
+                let jewelId = action.payload.jewelId
+                let idIndex = action.payload.idIndex
+
+                if (Helper.isEmpty(requiredConditions.equips[equipType].jewelIds[idIndex])) {
+                    return state
+                }
+
+                requiredConditions.equips[equipType].jewelIds[idIndex] = jewelId
+
+                return Object.assign({}, state, {
+                    requiredConditions: requiredConditions
+                })
             })()
 
         // // Required Sets

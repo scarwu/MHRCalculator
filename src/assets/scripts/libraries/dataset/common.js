@@ -16,18 +16,20 @@ import Constant from 'constant'
 // Load Datasets
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
+import PetalaceDataset from 'libraries/dataset/petalace'
+
 import JewelDataset from 'libraries/dataset/jewel'
-// import EnhanceDataset from 'libraries/dataset/enhance'
+import EnhanceDataset from 'libraries/dataset/enhance'
 import SkillDataset from 'libraries/dataset/skill'
 
-export const getAppliedWeaponInfo = (extend) => {
-    if ('object' !== typeof extend
-        || 'string' !== typeof extend.id
+export const getWeaponExtendInfo = (equipItem) => {
+    if ('object' !== typeof equipItem
+        || 'string' !== typeof equipItem.id
     ) {
         return null
     }
 
-    let info = WeaponDataset.getInfo(extend.id)
+    let info = WeaponDataset.getInfo(equipItem.id)
 
     if (Helper.isEmpty(info)) {
         return null
@@ -57,8 +59,8 @@ export const getAppliedWeaponInfo = (extend) => {
     // }
 
     // info.enhanceSize = enhanceSize
-    // info.enhances = Helper.isNotEmpty(extend.enhances)
-    //     ? extend.enhances : []
+    // info.enhances = Helper.isNotEmpty(equipItem.enhances)
+    //     ? equipItem.enhances : []
 
     // info.enhances.forEach((enhance) => {
     //     let enhanceLevel = enhance.level
@@ -111,10 +113,10 @@ export const getAppliedWeaponInfo = (extend) => {
     info.slots && info.slots.forEach((data, index) => {
         let jewelInfo = null
 
-        if (Helper.isNotEmpty(extend.slotIds)
-            && Helper.isNotEmpty(extend.slotIds[index])
+        if (Helper.isNotEmpty(equipItem.jewelIds)
+            && Helper.isNotEmpty(equipItem.jewelIds[index])
         ) {
-            jewelInfo = JewelDataset.getInfo(extend.slotIds[index])
+            jewelInfo = JewelDataset.getInfo(equipItem.jewelIds[index])
         }
 
         if (Helper.isEmpty(jewelInfo)) {
@@ -166,14 +168,14 @@ export const getAppliedWeaponInfo = (extend) => {
     return Helper.deepCopy(info)
 }
 
-export const getAppliedArmorInfo = (extend) => {
-    if ('object' !== typeof extend
-        || 'string' !== typeof extend.id
+export const getArmorExtendInfo = (equipItem) => {
+    if ('object' !== typeof equipItem
+        || 'string' !== typeof equipItem.id
     ) {
         return null
     }
 
-    let info = ArmorDataset.getInfo(extend.id)
+    let info = ArmorDataset.getInfo(equipItem.id)
 
     if (Helper.isEmpty(info)) {
         return null
@@ -195,10 +197,10 @@ export const getAppliedArmorInfo = (extend) => {
     info.slots && info.slots.forEach((data, index) => {
         let jewelInfo = null
 
-        if (Helper.isNotEmpty(extend.slotIds)
-            && Helper.isNotEmpty(extend.slotIds[index])
+        if (Helper.isNotEmpty(equipItem.jewelIds)
+            && Helper.isNotEmpty(equipItem.jewelIds[index])
         ) {
-            jewelInfo = JewelDataset.getInfo(extend.slotIds[index])
+            jewelInfo = JewelDataset.getInfo(equipItem.jewelIds[index])
         }
 
         if (Helper.isEmpty(jewelInfo)) {
@@ -245,7 +247,41 @@ export const getAppliedArmorInfo = (extend) => {
     return Helper.deepCopy(info)
 }
 
+export const transferEquipTypeToDatasetType = (equipType) => {
+    switch (equipType) {
+    case 'weapon':
+    case 'petalace':
+    case 'charm':
+        return equipType
+    case 'helm':
+    case 'chest':
+    case 'arm':
+    case 'waist':
+    case 'leg':
+        return 'armor'
+    default:
+        return null
+    }
+}
+
+export const getEquipExtendInfo = (equipType, equipItem) => {
+    switch (transferEquipTypeToDatasetType(equipType)) {
+        case 'weapon':
+            return getWeaponExtendInfo(equipItem)
+        case 'armor':
+            return getArmorExtendInfo(equipItem)
+        case 'petalace':
+            return Helper.deepCopy(PetalaceDataset.getInfo(equipItem.id))
+        case 'charm':
+            return null
+        default:
+            return null
+    }
+}
+
 export default {
-    getAppliedWeaponInfo,
-    getAppliedArmorInfo
+    getWeaponExtendInfo,
+    getArmorExtendInfo,
+    getEquipExtendInfo,
+    transferEquipTypeToDatasetType
 }

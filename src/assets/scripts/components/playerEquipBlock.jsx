@@ -49,10 +49,10 @@ const handleSwitchTempData = (index) => {
 /**
  * Render Functions
  */
-const renderEnhanceBlock = (equipItemInfo) => {
+const renderEnhanceBlock = (equipExtendInfo) => {
     let usedSize = 0
 
-    equipItemInfo.enhances.forEach((enhance) => {
+    equipExtendInfo.enhances.forEach((enhance) => {
         let enhanceInfo = EnhanceDataset.getInfo(enhance.id)
 
         usedSize += enhanceInfo.list[enhance.level - 1].size
@@ -64,15 +64,15 @@ const renderEnhanceBlock = (equipItemInfo) => {
                 <span>{_('enhanceFieldSize')}</span>
             </div>
             <div className="col-9 mhrc-value">
-                <span>{usedSize} / {equipItemInfo.enhanceSize}</span>
+                <span>{usedSize} / {equipExtendInfo.enhanceSize}</span>
                 <div className="mhrc-icons_bundle">
-                    {(usedSize < equipItemInfo.enhanceSize) ? (
-                        <IconButton key={equipItemInfo.enhances.length} iconName="plus" altName={_('add')} onClick={() => {
+                    {(usedSize < equipExtendInfo.enhanceSize) ? (
+                        <IconButton key={equipExtendInfo.enhances.length} iconName="plus" altName={_('add')} onClick={() => {
                             CommonState.setter.showModal('enhanceSelector', {
-                                equipType: equipItemInfo.type,
-                                equipRare: equipItemInfo.rare,
-                                enhanceIndex: equipItemInfo.enhances.length,
-                                enhanceIds: equipItemInfo.enhances.map((enhance) => {
+                                equipType: equipExtendInfo.type,
+                                equipRare: equipExtendInfo.rare,
+                                enhanceIndex: equipExtendInfo.enhances.length,
+                                enhanceIds: equipExtendInfo.enhances.map((enhance) => {
                                     return enhance.id
                                 })
                             })
@@ -81,7 +81,7 @@ const renderEnhanceBlock = (equipItemInfo) => {
                 </div>
             </div>
 
-            {equipItemInfo.enhances.map((enhance, index) => {
+            {/* {equipExtendInfo.enhances.map((enhance, index) => {
                 let enhanceInfo = EnhanceDataset.getInfo(enhance.id)
 
                 let currentLevel = enhance.level
@@ -93,14 +93,14 @@ const renderEnhanceBlock = (equipItemInfo) => {
                 let prevSize = enhanceInfo.list[prevLevel - 1].size
                 let nextSize = enhanceInfo.list[nextLevel - 1].size
 
-                if ((usedSize + nextSize - currentSize) > equipItemInfo.enhanceSize) {
+                if ((usedSize + nextSize - currentSize) > equipExtendInfo.enhanceSize) {
                     nextLevel = currentLevel
-                } else if (-1 === enhanceInfo.list[nextLevel - 1].allowRares.indexOf(equipItemInfo.rare)) {
+                } else if (-1 === enhanceInfo.list[nextLevel - 1].allowRares.indexOf(equipExtendInfo.rare)) {
                     nextLevel = currentLevel
                 }
 
                 return (
-                    <Fragment key={`${equipItemInfo.type}:${index}`}>
+                    <Fragment key={`${equipExtendInfo.type}:${index}`}>
                         <div className="col-3 mhrc-name">
                             <span>{_('enhance')}: {index + 1}</span>
                         </div>
@@ -108,24 +108,24 @@ const renderEnhanceBlock = (equipItemInfo) => {
                             <span>[{enhanceInfo.list[currentLevel - 1].size}] {_(enhanceInfo.name)} Lv.{currentLevel}</span>
                             <div className="mhrc-icons_bundle">
                                 <IconButton key={`prev:${prevLevel}`} iconName="minus-circle" altName={_('down')} onClick={() => {
-                                    CommonState.setter.setCurrentEquip({
-                                        equipType: equipItemInfo.type,
+                                    CommonState.setter.setPlayerEquip({
+                                        equipType: equipExtendInfo.type,
                                         enhanceIndex: index,
                                         enhanceId: enhance.id,
                                         enhanceLevel: prevLevel
                                     })
                                 }} />
                                 <IconButton key={`next:${nextLevel}`} iconName="plus-circle" altName={_('up')} onClick={() => {
-                                    CommonState.setter.setCurrentEquip({
-                                        equipType: equipItemInfo.type,
+                                    CommonState.setter.setPlayerEquip({
+                                        equipType: equipExtendInfo.type,
                                         enhanceIndex: index,
                                         enhanceId: enhance.id,
                                         enhanceLevel: nextLevel
                                     })
                                 }} />
                                 <IconButton iconName="times" altName={_('clean')} onClick={() => {
-                                    CommonState.setter.setCurrentEquip({
-                                        equipType: equipItemInfo.type,
+                                    CommonState.setter.setPlayerEquip({
+                                        equipType: equipExtendInfo.type,
                                         enhanceIndex: index,
                                         enhanceId: null
                                     })
@@ -134,26 +134,12 @@ const renderEnhanceBlock = (equipItemInfo) => {
                         </div>
                     </Fragment>
                 )
-            })}
+            })} */}
         </div>
     )
 }
 
 const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
-    let selectorData = {
-        equipType: equipType,
-        slotIndex: slotIndex,
-        slotSize: slotSize,
-        jewelId: (Helper.isNotEmpty(jewelInfo)) ? jewelInfo.id : null
-    }
-
-    let emptySelectorData = {
-        equipType: equipType,
-        slotIndex: slotIndex,
-        slotSize: slotSize,
-        jewelId: null
-    }
-
     if (Helper.isEmpty(jewelInfo)) {
         return (
             <Fragment key={`${equipType}:${slotIndex}`}>
@@ -164,7 +150,16 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
                     <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="plus" altName={_('add')}
-                            onClick={() => { CommonState.setter.showModal('jewelSelector', selectorData) }} />
+                            onClick={() => {
+                                CommonState.setter.showModal('jewelSelector', {
+                                    equipType: equipType,
+                                    idIndex: slotIndex,
+                                    jewelId: (Helper.isNotEmpty(jewelInfo)) ? jewelInfo.id : null,
+
+                                    // For Selector
+                                    slotSize: slotSize
+                                })
+                            }} />
                     </div>
                 </div>
             </Fragment>
@@ -181,23 +176,32 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
                 <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="exchange" altName={_('change')}
-                        onClick={() => { CommonState.setter.showModal('jewelSelector', selectorData) }} />
+                        onClick={() => {
+                            CommonState.setter.showModal('jewelSelector', {
+                                equipType: equipType,
+                                idIndex: slotIndex,
+                                jewelId: (Helper.isNotEmpty(jewelInfo)) ? jewelInfo.id : null,
+
+                                // For Selector
+                                slotSize: slotSize
+                            })
+                        }} />
                     <IconButton
                         iconName="times" altName={_('clean')}
-                        onClick={() => { CommonState.setter.setCurrentEquip(emptySelectorData) }} />
+                        onClick={() => { CommonState.setter.setPlayerEquipJewel(equipType, slotIndex, null) }} />
                 </div>
             </div>
         </Fragment>
     )
 }
 
-const renderWeaponProperties = (equipItemInfo) => {
+const renderWeaponProperties = (equipExtendInfo) => {
     let originalSharpness = null
     let enhancedSharpness = null
 
-    if (Helper.isNotEmpty(equipItemInfo.sharpness)) {
-        originalSharpness = Helper.deepCopy(equipItemInfo.sharpness)
-        enhancedSharpness = Helper.deepCopy(equipItemInfo.sharpness)
+    if (Helper.isNotEmpty(equipExtendInfo.sharpness)) {
+        originalSharpness = Helper.deepCopy(equipExtendInfo.sharpness)
+        enhancedSharpness = Helper.deepCopy(equipExtendInfo.sharpness)
         enhancedSharpness.value += 50
     }
 
@@ -207,7 +211,7 @@ const renderWeaponProperties = (equipItemInfo) => {
                 <span>{_('property')}</span>
             </div>
             <div className="col-12 mhrc-content">
-                {Helper.isNotEmpty(equipItemInfo.sharpness) ? (
+                {Helper.isNotEmpty(equipExtendInfo.sharpness) ? (
                     <Fragment>
                         <div className="col-3 mhrc-name">
                             <span>{_('sharpness')}</span>
@@ -223,57 +227,57 @@ const renderWeaponProperties = (equipItemInfo) => {
                     <span>{_('attack')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    <span>{equipItemInfo.attack}</span>
+                    <span>{equipExtendInfo.attack}</span>
                 </div>
 
                 <div className="col-3 mhrc-name">
                     <span>{_('criticalRate')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    <span>{equipItemInfo.criticalRate}%</span>
+                    <span>{equipExtendInfo.criticalRate}%</span>
                 </div>
 
-                {(Helper.isNotEmpty(equipItemInfo.element)
-                    && Helper.isNotEmpty(equipItemInfo.element.attack))
+                {(Helper.isNotEmpty(equipExtendInfo.element)
+                    && Helper.isNotEmpty(equipExtendInfo.element.attack))
                     ? (
                         <Fragment>
                             <div className="col-3 mhrc-name">
-                                <span>{_('element')}: {_(equipItemInfo.element.attack.type)}</span>
+                                <span>{_('element')}: {_(equipExtendInfo.element.attack.type)}</span>
                             </div>
                             <div className="col-3 mhrc-value">
-                                {equipItemInfo.element.attack.isHidden ? (
-                                    <span>({equipItemInfo.element.attack.value})</span>
+                                {equipExtendInfo.element.attack.isHidden ? (
+                                    <span>({equipExtendInfo.element.attack.value})</span>
                                 ) : (
-                                    <span>{equipItemInfo.element.attack.value}</span>
+                                    <span>{equipExtendInfo.element.attack.value}</span>
                                 )}
                             </div>
                         </Fragment>
                     ) : false}
 
-                {(Helper.isNotEmpty(equipItemInfo.element)
-                    && Helper.isNotEmpty(equipItemInfo.element.status))
+                {(Helper.isNotEmpty(equipExtendInfo.element)
+                    && Helper.isNotEmpty(equipExtendInfo.element.status))
                     ? (
                         <Fragment>
                             <div className="col-3 mhrc-name">
-                                <span>{_('element')}: {_(equipItemInfo.element.status.type)}</span>
+                                <span>{_('element')}: {_(equipExtendInfo.element.status.type)}</span>
                             </div>
                             <div className="col-3 mhrc-value">
-                                {equipItemInfo.element.status.isHidden ? (
-                                    <span>({equipItemInfo.element.status.value})</span>
+                                {equipExtendInfo.element.status.isHidden ? (
+                                    <span>({equipExtendInfo.element.status.value})</span>
                                 ) : (
-                                    <span>{equipItemInfo.element.status.value}</span>
+                                    <span>{equipExtendInfo.element.status.value}</span>
                                 )}
                             </div>
                         </Fragment>
                     ) : false}
 
-                {(Helper.isNotEmpty(equipItemInfo.elderseal)) ? (
+                {(Helper.isNotEmpty(equipExtendInfo.elderseal)) ? (
                     <Fragment>
                         <div className="col-3 mhrc-name">
                             <span>{_('elderseal')}</span>
                         </div>
                         <div className="col-3 mhrc-value">
-                            <span>{_(equipItemInfo.elderseal.affinity)}</span>
+                            <span>{_(equipExtendInfo.elderseal.affinity)}</span>
                         </div>
                     </Fragment>
                 ) : false}
@@ -282,14 +286,14 @@ const renderWeaponProperties = (equipItemInfo) => {
                     <span>{_('defense')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    <span>{equipItemInfo.defense}</span>
+                    <span>{equipExtendInfo.defense}</span>
                 </div>
             </div>
         </div>
     )
 }
 
-const renderArmorProperties = (equipItemInfo) => {
+const renderArmorProperties = (equipExtendInfo) => {
     return (
         <div className="col-12 mhrc-content">
             <div className="col-12 mhrc-name">
@@ -300,17 +304,17 @@ const renderArmorProperties = (equipItemInfo) => {
                     <span>{_('defense')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    <span>{equipItemInfo.defense}</span>
+                    <span>{equipExtendInfo.defense}</span>
                 </div>
 
-                {Constant.resistances.map((resistanceType) => {
+                {Constant.resistanceTypes.map((resistanceType) => {
                     return (
                         <Fragment key={resistanceType}>
                             <div className="col-3 mhrc-name">
                                 <span>{_('resistance')}: {_(resistanceType)}</span>
                             </div>
                             <div className="col-3 mhrc-value">
-                                <span>{equipItemInfo.resistance[resistanceType]}</span>
+                                <span>{equipExtendInfo.resistance[resistanceType]}</span>
                             </div>
                         </Fragment>
                     )
@@ -320,78 +324,98 @@ const renderArmorProperties = (equipItemInfo) => {
     )
 }
 
-const renderEquipPartBlock = (equipType, currentEquipItem, requiredEquip) => {
-    let equipItemInfo = null
+const renderPetalaceProperties = (equipExtendInfo) => {
+    return (
+        <div className="col-12 mhrc-content">
+            <div className="col-12 mhrc-name">
+                <span>{_('property')}</span>
+            </div>
+            <div className="col-12 mhrc-content">
+                <div className="col-3 mhrc-name">
+                    <span>{_('healthIncrement')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{equipExtendInfo.health.increment}</span>
+                </div>
+                <div className="col-3 mhrc-name">
+                    <span>{_('healthObtain')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{equipExtendInfo.health.obtain}</span>
+                </div>
 
-    if ('weapon' === equipType) {
-        equipItemInfo = CommonDataset.getAppliedWeaponInfo(currentEquipItem)
-    } else if ('helm' === equipType
-        || 'chest' === equipType
-        || 'arm' === equipType
-        || 'waist' === equipType
-        || 'leg' === equipType
+                <div className="col-3 mhrc-name">
+                    <span>{_('attackIncrement')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{equipExtendInfo.attack.increment}</span>
+                </div>
+                <div className="col-3 mhrc-name">
+                    <span>{_('attackObtain')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{equipExtendInfo.attack.obtain}</span>
+                </div>
+
+                <div className="col-3 mhrc-name">
+                    <span>{_('defenseIncrement')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{equipExtendInfo.defense.increment}</span>
+                </div>
+                <div className="col-3 mhrc-name">
+                    <span>{_('defenseObtain')}</span>
+                </div>
+                <div className="col-3 mhrc-value">
+                    <span>{equipExtendInfo.defense.obtain}</span>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const renderEquipPartBlock = (equipType, currentEquipItem, requiredEquipItem) => {
+    let equipExtendInfo = CommonDataset.getEquipExtendInfo(equipType, currentEquipItem)
+
+    // Can Add to Required Contditions
+    let isNotRequire = null
+
+    if (('weapon' === equipType || 'charm' === equipType)
+        && 'custom' === currentEquipItem.id
+        && 'custom' === requiredEquipItem.id
     ) {
-        equipItemInfo = CommonDataset.getAppliedArmorInfo(currentEquipItem)
-    } else if ('petalace' === equipType) {
-        // equipItemInfo = CommonDataset.getAppliedPetalaceInfo(currentEquipItem)
-    } else if ('charm' === equipType) {
-        // equipItemInfo = CommonDataset.getAppliedCharmInfo(currentEquipItem)
+        isNotRequire = Helper.jsonHash(currentEquipItem.custom) !== Helper.jsonHash(requiredEquipItem.custom)
     } else {
-        return false
+        isNotRequire = currentEquipItem.id !== requiredEquipItem.id
     }
 
-    let isNotRequire = true
+    let datasetType = CommonDataset.transferEquipTypeToDatasetType(equipType)
+    let modalName = datasetType + 'Selector'
 
-    if (Helper.isNotEmpty(requiredEquip)) {
-        if ('weapon' === equipType) {
-            isNotRequire = Helper.jsonHash({
-                id: currentEquipItem.id,
-                enhances: currentEquipItem.enhances
-            }) !== Helper.jsonHash({
-                id: requiredEquip.id,
-                enhances: requiredEquip.enhances
-            })
-        } else {
-            isNotRequire = currentEquipItem.id !== requiredEquip.id
-        }
-    }
-
-    if (Helper.isEmpty(equipItemInfo)) {
+    if (Helper.isEmpty(equipExtendInfo)) {
         return (
             <div key={equipType} className="mhrc-item mhrc-item-3-step">
                 <div className="col-12 mhrc-name">
                     <span>{_(equipType)}</span>
                     <div className="mhrc-icons_bundle">
-                        {'weapon' === equipType ? (
+                        {'weapon' === equipType || 'charm' === equipType ? (
                             <IconButton
-                                iconName="wrench" altName={_('customWeapon')}
+                                iconName="wrench" altName={_('customEquip')}
                                 onClick={() => {
-                                    CommonState.setter.setCurrentEquip({
-                                        equipType: 'weapon',
-                                        equipId: 'customWeapon'
+                                    CommonState.setter.setPlayerEquip(equipType, 'custom')
+                                }} />
+                        ) : false}
+                        {'charm' !== equipType ? (
+                            <IconButton
+                                iconName="plus" altName={_('add')}
+                                onClick={() => {
+                                    CommonState.setter.showModal(modalName, {
+                                        target: 'playerEquips',
+                                        equipType: equipType,
+                                        equipId: (Helper.isNotEmpty(equipExtendInfo)) ? equipExtendInfo.id : null
                                     })
                                 }} />
                         ) : false}
-                        <IconButton
-                            iconName="plus" altName={_('add')}
-                            onClick={() => {
-                                let modalName = equipType + 'Selector'
-
-                                if ('helm' === equipType
-                                    || 'chest' === equipType
-                                    || 'arm' === equipType
-                                    || 'waist' === equipType
-                                    || 'leg' === equipType
-                                ) {
-                                    modalName = 'armorSelector'
-                                }
-
-                                CommonState.setter.showModal(modalName, {
-                                    target: 'playerEquips',
-                                    equipType: equipType,
-                                    equipId: (Helper.isNotEmpty(equipItemInfo)) ? equipItemInfo.id : null
-                                })
-                            }} />
                     </div>
                 </div>
             </div>
@@ -399,48 +423,50 @@ const renderEquipPartBlock = (equipType, currentEquipItem, requiredEquip) => {
     }
 
     return (
-        <div key={selectorData.equipId} className="mhrc-item mhrc-item-3-step">
+        <div key={equipExtendInfo.id} className="mhrc-item mhrc-item-3-step">
             <div className="col-12 mhrc-name">
-                <span>{_(equipType)}: {_(equipItemInfo.name)}</span>
+                <span>{_(equipType)}: {_(equipExtendInfo.name)}</span>
                 <div className="mhrc-icons_bundle">
                     {isNotRequire ? (
                         <IconButton
                             iconName="arrow-left" altName={_('include')}
-                            onClick={() => { CommonState.setter.setRequiredConditions(equipType, currentEquipItem) }} />
-                    ) : false}
-                    {'weapon' === equipType ? (
-                        <IconButton
-                            iconName="wrench" altName={_('customWeapon')}
                             onClick={() => {
-                                CommonState.setter.setCurrentEquip({
-                                    equipType: 'weapon',
-                                    equipId: 'customWeapon'
-                                })
+                                CommonState.setter.setRequiredConditionsEquip(equipType, currentEquipItem.id)
+                            }} />
+                    ) : false}
+                    {'weapon' === equipType || 'charm' === equipType ? (
+                        <IconButton
+                            iconName="wrench" altName={_('customEquip')}
+                            onClick={() => {
+                                CommonState.setter.setPlayerEquip(equipType, 'custom')
                             }} />
                     ) : false}
                     <IconButton
                         iconName="exchange" altName={_('change')}
-                        onClick={() => { CommonState.setter.showModal(equipType + 'Selector', selectorData) }} />
+                        onClick={() => {
+                            CommonState.setter.showModal(modalName, {
+                                target: 'playerEquips',
+                                equipType: equipType,
+                                equipId: (Helper.isNotEmpty(equipExtendInfo)) ? equipExtendInfo.id : null
+                            })
+                         }} />
                     <IconButton
                         iconName="times" altName={_('clean')}
                         onClick={() => {
-                            CommonState.setter.setCurrentEquip({
-                                equipType: equipType,
-                                equipId: null
-                            })
+                            CommonState.setter.setPlayerEquip(equipType, null)
                         }} />
                 </div>
             </div>
 
-            {(0 < equipItemInfo.enhanceSize) ? (
-                renderEnhanceBlock(equipItemInfo)
+            {(0 < equipExtendInfo.enhanceSize) ? (
+                renderEnhanceBlock(equipExtendInfo)
             ) : false}
 
-            {(Helper.isNotEmpty(equipItemInfo.slots)
-                && 0 !== equipItemInfo.slots.length)
+            {(Helper.isNotEmpty(equipExtendInfo.slots)
+                && 0 !== equipExtendInfo.slots.length)
                 ? (
                     <div className="col-12 mhrc-content">
-                        {equipItemInfo.slots.map((data, index) => {
+                        {equipExtendInfo.slots.map((data, index) => {
                             return renderJewelOption(
                                 equipType, index, data.size,
                                 JewelDataset.getInfo(data.jewel.id)
@@ -449,21 +475,24 @@ const renderEquipPartBlock = (equipType, currentEquipItem, requiredEquip) => {
                     </div>
                 ) : false}
 
-            {('weapon' === equipType)
-                ? renderWeaponProperties(equipItemInfo) : false}
+            {('weapon' === CommonDataset.transferEquipTypeToDatasetType(equipType))
+                ? renderWeaponProperties(equipExtendInfo) : false}
 
-            {('weapon' !== equipType && 'charm' !== equipType)
-                ? renderArmorProperties(equipItemInfo) : false}
+            {('armor' === CommonDataset.transferEquipTypeToDatasetType(equipType))
+                ? renderArmorProperties(equipExtendInfo) : false}
 
-            {(Helper.isNotEmpty(equipItemInfo.skills)
-                && 0 !== equipItemInfo.skills.length)
+            {('petalace' === CommonDataset.transferEquipTypeToDatasetType(equipType))
+                ? renderPetalaceProperties(equipExtendInfo) : false}
+
+            {(Helper.isNotEmpty(equipExtendInfo.skills)
+                && 0 !== equipExtendInfo.skills.length)
                 ? (
                     <div className="col-12 mhrc-content">
                         <div className="col-12 mhrc-name">
                             <span>{_('skill')}</span>
                         </div>
                         <div className="col-12 mhrc-content">
-                            {equipItemInfo.skills.sort((skillA, skillB) => {
+                            {equipExtendInfo.skills.sort((skillA, skillB) => {
                                 return skillB.level - skillA.level
                             }).map((data) => {
                                 let skillInfo = SkillDataset.getInfo(data.id)
@@ -506,9 +535,9 @@ export default function PlayerEquipsBlock(props) {
     const getContent = useMemo(() => {
         let blocks = []
 
-        Object.keys(statePlayerEquips.current).forEach((equipType) => {
-            if (Helper.isNotEmpty(statePlayerEquips.current[equipType])
-                && 'customWeapon' === statePlayerEquips.current[equipType].id
+        Object.keys(statePlayerEquips).forEach((equipType) => {
+            if ('weapon' === CommonDataset.transferEquipTypeToDatasetType(equipType)
+                && 'custom' === statePlayerEquips[equipType].id
             ) {
                 blocks.push((
                     <CustomWeapon key="customWeapon" />
@@ -517,8 +546,8 @@ export default function PlayerEquipsBlock(props) {
                 return
             }
 
-            if (Helper.isNotEmpty(statePlayerEquips.current[equipType])
-                && 'customCharm' === statePlayerEquips.current[equipType].id
+            if ('charm' === CommonDataset.transferEquipTypeToDatasetType(equipType)
+                && 'custom' === statePlayerEquips[equipType].id
             ) {
                 blocks.push((
                     <CustomCharm key="customCharm" />
@@ -529,8 +558,8 @@ export default function PlayerEquipsBlock(props) {
 
             blocks.push(renderEquipPartBlock(
                 equipType,
-                statePlayerEquips.current[equipType],
-                stateRequiredConditions.equips.current[equipType]
+                statePlayerEquips[equipType],
+                stateRequiredConditions.equips[equipType]
             ))
         })
 

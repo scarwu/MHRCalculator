@@ -65,13 +65,19 @@ const renderSkillItem = (skill, enableSkillIdList) => {
                 <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="minus-circle" altName={_('down')}
-                        onClick={() => {States.setter.decreaseRequiredSkillLevel(skill.id)}} />
+                        onClick={() => {
+                            States.setter.decreaseRequiredConditionsSkillLevel(skill.id)
+                        }} />
                     <IconButton
                         iconName="plus-circle" altName={_('up')}
-                        onClick={() => {States.setter.increaseRequiredSkillLevel(skill.id)}} />
+                        onClick={() => {
+                            States.setter.increaseRequiredConditionsSkillLevel(skill.id)
+                        }} />
                     <IconButton
                         iconName="times" altName={_('clean')}
-                        onClick={() => {States.setter.removeRequiredSkill(skill.id)}} />
+                        onClick={() => {
+                            States.setter.removeRequiredConditionsSkill(skill.id)
+                        }} />
                 </div>
             </div>
             <div className="col-12 mhrc-value mhrc-description">
@@ -91,13 +97,12 @@ export default function SkillList(props) {
      * Hooks
      */
     // const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
-            updateRequiredSets(States.getter.getRequiredSets())
-            updateRequiredSkills(States.getter.getRequiredSkills())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -107,42 +112,6 @@ export default function SkillList(props) {
 
     return useMemo(() => {
         Helper.debug('Component: ConditionOptions -> SkillList')
-
-        let enableSkillIdList = []
-
-        // stateRequiredSets.forEach((set) => {
-        //     let setInfo = SetDataset.getInfo(set.id)
-
-        //     if (Helper.isEmpty(setInfo)) {
-        //         return
-        //     }
-
-        //     setInfo.skills.forEach((skill) => {
-        //         let skillInfo = SkillDataset.getInfo(skill.id)
-
-        //         if (Helper.isEmpty(skillInfo)) {
-        //             return
-        //         }
-
-        //         skillInfo.list.forEach((item) => {
-        //             if (Helper.isEmpty(item.reaction)
-        //                 || Helper.isEmpty(item.reaction.enableSkillLevel)
-        //             ) {
-        //                 return
-        //             }
-
-        //             if (Helper.isNotEmpty(item.reaction.enableSkillLevel.id)) {
-        //                 enableSkillIdList.push(item.reaction.enableSkillLevel.id)
-        //             }
-
-        //             if (Helper.isNotEmpty(item.reaction.enableSkillLevel.ids)) {
-        //                 item.reaction.enableSkillLevel.ids.forEach((skillId) => {
-        //                     enableSkillIdList.push(skillId)
-        //                 })
-        //             }
-        //         })
-        //     })
-        // })
 
         return (
             <div className="mhrc-item mhrc-item-3-step">
@@ -155,13 +124,12 @@ export default function SkillList(props) {
                     </div>
                 </div>
 
-                {stateRequiredSkills.map((skill) => {
+                {stateRequiredConditions.skills.map((skill) => {
                     return renderSkillItem(skill, enableSkillIdList)
                 })}
              </div>
         )
     }, [
-        stateRequiredSkills,
-        // stateRequiredSets
+        stateRequiredConditions
     ])
 }

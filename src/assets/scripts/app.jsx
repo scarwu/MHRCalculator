@@ -128,8 +128,8 @@ export default function App(props) {
             </div>
 
             <div className="row mhrc-container">
-                {/* <RequiredConditionsBlock /> */}
-                {/* <CandidateBundlesBlock /> */}
+                <RequiredConditionsBlock />
+                <CandidateBundlesBlock />
                 <PlayerEquipsBlock />
                 <PlayerStatusBlock />
             </div>

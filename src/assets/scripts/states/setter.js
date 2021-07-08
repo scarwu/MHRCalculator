@@ -107,6 +107,22 @@ export const setRequiredConditionsEquipJewel = (equipType, jewelId, idIndex) => 
     })
 }
 
+export const addRequiredConditionsSet = () => {
+
+}
+
+export const removeRequiredConditionsSet = () => {
+
+}
+
+export const increaseRequiredConditionsSetNumber = () => {
+
+}
+
+export const decreaseRequiredConditionsSetNumber = () => {
+
+}
+
 export const addRequiredConditionsSkill = () => {
 
 }
@@ -115,11 +131,11 @@ export const removeRequiredConditionsSkill = () => {
 
 }
 
-export const increaseRequiredConditionsSkill = () => {
+export const increaseRequiredConditionsSkillLevel = () => {
 
 }
 
-export const decreaseRequiredConditionsSkill = () => {
+export const decreaseRequiredConditionsSkillLevel = () => {
 
 }
 
@@ -138,10 +154,15 @@ export default {
     setRequiredConditionsEquip,
     setRequiredConditionsEquipJewel,
 
+    addRequiredConditionsSet,
+    removeRequiredConditionsSet,
+    increaseRequiredConditionsSetNumber,
+    decreaseRequiredConditionsSetNumber,
+
     addRequiredConditionsSkill,
     removeRequiredConditionsSkill,
-    increaseRequiredConditionsSkill,
-    decreaseRequiredConditionsSkill,
+    increaseRequiredConditionsSkillLevel,
+    decreaseRequiredConditionsSkillLevel,
 
     // Required Sets
     addRequiredSet: (setId) => {

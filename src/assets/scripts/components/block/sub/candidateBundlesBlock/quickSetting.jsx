@@ -35,17 +35,13 @@ export default function QuickSetting(props) {
      * Hooks
      */
     const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
-    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
-    // const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateAlgorithmParams(States.getter.getAlgorithmParams())
-            updateRequiredEquips(States.getter.getRequiredEquips())
-            updateRequiredSets(States.getter.getRequiredSets())
-            updateRequiredSkills(States.getter.getRequiredSkills())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -61,17 +57,17 @@ export default function QuickSetting(props) {
         let jewelMapping = {}
         let skillLevelMapping = {}
 
-        const equipTypes = Object.keys(stateRequiredEquips).filter((equipType) => {
+        const equipTypes = Object.keys(stateRequiredConditions.equips).filter((equipType) => {
             if ('weapon' === equipType || 'charm' === equipType) {
                 return false
             }
 
-            return Helper.isEmpty(stateRequiredEquips[equipType])
+            return Helper.isEmpty(stateRequiredConditions.equips[equipType])
         })
-        // const setIds = stateRequiredSets.map((set) => {
+        // const setIds = stateRequiredConditions.sets.map((set) => {
         //     return set.id
         // })
-        const skillIds = stateRequiredSkills.map((skill) => {
+        const skillIds = stateRequiredConditions.skills.map((skill) => {
             skillLevelMapping[skill.id] = skill.level
 
             return skill.id
@@ -141,7 +137,7 @@ export default function QuickSetting(props) {
             }
         })
 
-        // if (Helper.isEmpty(stateRequiredEquips.charm)) {
+        // if (Helper.isEmpty(stateRequiredConditions.equips.charm)) {
         //     CharmDataset.hasSkills(skillIds).getItems().forEach((charmInfo) => {
         //         let isSkip = false
 
@@ -355,8 +351,6 @@ export default function QuickSetting(props) {
     }, [
         data,
         stateAlgorithmParams,
-        stateRequiredEquips,
-        // stateRequiredSets,
-        stateRequiredSkills
+        stateRequiredConditions
     ])
 }

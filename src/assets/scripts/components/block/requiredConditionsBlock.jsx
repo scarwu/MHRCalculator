@@ -32,7 +32,7 @@ const handleRequireConditionRefresh = () => {
 }
 
 const handleSwitchDataStore = (index) => {
-    States.setter.switchDataStore('conditionOptions', index)
+    States.setter.switchDataStore('requiredConditions', index)
 }
 
 export default function RequiredConditionsBlock(props) {
@@ -61,19 +61,19 @@ export default function RequiredConditionsBlock(props) {
                 <div className="mhrc-icons_bundle-left">
                     <IconTab
                         iconName="circle-o" altName={_('tab') + ' 1'}
-                        isActive={0 === stateDataStore.conditionOptions.index}
+                        isActive={0 === stateDataStore.requiredConditions.index}
                         onClick={() => {handleSwitchDataStore(0)}} />
                     <IconTab
                         iconName="circle-o" altName={_('tab') + ' 2'}
-                        isActive={1 === stateDataStore.conditionOptions.index}
+                        isActive={1 === stateDataStore.requiredConditions.index}
                         onClick={() => {handleSwitchDataStore(1)}} />
                     <IconTab
                         iconName="circle-o" altName={_('tab') + ' 3'}
-                        isActive={2 === stateDataStore.conditionOptions.index}
+                        isActive={2 === stateDataStore.requiredConditions.index}
                         onClick={() => {handleSwitchDataStore(2)}} />
                     <IconTab
                         iconName="circle-o" altName={_('tab') + ' 4'}
-                        isActive={3 === stateDataStore.conditionOptions.index}
+                        isActive={3 === stateDataStore.requiredConditions.index}
                         onClick={() => {handleSwitchDataStore(3)}} />
                 </div>
 

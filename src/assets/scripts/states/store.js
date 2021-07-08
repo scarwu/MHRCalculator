@@ -28,7 +28,7 @@ const statusMapping = {
     // requiredSkills: 'state:requiredSkills',
     requiredConditions: 'state:requiredConditions',
     playerEquips: 'state:playerEquips',
-    // algorithmParams: 'state:algorithmParams',
+    algorithmParams: 'state:algorithmParams',
     // computedResult: 'state:computedResult',
     // reservedPlayerEquip: 'state:reservedPlayerEquip',
     // customWeapon: 'state:customWeapon'
@@ -65,6 +65,10 @@ const initialState = {
             index: 0,
             list: []
         },
+        candidateBundles: {
+            index: 0,
+            list: []
+        },
         playerEquips: {
             index: 0,
             list: []
@@ -72,12 +76,7 @@ const initialState = {
     },
     requiredConditions: Status.get(statusMapping.requiredConditions) || Helper.deepCopy(Constant.defaultRequiredConditions),
     playerEquips: Status.get(statusMapping.playerEquips) || Helper.deepCopy(Constant.defaultPlayerEquips),
-
-    // requiredEquips: Status.get(statusMapping.requiredEquips) || {},
-    // requiredSets: Status.get(statusMapping.requiredSets) || [],
-    // requiredSkills: Status.get(statusMapping.requiredSkills) || [],
-
-    // algorithmParams: Status.get(statusMapping.algorithmParams) || Helper.deepCopy(Constant.defaultAlgorithmParams),
+    algorithmParams: Status.get(statusMapping.algorithmParams) || Helper.deepCopy(Constant.defaultAlgorithmParams),
     // computedResult: Status.get(statusMapping.computedResult) || null,
     // reservedPlayerEquip: Status.get(statusMapping.reservedPlayerEquip) || []
 }

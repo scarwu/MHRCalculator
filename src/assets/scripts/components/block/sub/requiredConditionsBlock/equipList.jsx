@@ -7,14 +7,13 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useMemo } from 'react'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
 // import CharmDataset from 'libraries/dataset/charm'
@@ -22,8 +21,8 @@ import ArmorDataset from 'libraries/dataset/armor'
 // Load Components
 import IconButton from 'components/common/iconButton'
 
-// Load State Control
-import CommonState from 'states/common'
+// Load States
+import States from 'states'
 
 /**
  * Render Functions
@@ -48,7 +47,7 @@ const renderEquipItem = (equipType, requiredEquip) => {
                         <div className="mhrc-icons_bundle">
                             <IconButton
                                 iconName="times" altName={_('clean')}
-                                onClick={() => {CommonState.setter.setRequiredEquips(equipType, null)}} />
+                                onClick={() => {States.setter.setRequiredEquips(equipType, null)}} />
                         </div>
                     </div>
                 </div>
@@ -84,7 +83,7 @@ const renderEquipItem = (equipType, requiredEquip) => {
                 <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="times" altName={_('clean')}
-                        onClick={() => {CommonState.setter.setRequiredEquips(equipType, null)}} />
+                        onClick={() => {States.setter.setRequiredEquips(equipType, null)}} />
                 </div>
             </div>
         </div>
@@ -96,12 +95,12 @@ export default function EquipList (props) {
     /**
      * Hooks
      */
-    const [stateRequiredEquips, updateRequiredEquips] = useState(CommonState.getter.getRequiredEquips())
+    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateRequiredEquips(CommonState.getter.getRequiredEquips())
+        const unsubscribe = States.store.subscribe(() => {
+            updateRequiredEquips(States.getter.getRequiredEquips())
         })
 
         return () => {

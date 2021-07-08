@@ -7,14 +7,16 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { Fragment, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-// Load Core Libraries
+// Load Constant
+import Constant from 'constant'
+
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import WeaponDataset from 'libraries/dataset/weapon'
 import EnhanceDataset from 'libraries/dataset/enhance'
 import SkillDataset from 'libraries/dataset/skill'
@@ -25,25 +27,22 @@ import IconSelector from 'components/common/iconSelector'
 import IconInput from 'components/common/iconInput'
 import SharpnessBar from 'components/common/sharpnessBar'
 
-// Load State Control
-import CommonState from 'states/common'
-
-// Load Constant
-import Constant from 'constant'
+// Load States
+import States from 'states'
 
 /**
  * Handle Functions
  */
 const handleItemPickUp = (itemId, modalData) => {
     if ('playerEquips' === modalData.target) {
-        CommonState.setter.setPlayerEquip(modalData.equipType, itemId)
+        States.setter.setPlayerEquip(modalData.equipType, itemId)
     }
 
     if ('requiredConditions' === modalData.target) {
-        CommonState.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
+        States.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
     }
 
-    CommonState.setter.hideModal('weaponSelector')
+    States.setter.hideModal('weaponSelector')
 }
 
 /**
@@ -71,7 +70,9 @@ const renderWeaponItem = (weaponItem, modalData) => {
                     {(weaponItem.id !== modalData.equipId) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
-                            onClick={() => { handleItemPickUp(weaponItem.id, modalData)}} />
+                            onClick={() => {
+                                handleItemPickUp(weaponItem.id, modalData)
+                            }} />
                     ) : false}
                 </div>
             </div>
@@ -103,8 +104,14 @@ const renderWeaponItem = (weaponItem, modalData) => {
                             <span>{_('sharpness')}</span>
                         </div>
                         <div className="col-9 mhrc-value mhrc-sharpness">
-                            <SharpnessBar data={{ value: weaponItem.sharpness.minValue, steps: weaponItem.sharpness.steps }} />
-                            <SharpnessBar data={{ value: weaponItem.sharpness.maxValue, steps: weaponItem.sharpness.steps }} />
+                            <SharpnessBar data={{
+                                value: weaponItem.sharpness.minValue,
+                                steps: weaponItem.sharpness.steps
+                            }} />
+                            <SharpnessBar data={{
+                                value: weaponItem.sharpness.maxValue,
+                                steps: weaponItem.sharpness.steps
+                            }} />
                         </div>
                     </Fragment>
                 ) : false}
@@ -173,7 +180,7 @@ export default function WeaponSelectorModal(props) {
     /**
      * Hooks
      */
-    const [stateModalData, updateModalData] = useState(CommonState.getter.getModalData('weaponSelector'))
+    const [stateModalData, updateModalData] = useState(States.getter.getModalData('weaponSelector'))
     const [stateSortedList, updateSortedList] = useState([])
     const [stateType, updateType] = useState(undefined)
     const [stateRare, updateRare] = useState(undefined)
@@ -219,8 +226,8 @@ export default function WeaponSelectorModal(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeModel = CommonState.store.subscribe(() => {
-            updateModalData(CommonState.getter.getModalData('weaponSelector'))
+        const unsubscribeModel = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('weaponSelector'))
         })
 
         return () => {
@@ -236,7 +243,7 @@ export default function WeaponSelectorModal(props) {
             return
         }
 
-        CommonState.setter.hideEquipItemSelector()
+        States.setter.hideEquipItemSelector()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -338,7 +345,7 @@ export default function WeaponSelectorModal(props) {
                             options={stateRareList} onChange={handleRareChange} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={() => {CommonState.setter.hideModal('weaponSelector')}} />
+                            onClick={() => {States.setter.hideModal('weaponSelector')}} />
                     </div>
                 </div>
                 <div className="mhrc-list">

@@ -7,7 +7,7 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Core Libraries
+// Load Core
 import Helper from 'core/helper'
 
 // Load Dataset

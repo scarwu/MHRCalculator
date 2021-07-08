@@ -7,28 +7,24 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 // Load Core Libraries
-import Status from 'core/status'
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
-
 // Load Components
-import ArmorFactors from 'components/modal/sub/algorithmSetting/armorFactors'
-import JewelFactors from 'components/modal/sub/algorithmSetting/jewelFactors'
 import IconButton from 'components/common/iconButton'
 import IconSelector from 'components/common/iconSelector'
 import IconInput from 'components/common/iconInput'
 import BasicSelector from 'components/common/basicSelector'
 import BasicInput from 'components/common/basicInput'
 
-// Load State Control
-import CommonState from 'states/common'
-import ModalState from 'states/modal'
+import ArmorFactors from 'components/modal/sub/algorithmSetting/armorFactors'
+import JewelFactors from 'components/modal/sub/algorithmSetting/jewelFactors'
+
+// Load States
+import States from 'states'
 
 /**
  * Variables
@@ -69,7 +65,7 @@ const jewelSizeList = [ 1, 2, 3, 4 ]
  * Handler Functions
  */
 const handleModeChange = (event) => {
-    ModalState.setter.showAlgorithmSetting({
+    States.setter.showAlgorithmSetting({
         mode: event.target.value
     })
 }
@@ -85,19 +81,19 @@ const handleLimitChange = (event) => {
 
     event.target.value = limit
 
-    CommonState.setter.setAlgorithmParamsLimit(limit)
+    States.setter.setAlgorithmParamsLimit(limit)
 }
 
 const handleSortChange = (event) => {
-    CommonState.setter.setAlgorithmParamsSort(event.target.value)
+    States.setter.setAlgorithmParamsSort(event.target.value)
 }
 
 const handleOrderChange = (event) => {
-    CommonState.setter.setAlgorithmParamsOrder(event.target.value)
+    States.setter.setAlgorithmParamsOrder(event.target.value)
 }
 
 const handleStrategyChange = (event) => {
-    CommonState.setter.setAlgorithmParamsStrategy(event.target.value)
+    States.setter.setAlgorithmParamsStrategy(event.target.value)
 }
 
 export default function AlgorithmSetting(props) {
@@ -105,9 +101,9 @@ export default function AlgorithmSetting(props) {
     /**
      * Hooks
      */
-    const [stateAlgorithmParams, updateAlgorithmParams] = useState(CommonState.getter.getAlgorithmParams())
-    const [stateIsShow, updateIsShow] = useState(ModalState.getter.isShowAlgorithmSetting())
-    const [stateBypassData, updateBypassData] = useState(ModalState.getter.getAlgorithmSettingBypassData())
+    const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
+    const [stateIsShow, updateIsShow] = useState(States.getter.isShowAlgorithmSetting())
+    const [stateBypassData, updateBypassData] = useState(States.getter.getAlgorithmSettingBypassData())
     const [stateSegment, updateSegment] = useState(undefined)
     const [stateMode, updateMode] = useState(undefined)
     const refModal = useRef()
@@ -126,13 +122,13 @@ export default function AlgorithmSetting(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeCommon = CommonState.store.subscribe(() => {
-            updateAlgorithmParams(CommonState.getter.getAlgorithmParams())
+        const unsubscribeCommon = States.store.subscribe(() => {
+            updateAlgorithmParams(States.getter.getAlgorithmParams())
         })
 
-        const unsubscribeModal = ModalState.store.subscribe(() => {
-            updateIsShow(ModalState.getter.isShowAlgorithmSetting())
-            updateBypassData(ModalState.getter.getAlgorithmSettingBypassData())
+        const unsubscribeModal = States.store.subscribe(() => {
+            updateIsShow(States.getter.isShowAlgorithmSetting())
+            updateBypassData(States.getter.getAlgorithmSettingBypassData())
         })
 
         return () => {
@@ -149,7 +145,7 @@ export default function AlgorithmSetting(props) {
             return
         }
 
-        ModalState.setter.hideAlgorithmSetting()
+        States.setter.hideAlgorithmSetting()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -179,7 +175,7 @@ export default function AlgorithmSetting(props) {
                             options={getModeList()} onChange={handleModeChange} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={ModalState.setter.hideAlgorithmSetting} />
+                            onClick={States.setter.hideAlgorithmSetting} />
                     </div>
                 </div>
                 <div className="mhrc-list">
@@ -234,12 +230,12 @@ export default function AlgorithmSetting(props) {
                                                         <IconButton
                                                             iconName="star"
                                                             altName={_('exclude')}
-                                                            onClick={() => {CommonState.setter.setAlgorithmParamsUsingFactor('armor', 'rare' + rare, false)}} />
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', 'rare' + rare, false)}} />
                                                     ) : (
                                                         <IconButton
                                                             iconName="star-o"
                                                             altName={_('include')}
-                                                            onClick={() => {CommonState.setter.setAlgorithmParamsUsingFactor('armor', 'rare' + rare, true)}} />
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', 'rare' + rare, true)}} />
                                                     )}
                                                 </div>
                                             </div>
@@ -264,12 +260,12 @@ export default function AlgorithmSetting(props) {
                                                         <IconButton
                                                             iconName="star"
                                                             altName={_('exclude')}
-                                                            onClick={() => {CommonState.setter.setAlgorithmParamsUsingFactor('jewel', 'size' + size, false)}} />
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('jewel', 'size' + size, false)}} />
                                                     ) : (
                                                         <IconButton
                                                             iconName="star-o"
                                                             altName={_('include')}
-                                                            onClick={() => {CommonState.setter.setAlgorithmParamsUsingFactor('jewel', 'size' + size, true)}} />
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('jewel', 'size' + size, true)}} />
                                                     )}
                                                 </div>
                                             </div>

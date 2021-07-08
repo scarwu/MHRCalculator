@@ -7,23 +7,20 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Status from 'core/status'
 import Helper from 'core/helper'
-
-// Load Custom Libraries
-import _ from 'libraries/lang'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
 
-// Load State Control
-import CommonState from 'states/common'
+// Load States
+import States from 'states'
 
-// Load Markdown
+// Load Markdown Files
 import zhTWChangeLog from 'langs/zhTW/changeLog.md'
 import jaJPChangeLog from 'langs/jaJP/changeLog.md'
 import enUSChangeLog from 'langs/enUS/changeLog.md'
@@ -68,13 +65,13 @@ export default function ChangeLogModal(props) {
     /**
      * Hooks
      */
-    const [stateModalData, updateModalData] = useState(CommonState.getter.getModalData('changeLog'))
+    const [stateModalData, updateModalData] = useState(States.getter.getModalData('changeLog'))
     const refModal = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateModalData(CommonState.getter.getModalData('changeLog'))
+        const unsubscribe = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('changeLog'))
         })
 
         return () => {
@@ -90,7 +87,7 @@ export default function ChangeLogModal(props) {
             return
         }
 
-        CommonState.setter.hideModal('changeLog')
+        States.setter.hideModal('changeLog')
     }, [])
 
     return Helper.isNotEmpty(stateModalData) ? (
@@ -102,7 +99,7 @@ export default function ChangeLogModal(props) {
                     <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={() => { CommonState.setter.hideModal('changeLog') }} />
+                            onClick={() => { States.setter.hideModal('changeLog') }} />
                     </div>
                 </div>
                 <div className="mhrc-list">

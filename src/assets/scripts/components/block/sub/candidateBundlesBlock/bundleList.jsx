@@ -7,34 +7,33 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
+import Misc from 'libraries/misc'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
 // import CharmDataset from 'libraries/dataset/charm'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
 // import SetDataset from 'libraries/dataset/set'
-import CommonDataset from 'libraries/dataset/common'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
 import IconSwitch from 'components/common/iconSwitch'
 
-// Load State Control
-import CommonState from 'states/common'
+// Load States
+import States from 'states'
 
 /**
  * Handle Functions
  */
 const handleBundlePickUp = (bundle, required) => {
-    let currentEquips = Helper.deepCopy(CommonState.getter.getCurrentEquips())
+    let currentEquips = Helper.deepCopy(States.getter.getCurrentEquips())
     let slotMap = {
         1: [],
         2: [],
@@ -58,21 +57,21 @@ const handleBundlePickUp = (bundle, required) => {
 
         if ('weapon' === equipType) {
             if (Helper.isNotEmpty(required.equips.weapon.customWeapon)) {
-                CommonState.setter.replaceCustomWeapon(required.equips.weapon.customWeapon)
+                States.setter.replaceCustomWeapon(required.equips.weapon.customWeapon)
             }
 
             if (Helper.isNotEmpty(required.equips.weapon.enhances)) {
                 currentEquips.weapon.enhances = required.equips.weapon.enhances // Restore Enhance
             }
 
-            equipInfo = CommonDataset.getAppliedWeaponInfo(currentEquips.weapon)
+            equipInfo = Misc.getAppliedWeaponInfo(currentEquips.weapon)
         } else if ('helm' === equipType
             || 'chest' === equipType
             || 'arm' === equipType
             || 'waist' === equipType
             || 'leg' === equipType
         ) {
-            equipInfo = CommonDataset.getAppliedArmorInfo(currentEquips[equipType])
+            equipInfo = Misc.getAppliedArmorInfo(currentEquips[equipType])
         }
 
         if (Helper.isEmpty(equipInfo)) {
@@ -130,7 +129,7 @@ const handleBundlePickUp = (bundle, required) => {
         })
     }
 
-    CommonState.setter.replaceCurrentEquips(currentEquips)
+    States.setter.replaceCurrentEquips(currentEquips)
 }
 
 export default function BundleList(props) {
@@ -138,18 +137,18 @@ export default function BundleList(props) {
     /**
      * Hooks
      */
-    const [stateComputedResult, updateComputedResult] = useState(CommonState.getter.getComputedResult())
-    const [stateRequiredEquips, updateRequiredEquips] = useState(CommonState.getter.getRequiredEquips())
-    const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(CommonState.getter.getRequiredSkills())
+    const [stateComputedResult, updateComputedResult] = useState(States.getter.getComputedResult())
+    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
+    const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
+    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateComputedResult(CommonState.getter.getComputedResult())
-            updateRequiredEquips(CommonState.getter.getRequiredEquips())
-            updateRequiredSets(CommonState.getter.getRequiredSets())
-            updateRequiredSkills(CommonState.getter.getRequiredSkills())
+        const unsubscribe = States.store.subscribe(() => {
+            updateComputedResult(States.getter.getComputedResult())
+            updateRequiredEquips(States.getter.getRequiredEquips())
+            updateRequiredSets(States.getter.getRequiredSets())
+            updateRequiredSkills(States.getter.getRequiredSkills())
         })
 
         return () => {
@@ -165,7 +164,7 @@ export default function BundleList(props) {
 
         computedResult.list[bundleIndex].jewelPackageIndex = packageIndex
 
-        CommonState.setter.saveComputedResult(computedResult)
+        States.setter.saveComputedResult(computedResult)
     }, [stateComputedResult])
 
     return useMemo(() => {
@@ -400,7 +399,7 @@ export default function BundleList(props) {
                                                     {isNotRequire ? (
                                                         <IconButton
                                                             iconName="arrow-left" altName={_('include')}
-                                                            onClick={() => {CommonState.setter.setRequiredEquips(equip.type, equipInfo)}} />
+                                                            onClick={() => {States.setter.setRequiredEquips(equip.type, equipInfo)}} />
                                                     ) : false}
                                                 </div>
                                             </div>
@@ -427,7 +426,7 @@ export default function BundleList(props) {
                                             {isNotRequire ? (
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
-                                                    onClick={() => {CommonState.setter.setRequiredEquips(equip.type, equipInfo)}} />
+                                                    onClick={() => {States.setter.setRequiredEquips(equip.type, equipInfo)}} />
                                             ) : false}
                                         </div>
                                     </div>
@@ -513,7 +512,7 @@ export default function BundleList(props) {
                                                 <div className="mhrc-icons_bundle">
                                                     <IconButton
                                                         iconName="arrow-left" altName={_('include')}
-                                                        onClick={() => {CommonState.setter.addRequiredSet(setInfo.id)}} />
+                                                        onClick={() => {States.setter.addRequiredSet(setInfo.id)}} />
                                                 </div>
                                             ) : false}
                                         </div>
@@ -539,7 +538,7 @@ export default function BundleList(props) {
                                                 <div className="mhrc-icons_bundle">
                                                     <IconButton
                                                         iconName="arrow-left" altName={_('include')}
-                                                        onClick={() => {CommonState.setter.addRequiredSkill(skillInfo.id)}} />
+                                                        onClick={() => {States.setter.addRequiredSkill(skillInfo.id)}} />
                                                 </div>
                                             ) : false}
                                         </div>

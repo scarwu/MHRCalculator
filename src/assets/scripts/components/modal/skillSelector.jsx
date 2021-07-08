@@ -7,14 +7,13 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { Fragment, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 // import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 
@@ -23,15 +22,14 @@ import IconButton from 'components/common/iconButton'
 import IconSelector from 'components/common/iconSelector'
 import IconInput from 'components/common/iconInput'
 
-// Load State Control
-import CommonState from 'states/common'
-import ModalState from 'states/modal'
+// Load States
+import States from 'states'
 
 /**
  * Handle Functions
  */
 const handleModeChange = (event) => {
-    ModalState.setter.showConditionItemSelector({
+    States.setter.showConditionItemSelector({
         mode: event.target.value
     })
 }
@@ -49,11 +47,11 @@ const renderSetItem = (set) => {
                     {set.isSelect ? (
                         <IconButton
                             iconName="minus" altName={_('remove')}
-                            onClick={() => {CommonState.setter.removeRequiredSet(set.id)}} />
+                            onClick={() => {States.setter.removeRequiredSet(set.id)}} />
                     ) : (
                         <IconButton
                             iconName="plus" altName={_('add')}
-                            onClick={() => {CommonState.setter.addRequiredSet(set.id)}} />
+                            onClick={() => {States.setter.addRequiredSet(set.id)}} />
                     )}
                 </div>
             </div>
@@ -87,11 +85,11 @@ const renderSkillItem = (skill) => {
                     {skill.isSelect ? (
                         <IconButton
                             iconName="minus" altName={_('remove')}
-                            onClick={() => {CommonState.setter.removeRequiredSkill(skill.id)}} />
+                            onClick={() => {States.setter.removeRequiredSkill(skill.id)}} />
                     ) : (
                         <IconButton
                             iconName="plus" altName={_('add')}
-                            onClick={() => {CommonState.setter.addRequiredSkill(skill.id)}} />
+                            onClick={() => {States.setter.addRequiredSkill(skill.id)}} />
                     )}
                 </div>
             </div>
@@ -145,10 +143,10 @@ export default function ConditionItemSelector(props) {
     /**
      * Hooks
      */
-    const [stateIsShow, updateIsShow] = useState(ModalState.getter.isShowConditionItemSelector())
-    const [stateBypassData, updateBypassData] = useState(ModalState.getter.getConditionItemSelectorBypassData())
-    const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(CommonState.getter.getRequiredSkills())
+    const [stateIsShow, updateIsShow] = useState(States.getter.isShowConditionItemSelector())
+    const [stateBypassData, updateBypassData] = useState(States.getter.getConditionItemSelectorBypassData())
+    const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
+    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
     const [stateMode, updateMode] = useState(undefined)
     const [stateSortedList, updateSortedList] = useState([])
     const [stateSegment, updateSegment] = useState(undefined)
@@ -215,14 +213,14 @@ export default function ConditionItemSelector(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeCommon = CommonState.store.subscribe(() => {
-            updateRequiredSets(CommonState.getter.getRequiredSets())
-            updateRequiredSkills(CommonState.getter.getRequiredSkills())
+        const unsubscribeCommon = States.store.subscribe(() => {
+            updateRequiredSets(States.getter.getRequiredSets())
+            updateRequiredSkills(States.getter.getRequiredSkills())
         })
 
-        const unsubscribeModal = ModalState.store.subscribe(() => {
-            updateIsShow(ModalState.getter.isShowConditionItemSelector())
-            updateBypassData(ModalState.getter.getConditionItemSelectorBypassData())
+        const unsubscribeModal = States.store.subscribe(() => {
+            updateIsShow(States.getter.isShowConditionItemSelector())
+            updateBypassData(States.getter.getConditionItemSelectorBypassData())
         })
 
         return () => {
@@ -249,7 +247,7 @@ export default function ConditionItemSelector(props) {
             return
         }
 
-        ModalState.setter.hideConditionItemSelector()
+        States.setter.hideConditionItemSelector()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -337,7 +335,7 @@ export default function ConditionItemSelector(props) {
                             options={getModeList()} onChange={handleModeChange} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={ModalState.setter.hideConditionItemSelector} />
+                            onClick={States.setter.hideConditionItemSelector} />
                     </div>
                 </div>
                 <div className="mhrc-list">

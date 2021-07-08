@@ -7,14 +7,13 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useMemo } from 'react'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import ArmorDataset from 'libraries/dataset/armor'
 // import CharmDataset from 'libraries/dataset/charm'
 import SkillDataset from 'libraries/dataset/skill'
@@ -23,8 +22,8 @@ import SkillDataset from 'libraries/dataset/skill'
 // Load Components
 import IconButton from 'components/common/iconButton'
 
-// Load State Control
-import CommonState from 'states/common'
+// Load States
+import States from 'states'
 
 export default function RequiredConditions(props) {
     const {data} = props
@@ -32,16 +31,16 @@ export default function RequiredConditions(props) {
     /**
      * Hooks
      */
-    const [stateRequiredEquips, updateRequiredEquips] = useState(CommonState.getter.getRequiredEquips())
-    const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(CommonState.getter.getRequiredSkills())
+    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
+    const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
+    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateRequiredEquips(CommonState.getter.getRequiredEquips())
-            updateRequiredSets(CommonState.getter.getRequiredSets())
-            updateRequiredSkills(CommonState.getter.getRequiredSkills())
+        const unsubscribe = States.store.subscribe(() => {
+            updateRequiredEquips(States.getter.getRequiredEquips())
+            updateRequiredSets(States.getter.getRequiredSets())
+            updateRequiredSkills(States.getter.getRequiredSkills())
         })
 
         return () => {
@@ -140,7 +139,7 @@ export default function RequiredConditions(props) {
                                                     {isNotRequire ? (
                                                         <IconButton
                                                             iconName="arrow-left" altName={_('include')}
-                                                            onClick={() => {CommonState.setter.setRequiredEquips(equip.type, equipInfo)}} />
+                                                            onClick={() => {States.setter.setRequiredEquips(equip.type, equipInfo)}} />
                                                     ) : false}
                                                 </div>
                                             </div>
@@ -167,7 +166,7 @@ export default function RequiredConditions(props) {
                                             {isNotRequire ? (
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
-                                                    onClick={() => {CommonState.setter.setRequiredEquips(equip.type, equipInfo)}} />
+                                                    onClick={() => {States.setter.setRequiredEquips(equip.type, equipInfo)}} />
                                             ) : false}
                                         </div>
                                     </div>
@@ -198,7 +197,7 @@ export default function RequiredConditions(props) {
                                             <div className="mhrc-icons_bundle">
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
-                                                    onClick={() => {CommonState.setter.addRequiredSet(setInfo.id)}} />
+                                                    onClick={() => {States.setter.addRequiredSet(setInfo.id)}} />
                                             </div>
                                         ) : false}
                                     </div>
@@ -225,7 +224,7 @@ export default function RequiredConditions(props) {
                                             <div className="mhrc-icons_bundle">
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
-                                                    onClick={() => {CommonState.setter.addRequiredSkill(skillInfo.id)}} />
+                                                    onClick={() => {States.setter.addRequiredSkill(skillInfo.id)}} />
                                             </div>
                                         ) : false}
                                     </div>

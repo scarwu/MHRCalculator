@@ -7,30 +7,29 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { Fragment, useState, useEffect, useCallback } from 'react'
 
-// Load Core Libraries
+// Load Config
+import Config from 'config'
+
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 import Event from 'core/event'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
+import Misc from 'libraries/misc'
 
 // Load Components
-import QuickSetting from 'components/sub/candidateBundles/quickSetting'
-import RequiredConditions from 'components/sub/candidateBundles/requiredConditions'
-import BundleList from 'components/sub/candidateBundles/bundleList'
 import IconButton from 'components/common/iconButton'
 import IconTab from 'components/common/iconTab'
 
-// Load State Control
-import CommonState from 'states/common'
-import ModalState from 'states/modal'
+import QuickSetting from 'components/block/sub/candidateBundlesBlock/quickSetting'
+import RequiredConditions from 'components/block/sub/candidateBundlesBlock/requiredConditions'
+import BundleList from 'components/block/sub/candidateBundlesBlock/bundleList'
 
-// Load Config & Constant
-import Config from 'config'
-import Constant from 'constant'
+// Load States
+import States from 'states'
 
 // Variables
 let workers = {}
@@ -39,13 +38,13 @@ let workers = {}
  * Handle Functions
  */
 const handleShowAllAlgorithmSetting = () => {
-    ModalState.setter.showAlgorithmSetting({
+    States.setter.showModal('algorithmSetting')({
         mode: 'all'
     })
 }
 
-const handleSwitchTempData = (index) => {
-    CommonState.setter.switchTempData('candidateBundles', index)
+const handleSwitchDataStore = (index) => {
+    States.setter.switchDataStore('candidateBundles', index)
 }
 
 const convertTimeFormat = (seconds) => {
@@ -70,20 +69,20 @@ const convertTimeFormat = (seconds) => {
     return text
 }
 
-export default function CandidateBundles(props) {
+export default function CandidateBundlesBlock(props) {
 
     /**
      * Hooks
      */
-    const [stateTempData, updateTempData] = useState(CommonState.getter.getTempData())
-    const [stateComputedResult, updateComputedResult] = useState(CommonState.getter.getComputedResult())
+    const [stateDataStore, updateDataStore] = useState(States.getter.getDataStore())
+    const [stateComputedResult, updateComputedResult] = useState(States.getter.getComputedResult())
     const [stateTasks, updateTasks] = useState({})
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateTempData(CommonState.getter.getTempData())
-            updateComputedResult(CommonState.getter.getComputedResult())
+        const unsubscribe = States.store.subscribe(() => {
+            updateDataStore(States.getter.getDataStore())
+            updateComputedResult(States.getter.getComputedResult())
         })
 
         return () => {
@@ -116,9 +115,9 @@ export default function CandidateBundles(props) {
 
                 break
             case 'result':
-                handleSwitchTempData(tabIndex)
+                handleSwitchDataStore(tabIndex)
 
-                CommonState.setter.saveComputedResult(payload.computedResult)
+                States.setter.saveComputedResult(payload.computedResult)
 
                 // workers[tabIndex].terminate()
                 // workers[tabIndex] = undefined
@@ -140,7 +139,7 @@ export default function CandidateBundles(props) {
 
     // Search Remaining Timer
     useEffect(() => {
-        let tabIndex = stateTempData.candidateBundles.index
+        let tabIndex = stateDataStore.candidateBundles.index
 
         if (Helper.isEmpty(stateTasks[tabIndex])) {
             return
@@ -159,24 +158,24 @@ export default function CandidateBundles(props) {
         return () => {
             clearInterval(timerId)
         }
-    }, [stateTasks, stateTempData])
+    }, [stateTasks, stateDataStore])
 
     /**
      * Handle Functions
      */
     const handleCandidateBundlesSearch = useCallback(() => {
-        let tabIndex = stateTempData.candidateBundles.index
+        let tabIndex = stateDataStore.candidateBundles.index
 
         if (Helper.isNotEmpty(stateTasks[tabIndex])) {
             return
         }
 
         // Get All Data From Store
-        let customWeapon = CommonState.getter.getCustomWeapon()
-        let requiredEquips = CommonState.getter.getRequiredEquips()
-        let requiredSets = CommonState.getter.getRequiredSets()
-        let requiredSkills = CommonState.getter.getRequiredSkills()
-        let algorithmParams = CommonState.getter.getAlgorithmParams()
+        let customWeapon = States.getter.getCustomWeapon()
+        let requiredEquips = States.getter.getRequiredEquips()
+        let requiredSets = States.getter.getRequiredSets()
+        let requiredSkills = States.getter.getRequiredSkills()
+        let algorithmParams = States.getter.getAlgorithmParams()
 
         if (0 === requiredSets.length && 0 === requiredSkills.length) {
             return
@@ -213,10 +212,10 @@ export default function CandidateBundles(props) {
             requiredEquips: requiredEquips,
             algorithmParams: algorithmParams
         })
-    }, [stateTasks, stateTempData])
+    }, [stateTasks, stateDataStore])
 
     const handleCandidateBundlesCancel = useCallback(() => {
-        let tabIndex = stateTempData.candidateBundles.index
+        let tabIndex = stateDataStore.candidateBundles.index
 
         workers[tabIndex].terminate()
         workers[tabIndex] = undefined
@@ -224,9 +223,9 @@ export default function CandidateBundles(props) {
         stateTasks[tabIndex] = undefined
 
         updateTasks(Helper.deepCopy(stateTasks))
-    }, [stateTasks, stateTempData])
+    }, [stateTasks, stateDataStore])
 
-    let tabIndex = stateTempData.candidateBundles.index
+    let tabIndex = stateDataStore.candidateBundles.index
 
     return (
         <div className="col mhrc-bundles">
@@ -238,28 +237,28 @@ export default function CandidateBundles(props) {
                         iconName={Helper.isNotEmpty(stateTasks[0]) ? 'cog fa-spin' : 'circle-o'}
                         altName={_('tab') + ' 1'}
                         isActive={0 === tabIndex}
-                        onClick={() => {handleSwitchTempData(0)}} />
+                        onClick={() => {handleSwitchDataStore(0)}} />
                     <IconTab
                         iconName={Helper.isNotEmpty(stateTasks[1]) ? 'cog fa-spin' : 'circle-o'}
                         altName={_('tab') + ' 2'}
                         isActive={1 === tabIndex}
-                        onClick={() => {handleSwitchTempData(1)}} />
+                        onClick={() => {handleSwitchDataStore(1)}} />
                     <IconTab
                         iconName={Helper.isNotEmpty(stateTasks[2]) ? 'cog fa-spin' : 'circle-o'}
                         altName={_('tab') + ' 3'}
                         isActive={2 === tabIndex}
-                        onClick={() => {handleSwitchTempData(2)}} />
+                        onClick={() => {handleSwitchDataStore(2)}} />
                     <IconTab
                         iconName={Helper.isNotEmpty(stateTasks[3]) ? 'cog fa-spin' : 'circle-o'}
                         altName={_('tab') + ' 4'}
                         isActive={3 === tabIndex}
-                        onClick={() => {handleSwitchTempData(3)}} />
+                        onClick={() => {handleSwitchDataStore(3)}} />
                 </div>
 
                 <div className="mhrc-icons_bundle-right">
                     <IconButton
                         iconName="refresh" altName={_('reset')}
-                        onClick={CommonState.setter.cleanComputedResult} />
+                        onClick={States.setter.cleanComputedResult} />
                     <IconButton
                         iconName="cog" altName={_('setting')}
                         onClick={handleShowAllAlgorithmSetting} />

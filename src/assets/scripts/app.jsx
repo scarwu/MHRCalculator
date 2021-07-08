@@ -7,34 +7,43 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useCallback } from 'react'
-
-// Load Core Libraries
-import Status from 'core/status'
-import Helper from 'core/helper'
-
-// Load Custom Libraries
-import _ from 'libraries/lang'
-
-// Load Components
-import IconButton from 'components/common/iconButton'
-import IconSelector from 'components/common/iconSelector'
-import ConditionOptions from 'components/conditionOptions'
-import CandidateBundles from 'components/candidateBundles'
-import PlayerEquipBlock from 'components/playerEquipBlock'
-import PlayerStatusBlock from 'components/playerStatusBlock'
-
-// Load State Control
-import CommonState from 'states/common'
 
 // Load Config & Constant
 import Config from 'config'
 import Constant from 'constant'
 
+// Load Core
+import _ from 'core/lang'
+import Status from 'core/status'
+import Helper from 'core/helper'
+
+// Load States
+import States from 'states'
+
+// Load Components
+import IconButton from 'components/common/iconButton'
+import IconSelector from 'components/common/iconSelector'
+
+import RequiredConditionsBlock from 'components/block/requiredConditionsBlock'
+import CandidateBundlesBlock from 'components/block/candidateBundlesBlock'
+import PlayerEquipsBlock from 'components/block/playerEquipsBlock'
+import PlayerStatusBlock from 'components/block/playerStatusBlock'
+
+import ChangeLogModal from 'components/modal/changeLog'
+import AlgorithmSettingModal from 'components/modal/algorithmSetting'
+import WeaponSelectorModal from 'components/modal/weaponSelector'
+import ArmorSelectorModal from 'components/modal/armorSelector'
+import SetSelectorModal from 'components/modal/setSelector'
+import PetalaceSelectorModal from 'components/modal/petalaceSelector'
+import JewelSelectorModal from 'components/modal/jewelSelector'
+import EnhanceSelectorModal from 'components/modal/enhanceSelector'
+import SkillSelectorModal from 'components/modal/skillSelector'
+import PlayerEquipSelectorModal from 'components/modal/playerEquipSelector'
+
 if ('production' === Config.env) {
     if (Config.buildTime !== Status.get('sys:buildTime')) {
-        CommonState.setter.showModal('changeLog')
+        States.setter.showModal('changeLog')
     }
 
     Status.set('sys:buildTime', Config.buildTime)
@@ -51,7 +60,7 @@ const langList = Object.keys(Constant.langs).map((lang) => {
  * Handle Functions
  */
 const handleBundleExport = () => {
-    let equips = Helper.deepCopy(CommonState.getter.getCurrentEquips())
+    let equips = Helper.deepCopy(States.getter.getCurrentEquips())
     let hash = Helper.base64Encode(JSON.stringify(equips))
 
     let protocol = window.location.protocol
@@ -77,7 +86,7 @@ export default function App(props) {
 
         // Restore Equips from Url to State
         if (Helper.isNotEmpty(props.match.params.hash)) {
-            CommonState.setter.replaceCurrentEquips(
+            States.setter.replaceCurrentEquips(
                 JSON.parse(Helper.base64Decode(props.match.params.hash))
             )
         }
@@ -107,7 +116,7 @@ export default function App(props) {
                         onClick={handleBundleExport} />
                     <IconButton
                         iconName="info" altName={_('changeLog')}
-                        onClick={() => {CommonState.setter.showModal('changeLog')}} />
+                        onClick={() => {States.setter.showModal('changeLog')}} />
                     <IconButton
                         iconName="question" altName={_('readme')}
                         onClick={handleOpenReadme} />
@@ -119,9 +128,9 @@ export default function App(props) {
             </div>
 
             <div className="row mhrc-container">
-                {/* <ConditionOptions />
-                <CandidateBundles /> */}
-                <PlayerEquipBlock />
+                {/* <RequiredConditionsBlock /> */}
+                {/* <CandidateBundlesBlock /> */}
+                <PlayerEquipsBlock />
                 {/* <PlayerStatusBlock /> */}
             </div>
 
@@ -140,6 +149,17 @@ export default function App(props) {
                     </a>
                 </div>
             </div>
+
+            <ChangeLogModal />
+            {/* <AlgorithmSettingModal /> */}
+            <WeaponSelectorModal />
+            <ArmorSelectorModal />
+            {/* <SetSelectorModal /> */}
+            <PetalaceSelectorModal />
+            <JewelSelectorModal />
+            {/* <EnhanceSelectorModal /> */}
+            {/* <SkillSelectorModal /> */}
+            {/* <PlayerEquipSelectorModal /> */}
         </div>
     )
 }

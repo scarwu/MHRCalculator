@@ -7,14 +7,13 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { Fragment, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
 // import SetDataset from 'libraries/dataset/set'
@@ -24,9 +23,8 @@ import IconButton from 'components/common/iconButton'
 import BasicSelector from 'components/common/basicSelector'
 import BasicInput from 'components/common/basicInput'
 
-// Load State Control
-import CommonState from 'states/common'
-import ModalState from 'states/modal'
+// Load States
+import States from 'states'
 
 const getTypeList = () => {
     return [
@@ -212,7 +210,7 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
             <div key={`${equipType}:${slotIndex}:${slotSize}`} className="mhrc-icons_bundle">
                 <IconButton
                     iconName="plus" altName={_('add')}
-                    onClick={() => {ModalState.setter.showEquipItemSelector(selectorData)}} />
+                    onClick={() => {States.setter.showEquipItemSelector(selectorData)}} />
             </div>
         )
     }
@@ -223,10 +221,10 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
             <div className="mhrc-icons_bundle">
                 <IconButton
                     iconName="exchange" altName={_('change')}
-                    onClick={() => {ModalState.setter.showEquipItemSelector(selectorData)}} />
+                    onClick={() => {States.setter.showEquipItemSelector(selectorData)}} />
                 <IconButton
                     iconName="times" altName={_('clean')}
-                    onClick={() => {CommonState.setter.setCurrentEquip(emptySelectorData)}} />
+                    onClick={() => {States.setter.setCurrentEquip(emptySelectorData)}} />
             </div>
         </Fragment>
     )
@@ -237,16 +235,16 @@ export default function CustomWeapon(props) {
     /**
      * Hooks
      */
-    const [stateCustomWeapon, updateCustomWeapon] = useState(CommonState.getter.getCustomWeapon())
-    const [stateCurrentEquips, updateCurrentEquips] = useState(CommonState.getter.getCurrentEquips())
-    const [stateRequiredEquips, updateRequiredEquips] = useState(CommonState.getter.getRequiredEquips())
+    const [stateCustomWeapon, updateCustomWeapon] = useState(States.getter.getCustomWeapon())
+    const [stateCurrentEquips, updateCurrentEquips] = useState(States.getter.getCurrentEquips())
+    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateCustomWeapon(CommonState.getter.getCustomWeapon())
-            updateCurrentEquips(CommonState.getter.getCurrentEquips())
-            updateRequiredEquips(CommonState.getter.getRequiredEquips())
+        const unsubscribe = States.store.subscribe(() => {
+            updateCustomWeapon(States.getter.getCustomWeapon())
+            updateCurrentEquips(States.getter.getCurrentEquips())
+            updateRequiredEquips(States.getter.getRequiredEquips())
         })
 
         return () => {
@@ -291,14 +289,14 @@ export default function CustomWeapon(props) {
                         {isNotRequire ? (
                             <IconButton
                                 iconName="arrow-left" altName={_('include')}
-                                onClick={() => {CommonState.setter.setRequiredEquips(equipType, stateCustomWeapon)}} />
+                                onClick={() => {States.setter.setRequiredEquips(equipType, stateCustomWeapon)}} />
                         ) : false}
                         <IconButton
                             iconName="exchange" altName={_('change')}
-                            onClick={() => {ModalState.setter.showEquipItemSelector(emptySelectorData)}} />
+                            onClick={() => {States.setter.showEquipItemSelector(emptySelectorData)}} />
                         <IconButton
                             iconName="times" altName={_('clean')}
-                            onClick={() => {CommonState.setter.setCurrentEquip(emptySelectorData)}} />
+                            onClick={() => {States.setter.setCurrentEquip(emptySelectorData)}} />
                     </div>
                 </div>
 
@@ -313,7 +311,7 @@ export default function CustomWeapon(props) {
                                 let value = ('none' !== event.target.value)
                                     ? event.target.value : null
 
-                                CommonState.setter.setCustomWeaponValue('type', value)
+                                States.setter.setCustomWeaponValue('type', value)
                             }} />
                     </div>
 
@@ -326,7 +324,7 @@ export default function CustomWeapon(props) {
                             options={getRareList()} onChange={(event) => {
                                 let value = parseInt(event.target.value)
 
-                                CommonState.setter.setCustomWeaponValue('rare', value)
+                                States.setter.setCustomWeaponValue('rare', value)
                             }} />
                     </div>
 
@@ -340,7 +338,7 @@ export default function CustomWeapon(props) {
                                 let value = ('' !== event.target.value)
                                     ? parseInt(event.target.value) : 0
 
-                                CommonState.setter.setCustomWeaponValue('attack', value)
+                                States.setter.setCustomWeaponValue('attack', value)
                             }} />
                     </div>
 
@@ -355,7 +353,7 @@ export default function CustomWeapon(props) {
                                     let value = ('none' !== event.target.value)
                                         ? event.target.value : null
 
-                                    CommonState.setter.setCustomWeaponSharpness(value)
+                                    States.setter.setCustomWeaponSharpness(value)
                                 }} />
                         ) : false}
                     </div>
@@ -370,7 +368,7 @@ export default function CustomWeapon(props) {
                                 let value = ('' !== event.target.value)
                                     ? parseInt(event.target.value) : 0
 
-                                CommonState.setter.setCustomWeaponValue('criticalRate', value)
+                                States.setter.setCustomWeaponValue('criticalRate', value)
                             }} />
                     </div>
 
@@ -385,7 +383,7 @@ export default function CustomWeapon(props) {
                                     let value = ('none' !== event.target.value)
                                         ? event.target.value : null
 
-                                    CommonState.setter.setCustomWeaponElderseal(value)
+                                    States.setter.setCustomWeaponElderseal(value)
                                 }} />
                         ) : false}
                     </div>
@@ -400,7 +398,7 @@ export default function CustomWeapon(props) {
                                 let value = ('' !== event.target.value)
                                     ? parseInt(event.target.value) : 0
 
-                                CommonState.setter.setCustomWeaponValue('defense', value)
+                                States.setter.setCustomWeaponValue('defense', value)
                             }} />
                     </div>
                 </div>
@@ -416,7 +414,7 @@ export default function CustomWeapon(props) {
                                 let value = ('none' !== event.target.value)
                                     ? event.target.value : null
 
-                                CommonState.setter.setCustomWeaponElementType('attack', value)
+                                States.setter.setCustomWeaponElementType('attack', value)
                             }} />
                     </div>
                     <div className="col-6 mhrc-value">
@@ -427,7 +425,7 @@ export default function CustomWeapon(props) {
                                     let value = ('' !== event.target.value)
                                         ? parseInt(event.target.value) : 0
 
-                                    CommonState.setter.setCustomWeaponElementValue('attack', value)
+                                    States.setter.setCustomWeaponElementValue('attack', value)
                                 }} />
                         ) : false}
                     </div>
@@ -441,7 +439,7 @@ export default function CustomWeapon(props) {
                                 let value = ('none' !== event.target.value)
                                     ? event.target.value : null
 
-                                CommonState.setter.setCustomWeaponElementType('status', value)
+                                States.setter.setCustomWeaponElementType('status', value)
                             }} />
                     </div>
                     <div className="col-6 mhrc-value">
@@ -452,7 +450,7 @@ export default function CustomWeapon(props) {
                                     let value = ('' !== event.target.value)
                                         ? parseInt(event.target.value) : 0
 
-                                    CommonState.setter.setCustomWeaponElementValue('status', value)
+                                    States.setter.setCustomWeaponElementValue('status', value)
                                 }} />
                         ) : false}
                     </div>
@@ -473,7 +471,7 @@ export default function CustomWeapon(props) {
                                             let value = ('none' !== event.target.value)
                                                 ? parseInt(event.target.value) : null
 
-                                            CommonState.setter.setCustomWeaponSlot(index, value)
+                                            States.setter.setCustomWeaponSlot(index, value)
                                         }} />
                                 </div>
                                 <div className="col-6 mhrc-value">
@@ -501,7 +499,7 @@ export default function CustomWeapon(props) {
                                 let value = ('none' !== event.target.value)
                                     ? event.target.value : null
 
-                                CommonState.setter.setCustomWeaponSkill(0, value)
+                                States.setter.setCustomWeaponSkill(0, value)
                             }} />
                     </div>
 
@@ -515,7 +513,7 @@ export default function CustomWeapon(props) {
                                 let value = ('none' !== event.target.value)
                                     ? event.target.value : null
 
-                                CommonState.setter.setCustomWeaponSet(value)
+                                States.setter.setCustomWeaponSet(value)
                             }} />
                     </div> */}
                 </div>

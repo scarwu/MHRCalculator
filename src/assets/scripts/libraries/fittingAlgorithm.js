@@ -7,22 +7,21 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
-import MD5 from 'md5'
+import md5 from 'md5'
+
+// Load Constant
+import Constant from 'constant'
 
 // Load Core
 import Helper from 'core/helper'
 
-// Load Custom Libraries
+// Load Libraries
+import Misc from 'libraries/misc'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
 // import SetDataset from 'libraries/dataset/set'
 import JewelDataset from 'libraries/dataset/jewel'
 // import CharmDataset from 'libraries/dataset/charm'
-import CommonDataset from 'libraries/dataset/common'
-
-// Load Constant
-import Constant from 'constant'
 
 class FittingAlgorithm {
 
@@ -137,7 +136,7 @@ class FittingAlgorithm {
             equipMapping[equipType] = bundle.equipIdMapping[equipType]
         })
 
-        return MD5(JSON.stringify(equipMapping))
+        return md5(JSON.stringify(equipMapping))
     }
 
     /**
@@ -154,7 +153,7 @@ class FittingAlgorithm {
             jewelMapping[jewelId] = bundle.jewelMapping[jewelId]
         })
 
-        return MD5(JSON.stringify(jewelMapping))
+        return md5(JSON.stringify(jewelMapping))
     }
 
     /**
@@ -371,16 +370,16 @@ class FittingAlgorithm {
                     Helper.log('FA: Input: Custom Weapon', customWeapon)
                 }
 
-                equipInfo = CommonDataset.getAppliedWeaponInfo(requiredEquips.weapon)
+                equipInfo = Misc.getAppliedWeaponInfo(requiredEquips.weapon)
             } else if ('helm' === equipType
                 || 'chest' === equipType
                 || 'arm' === equipType
                 || 'waist' === equipType
                 || 'leg' === equipType
             ) {
-                equipInfo = CommonDataset.getAppliedArmorInfo(requiredEquips[equipType])
+                equipInfo = Misc.getAppliedArmorInfo(requiredEquips[equipType])
             } else if ('charm' === equipType) {
-                equipInfo = CommonDataset.getAppliedCharmInfo(requiredEquips.charm)
+                equipInfo = Misc.getAppliedCharmInfo(requiredEquips.charm)
             }
 
             // Check Equip Info

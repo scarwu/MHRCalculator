@@ -7,28 +7,21 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useMemo } from 'react'
 
-// Load Core Libraries
-import Status from 'core/status'
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
 
 // Load Components
 import BasicSelector from 'components/common/basicSelector'
 
-// Load State Control
-import CommonState from 'states/common'
-
-/**
- * Variables
- */
-const jewelSizeList = [ 1, 2, 3, 4 ]
+// Load States
+import States from 'states'
 
 export default function JewelFactors(props) {
     const {segment, byRequiredConditions} = props
@@ -36,14 +29,14 @@ export default function JewelFactors(props) {
     /**
      * Hooks
      */
-    const [stateAlgorithmParams, updateAlgorithmParams] = useState(CommonState.getter.getAlgorithmParams())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(CommonState.getter.getRequiredSkills())
+    const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
+    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateAlgorithmParams(CommonState.getter.getAlgorithmParams())
-            updateRequiredSkills(CommonState.getter.getRequiredSkills())
+        const unsubscribe = States.store.subscribe(() => {
+            updateAlgorithmParams(States.getter.getAlgorithmParams())
+            updateRequiredSkills(States.getter.getRequiredSkills())
         })
 
         return () => {
@@ -173,7 +166,7 @@ export default function JewelFactors(props) {
                                                 iconName="sort-numeric-asc"
                                                 defaultValue={selectLevel}
                                                 options={levelList} onChange={(event) => {
-                                                    CommonState.setter.setAlgorithmParamsUsingFactor('jewel', jewelId, parseInt(event.target.value))
+                                                    States.setter.setAlgorithmParamsUsingFactor('jewel', jewelId, parseInt(event.target.value))
                                                 }} />
                                         </div>
                                     </div>

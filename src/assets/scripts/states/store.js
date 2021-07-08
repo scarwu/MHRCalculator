@@ -7,26 +7,22 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import { createStore, applyMiddleware } from 'redux'
-
-// Load Core Libraries
-import Status from 'core/status'
-import Helper from 'core/helper'
-
-// Load Custom Libraries
-// import SetDataset from 'libraries/dataset/set'
-import SkillDataset from 'libraries/dataset/skill'
 
 // Load Constant
 import Constant from 'constant'
 
-// Load Json
-// import TestData from 'files/json/testData.json'
+// Load Core
+import Status from 'core/status'
+import Helper from 'core/helper'
+
+// Load Libraries
+// import SetDataset from 'libraries/dataset/set'
+import SkillDataset from 'libraries/dataset/skill'
 
 const statusMapping = {
     modalHub: 'state:modalHub',
-    tempData: 'state:tempData',
+    dataStore: 'state:dataStore',
     // requiredEquip: 'state:requiredEquip',
     // requiredSets:  'state:requiredSets',
     // requiredSkills: 'state:requiredSkills',
@@ -64,29 +60,25 @@ const diffLogger = store => next => action => {
 // Initial State
 const initialState = {
     modalHub: Status.get(statusMapping.modalHub) || {},
-    tempData: Status.get(statusMapping.tempData) || {
-        // conditionOptions: {
-        //     index: 0,
-        //     list: []
-        // },
-        // candidateBundles: {
-        //     index: 0,
-        //     list: []
-        // },
+    dataStore: Status.get(statusMapping.dataStore) || {
+        requiredConditions: {
+            index: 0,
+            list: []
+        },
         playerEquips: {
             index: 0,
             list: []
         }
     },
+    requiredConditions: Status.get(statusMapping.requiredConditions) || Helper.deepCopy(Constant.defaultRequiredConditions),
+    playerEquips: Status.get(statusMapping.playerEquips) || Helper.deepCopy(Constant.defaultPlayerEquips),
 
     // requiredEquips: Status.get(statusMapping.requiredEquips) || {},
     // requiredSets: Status.get(statusMapping.requiredSets) || [],
     // requiredSkills: Status.get(statusMapping.requiredSkills) || [],
 
-    requiredConditions: Status.get(statusMapping.requiredConditions) || Helper.deepCopy(Constant.defaultRequiredConditions),
     // algorithmParams: Status.get(statusMapping.algorithmParams) || Helper.deepCopy(Constant.defaultAlgorithmParams),
     // computedResult: Status.get(statusMapping.computedResult) || null,
-    playerEquips: Status.get(statusMapping.playerEquips) || Helper.deepCopy(Constant.defaultPlayerEquips),
     // reservedPlayerEquip: Status.get(statusMapping.reservedPlayerEquip) || []
 }
 
@@ -118,96 +110,34 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
-        // Temp Data
-        case 'SWITCH_TEMP_DATA':
+        // Data Store
+        case 'SWITCH_DATA_STORE':
             return (() => {
+                let dataStore = Helper.deepCopy(state.dataStore)
                 let target = action.payload.target
                 let index = action.payload.index
-                let tempData = Helper.deepCopy(state.tempData)
-                let bundle = undefined
 
-                if (Helper.isEmpty(tempData[target])) {
-                    tempData[target] = {
+                if (Helper.isEmpty(dataStore[target])) {
+                    dataStore[target] = {
                         index: 0,
                         list: []
                     }
                 }
 
-                if (index === tempData[target].index) {
+                if (index === dataStore[target].index) {
                     return state
                 }
 
-                switch (target) {
-                    // case 'conditionOptions':
-                    //     if (Helper.isEmpty(tempData[target].list[index])) {
-                    //         tempData[target].list[index] = {
-                    //             requiredEquip: {
-                    //                 weapon: null,
-                    //                 helm: null,
-                    //                 chest: null,
-                    //                 arm: null,
-                    //                 waist: null,
-                    //                 leg: null,
-                    //                 petalace: null,
-                    //                 charm: null
-                    //             },
-                    //             // requiredSets: [],
-                    //             requiredSkills: []
-                    //         }
-                    //     }
+                let newData = Helper.deepCopy(state.playerEquips)
+                let oldData = Helper.deepCopy(dataStore[target].list[index])
 
-                    //     bundle = Helper.deepCopy(tempData[target].list[index])
+                dataStore[target].list[dataStore[target].index] = newData
+                dataStore[target].index = index
 
-                    //     tempData[target].list[tempData[target].index] = Helper.deepCopy({
-                    //         requiredEquip: state.requiredEquip,
-                    //         // requiredSets: state.requiredSets,
-                    //         requiredSkills: state.requiredSkills
-                    //     })
-                    //     tempData[target].index = index
-
-                    //     return Object.assign({}, state, {
-                    //         tempData: tempData,
-                    //         requiredEquip: bundle.requiredEquip,
-                    //         // requiredSets: bundle.requiredSets,
-                    //         requiredSkills: bundle.requiredSkills
-                    //     })
-                    // case 'candidateBundles':
-                    //     if (Helper.isEmpty(tempData[target].list[index])) {
-                    //         tempData[target].list[index] = {
-                    //             computedResult: null
-                    //         }
-                    //     }
-
-                    //     bundle = Helper.deepCopy(tempData[target].list[index])
-
-                    //     tempData[target].list[tempData[target].index] = Helper.deepCopy({
-                    //         computedResult: state.computedResult
-                    //     })
-                    //     tempData[target].index = index
-
-                    //     return Object.assign({}, state, {
-                    //         tempData: tempData,
-                    //         computedResult: bundle.computedResult
-                    //     })
-                    case 'playerEquips':
-                        if (Helper.isEmpty(tempData[target].list[index])) {
-                            tempData[target].list[index] = {
-                                playerEquips: {}
-                            }
-                        }
-
-                        bundle = Helper.deepCopy(tempData[target].list[index])
-
-                        tempData[target].list[tempData[target].index] = Helper.deepCopy({
-                            playerEquips: state.playerEquips
-                        })
-                        tempData[target].index = index
-
-                        return Object.assign({}, state, {
-                            tempData: tempData,
-                            playerEquips: bundle.playerEquips
-                        })
-                }
+                return Object.assign({}, state, {
+                    dataStore: dataStore,
+                    playerEquips: oldData
+                })
             })()
 
         // Player Equips

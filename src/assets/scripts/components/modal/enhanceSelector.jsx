@@ -7,14 +7,16 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { Fragment, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-// Load Core Libraries
+// Load Constant
+import Constant from 'constant'
+
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
 import PetalaceDataset from 'libraries/dataset/petalace'
@@ -28,12 +30,8 @@ import IconSelector from 'components/common/iconSelector'
 import IconInput from 'components/common/iconInput'
 import SharpnessBar from 'components/common/sharpnessBar'
 
-// Load State Control
-import CommonState from 'states/common'
-import ModalState from 'states/modal'
-
-// Load Constant
-import Constant from 'constant'
+// Load States
+import States from 'states'
 
 /**
  * Handle Functions
@@ -47,8 +45,8 @@ const handleItemPickUp = (bypassData, itemId) => {
         bypassData.equipId = itemId
     }
 
-    CommonState.setter.setCurrentEquip(bypassData)
-    ModalState.setter.hideEquipItemSelector()
+    States.setter.setCurrentEquip(bypassData)
+    States.setter.hideEquipItemSelector()
 }
 
 /**
@@ -367,8 +365,8 @@ export default function EquipItemSelector(props) {
     /**
      * Hooks
      */
-    const [stateIsShow, updateIsShow] = useState(ModalState.getter.isShowEquipItemSelector())
-    const [stateBypassData, updateBypassData] = useState(ModalState.getter.getEquipItemSelectorBypassData())
+    const [stateIsShow, updateIsShow] = useState(States.getter.isShowEquipItemSelector())
+    const [stateBypassData, updateBypassData] = useState(States.getter.getEquipItemSelectorBypassData())
     const [stateMode, updateMode] = useState(undefined)
     const [stateSortedList, updateSortedList] = useState([])
     const [stateType, updateType] = useState(undefined)
@@ -479,9 +477,9 @@ export default function EquipItemSelector(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeModel = ModalState.store.subscribe(() => {
-            updateIsShow(ModalState.getter.isShowEquipItemSelector())
-            updateBypassData(ModalState.getter.getEquipItemSelectorBypassData())
+        const unsubscribeModel = States.store.subscribe(() => {
+            updateIsShow(States.getter.isShowEquipItemSelector())
+            updateBypassData(States.getter.getEquipItemSelectorBypassData())
         })
 
         return () => {
@@ -497,7 +495,7 @@ export default function EquipItemSelector(props) {
             return
         }
 
-        ModalState.setter.hideEquipItemSelector()
+        States.setter.hideEquipItemSelector()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -727,7 +725,7 @@ export default function EquipItemSelector(props) {
 
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={ModalState.setter.hideEquipItemSelector} />
+                            onClick={States.setter.hideEquipItemSelector} />
                     </div>
                 </div>
                 <div className="mhrc-list">

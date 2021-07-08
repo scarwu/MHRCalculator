@@ -7,14 +7,16 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { Fragment, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-// Load Core Libraries
+// Load Constant
+import Constant from 'constant'
+
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import ArmorDataset from 'libraries/dataset/armor'
 import SkillDataset from 'libraries/dataset/skill'
 
@@ -23,25 +25,22 @@ import IconButton from 'components/common/iconButton'
 import IconSelector from 'components/common/iconSelector'
 import IconInput from 'components/common/iconInput'
 
-// Load State Control
-import CommonState from 'states/common'
-
-// Load Constant
-import Constant from 'constant'
+// Load States
+import States from 'states'
 
 /**
  * Handle Functions
  */
 const handleItemPickUp = (itemId, modalData) => {
     if ('playerEquips' === modalData.target) {
-        CommonState.setter.setPlayerEquip(modalData.equipType, itemId)
+        States.setter.setPlayerEquip(modalData.equipType, itemId)
     }
 
     if ('requiredConditions' === modalData.target) {
-        CommonState.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
+        States.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
     }
 
-    CommonState.setter.hideModal('armorSelector')
+    States.setter.hideModal('armorSelector')
 }
 
 /**
@@ -57,7 +56,9 @@ const renderArmorItem = (armorItem, modalData) => {
                     {(armorItem.id !== modalData.equipId) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
-                            onClick={() => { handleItemPickUp(armorItem.id, modalData) }} />
+                            onClick={() => {
+                                handleItemPickUp(armorItem.id, modalData)
+                            }} />
                     ) : false}
                 </div>
             </div>
@@ -124,7 +125,7 @@ export default function ArmorSelectorModal(props) {
     /**
      * Hooks
      */
-    const [stateModalData, updateModalData] = useState(CommonState.getter.getModalData('armorSelector'))
+    const [stateModalData, updateModalData] = useState(States.getter.getModalData('armorSelector'))
     const [stateSortedList, updateSortedList] = useState([])
     const [stateType, updateType] = useState(undefined)
     const [stateRare, updateRare] = useState(undefined)
@@ -169,8 +170,8 @@ export default function ArmorSelectorModal(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeModel = CommonState.store.subscribe(() => {
-            updateModalData(CommonState.getter.getModalData('armorSelector'))
+        const unsubscribeModel = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('armorSelector'))
         })
 
         return () => {
@@ -186,7 +187,7 @@ export default function ArmorSelectorModal(props) {
             return
         }
 
-        CommonState.setter.hideModal('armorSelector')
+        States.setter.hideModal('armorSelector')
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -275,7 +276,7 @@ export default function ArmorSelectorModal(props) {
                             options={stateRareList} onChange={handleRareChange} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={() => { CommonState.setter.hideModal('armorSelector') }} />
+                            onClick={() => { States.setter.hideModal('armorSelector') }} />
                     </div>
                 </div>
                 <div className="mhrc-list">

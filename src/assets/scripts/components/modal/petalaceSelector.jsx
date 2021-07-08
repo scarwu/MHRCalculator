@@ -7,36 +7,35 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { Fragment, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import PetalaceDataset from 'libraries/dataset/petalace'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
 import IconInput from 'components/common/iconInput'
 
-// Load State Control
-import CommonState from 'states/common'
+// Load States
+import States from 'states'
 
 /**
  * Handle Functions
  */
 const handleItemPickUp = (itemId, modalData) => {
     if ('playerEquips' === modalData.target) {
-        CommonState.setter.setPlayerEquip(modalData.equipType, itemId)
+        States.setter.setPlayerEquip(modalData.equipType, itemId)
     }
 
     if ('requiredConditions' === modalData.target) {
-        CommonState.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
+        States.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
     }
 
-    CommonState.setter.hideModal('petalaceSelector')
+    States.setter.hideModal('petalaceSelector')
 }
 
 /**
@@ -52,7 +51,9 @@ const renderPetalaceItem = (petalaceItem, modalData) => {
                     {(petalaceItem.id !== modalData.equipId) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
-                            onClick={() => { handleItemPickUp(petalaceItem.id, modalData) }} />
+                            onClick={() => {
+                                handleItemPickUp(petalaceItem.id, modalData)
+                            }} />
                     ) : false}
                 </div>
             </div>
@@ -115,7 +116,7 @@ export default function PetalaceSelectorModal(props) {
     /**
      * Hooks
      */
-    const [stateModalData, updateModalData] = useState(CommonState.getter.getModalData('petalaceSelector'))
+    const [stateModalData, updateModalData] = useState(States.getter.getModalData('petalaceSelector'))
     const [stateSortedList, updateSortedList] = useState([])
     const [stateSegment, updateSegment] = useState(undefined)
     const refModal = useRef()
@@ -132,8 +133,8 @@ export default function PetalaceSelectorModal(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeModel = CommonState.store.subscribe(() => {
-            updateModalData(CommonState.getter.getModalData('petalaceSelector'))
+        const unsubscribeModel = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('petalaceSelector'))
         })
 
         return () => {
@@ -149,7 +150,7 @@ export default function PetalaceSelectorModal(props) {
             return
         }
 
-        CommonState.setter.hideModal('petalaceSelector')
+        States.setter.hideModal('petalaceSelector')
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -204,7 +205,7 @@ export default function PetalaceSelectorModal(props) {
                             defaultValue={stateSegment} onChange={handleSegmentInput} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={() => { CommonState.setter.hideModal('petalaceSelector') }} />
+                            onClick={() => { States.setter.hideModal('petalaceSelector') }} />
                     </div>
                 </div>
                 <div className="mhrc-list">

@@ -7,29 +7,27 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useMemo } from 'react'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 // import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
 
-// Load State Control
-import CommonState from 'states/common'
-import ModalState from 'states/modal'
+// Load States
+import States from 'states'
 
 /**
  * Handle Functions
  */
 const handleShowSkillItemSelector = () => {
-    ModalState.setter.showConditionItemSelector({
+    States.setter.showConditionItemSelector({
         mode: 'skill'
     })
 }
@@ -67,13 +65,13 @@ const renderSkillItem = (skill, enableSkillIdList) => {
                 <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="minus-circle" altName={_('down')}
-                        onClick={() => {CommonState.setter.decreaseRequiredSkillLevel(skill.id)}} />
+                        onClick={() => {States.setter.decreaseRequiredSkillLevel(skill.id)}} />
                     <IconButton
                         iconName="plus-circle" altName={_('up')}
-                        onClick={() => {CommonState.setter.increaseRequiredSkillLevel(skill.id)}} />
+                        onClick={() => {States.setter.increaseRequiredSkillLevel(skill.id)}} />
                     <IconButton
                         iconName="times" altName={_('clean')}
-                        onClick={() => {CommonState.setter.removeRequiredSkill(skill.id)}} />
+                        onClick={() => {States.setter.removeRequiredSkill(skill.id)}} />
                 </div>
             </div>
             <div className="col-12 mhrc-value mhrc-description">
@@ -92,14 +90,14 @@ export default function SkillList(props) {
     /**
      * Hooks
      */
-    // const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(CommonState.getter.getRequiredSkills())
+    // const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
+    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateRequiredSets(CommonState.getter.getRequiredSets())
-            updateRequiredSkills(CommonState.getter.getRequiredSkills())
+        const unsubscribe = States.store.subscribe(() => {
+            updateRequiredSets(States.getter.getRequiredSets())
+            updateRequiredSkills(States.getter.getRequiredSkills())
         })
 
         return () => {

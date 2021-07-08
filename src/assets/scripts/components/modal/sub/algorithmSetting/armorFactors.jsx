@@ -7,27 +7,20 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useMemo } from 'react'
 
-// Load Core Libraries
-import Status from 'core/status'
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import ArmorDataset from 'libraries/dataset/armor'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
 
-// Load State Control
-import CommonState from 'states/common'
-
-/**
- * Variables
- */
-const armorRareList = [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+// Load States
+import States from 'states'
 
 export default function ArmorFactors(props) {
     const {segment, byRequiredConditions} = props
@@ -35,18 +28,18 @@ export default function ArmorFactors(props) {
     /**
      * Hooks
      */
-    const [stateAlgorithmParams, updateAlgorithmParams] = useState(CommonState.getter.getAlgorithmParams())
-    const [stateRequiredEquips, updateRequiredEquips] = useState(CommonState.getter.getRequiredEquips())
-    const [stateRequiredSets, updateRequiredSets] = useState(CommonState.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(CommonState.getter.getRequiredSkills())
+    const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
+    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
+    const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
+    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateAlgorithmParams(CommonState.getter.getAlgorithmParams())
-            updateRequiredEquips(CommonState.getter.getRequiredEquips())
-            updateRequiredSets(CommonState.getter.getRequiredSets())
-            updateRequiredSkills(CommonState.getter.getRequiredSkills())
+        const unsubscribe = States.store.subscribe(() => {
+            updateAlgorithmParams(States.getter.getAlgorithmParams())
+            updateRequiredEquips(States.getter.getRequiredEquips())
+            updateRequiredSets(States.getter.getRequiredSets())
+            updateRequiredSkills(States.getter.getRequiredSkills())
         })
 
         return () => {
@@ -212,12 +205,12 @@ export default function ArmorFactors(props) {
                                                 <IconButton
                                                     iconName="star"
                                                     altName={_('exclude')}
-                                                    onClick={() => {CommonState.setter.setAlgorithmParamsUsingFactor('armor', seriesId, false)}} />
+                                                    onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', seriesId, false)}} />
                                             ) : (
                                                 <IconButton
                                                     iconName="star-o"
                                                     altName={_('include')}
-                                                    onClick={() => {CommonState.setter.setAlgorithmParamsUsingFactor('armor', seriesId, true)}} />
+                                                    onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', seriesId, true)}} />
                                             )}
                                         </div>
                                     </div>

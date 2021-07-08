@@ -7,12 +7,12 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Core Libraries
-import Status from 'core/status'
-import Helper from 'core/helper'
-
 // Load Constant
 import Constant from 'constant'
+
+// Load Core
+import Status from 'core/status'
+import Helper from 'core/helper'
 
 // Load Langs
 import zhTWUI from 'langs/zhTW/ui.json'

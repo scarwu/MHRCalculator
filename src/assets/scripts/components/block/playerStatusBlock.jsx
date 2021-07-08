@@ -7,29 +7,28 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { Fragment, useState, useEffect, useCallback, useRef } from 'react'
 
-// Load Core Libraries
+// Load Constant
+import Constant from 'constant'
+
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
+import Misc from 'libraries/misc'
 // import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 import WeaponDataset from 'libraries/dataset/weapon'
-import CommonDataset from 'libraries/dataset/common'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
 import BasicInput from 'components/common/basicInput'
 import SharpnessBar from 'components/common/sharpnessBar'
 
-// Load State Control
-import CommonState from 'states/common'
-
-// Load Constant
-import Constant from 'constant'
+// Load States
+import States from 'states'
 
 /**
  * Generate Functions
@@ -41,7 +40,7 @@ const generateEquipInfos = (equips) => {
         && 'customWeapon' === equips.weapon.id
     ) {
         let isCompleted = true
-        let customWeapon = CommonState.getter.getCustomWeapon()
+        let customWeapon = States.getter.getCustomWeapon()
 
         if (Helper.isEmpty(customWeapon.type)
             || Helper.isEmpty(customWeapon.rare)
@@ -68,13 +67,13 @@ const generateEquipInfos = (equips) => {
             ? Helper.deepCopy(customWeapon) : undefined)
     }
 
-    equipInfos.weapon = CommonDataset.getAppliedWeaponInfo(equips.weapon)
+    equipInfos.weapon = Misc.getAppliedWeaponInfo(equips.weapon)
 
     for (let equipType of ['helm', 'chest', 'arm', 'waist', 'leg']) {
-        equipInfos[equipType] = CommonDataset.getAppliedArmorInfo(equips[equipType])
+        equipInfos[equipType] = Misc.getAppliedArmorInfo(equips[equipType])
     }
 
-    // equipInfos.charm = CommonDataset.getAppliedCharmInfo(equips.charm)
+    // equipInfos.charm = Misc.getAppliedCharmInfo(equips.charm)
 
     return equipInfos
 }
@@ -608,8 +607,8 @@ export default function PlayerStatusBlock(props) {
     /**
      * Hooks
      */
-    const [stateCustomWeapon, updateCustomWeapon] = useState(CommonState.getter.getCustomWeapon())
-    const [stateCurrentEquips, updateCurrentEquips] = useState(CommonState.getter.getCurrentEquips())
+    const [stateCustomWeapon, updateCustomWeapon] = useState(States.getter.getCustomWeapon())
+    const [stateCurrentEquips, updateCurrentEquips] = useState(States.getter.getCurrentEquips())
     const [stateEquipInfos, updateEquipInfos] = useState({})
     const [stateStatus, updateStatus] = useState(Helper.deepCopy(Constant.defaultPlayerStatus))
     const [stateBenefitAnalysis, updateBenefitAnalysis] = useState(Helper.deepCopy(Constant.default.benefitAnalysis))
@@ -640,9 +639,9 @@ export default function PlayerStatusBlock(props) {
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribe = CommonState.store.subscribe(() => {
-            updateCustomWeapon(CommonState.getter.getCustomWeapon())
-            updateCurrentEquips(CommonState.getter.getCurrentEquips())
+        const unsubscribe = States.store.subscribe(() => {
+            updateCustomWeapon(States.getter.getCustomWeapon())
+            updateCurrentEquips(States.getter.getCurrentEquips())
         })
 
         return () => {

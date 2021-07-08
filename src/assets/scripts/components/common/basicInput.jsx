@@ -7,10 +7,9 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useMemo } from 'react'
 
-// Load Core Libraries
+// Load Core
 import Helper from 'core/helper'
 
 export default function BasicInput(props) {

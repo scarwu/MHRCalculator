@@ -7,11 +7,11 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import Store from './store'
+import store from './store'
 
 // Modal Hub
 export const showModal = (target, bypassData = null) => {
-    Store.dispatch({
+    store.dispatch({
         type: 'SHOW_MODAL',
         payload: {
             target: target,
@@ -21,7 +21,7 @@ export const showModal = (target, bypassData = null) => {
 }
 
 export const hideModal = (target) => {
-    Store.dispatch({
+    store.dispatch({
         type: 'HIDE_MODAL',
         payload: {
             target: target
@@ -29,10 +29,10 @@ export const hideModal = (target) => {
     })
 }
 
-// Temp Data
-export const switchTempData = (target, index) => {
-    Store.dispatch({
-        type: 'SWITCH_TEMP_DATA',
+// Data Store
+export const switchDataStore = (target, index) => {
+    store.dispatch({
+        type: 'SWITCH_DATA_STORE',
         payload: {
             target: target,
             index: index
@@ -42,13 +42,13 @@ export const switchTempData = (target, index) => {
 
 // Player Equips
 export const cleanPlayerEquips = () => {
-    Store.dispatch({
+    store.dispatch({
         type: 'CLEAN_PLAYER_EQUIP'
     })
 }
 
 export const setPlayerEquip = (equipType, equipId) => {
-    Store.dispatch({
+    store.dispatch({
         type: 'SET_PLAYER_EQUIP',
         payload: {
             equipType: equipType,
@@ -58,7 +58,7 @@ export const setPlayerEquip = (equipType, equipId) => {
 }
 
 export const setPlayerEquipJewel = (equipType, idIndex, jewelId) => {
-    Store.dispatch({
+    store.dispatch({
         type: 'SET_PLAYER_EQUIP_JEWEL',
         payload: {
             equipType: equipType,
@@ -69,7 +69,7 @@ export const setPlayerEquipJewel = (equipType, idIndex, jewelId) => {
 }
 
 export const setPlayerEquipEnhance = (equipType, idIndex, enhanceId) => {
-    Store.dispatch({
+    store.dispatch({
         type: 'SET_PLAYER_EQUIP_ENHANCE',
         payload: {
             equipType: equipType,
@@ -81,13 +81,13 @@ export const setPlayerEquipEnhance = (equipType, idIndex, enhanceId) => {
 
 // Required Conditions
 export const cleanRequiredConditions = () => {
-    Store.dispatch({
+    store.dispatch({
         type: 'CLEAN_REQUIRED_CONDITIONS'
     })
 }
 
 export const setRequiredConditionsEquip = (equipType, equipId) => {
-    Store.dispatch({
+    store.dispatch({
         type: 'SET_REQUIRED_CONDITIONS_EQUIP',
         payload: {
             equipType: equipType,
@@ -97,7 +97,7 @@ export const setRequiredConditionsEquip = (equipType, equipId) => {
 }
 
 export const setRequiredConditionsEquipJewel = (equipType, jewelId, idIndex) => {
-    Store.dispatch({
+    store.dispatch({
         type: 'SET_REQUIRED_CONDITIONS_EQUIP_JEWEL',
         payload: {
             equipType: equipType,
@@ -127,7 +127,7 @@ export default {
     showModal,
     hideModal,
 
-    switchTempData,
+    switchDataStore,
 
     cleanPlayerEquips,
     setPlayerEquip,
@@ -145,7 +145,7 @@ export default {
 
     // Required Sets
     addRequiredSet: (setId) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'ADD_REQUIRED_SET',
             payload: {
                 setId: setId
@@ -153,7 +153,7 @@ export default {
         })
     },
     removeRequiredSet: (setId) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'REMOVE_REQUIRED_SET',
             payload: {
                 setId: setId
@@ -161,7 +161,7 @@ export default {
         })
     },
     increaseRequiredSetStep: (setId) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'INCREASE_REQUIRED_SET_STEP',
             payload: {
                 setId: setId
@@ -169,7 +169,7 @@ export default {
         })
     },
     decreaseRequiredSetStep: (setId) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'DECREASE_REQUIRED_SET_STEP',
             payload: {
                 setId: setId
@@ -177,14 +177,14 @@ export default {
         })
     },
     cleanRequiredSets: () => {
-        Store.dispatch({
+        store.dispatch({
             type: 'CLEAN_REQUIRED_SETS'
         })
     },
 
     // Required Skills
     addRequiredSkill: (skillId) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'ADD_REQUIRED_SKILL',
             payload: {
                 skillId: skillId
@@ -192,7 +192,7 @@ export default {
         })
     },
     removeRequiredSkill: (skillId) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'REMOVE_REQUIRED_SKILL',
             payload: {
                 skillId: skillId
@@ -200,7 +200,7 @@ export default {
         })
     },
     increaseRequiredSkillLevel: (skillId) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'INCREASE_REQUIRED_SKILL_LEVEL',
             payload: {
                 skillId: skillId
@@ -208,7 +208,7 @@ export default {
         })
     },
     decreaseRequiredSkillLevel: (skillId) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'DECREASE_REQUIRED_SKILL_LEVEL',
             payload: {
                 skillId: skillId
@@ -216,14 +216,14 @@ export default {
         })
     },
     cleanRequiredSkills: () => {
-        Store.dispatch({
+        store.dispatch({
             type: 'CLEAN_REQUIRED_SKILLS'
         })
     },
 
     // Required Equips
     setRequiredEquips: (equipType, currentEquip) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_REQUIRED_EQUIPS',
             payload: {
                 equipType: equipType,
@@ -232,14 +232,14 @@ export default {
         })
     },
     cleanRequiredEquips: () => {
-        Store.dispatch({
+        store.dispatch({
             type: 'CLEAN_REQUIRED_EQUIPS'
         })
     },
 
     // CurrentEquips
     setCurrentEquip: (data) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CURRENT_EQUIP',
             payload: {
                 data: data
@@ -247,7 +247,7 @@ export default {
         })
     },
     replaceCurrentEquips: (data) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'REPLACE_CURRENT_EQUIPS',
             payload: {
                 data: data
@@ -255,14 +255,14 @@ export default {
         })
     },
     cleanCurrentEquips: () => {
-        Store.dispatch({
+        store.dispatch({
             type: 'CLEAN_CURRENT_EQUIPS'
         })
     },
 
     // Algorithm Params
     setAlgorithmParamsLimit: (limit) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_ALGORITHM_PARAMS_LIMIT',
             payload: {
                 limit: limit
@@ -270,7 +270,7 @@ export default {
         })
     },
     setAlgorithmParamsSort: (sort) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_ALGORITHM_PARAMS_SORT',
             payload: {
                 sort: sort
@@ -278,7 +278,7 @@ export default {
         })
     },
     setAlgorithmParamsOrder: (order) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_ALGORITHM_PARAMS_ORDER',
             payload: {
                 order: order
@@ -286,7 +286,7 @@ export default {
         })
     },
     toggleAlgorithmParamsFlag: (target) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'TOGGLE_ALGORITHM_PARAMS_FLAG',
             payload: {
                 target: target
@@ -294,7 +294,7 @@ export default {
         })
     },
     setAlgorithmParamsUsingFactor: (target, flag, value) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_ALGORITHM_PARAMS_USING_FACTOR',
             payload: {
                 target: target,
@@ -306,7 +306,7 @@ export default {
 
     // Computed Result
     saveComputedResult: (data) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'UPDATE_COMPUTED_RESULT',
             payload: {
                 data: data
@@ -314,7 +314,7 @@ export default {
         })
     },
     cleanComputedResult: () => {
-        Store.dispatch({
+        store.dispatch({
             type: 'UPDATE_COMPUTED_RESULT',
             payload: {
                 data: null
@@ -324,7 +324,7 @@ export default {
 
     // Reserved Bundles
     addReservedBundle: (data) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'ADD_RESERVED_BUNDLE',
             payload: {
                 data: data
@@ -332,7 +332,7 @@ export default {
         })
     },
     updateReservedBundleName: (index, name) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'UPDATE_RESERVED_BUNDLE_NAME',
             payload: {
                 index: index,
@@ -341,7 +341,7 @@ export default {
         })
     },
     removeReservedBundle: (index) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'REMOVE_RESERVED_BUNDLE',
             payload: {
                 index: index
@@ -351,7 +351,7 @@ export default {
 
     // Custom Weapon
     replaceCustomWeapon: (data) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'REPLACE_CUSTOM_WEAPON',
             payload: {
                 data: data
@@ -359,7 +359,7 @@ export default {
         })
     },
     setCustomWeaponValue: (target, value) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CUSTOM_WEAPON_VALUE',
             payload: {
                 target: target,
@@ -368,7 +368,7 @@ export default {
         })
     },
     setCustomWeaponElderseal: (affinity) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CUSTOM_WEAPON_ELDERSEAL',
             payload: {
                 affinity: affinity
@@ -376,7 +376,7 @@ export default {
         })
     },
     setCustomWeaponSharpness: (step) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CUSTOM_WEAPON_SHARPNESS',
             payload: {
                 step: step
@@ -384,7 +384,7 @@ export default {
         })
     },
     setCustomWeaponElementType: (target, type) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CUSTOM_WEAPON_ELEMENT_TYPE',
             payload: {
                 target: target,
@@ -393,7 +393,7 @@ export default {
         })
     },
     setCustomWeaponElementValue: (target, value) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CUSTOM_WEAPON_ELEMENT_VALUE',
             payload: {
                 target: target,
@@ -402,7 +402,7 @@ export default {
         })
     },
     setCustomWeaponSlot: (index, size) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CUSTOM_WEAPON_SLOT',
             payload: {
                 index: index,
@@ -411,7 +411,7 @@ export default {
         })
     },
     setCustomWeaponSkill: (index, id) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CUSTOM_WEAPON_SKILL',
             payload: {
                 index: index,
@@ -420,7 +420,7 @@ export default {
         })
     },
     setCustomWeaponSet: (id) => {
-        Store.dispatch({
+        store.dispatch({
             type: 'SET_CUSTOM_WEAPON_SET',
             payload: {
                 id: id

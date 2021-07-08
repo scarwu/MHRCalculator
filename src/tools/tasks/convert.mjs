@@ -21,7 +21,7 @@ import {
 const tempCrawlerRoot = 'temp/crawler'
 const tempConvertRoot = 'temp/convert'
 
-const fileRoot = 'files'
+const fileRoot = '../files'
 
 const assetsDatasetRoot = '../assets/scripts/datasets'
 const assetsLangRoot = '../assets/scripts/langs'

@@ -8,7 +8,7 @@
  */
 
 // Load Libraries
-import MD5 from 'md5'
+import md5 from 'md5'
 
 // Load Config
 import Config from 'config'
@@ -38,7 +38,7 @@ function deepCopy(data) {
 }
 
 function jsonHash(data) {
-    return MD5(JSON.stringify(data))
+    return md5(JSON.stringify(data))
 }
 
 function base64Encode(text) {

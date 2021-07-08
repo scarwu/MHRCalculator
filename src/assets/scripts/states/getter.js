@@ -7,55 +7,59 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
+// Load Core
 import Helper from 'core/helper'
-import Store from './store'
+
+import store from './store'
 
 export const getModalData = (target) => {
-    if (Helper.isEmpty(Store.getState().modalHub[target])) {
+    if (Helper.isEmpty(store.getState().modalHub[target])) {
         return null
     }
 
-    return Store.getState().modalHub[target]
+    return store.getState().modalHub[target]
+}
+
+export const getDataStore = () => {
+    return store.getState().dataStore
 }
 
 export const getPlayerEquips = () => {
-    return Store.getState().playerEquips
+    return store.getState().playerEquips
 }
 
 export const getRequiredConditions = () => {
-    return Store.getState().requiredConditions
+    return store.getState().requiredConditions
 }
 
 export default {
     getModalData,
+    getDataStore,
     getPlayerEquips,
     getRequiredConditions,
 
-    getTempData: () => {
-        return Store.getState().tempData
-    },
     getRequiredSets: () => {
-        return Store.getState().requiredSets
+        return store.getState().requiredSets
     },
     getRequiredSkills: () => {
-        return Store.getState().requiredSkills
+        return store.getState().requiredSkills
     },
     getRequiredEquips: () => {
-        return Store.getState().requiredEquips
+        return store.getState().requiredEquips
     },
     getCurrentEquips: () => {
-        return Store.getState().currentEquips
+        return store.getState().currentEquips
     },
     getAlgorithmParams: () => {
-        return Store.getState().algorithmParams
+        return store.getState().algorithmParams
     },
     getComputedResult: () => {
-        return Store.getState().computedResult
+        return store.getState().computedResult
     },
     getReservedBundles: () => {
-        return Store.getState().reservedBundles
+        return store.getState().reservedBundles
     },
     getCustomWeapon: () => {
-        return Store.getState().customWeapon
+        return store.getState().customWeapon
     }
 }

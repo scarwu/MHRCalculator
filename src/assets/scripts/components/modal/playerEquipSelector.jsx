@@ -7,15 +7,14 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import React, { useState, useEffect, useCallback, useRef, createRef } from 'react'
 import md5 from 'md5'
 
-// Load Core Libraries
+// Load Core
+import _ from 'core/lang'
 import Helper from 'core/helper'
 
-// Load Custom Libraries
-import _ from 'libraries/lang'
+// Load Libraries
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
 // import CharmDataset from 'libraries/dataset/charm'
@@ -24,36 +23,32 @@ import ArmorDataset from 'libraries/dataset/armor'
 import IconButton from 'components/common/iconButton'
 import BasicInput from 'components/common/basicInput'
 
-// Load State Control
-import CommonState from 'states/common'
-import ModalState from 'states/modal'
-
-// Load Constant
-import Constant from 'constant'
+// Load States
+import States from 'states'
 
 export default function BundleItemSelector(props) {
 
     /**
      * Hooks
      */
-    const [stateIsShow, updateIsShow] = useState(ModalState.getter.isShowBundleItemSelector())
-    const [stateReservedBundles, updateReservedBundles] = useState(CommonState.getter.getReservedBundles())
-    const [stateCurrentEquips, updateCurrentEquips] = useState(CommonState.getter.getCurrentEquips())
+    const [stateIsShow, updateIsShow] = useState(States.getter.isShowBundleItemSelector())
+    const [stateReservedBundles, updateReservedBundles] = useState(States.getter.getReservedBundles())
+    const [stateCurrentEquips, updateCurrentEquips] = useState(States.getter.getCurrentEquips())
     const refModal = useRef()
     const refName = useRef()
     const refNameList = useRef(stateReservedBundles.map(() => createRef()))
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
-        const unsubscribeCommon = CommonState.store.subscribe(() => {
-            updateReservedBundles(CommonState.getter.getReservedBundles())
-            updateCurrentEquips(CommonState.getter.getCurrentEquips())
+        const unsubscribeCommon = States.store.subscribe(() => {
+            updateReservedBundles(States.getter.getReservedBundles())
+            updateCurrentEquips(States.getter.getCurrentEquips())
 
-            refNameList.current = CommonState.getter.getReservedBundles().map(() => createRef())
+            refNameList.current = States.getter.getReservedBundles().map(() => createRef())
         })
 
-        const unsubscribeModal = ModalState.store.subscribe(() => {
-            updateIsShow(ModalState.getter.isShowBundleItemSelector())
+        const unsubscribeModal = States.store.subscribe(() => {
+            updateIsShow(States.getter.isShowBundleItemSelector())
         })
 
         return () => {
@@ -70,7 +65,7 @@ export default function BundleItemSelector(props) {
             return
         }
 
-        ModalState.setter.hideBundleItemSelector()
+        States.setter.hideBundleItemSelector()
     }, [])
 
     const handleBundleSave = useCallback((index) => {
@@ -83,17 +78,17 @@ export default function BundleItemSelector(props) {
         }
 
         if (Helper.isNotEmpty(index)) {
-            CommonState.setter.updateReservedBundleName(index, name)
+            States.setter.updateReservedBundleName(index, name)
         } else {
             let customWeapon = null
 
             if (Helper.isNotEmpty(stateCurrentEquips.weapon)
                 && 'customWeapon' === stateCurrentEquips.weapon.id
             ) {
-                customWeapon = CommonState.getter.getCustomWeapon()
+                customWeapon = States.getter.getCustomWeapon()
             }
 
-            CommonState.setter.addReservedBundle({
+            States.setter.addReservedBundle({
                 id: md5(JSON.stringify(stateCurrentEquips)),
                 name: name,
                 equips: stateCurrentEquips,
@@ -104,12 +99,12 @@ export default function BundleItemSelector(props) {
 
     const handleBundlePickUp = useCallback((index) => {
         if (Helper.isNotEmpty(stateReservedBundles[index].customWeapon)) {
-            CommonState.setter.replaceCustomWeapon(stateReservedBundles[index].customWeapon)
+            States.setter.replaceCustomWeapon(stateReservedBundles[index].customWeapon)
         }
 
-        CommonState.setter.replaceCurrentEquips(stateReservedBundles[index].equips)
+        States.setter.replaceCurrentEquips(stateReservedBundles[index].equips)
 
-        ModalState.setter.hideBundleItemSelector()
+        States.setter.hideBundleItemSelector()
     }, [stateReservedBundles])
 
     /**
@@ -157,7 +152,7 @@ export default function BundleItemSelector(props) {
 
                         if ('weapon' === equipType) {
                             if ('customWeapon' === stateCurrentEquips[equipType].id) {
-                                equipInfo = CommonState.getter.getCustomWeapon()
+                                equipInfo = States.getter.getCustomWeapon()
 
                                 return Helper.isNotEmpty(equipInfo) ? (
                                     <div key={equipType} className="col-6 mhrc-value">
@@ -202,7 +197,7 @@ export default function BundleItemSelector(props) {
                             onClick={() => {handleBundlePickUp(index)}} />
                         <IconButton
                             iconName="times" altName={_('remove')}
-                            onClick={() => {CommonState.setter.removeReservedBundle(index)}} />
+                            onClick={() => {States.setter.removeReservedBundle(index)}} />
                         <IconButton
                             iconName="floppy-o" altName={_('save')}
                             onClick={() => {handleBundleSave(index)}} />
@@ -259,7 +254,7 @@ export default function BundleItemSelector(props) {
                     <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={ModalState.setter.hideBundleItemSelector} />
+                            onClick={States.setter.hideBundleItemSelector} />
                     </div>
                 </div>
                 <div className="mhrc-list">

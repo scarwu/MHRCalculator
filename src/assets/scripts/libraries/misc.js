@@ -1,5 +1,5 @@
 /**
- * Common
+ * Misc Library
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -7,17 +7,16 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Core Libraries
-import Helper from 'core/helper'
-
 // Load Constant
 import Constant from 'constant'
 
-// Load Datasets
+// Load Core
+import Helper from 'core/helper'
+
+// Load Libraries
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
 import PetalaceDataset from 'libraries/dataset/petalace'
-
 import JewelDataset from 'libraries/dataset/jewel'
 import EnhanceDataset from 'libraries/dataset/enhance'
 import SkillDataset from 'libraries/dataset/skill'
@@ -247,7 +246,7 @@ export const getArmorExtendInfo = (equipItem) => {
     return Helper.deepCopy(info)
 }
 
-export const transferEquipTypeToDatasetType = (equipType) => {
+export const equipTypeToDatasetType = (equipType) => {
     switch (equipType) {
     case 'weapon':
     case 'petalace':
@@ -265,7 +264,7 @@ export const transferEquipTypeToDatasetType = (equipType) => {
 }
 
 export const getEquipExtendInfo = (equipType, equipItem) => {
-    switch (transferEquipTypeToDatasetType(equipType)) {
+    switch (equipTypeToDatasetType(equipType)) {
         case 'weapon':
             return getWeaponExtendInfo(equipItem)
         case 'armor':
@@ -283,5 +282,5 @@ export default {
     getWeaponExtendInfo,
     getArmorExtendInfo,
     getEquipExtendInfo,
-    transferEquipTypeToDatasetType
+    equipTypeToDatasetType
 }

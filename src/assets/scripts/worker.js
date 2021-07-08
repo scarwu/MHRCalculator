@@ -7,17 +7,16 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Libraries
 import * as Sentry from '@sentry/browser'
-
-// Load Core Libraries
-import Helper from 'core/helper'
-
-// Load Custom Libraries
-import FittingAlgorithm from 'libraries/fittingAlgorithm'
 
 // Load Config
 import Config from 'config'
+
+// Load Core
+import Helper from 'core/helper'
+
+// Load Libraries
+import FittingAlgorithm from 'libraries/fittingAlgorithm'
 
 // Set Sentry Endpoint
 if ('production' === Config.env) {

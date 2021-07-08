@@ -211,6 +211,23 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     'purple'
                 ]
 
+
+                // minimum sharpness
+                rowNode.find('td').eq(5).find('div.flex div.flex').eq(0).find('div').each((index, node) => {
+                    let value = parseFloat(listDom(node).css('width').replace('px', '')) * 5
+
+                    if (0 === value) {
+                        return
+                    }
+
+                    if (Helper.isEmpty(mapping[mappingKey].sharpness.minValue)) {
+                        mapping[mappingKey].sharpness.minValue = 0
+                    }
+
+                    mapping[mappingKey].sharpness.minValue += value
+                })
+
+                // maximum sharpness
                 rowNode.find('td').eq(5).find('div.flex div.flex').eq(1).find('div').each((index, node) => {
                     let value = parseFloat(listDom(node).css('width').replace('px', '')) * 5
 
@@ -218,7 +235,12 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         return
                     }
 
-                    mapping[mappingKey].sharpness[sharpnessList[index]] = value
+                    if (Helper.isEmpty(mapping[mappingKey].sharpness.maxValue)) {
+                        mapping[mappingKey].sharpness.maxValue = 0
+                    }
+
+                    mapping[mappingKey].sharpness.maxValue += value
+                    mapping[mappingKey].sharpness.steps[sharpnessList[index]] = value
                 })
             }
 

@@ -196,42 +196,53 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 })
             }
 
-            if ('bow' !== weaponType
-                && 'lightBowgun' !== weaponType
-                && 'heavyBowgun' !== weaponType
-            ) {
-                let sharpnessMapping = {
-                    '.kr0': 'red',
-                    '.kr1': 'orange',
-                    '.kr2': 'yellow',
-                    '.kr3': 'green',
-                    '.kr4': 'blue',
-                    '.kr5': 'white',
-                    '.kr6': 'purple'
-                }
+            // if ('bow' !== weaponType
+            //     && 'lightBowgun' !== weaponType
+            //     && 'heavyBowgun' !== weaponType
+            // ) {
+            //     let sharpnessMapping = {
+            //         '.kr0': 'red',
+            //         '.kr1': 'orange',
+            //         '.kr2': 'yellow',
+            //         '.kr3': 'green',
+            //         '.kr4': 'blue',
+            //         '.kr5': 'white',
+            //         '.kr6': 'purple'
+            //     }
 
-                for (let kr of Object.keys(sharpnessMapping)) {
-                    if (0 === itemNode.find('td').eq(4).find(kr).length) {
-                        break
-                    }
+            //     for (let kr of Object.keys(sharpnessMapping)) {
+            //         if (0 === itemNode.find('td').eq(4).find(kr).length) {
+            //             break
+            //         }
 
-                    if (Helper.isEmpty(mapping[mappingKey].sharpness[sharpnessMapping[kr]])) {
-                        mapping[mappingKey].sharpness[sharpnessMapping[kr]] = 0
-                    }
+            //         if (Helper.isEmpty(mapping[mappingKey].sharpness.value)) {
+            //             mapping[mappingKey].sharpness.value = 0
+            //         }
 
-                    let krIndex = itemNode.find('td').eq(4).find(kr).length - 1
+            //         if (Helper.isEmpty(mapping[mappingKey].sharpness.steps[sharpnessMapping[kr]])) {
+            //             mapping[mappingKey].sharpness.steps[sharpnessMapping[kr]] = 0
+            //         }
 
-                    itemNode.find('td').eq(4).find(kr).eq(krIndex).text().split('').forEach((step) => {
-                        if ('…' === step) {
-                            mapping[mappingKey].sharpness[sharpnessMapping[kr]] += 30
-                        }
+            //         let krIndex = itemNode.find('td').eq(4).find(kr).length - 1
 
-                        if ('.' === step) {
-                            mapping[mappingKey].sharpness[sharpnessMapping[kr]] += 10
-                        }
-                    })
-                }
-            }
+            //         itemNode.find('td').eq(4).find(kr).eq(krIndex).text().split('').forEach((step) => {
+            //             let value = 0
+
+            //             if ('…' === step) {
+            //                 value = 30
+            //             }
+
+            //             if ('.' === step) {
+            //                 value = 10
+            //             }
+
+            //             mapping[mappingKey].sharpness.value += value
+            //             mapping[mappingKey].sharpness.steps[sharpnessMapping[kr]] += value
+            //         })
+            //     }
+
+            //     mapping[mappingKey].sharpness.value -= 50
+            // }
 
             // Fetch Detail Page
             fetchPageUrl = itemNode.find('td').eq(1).find('a').attr('href')
@@ -248,17 +259,17 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     continue
                 }
 
-                // Enhance
-                let enhanceTableIndex = 0
+                // Performace
+                let performaceTableIndex = 0
 
                 if ('chargeBlade' === weaponType
                     || 'switchAxe' === weaponType
                 ) {
-                    enhanceTableIndex = 1
+                    performaceTableIndex = 1
                 }
 
-                for (let itemIndex = 0; itemIndex < itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').length; itemIndex++) {
-                    let rowNode = itemDom('.wp-block-table').eq(enhanceTableIndex).find('tbody tr').eq(itemIndex)
+                for (let itemIndex = 0; itemIndex < itemDom('.wp-block-table').eq(performaceTableIndex).find('tbody tr').length; itemIndex++) {
+                    let rowNode = itemDom('.wp-block-table').eq(performaceTableIndex).find('tbody tr').eq(itemIndex)
 
                     let subName = normalizeText(rowNode.find('td').eq(0).text().trim())
 
@@ -266,6 +277,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         continue
                     }
 
+                    // Enhance
                     for (let enhanceIndex = 0; enhanceIndex < rowNode.find('td').eq(3).find('a').length; enhanceIndex++) {
                         let enhanceNode = rowNode.find('td').eq(3).find('a').eq(enhanceIndex)
 
@@ -301,6 +313,83 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                                     console.log(fetchPageUrl, fetchPageName, 'Err')
                                 }
                             }
+                        }
+                    }
+
+                    if ('bow' !== weaponType
+                        && 'lightBowgun' !== weaponType
+                        && 'heavyBowgun' !== weaponType
+                    ) {
+                        let sharpnessMapping = {
+                            '.kr0': 'red',
+                            '.kr1': 'orange',
+                            '.kr2': 'yellow',
+                            '.kr3': 'green',
+                            '.kr4': 'blue',
+                            '.kr5': 'white',
+                            '.kr6': 'purple'
+                        }
+
+                        let sharpnessRows = rowNode.find('td').eq(4).html().replace(/\<br\>$/, '').split('<br>')
+                        let sharpnessNode = null
+
+                        // minimum
+                        sharpnessNode = itemDom('<div>' + sharpnessRows[0] + '</div>')
+
+                        for (let kr of Object.keys(sharpnessMapping)) {
+                            if ('' === sharpnessNode.find(kr).text()) {
+                                break
+                            }
+
+                            if (Helper.isEmpty(mapping[mappingKey].sharpness.minValue)) {
+                                mapping[mappingKey].sharpness.minValue = 0
+                            }
+
+                            sharpnessNode.find(kr).text().split('').forEach((step) => {
+                                let value = 0
+
+                                if ('…' === step) {
+                                    value = 30
+                                }
+
+                                if ('.' === step) {
+                                    value = 10
+                                }
+
+                                mapping[mappingKey].sharpness.minValue += value
+                            })
+                        }
+
+                        // maximum
+                        sharpnessNode = itemDom('<div>' + sharpnessRows[sharpnessRows.length - 1] + '</div>')
+
+                        for (let kr of Object.keys(sharpnessMapping)) {
+                            if ('' === sharpnessNode.find(kr).text()) {
+                                break
+                            }
+
+                            if (Helper.isEmpty(mapping[mappingKey].sharpness.maxValue)) {
+                                mapping[mappingKey].sharpness.maxValue = 0
+                            }
+
+                            if (Helper.isEmpty(mapping[mappingKey].sharpness.steps[sharpnessMapping[kr]])) {
+                                mapping[mappingKey].sharpness.steps[sharpnessMapping[kr]] = 0
+                            }
+
+                            sharpnessNode.find(kr).text().split('').forEach((step) => {
+                                let value = 0
+
+                                if ('…' === step) {
+                                    value = 30
+                                }
+
+                                if ('.' === step) {
+                                    value = 10
+                                }
+
+                                mapping[mappingKey].sharpness.maxValue += value
+                                mapping[mappingKey].sharpness.steps[sharpnessMapping[kr]] += value
+                            })
                         }
                     }
                 }

@@ -30,13 +30,17 @@ export const defaultWeaponItem = {
         }
     },
     sharpness: {
-        red: null,
-        orange: null,
-        yellow: null,
-        green: null,
-        blue: null,
-        white: null,
-        purple: null
+        minValue: null,
+        maxValue: null,
+        steps: {
+            red: null,
+            orange: null,
+            yellow: null,
+            green: null,
+            blue: null,
+            white: null,
+            purple: null
+        }
     },
     slots: [
         // {

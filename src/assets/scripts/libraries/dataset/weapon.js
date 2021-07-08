@@ -16,56 +16,51 @@ import Weapons from 'datasets/weapons.json'
 let dataset = Weapons.map((weapon) => {
     return {
         id: weapon[0],
-        rare: weapon[1],
-        type: weapon[2],
-        series: weapon[3],
-        name: weapon[4],
+        series: weapon[1],
+        name: weapon[2],
+        rare: weapon[3],
+        type: weapon[4],
         attack: weapon[5],
         criticalRate: weapon[6],
         defense: weapon[7],
-        sharpness: (Helper.isNotEmpty(weapon[8])) ? {
-            value: weapon[8][0],
-            steps: {
-                red: weapon[8][1][0],
-                orange: weapon[8][1][1],
-                yellow: weapon[8][1][2],
-                green: weapon[8][1][3],
-                blue: weapon[8][1][4],
-                white: weapon[8][1][5],
-                purple: weapon[8][1][6]
-            }
-        } : null,
         element: {
-            attack: (Helper.isNotEmpty(weapon[9][0])) ? {
-                type: weapon[9][0][0],
-                minValue: weapon[9][0][1],
-                maxValue: weapon[9][0][2],
-                isHidden: weapon[9][0][3]
-            } : null,
-            status: (Helper.isNotEmpty(weapon[9][1])) ? {
-                type: weapon[9][1][0],
-                minValue: weapon[9][1][1],
-                maxValue: weapon[9][1][2],
-                isHidden: weapon[9][1][3]
-            } : null
+            attack: {
+                type: weapon[8][0][0],
+                minValue: weapon[8][0][1],
+                maxValue: weapon[8][0][2]
+            },
+            status: {
+                type: weapon[8][1][0],
+                minValue: weapon[8][1][1],
+                maxValue: weapon[8][1][2]
+            }
         },
-        elderseal: (Helper.isNotEmpty(weapon[10])) ? {
-            affinity: weapon[10]
-        } : null,
-        slots: (Helper.isNotEmpty(weapon[11])) ? weapon[11].map((size) => {
+        sharpness: {
+            minValue: weapon[9][0],
+            maxValue: weapon[9][1],
+            steps: {
+                red: weapon[9][2][0],
+                orange: weapon[9][2][1],
+                yellow: weapon[9][2][2],
+                green: weapon[9][2][3],
+                blue: weapon[9][2][4],
+                white: weapon[9][2][5],
+                purple: weapon[9][2][6]
+            }
+        },
+        slots: weapon[10].map((size) => {
             return {
                 size: size
             }
-        }) : [],
-        skills: (Helper.isNotEmpty(weapon[12])) ? weapon[12].map((skill) => {
-            return {
-                id: skill[0],
-                level: skill[1]
-            }
-        }) : [],
-        set: (Helper.isNotEmpty(weapon[13])) ? {
-            id: weapon[13]
-        } : null,
+        }),
+        enhance: {
+            amount: weapon[11][0],
+            list: weapon[11][1].map((name) => {
+                return {
+                    name: name
+                }
+            })
+        }
     }
 })
 

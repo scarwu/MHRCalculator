@@ -621,13 +621,17 @@ export const runAction = () => {
                 ]
             ],
             [
-                weaponItem.sharpness.red,
-                weaponItem.sharpness.orange,
-                weaponItem.sharpness.yellow,
-                weaponItem.sharpness.green,
-                weaponItem.sharpness.blue,
-                weaponItem.sharpness.white,
-                weaponItem.sharpness.purple
+                weaponItem.sharpness.minValue,
+                weaponItem.sharpness.maxValue,
+                [
+                    weaponItem.sharpness.steps.red,
+                    weaponItem.sharpness.steps.orange,
+                    weaponItem.sharpness.steps.yellow,
+                    weaponItem.sharpness.steps.green,
+                    weaponItem.sharpness.steps.blue,
+                    weaponItem.sharpness.steps.white,
+                    weaponItem.sharpness.steps.purple
+                ]
             ],
             weaponItem.slots.map((slotItem) => {
                 return [

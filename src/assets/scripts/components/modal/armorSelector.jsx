@@ -73,7 +73,7 @@ const renderArmorItem = (armorItem, modalData) => {
                     <span>{_('defense')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    <span>{armorItem.minDefense} ~ {Helper.isNotEmpty(armorItem.maxDefense) ? armorItem.maxDefense : '?'}</span>
+                    <span>{armorItem.minDefense}-{Helper.isNotEmpty(armorItem.maxDefense) ? armorItem.maxDefense : '?'}</span>
                 </div>
 
                 {Constant.resistanceTypes.map((resistanceType) => {
@@ -144,7 +144,7 @@ export default function ArmorSelectorModal(props) {
         let type = null
         let rare = null
 
-        let armorItem = ArmorDataset.getInfo(stateModalData.equipId)
+        let armorInfo = ArmorDataset.getInfo(stateModalData.equipId)
 
         typeList = Constant.armorTypes.map((type) => {
             return { key: type, value: _(type) }
@@ -152,13 +152,13 @@ export default function ArmorSelectorModal(props) {
         type = (Helper.isNotEmpty(stateModalData.equipType))
             ? stateModalData.equipType : typeList[0].key
 
-        sortedList.forEach((armorItem) => {
-            rareList[armorItem.rare] = armorItem.rare
+        sortedList.forEach((armorInfo) => {
+            rareList[armorInfo.rare] = armorInfo.rare
         })
         rareList = Object.values(rareList).reverse().map((rare) => {
             return { key: rare, value: _('rare') + `: ${rare}` }
         })
-        rare = (Helper.isNotEmpty(armorItem)) ? armorItem.rare : rareList[0].key
+        rare = (Helper.isNotEmpty(armorInfo)) ? armorInfo.rare : rareList[0].key
 
         updateSortedList(sortedList)
         updateTypeList(typeList)

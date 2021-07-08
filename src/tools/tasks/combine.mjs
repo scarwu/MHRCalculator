@@ -757,36 +757,53 @@ export const runAction = () => {
     }
 
     const mergeSharpnessValue = (target, itemId, item, crawlerMapping) => {
-        for (let key of ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'purple']) {
-            let voteMapping = {}
-            let valueMapping = {}
+        let voteMapping = {}
+        let valueMapping = {}
 
-            for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
-                if (Helper.isEmpty(crawlerItem.sharpness[key])) {
-                    continue
-                }
-
-                // Set Default Value
-                if (Helper.isEmpty(item.sharpness[key])) {
-                    item.sharpness[key] = crawlerItem.sharpness[key]
-                }
-
-                // Set Count & Value
-                if (Helper.isEmpty(voteMapping[crawlerItem.sharpness[key]])) {
-                    voteMapping[crawlerItem.sharpness[key]] = {
-                        count: 0,
-                        value: crawlerItem.sharpness[key]
-                    }
-                }
-
-                voteMapping[crawlerItem.sharpness[key]].count++
-                valueMapping[crawlerName] = crawlerItem.sharpness[key]
-            }
-
-            // Dosen't need Copy
-            if (0 === Object.keys(voteMapping).length) {
+        for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+            if (Helper.isEmpty(crawlerItem.sharpness.minValue)
+                && Helper.isEmpty(crawlerItem.sharpness.maxValue)
+                && Helper.isEmpty(crawlerItem.sharpness.steps.red)
+                && Helper.isEmpty(crawlerItem.sharpness.steps.orange)
+                && Helper.isEmpty(crawlerItem.sharpness.steps.yellow)
+                && Helper.isEmpty(crawlerItem.sharpness.steps.green)
+                && Helper.isEmpty(crawlerItem.sharpness.steps.blue)
+                && Helper.isEmpty(crawlerItem.sharpness.steps.white)
+                && Helper.isEmpty(crawlerItem.sharpness.steps.purple)
+            ) {
                 continue
             }
+
+            // Set Default Value
+            if (Helper.isEmpty(item.sharpness.steps.minValue)
+                && Helper.isEmpty(item.sharpness.steps.maxValue)
+                && Helper.isEmpty(item.sharpness.steps.red)
+                && Helper.isEmpty(item.sharpness.steps.orange)
+                && Helper.isEmpty(item.sharpness.steps.yellow)
+                && Helper.isEmpty(item.sharpness.steps.green)
+                && Helper.isEmpty(item.sharpness.steps.blue)
+                && Helper.isEmpty(item.sharpness.steps.white)
+                && Helper.isEmpty(item.sharpness.steps.purple)
+            ) {
+                item.sharpness = crawlerItem.sharpness
+            }
+
+            // Set Count & Value
+            let uniqueKey = JSON.stringify(crawlerItem.sharpness)
+
+            if (Helper.isEmpty(voteMapping[uniqueKey])) {
+                voteMapping[uniqueKey] = {
+                    count: 0,
+                    value: crawlerItem.sharpness
+                }
+            }
+
+            voteMapping[uniqueKey].count++
+            valueMapping[crawlerName] = crawlerItem.sharpness
+        }
+
+        // Need Copy
+        if (0 !== Object.keys(voteMapping).length) {
 
             // Assign Final Value by Max Count
             let maxCount = 0
@@ -794,7 +811,7 @@ export const runAction = () => {
             for (let voteItem of Object.values(voteMapping)) {
                 if (maxCount < voteItem.count) {
                     maxCount = voteItem.count
-                    item.sharpness[key] = voteItem.value
+                    item.sharpness = voteItem.value
                 }
             }
 
@@ -804,12 +821,14 @@ export const runAction = () => {
                     duplicateValueMapping.sharpness = []
                 }
 
-                duplicateValueMapping.sharpness.push({
-                    target: target,
-                    name: idNameMapping[itemId],
-                    rare: item.rare,
-                    key: key,
-                    valueMapping: valueMapping
+                Object.keys(valueMapping).forEach((crawlerName) => {
+                    duplicateValueMapping.sharpness.push({
+                        target: target,
+                        name: idNameMapping[itemId],
+                        rare: item.rare,
+                        crawlerName: crawlerName,
+                        valueMapping: valueMapping[crawlerName]
+                    })
                 })
             }
         }

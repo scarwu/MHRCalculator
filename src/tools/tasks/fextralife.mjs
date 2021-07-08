@@ -377,7 +377,12 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         return
                     }
 
-                    mapping[mappingKey].sharpness[sharpnessList[index]] = value
+                    if (Helper.isEmpty(mapping[mappingKey].sharpness.minValue)) {
+                        mapping[mappingKey].sharpness.minValue = 0
+                    }
+
+                    mapping[mappingKey].sharpness.minValue += value
+                    mapping[mappingKey].sharpness.steps[sharpnessList[index]] = value
                 })
             }
 

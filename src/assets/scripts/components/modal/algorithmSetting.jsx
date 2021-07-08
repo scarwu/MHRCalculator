@@ -1,5 +1,5 @@
 /**
- * Algorithm Setting
+ * Algorithm Setting Modal
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -96,7 +96,7 @@ const handleStrategyChange = (event) => {
     States.setter.setAlgorithmParamsStrategy(event.target.value)
 }
 
-export default function AlgorithmSetting(props) {
+export default function AlgorithmSettingModal(props) {
 
     /**
      * Hooks

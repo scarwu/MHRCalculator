@@ -115,11 +115,11 @@ export const removeRequiredConditionsSet = () => {
 
 }
 
-export const increaseRequiredConditionsSetNumber = () => {
+export const increaseRequiredConditionsSetCount = () => {
 
 }
 
-export const decreaseRequiredConditionsSetNumber = () => {
+export const decreaseRequiredConditionsSetCount = () => {
 
 }
 
@@ -156,8 +156,8 @@ export default {
 
     addRequiredConditionsSet,
     removeRequiredConditionsSet,
-    increaseRequiredConditionsSetNumber,
-    decreaseRequiredConditionsSetNumber,
+    increaseRequiredConditionsSetCount,
+    decreaseRequiredConditionsSetCount,
 
     addRequiredConditionsSkill,
     removeRequiredConditionsSkill,

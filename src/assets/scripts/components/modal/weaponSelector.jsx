@@ -243,7 +243,7 @@ export default function WeaponSelectorModal(props) {
             return
         }
 
-        States.setter.hideEquipItemSelector()
+        States.setter.hideModal('weaponSelector')
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -345,7 +345,9 @@ export default function WeaponSelectorModal(props) {
                             options={stateRareList} onChange={handleRareChange} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={() => {States.setter.hideModal('weaponSelector')}} />
+                            onClick={() => {
+                                States.setter.hideModal('weaponSelector')
+                            }} />
                     </div>
                 </div>
                 <div className="mhrc-list">

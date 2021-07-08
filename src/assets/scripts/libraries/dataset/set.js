@@ -13,12 +13,19 @@ import Helper from 'core/helper'
 // Load Dataset
 import Armors from 'datasets/armors.json'
 
-let dataset = Armors.map((bundle) => {
+let dataset = Armors.map((armorBundle) => {
     return {
-        id: bundle[0][0],
-        name: bundle[0][1],
-        rare: bundle[0][2],
-        gender: bundle[0][3]
+        id: armorBundle[0][0],
+        name: armorBundle[0][1],
+        rare: armorBundle[0][2],
+        gender: armorBundle[0][3],
+        items: armorBundle[1].map((armorItem) => {
+            return {
+                id: armorItem[0],
+                name: armorItem[1],
+                type: armorItem[2]
+            }
+        })
     }
 })
 

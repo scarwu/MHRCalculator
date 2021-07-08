@@ -13,34 +13,34 @@ import Helper from 'core/helper'
 // Load Dataset
 import Armors from 'datasets/armors.json'
 
-let dataset = Armors.map((bundle) => {
-    return bundle[1].map((item) => {
+let dataset = Armors.map((armorBundle) => {
+    return armorBundle[1].map((armorItem) => {
         return {
-            seriesId: bundle[0][0],
-            series: bundle[0][1],
-            rare: bundle[0][2],
-            gender: bundle[0][3],
-            minDefense: bundle[0][4],
-            maxDefense: bundle[0][5],
+            seriesId: armorBundle[0][0],
+            series: armorBundle[0][1],
+            rare: armorBundle[0][2],
+            gender: armorBundle[0][3],
+            minDefense: armorBundle[0][4],
+            maxDefense: armorBundle[0][5],
             resistance: {
-                fire: bundle[0][6][0],
-                water: bundle[0][6][1],
-                thunder: bundle[0][6][2],
-                ice: bundle[0][6][3],
-                dragon: bundle[0][6][4]
+                fire: armorBundle[0][6][0],
+                water: armorBundle[0][6][1],
+                thunder: armorBundle[0][6][2],
+                ice: armorBundle[0][6][3],
+                dragon: armorBundle[0][6][4]
             },
-            id: item[0],
-            name: item[1],
-            type: item[2],
-            slots: (Helper.isNotEmpty(item[3])) ? item[3].map((size) => {
+            id: armorItem[0],
+            name: armorItem[1],
+            type: armorItem[2],
+            slots: (Helper.isNotEmpty(armorItem[3])) ? armorItem[3].map((size) => {
                 return {
                     size: size
                 }
             }) : [],
-            skills: (Helper.isNotEmpty(item[4])) ? item[4].map((skill) => {
+            skills: (Helper.isNotEmpty(armorItem[4])) ? armorItem[4].map((skillItem) => {
                 return {
-                    id: skill[0],
-                    level: skill[1]
+                    id: skillItem[0],
+                    level: skillItem[1]
                 }
             }) : []
         }

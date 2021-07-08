@@ -1,5 +1,5 @@
 /**
- * Condition Options: Skill List
+ * Condition Options: Set List
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -15,7 +15,7 @@ import Helper from 'core/helper'
 
 // Load Libraries
 // import SetDataset from 'libraries/dataset/set'
-import SkillDataset from 'libraries/dataset/skill'
+import SetDataset from 'libraries/dataset/set'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -26,63 +26,49 @@ import States from 'states'
 /**
  * Render Functions
  */
-const renderSkillItem = (skill, enableSkillIdList) => {
-    let skillInfo = SkillDataset.getInfo(skill.id)
+const renderSetItem = (set, enableSetIdList) => {
+    let setInfo = SetDataset.getInfo(set.id)
 
-    if (Helper.isEmpty(skillInfo)) {
+    if (Helper.isEmpty(setInfo)) {
         return false
     }
 
-    let currentSkillLevel = 0
-    let totalSkillLevel = 0
+    let currentSetCount = 0
 
-    skillInfo.list.forEach((item) => {
-        if (false === item.isHidden || -1 !== enableSkillIdList.indexOf(skillInfo.id)) {
-            currentSkillLevel++
+    setInfo.list.forEach((item) => {
+        if (false === item.isHidden || -1 !== enableSetIdList.indexOf(setInfo.id)) {
+            currentSetCount++
         }
-
-        totalSkillLevel++
     })
 
     return (
-        <div key={skillInfo.id} className="col-12 mhrc-content">
+        <div key={setInfo.id} className="col-12 mhrc-content">
             <div className="col-12 mhrc-name">
-                {(currentSkillLevel === totalSkillLevel) ? (
-                    <span>{_(skillInfo.name)} Lv.{skill.level} / {currentSkillLevel}</span>
-                ) : (
-                    <span>{_(skillInfo.name)} Lv.{skill.level} / {currentSkillLevel} ({totalSkillLevel})</span>
-                )}
+                <span>{_(setInfo.name)} x {currentSetCount}</span>
 
                 <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="minus-circle" altName={_('down')}
                         onClick={() => {
-                            States.setter.decreaseRequiredConditionsSkillLevel(skill.id)
+                            States.setter.decreaseRequiredConditionsSetCount(set.id)
                         }} />
                     <IconButton
                         iconName="plus-circle" altName={_('up')}
                         onClick={() => {
-                            States.setter.increaseRequiredConditionsSkillLevel(skill.id)
+                            States.setter.increaseRequiredConditionsSetCount(set.id)
                         }} />
                     <IconButton
                         iconName="times" altName={_('clean')}
                         onClick={() => {
-                            States.setter.removeRequiredConditionsSkill(skill.id)
+                            States.setter.removeRequiredConditionsSet(set.id)
                         }} />
                 </div>
-            </div>
-            <div className="col-12 mhrc-value mhrc-description">
-                <span>
-                    {(0 !== skill.level)
-                        ? _(skillInfo.list[skill.level - 1].effect)
-                        : _('skillLevelZero')}
-                </span>
             </div>
         </div>
     )
 }
 
-export default function SkillList(props) {
+export default function SetList(props) {
 
     /**
      * Hooks
@@ -102,25 +88,25 @@ export default function SkillList(props) {
     }, [])
 
     return useMemo(() => {
-        Helper.debug('Component: ConditionOptions -> SkillList')
+        Helper.debug('Component: ConditionOptions -> SetList')
 
         return (
             <div className="mhrc-item mhrc-item-3-step">
                 <div className="col-12 mhrc-name">
-                    <span>{_('skill')}</span>
+                    <span>{_('set')}</span>
                     <div className="mhrc-icons_bundle">
                         <IconButton
                             iconName="plus" altName={_('add')}
                             onClick={() => {
-                                States.setter.showModal('skillSelector', {
+                                States.setter.showModal('setSelector', {
                                     target: 'requiredConditions'
                                 })
                             }} />
                     </div>
                 </div>
 
-                {stateRequiredConditions.skills.map((skill) => {
-                    return renderSkillItem(skill, enableSkillIdList)
+                {stateRequiredConditions.sets.map((set) => {
+                    return renderSetItem(set, enableSetIdList)
                 })}
              </div>
         )

@@ -17,6 +17,7 @@ import Helper from 'core/helper'
 import Misc from 'libraries/misc'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
+import PetalaceDataset from 'libraries/dataset/petalace'
 // import CharmDataset from 'libraries/dataset/charm'
 
 // Load Components
@@ -48,7 +49,7 @@ const renderEquipItem = (equipType, requiredEquip) => {
                         <div className="mhrc-icons_bundle">
                             <IconButton
                                 iconName="times" altName={_('clean')}
-                                onClick={() => {States.setter.setRequiredEquips(equipType, null)}} />
+                                onClick={() => {States.setter.setRequiredConditions.equips(equipType, null)}} />
                         </div>
                     </div>
                 </div>
@@ -63,7 +64,9 @@ const renderEquipItem = (equipType, requiredEquip) => {
         || 'leg' === equipType
     ) {
         equipInfo = ArmorDataset.getInfo(requiredEquip.id)
-    } else if ('charm' === equipType) {
+    } else if ('petalace' === equipType) {
+        equipInfo = PetalaceDataset.getInfo(requiredEquip.id)
+    } else if('charm' === equipType) {
         // equipInfo = CharmDataset.getInfo(requiredEquip.id)
     } else {
         return false
@@ -84,7 +87,9 @@ const renderEquipItem = (equipType, requiredEquip) => {
                 <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="times" altName={_('clean')}
-                        onClick={() => {States.setter.setRequiredEquips(equipType, null)}} />
+                        onClick={() => {
+                            States.setter.setRequiredConditionsEquip(equipType, null)
+                        }} />
                 </div>
             </div>
         </div>
@@ -96,12 +101,12 @@ export default function EquipList (props) {
     /**
      * Hooks
      */
-    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
-            updateRequiredEquips(States.getter.getRequiredEquips())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -112,7 +117,7 @@ export default function EquipList (props) {
     return useMemo(() => {
         Helper.debug('Component: ConditionOptions -> EquipList')
 
-        if (Helper.isEmpty(stateRequiredEquips)) {
+        if (Helper.isEmpty(stateRequiredConditions.equips)) {
             return false
         }
 
@@ -122,10 +127,10 @@ export default function EquipList (props) {
                     <span>{_('equip')}</span>
                 </div>
 
-                {Object.keys(stateRequiredEquips).map((equipType) => {
-                    return renderEquipItem(equipType, stateRequiredEquips[equipType])
+                {Object.keys(stateRequiredConditions.equips).map((equipType) => {
+                    return renderEquipItem(equipType, stateRequiredConditions.equips[equipType])
                 })}
             </div>
         )
-    }, [stateRequiredEquips])
+    }, [stateRequiredConditions])
 }

@@ -18,6 +18,7 @@ import IconButton from 'components/common/iconButton'
 import IconTab from 'components/common/iconTab'
 
 import EquipList from 'components/block/sub/requiredConditionsBlock/equipList'
+import SetList from 'components/block/sub/requiredConditionsBlock/setList'
 import SkillList from 'components/block/sub/requiredConditionsBlock/skillList'
 
 // Load States
@@ -27,8 +28,7 @@ import States from 'states'
  * Handle Functions
  */
 const handleRequireConditionRefresh = () => {
-    States.setter.cleanRequiredEquips()
-    States.setter.cleanRequiredSkills()
+    States.setter.cleanRequiredConditions()
 }
 
 const handleSwitchDataStore = (index) => {
@@ -86,6 +86,7 @@ export default function RequiredConditionsBlock(props) {
 
             <div className="mhrc-list">
                 <EquipList />
+                <SetList />
                 <SkillList />
             </div>
         </div>

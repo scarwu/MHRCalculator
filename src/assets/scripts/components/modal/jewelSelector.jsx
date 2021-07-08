@@ -1,5 +1,5 @@
 /**
- * Equip Item Selector
+ * Jewel Selector Modal
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu

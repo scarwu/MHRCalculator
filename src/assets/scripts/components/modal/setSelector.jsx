@@ -1,5 +1,5 @@
 /**
- * Condition Item Selector
+ * Set Selector Modal
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -15,6 +15,7 @@ import Helper from 'core/helper'
 
 // Load Libraries
 import SetDataset from 'libraries/dataset/set'
+import ArmorDataset from 'libraries/dataset/armor'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -36,35 +37,42 @@ const handleModeChange = (event) => {
 /**
  * Render Functions
  */
-const renderSetItem = (set) => {
+const renderSetItem = (setItem) => {
     return (
-        <div key={set.id} className="mhrc-item mhrc-item-2-step">
+        <div key={setItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
-                <span>{_(set.name)}</span>
+                <span>{_(setItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {set.isSelect ? (
+                    {setItem.isSelect ? (
                         <IconButton
                             iconName="minus" altName={_('remove')}
-                            onClick={() => {States.setter.removeRequiredSet(set.id)}} />
+                            onClick={() => { States.setter.removeRequiredSet(setItem.id)}} />
                     ) : (
                         <IconButton
                             iconName="plus" altName={_('add')}
-                            onClick={() => {States.setter.addRequiredSet(set.id)}} />
+                                onClick={() => { States.setter.addRequiredSet(setItem.id)}} />
                     )}
                 </div>
             </div>
             <div className="col-12 mhrc-content">
-                {set.skills.map((skill, index) => {
-                    let skillInfo = SkillDataset.getInfo(skill.id)
+                <div className="col-2 mhrc-name">
+                    <span>{_('rare')}</span>
+                </div>
+                <div className="col-4 mhrc-value">
+                    <span>{setItem.rare}</span>
+                </div>
 
-                    return Helper.isNotEmpty(skillInfo) ? (
+                {setItem.items.map((armorItem, index) => {
+                    let armorInfo = ArmorDataset.getInfo(armorItem.id)
+
+                    return Helper.isNotEmpty(armorInfo) ? (
                         <Fragment key={index}>
-                            <div className="col-12 mhrc-name">
-                                <span>({skill.require}) {_(skillInfo.name)} Lv.{skill.level}</span>
+                            <div className="col-2 mhrc-name">
+                                <span>{_(armorInfo.type)}</span>
                             </div>
-                            <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillInfo.list[0].description)}</span>
+                            <div className="col-4 mhrc-value">
+                                <span>{_(armorInfo.name)}</span>
                             </div>
                         </Fragment>
                     ) : false
@@ -87,7 +95,7 @@ const SetList = (props) => {
     }, [data])
 }
 
-export default function ConditionItemSelector(props) {
+export default function SetSelectorModal(props) {
 
     /**
      * Hooks
@@ -178,18 +186,6 @@ export default function ConditionItemSelector(props) {
                 // Create Text
                 let text = _(set.name)
 
-                set.skills.forEach((set) => {
-                    let skillInfo = SkillDataset.getInfo(set.id)
-
-                    if (Helper.isEmpty(skillInfo)) {
-                        return
-                    }
-
-                    text += _(skillInfo.name) + skillInfo.list.map((item) => {
-                        return _(item.description)
-                    }).join('')
-                })
-
                 // Search Nameword
                 if (Helper.isNotEmpty(stateSegment)
                     && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
@@ -199,7 +195,7 @@ export default function ConditionItemSelector(props) {
 
                 return true
             }).sort((dataA, dataB) => {
-                return _(dataA.id) > _(dataB.id) ? 1 : -1
+                return _(dataA.rare) > _(dataB.rare) ? 1 : -1
             })} />
         )
     }, [

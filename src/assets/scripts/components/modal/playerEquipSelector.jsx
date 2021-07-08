@@ -1,5 +1,5 @@
 /**
- * Bundle Item Selector
+ * Player Equip Selector Modal
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -26,7 +26,7 @@ import BasicInput from 'components/common/basicInput'
 // Load States
 import States from 'states'
 
-export default function BundleItemSelector(props) {
+export default function PlayerEquipSelectorModal(props) {
 
     /**
      * Hooks

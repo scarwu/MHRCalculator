@@ -299,7 +299,7 @@ const renderArmorProperties = (equipExtendInfo) => {
                     <span>{_('defense')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    <span>{equipExtendInfo.defense}</span>
+                    <span>{equipExtendInfo.minDefense}-{Helper.isNotEmpty(equipExtendInfo.maxDefense) ? equipExtendInfo.maxDefense : '?'}</span>
                 </div>
 
                 {Constant.resistanceTypes.map((resistanceType) => {
@@ -591,7 +591,9 @@ export default function PlayerEquipsBlock(props) {
                         onClick={handleEquipsDisplayerRefresh} />
                     {/* <IconButton
                         iconName="th-list" altName={_('bundleList')}
-                        onClick={States.setter.showBundleItemSelector} /> */}
+                        onClick={() => {
+                            States.setter.showModal('playerEquipSelector')
+                        }} /> */}
                 </div>
             </div>
 

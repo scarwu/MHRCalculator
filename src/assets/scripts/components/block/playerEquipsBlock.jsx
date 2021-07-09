@@ -137,10 +137,14 @@ const handleSwitchDataStore = (index) => {
 //     )
 // }
 
-const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
+const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
+
+    // Get Jewel Item
+    let jewelItem = JewelDataset.getItem(jewelId)
+
     const showModal = () => {
         States.setter.showModal('jewelSelector', {
-            id: (Helper.isNotEmpty(jewelInfo)) ? jewelInfo.id : null,
+            id: (Helper.isNotEmpty(jewelItem)) ? jewelItem.id : null,
             size: slotSize,
 
             // Bypass
@@ -162,9 +166,9 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
                 <span>{_('slot')}: {slotIndex + 1} [{slotSize}]</span>
             </div>
             <div className="col-9 mhrc-value">
-                {Helper.isNotEmpty(jewelInfo) ? (
+                {Helper.isNotEmpty(jewelItem) ? (
                     <Fragment>
-                        <span>[{jewelInfo.size}] {_(jewelInfo.name)}</span>
+                        <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
 
                         <div className="mhrc-icons_bundle">
                             <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
@@ -446,7 +450,8 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
                             equipType,
                             slotIndex,
                             slotData.size,
-                            JewelDataset.getItem(slotData.jewel.id)
+                            Helper.isNotEmpty(currentEquipData.jewelIds[slotIndex])
+                                ? currentEquipData.jewelIds[slotIndex] : null
                         )
                     })}
                 </div>
@@ -474,7 +479,7 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
 
                             return (Helper.isNotEmpty(skillItem)) ? (
                                 <div key={skillItem.id} className="col-6 mhrc-value">
-                                    <span>{_(skillItem.name)} Lv.{skillItem.level}</span>
+                                    <span>{_(skillItem.name)} Lv.{skillData.level}</span>
                                 </div>
                             ) : false
                         })}

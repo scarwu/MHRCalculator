@@ -22,229 +22,198 @@ import JewelDataset from 'libraries/dataset/jewel'
 import EnhanceDataset from 'libraries/dataset/enhance'
 import SkillDataset from 'libraries/dataset/skill'
 
-export const getWeaponExtendItem = (equipItem) => {
-    if ('object' !== typeof equipItem
-        || 'string' !== typeof equipItem.id
-    ) {
+export const getWeaponExtendItem = (equipData) => {
+    if (Helper.isEmpty(equipData.id)) {
         return null
     }
 
-    let weaponItem = WeaponDataset.getItem(equipItem.id)
+    let weaponItem = null
+
+    if ('custom' === equipData.id) {
+        weaponItem = Helper.deepCopy(equipData.custom)
+    } else {
+        weaponItem = WeaponDataset.getItem(equipData.id)
+    }
 
     if (Helper.isEmpty(weaponItem)) {
         return null
     }
 
-    if (Helper.isNotEmpty(weaponItem.element)
-        && Helper.isNotEmpty(weaponItem.element.attack)
-    ) {
-        weaponItem.element.attack.value = weaponItem.element.attack.minValue
+    // Set Extends
+    weaponItem.extends = {
+        jewelIds: Helper.deepCopy(equipData.jewelIds),
+        enhanceIds: Helper.deepCopy(equipData.enhanceIds)
     }
 
-    if (Helper.isNotEmpty(weaponItem.element)
-        && Helper.isNotEmpty(weaponItem.element.status)
-    ) {
-        weaponItem.element.status.value = weaponItem.element.status.minValue
-    }
+    // Handle Skills
+    let skillMapping = {}
 
-    // // Handle Enhance
-    // let enhanceSize = 0
-
-    // if (6 <= weaponItem.rare && weaponItem.rare <= 8) {
-    //     enhanceSize = 9 - weaponItem.rare
-    // }
-
-    // if (10 <= weaponItem.rare && weaponItem.rare <= 12) {
-    //     enhanceSize = (15 - weaponItem.rare) * 2
-    // }
-
-    // weaponItem.enhanceSize = enhanceSize
-    // weaponItem.enhances = Helper.isNotEmpty(equipItem.enhances)
-    //     ? equipItem.enhances : []
-
-    // weaponItem.enhances.forEach((enhance) => {
-    //     let enhanceLevel = enhance.level
-    //     let enhanceItem = EnhanceDataset.getItem(enhance.id)
-
-    //     if (Helper.isEmpty(enhanceItem.list[enhanceLevel - 1].reaction)) {
-    //         return false
-    //     }
-
-    //     Object.keys(enhanceItem.list[enhanceLevel - 1].reaction).forEach((reactionType) => {
-    //         let data = enhanceItem.list[enhanceLevel - 1].reaction[reactionType]
-
-    //         switch (reactionType) {
-    //         case 'attack':
-    //             weaponItem.attack += data.value * Constant.weaponMultiple[weaponItem.type]
-    //             weaponItem.attack = parseInt(Math.round(weaponItem.attack))
-
-    //             break
-    //         case 'criticalRate':
-    //             weaponItem.criticalRate += data.value
-
-    //             break
-    //         case 'defense':
-    //             weaponItem.defense = data.value
-
-    //             break
-    //         case 'addSlot':
-    //             weaponItem.slots.push({
-    //                 size: data.size
-    //             })
-
-    //             break
-    //         }
-    //     })
-    // })
-
-    // Handler Slot
-    let skillLevelMapping = {}
-
-    weaponItem.skills && weaponItem.skills.forEach((skillData) => {
-        let skillId = skillData.id
-
-        if (Helper.isEmpty(skillLevelMapping[skillId])) {
-            skillLevelMapping[skillId] = 0
-        }
-
-        skillLevelMapping[skillId] += skillData.level
-    })
-
-    weaponItem.slots && weaponItem.slots.forEach((data, index) => {
-        let jewelItem = null
-
-        if (Helper.isNotEmpty(equipItem.jewelIds)
-            && Helper.isNotEmpty(equipItem.jewelIds[index])
-        ) {
-            jewelItem = JewelDataset.getItem(equipItem.jewelIds[index])
-        }
+    weaponItem.extends.jewelIds.forEach((jewelId) => {
+        let jewelItem = JewelDataset.getItem(jewelId)
 
         if (Helper.isEmpty(jewelItem)) {
-            weaponItem.slots[index].jewel = {}
-
-            return false
+            return
         }
 
-        // Update Item
-        weaponItem.slots[index].jewel = {
-            id: jewelItem.id,
-            size: jewelItem.size
-        }
+        jewelItem.skills.forEach((skillData) => {
+            let skillItem = SkillDataset.getItem(skillData.id)
 
-        jewelItem.skills && jewelItem.skills.forEach((data, index) => {
-            let skillId = data.id
-
-            if (Helper.isEmpty(skillLevelMapping[skillId])) {
-                skillLevelMapping[skillId] = 0
+            if (Helper.isEmpty(skillItem)) {
+                return
             }
 
-            skillLevelMapping[skillId] += data.level
+            if (Helper.isEmpty(skillMapping[skillItem.id])) {
+                skillMapping[skillItem.id] = {
+                    id: skillItem.id,
+                    level: 0
+                }
+            }
+
+            skillMapping[skillItem.id].level += skillData.level
+
+            if (skillMapping[skillItem.id].level > skillItem.list.length) {
+                skillMapping[skillItem.id].level = skillItem.list.length
+            }
         })
     })
 
-    // Reset Skill
-    weaponItem.skills = []
-
-    Object.keys(skillLevelMapping).forEach((skillId) => {
-        let skillLevel = skillLevelMapping[skillId]
-        let skillItem = SkillDataset.getItem(skillId)
-
-        // Fix Skill Level Overflow
-        if (skillLevel > skillItem.list.length) {
-            skillLevel = skillItem.list.length
-        }
-
-        weaponItem.skills.push({
-            id: skillId,
-            level: skillLevel,
-            description: skillItem.list[skillLevel - 1].description
-        })
-    })
-
+    // Replace Skills
+    weaponItem.skills = Object.values(skillMapping)
     weaponItem.skills = weaponItem.skills.sort((skillDataA, skillDataB) => {
         return skillDataB.level - skillDataA.level
     })
 
-    return Helper.deepCopy(weaponItem)
+    return weaponItem
 }
 
-export const getArmorExtendItem = (equipItem) => {
-    if ('object' !== typeof equipItem
-        || 'string' !== typeof equipItem.id
-    ) {
+export const getArmorExtendItem = (equipData) => {
+    if (Helper.isEmpty(equipData.id)) {
         return null
     }
 
-    let armorItem = ArmorDataset.getItem(equipItem.id)
+    let armorItem = ArmorDataset.getItem(equipData.id)
 
     if (Helper.isEmpty(armorItem)) {
         return null
     }
 
-    // Handler Skill & Slot
-    let skillLevelMapping = {}
+    // Set Extends
+    armorItem.extends = {
+        jewelIds: Helper.deepCopy(equipData.jewelIds)
+    }
 
-    armorItem.skills && armorItem.skills.forEach((skillData) => {
-        let skillId = skillData.id
+    // Handle Skills
+    let skillMapping = {}
 
-        if (Helper.isEmpty(skillLevelMapping[skillId])) {
-            skillLevelMapping[skillId] = 0
+    armorItem.skills.forEach((skillData) => {
+        if (Helper.isEmpty(skillMapping[skillData.id])) {
+            skillMapping[skillData.id] = skillData
         }
-
-        skillLevelMapping[skillId] += skillData.level
     })
 
-    armorItem.slots && armorItem.slots.forEach((slotData, index) => {
-        let jewelItem = null
-
-        if (Helper.isNotEmpty(equipItem.jewelIds)
-            && Helper.isNotEmpty(equipItem.jewelIds[index])
-        ) {
-            jewelItem = JewelDataset.getItem(equipItem.jewelIds[index])
-        }
+    armorItem.extends.jewelIds.forEach((jewelId) => {
+        let jewelItem = JewelDataset.getItem(jewelId)
 
         if (Helper.isEmpty(jewelItem)) {
-            armorItem.slots[index].jewel = {}
-
-            return false
+            return
         }
 
-        // Update Item
-        armorItem.slots[index].jewel = {
-            id: jewelItem.id,
-            size: jewelItem.size
-        }
+        jewelItem.skills.forEach((skillData) => {
+            let skillItem = SkillDataset.getItem(skillData.id)
 
-        jewelItem.skills && jewelItem.skills.forEach((skillData, index) => {
-            let skillId = skillData.id
-
-            if (Helper.isEmpty(skillLevelMapping[skillId])) {
-                skillLevelMapping[skillId] = 0
+            if (Helper.isEmpty(skillItem)) {
+                return
             }
 
-            skillLevelMapping[skillId] += skillData.level
+            if (Helper.isEmpty(skillMapping[skillItem.id])) {
+                skillMapping[skillItem.id] = {
+                    id: skillItem.id,
+                    level: 0
+                }
+            }
+
+            skillMapping[skillItem.id].level += skillData.level
+
+            if (skillMapping[skillItem.id].level > skillItem.list.length) {
+                skillMapping[skillItem.id].level = skillItem.list.length
+            }
         })
     })
 
-    // Reset Skill
-    armorItem.skills = []
+    // Replace Skills
+    armorItem.skills = Object.values(skillMapping)
+    armorItem.skills = armorItem.skills.sort((skillDataA, skillDataB) => {
+        return skillDataB.level - skillDataA.level
+    })
 
-    Object.keys(skillLevelMapping).forEach((skillId) => {
-        let skillLevel = skillLevelMapping[skillId]
-        let skillItem = SkillDataset.getItem(skillId)
+    return armorItem
+}
 
-        armorItem.skills.push({
-            id: skillId,
-            level: skillLevel,
-            description: skillItem.list[skillLevel - 1].description
+export const getCharmExtendItem = (equipData) => {
+    if (Helper.isEmpty(equipData.id)) {
+        return null
+    }
+
+    if ('custom' !== equipData.id) {
+        return null
+    }
+
+    let charmItem = Helper.deepCopy(equipData.custom)
+
+    if (Helper.isEmpty(charmItem)) {
+        return null
+    }
+
+    // Set Extends
+    charmItem.extends = {
+        jewelIds: Helper.deepCopy(equipData.jewelIds)
+    }
+
+    // Handle Skills
+    let skillMapping = {}
+
+    charmItem.skills.forEach((skillData) => {
+        if (Helper.isEmpty(skillMapping[skillData.id])) {
+            skillMapping[skillData.id] = skillData
+        }
+    })
+
+    charmItem.extends.jewelIds.forEach((jewelId) => {
+        let jewelItem = JewelDataset.getItem(jewelId)
+
+        if (Helper.isEmpty(jewelItem)) {
+            return
+        }
+
+        jewelItem.skills.forEach((skillData) => {
+            let skillItem = SkillDataset.getItem(skillData.id)
+
+            if (Helper.isEmpty(skillItem)) {
+                return
+            }
+
+            if (Helper.isEmpty(skillMapping[skillItem.id])) {
+                skillMapping[skillItem.id] = {
+                    id: skillItem.id,
+                    level: 0
+                }
+            }
+
+            skillMapping[skillItem.id].level += skillData.level
+
+            if (skillMapping[skillItem.id].level > skillItem.list.length) {
+                skillMapping[skillItem.id].level = skillItem.list.length
+            }
         })
     })
 
-    armorItem.skills = armorItem.skills.sort((skillA, skillB) => {
-        return skillB.level - skillA.level
+    // Replace Skills
+    charmItem.skills = Object.values(skillMapping)
+    charmItem.skills = armorItem.skills.sort((skillDataA, skillDataB) => {
+        return skillDataB.level - skillDataA.level
     })
 
-    return Helper.deepCopy(armorItem)
+    return charmItem
 }
 
 export const equipTypeToDatasetType = (equipType) => {
@@ -264,24 +233,49 @@ export const equipTypeToDatasetType = (equipType) => {
     }
 }
 
-export const getEquipExtendItem = (equipType, equipItem) => {
+export const getEquipExtendItem = (equipType, equipData) => {
+    if (Helper.isEmpty(equipData.id)) {
+        return null
+    }
+
     switch (equipTypeToDatasetType(equipType)) {
         case 'weapon':
-            return getWeaponExtendItem(equipItem)
+            return getWeaponExtendItem(equipData)
         case 'armor':
-            return getArmorExtendItem(equipItem)
+            return getArmorExtendItem(equipData)
         case 'petalace':
-            return Helper.deepCopy(PetalaceDataset.getItem(equipItem.id))
+            return Helper.deepCopy(PetalaceDataset.getItem(equipData.id))
         case 'charm':
-            return null
+            return getCharmExtendItem(equipData)
         default:
             return null
     }
 }
 
+export const getEquipItem = (equipType, equipData) => {
+    if (Helper.isEmpty(equipData.id)) {
+        return null
+    }
+
+    switch (equipTypeToDatasetType(equipType)) {
+    case 'weapon':
+        return ('custom' === equipData.id)
+            ? Helper.deepCopy(equipData.custom)
+            : Helper.deepCopy(WeaponDataset.getItem(equipData.id))
+    case 'armor':
+        return Helper.deepCopy(ArmorDataset.getItem(equipData.id))
+    case 'petalace':
+        return Helper.deepCopy(PetalaceDataset.getItem(equipData.id))
+    case 'charm':
+        return ('custom' === equipData.id)
+            ? Helper.deepCopy(equipData.custom) : null
+    default:
+        return null
+    }
+}
+
 export default {
-    getWeaponExtendItem,
-    getArmorExtendItem,
     getEquipExtendItem,
+    getEquipItem,
     equipTypeToDatasetType
 }

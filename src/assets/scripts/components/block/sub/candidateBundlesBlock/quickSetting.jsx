@@ -15,7 +15,6 @@ import Helper from 'core/helper'
 
 // Load Libraries
 import ArmorDataset from 'libraries/dataset/armor'
-// import CharmDataset from 'libraries/dataset/charm'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
 
@@ -53,12 +52,11 @@ export default function QuickSetting(props) {
         Helper.debug('Component: CandidateBundles -> QuickFactorSetting')
 
         let armorSeriesMapping = {}
-        let charmSeriesMapping = {}
         let jewelMapping = {}
         let skillLevelMapping = {}
 
         const equipTypes = Object.keys(stateRequiredConditions.equips).filter((equipType) => {
-            if ('weapon' === equipType || 'charm' === equipType) {
+            if ('weapon' === equipType || 'charm' === equipType || 'petalace' === equipType) {
                 return false
             }
 
@@ -136,40 +134,6 @@ export default function QuickSetting(props) {
                 name: armorInfo.series
             }
         })
-
-        // if (Helper.isEmpty(stateRequiredConditions.equips.charm)) {
-        //     CharmDataset.hasSkills(skillIds).getList().forEach((charmInfo) => {
-        //         let isSkip = false
-
-        //         charmInfo.skills.forEach((skill) => {
-        //             if (true === isSkip) {
-        //                 return
-        //             }
-
-        //             if (0 === skillLevelMapping[skill.id]) {
-        //                 isSkip = true
-
-        //                 return
-        //             }
-        //         })
-
-        //         if (true === isSkip) {
-        //             return
-        //         }
-
-        //         if (Helper.isEmpty(charmSeriesMapping[charmInfo.seriesId])) {
-        //             charmSeriesMapping[charmInfo.seriesId] = {
-        //                 series: charmInfo.series,
-        //                 min: 1,
-        //                 max: 1
-        //             }
-        //         }
-
-        //         if (charmSeriesMapping[charmInfo.seriesId].max < charmInfo.level) {
-        //             charmSeriesMapping[charmInfo.seriesId].max = charmInfo.level
-        //         }
-        //     })
-        // }
 
         JewelDataset.hasSkills(skillIds, true).getList().forEach((jewelItem) => {
             let isSkip = false
@@ -260,46 +224,6 @@ export default function QuickSetting(props) {
                         </div>
                     )
                 }) : false}
-
-                {0 !== Object.keys(charmSeriesMapping).length ? (
-                    <div className="col-12 mhrc-content">
-                        <div className="col-12 mhrc-name">
-                            <span>{_('charmFactor')}</span>
-                        </div>
-
-                        <div className="col-12 mhrc-content">
-                            {Object.keys(charmSeriesMapping).sort((seriesIdA, seriesIdB) => {
-                                return _(seriesIdA) > _(seriesIdB) ? 1 : -1
-                            }).map((seriesId) => {
-                                let selectLevel = Helper.isNotEmpty(charmFactor[seriesId])
-                                    ? charmFactor[seriesId] : -1
-                                let levelList = [
-                                    { key: -1, value: _('all') },
-                                    { key: 0, value: _('exclude') }
-                                ]
-                                let countableEmptyArray = [...Array(charmSeriesMapping[seriesId].max - charmSeriesMapping[seriesId].min + 1).keys()]
-
-                                countableEmptyArray.forEach((data, index) => {
-                                    levelList.push({ key: index + 1, value: levelMapping[index] })
-                                })
-
-                                return (
-                                    <div key={seriesId} className="col-6 mhrc-value">
-                                        <span>{_(charmSeriesMapping[seriesId].series)}</span>
-                                        <div className="mhrc-icons_bundle">
-                                            <BasicSelector
-                                                iconName="sort-numeric-asc"
-                                                defaultValue={selectLevel}
-                                                options={levelList} onChange={(event) => {
-                                                    States.setter.setAlgorithmParamsUsingFactor('charm', seriesId, parseInt(event.target.value))
-                                                }} />
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-                ) : false}
 
                 {0 !== Object.keys(jewelMapping).length ? Object.keys(jewelMapping).sort((sizeA, sizeB) => {
                     return sizeA > sizeB ? 1 : -1

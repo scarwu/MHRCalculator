@@ -7,7 +7,7 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { Fragment, useState, useEffect, useMemo } from 'react'
 
 // Load Core
 import _ from 'core/lang'
@@ -15,10 +15,7 @@ import Helper from 'core/helper'
 
 // Load Libraries
 import Misc from 'libraries/misc'
-import WeaponDataset from 'libraries/dataset/weapon'
-import ArmorDataset from 'libraries/dataset/armor'
-import PetalaceDataset from 'libraries/dataset/petalace'
-// import CharmDataset from 'libraries/dataset/charm'
+import JewelDataset from 'libraries/dataset/petalace'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -29,69 +26,135 @@ import States from 'states'
 /**
  * Render Functions
  */
+const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
+
+    // Get Jewel Item
+    let jewelItem = JewelDataset.getItem(jewelId)
+
+    const showModal = () => {
+        States.setter.showModal('jewelSelector', {
+            id: (Helper.isNotEmpty(jewelItem)) ? jewelItem.id : null,
+            size: slotSize,
+
+            // Bypass
+            bypass: {
+                target: 'requiredConditions',
+                equipType: equipType,
+                idIndex: slotIndex,
+            }
+        })
+    }
+
+    const removeItem = () => {
+        States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
+    }
+
+    return (
+        <Fragment key={`${equipType}:${slotIndex}`}>
+            <div className="col-3 mhrc-name">
+                <span>{_('slot')}: {slotIndex + 1} [{slotSize}]</span>
+            </div>
+            <div className="col-9 mhrc-value">
+                {Helper.isNotEmpty(jewelItem) ? (
+                    <Fragment>
+                        <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
+
+                        <div className="mhrc-icons_bundle">
+                            <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
+                            <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
+                        </div>
+                    </Fragment>
+                ) : (
+                    <div className="mhrc-icons_bundle">
+                        <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
+                    </div>
+                )}
+            </div>
+        </Fragment>
+    )
+}
+
 const renderEquipItem = (equipType, requiredEquipData) => {
-    if (Helper.isEmpty(requiredEquipData)) {
+    if ('petalace' === equipType) {
         return false
     }
 
-    let equipItem = null
+    let equipItem = Misc.getEquipItem(equipType, requiredEquipData)
 
-    if ('weapon' === equipType) {
-        if ('customWeapon' === requiredEquipData.id) {
-            return (
-                <div key={requiredEquipData.id} className="col-12 mhrc-content">
-                    <div className="col-4 mhrc-name">
-                        <span>{_(equipType)}</span>
-                    </div>
-                    <div className="col-8 mhrc-value">
-                        <span>{_('customWeapon')}: {_(requiredEquipData.customWeapon.type)}</span>
+    const showModal = () => {
+        States.setter.showModal(Misc.equipTypeToDatasetType(equipType) + 'Selector', {
+            id: (Helper.isNotEmpty(equipItem)) ? equipItem.id : null,
+            type: equipType,
 
-                        <div className="mhrc-icons_bundle">
-                            <IconButton
-                                iconName="times" altName={_('clean')}
-                                onClick={() => {States.setter.setRequiredConditions.equips(equipType, null)}} />
-                        </div>
-                    </div>
-                </div>
-            )
-        }
+            // Bypass
+            bypass: {
+                target: 'requiredConditions',
+                equipType: equipType
+            }
+        })
+    }
 
-        equipItem = WeaponDataset.getItem(requiredEquipData.id)
-    } else if ('helm' === equipType
-        || 'chest' === equipType
-        || 'arm' === equipType
-        || 'waist' === equipType
-        || 'leg' === equipType
-    ) {
-        equipItem = ArmorDataset.getItem(requiredEquipData.id)
-    } else if ('petalace' === equipType) {
-        equipItem = PetalaceDataset.getItem(requiredEquipData.id)
-    } else if('charm' === equipType) {
-        // equipItem = CharmDataset.getItem(requiredEquipData.id)
-    } else {
-        return false
+    const removeItem = () => {
+        States.setter.setRequiredConditionsEquip(equipType, null)
     }
 
     if (Helper.isEmpty(equipItem)) {
-        return false
+        return (
+            <div key={equipType} className="col-12 mhrc-content">
+                <div className="col-12 mhrc-name">
+                    <span>{_(equipType)}</span>
+
+                    <div className="mhrc-icons_bundle">
+                        {'weapon' === equipType || 'charm' === equipType ? (
+                            <IconButton
+                                iconName="wrench" altName={_('customEquip')}
+                                onClick={() => {
+                                    States.setter.setRequiredConditionsEquip(equipType, 'custom')
+                                }} />
+                        ) : false}
+                        {'charm' !== equipType ? (
+                            <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
+                        ) : false}
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
         <div key={equipItem.id} className="col-12 mhrc-content">
-            <div className="col-4 mhrc-name">
-                <span>{_(equipType)}</span>
-            </div>
-            <div className="col-8 mhrc-value">
-                <span>{_(equipItem.name)}</span>
+            <div className="col-12 mhrc-name">
+                <span>{_(equipType)}: {_(equipItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    <IconButton
-                        iconName="times" altName={_('clean')}
-                        onClick={() => {
-                            States.setter.setRequiredConditionsEquip(equipType, null)
-                        }} />
+                    {'weapon' === equipType || 'charm' === equipType ? (
+                        <IconButton
+                            iconName="wrench" altName={_('customEquip')}
+                            onClick={() => {
+                                States.setter.setRequiredConditionsEquip(equipType, 'custom')
+                            }} />
+                    ) : false}
+                    {'charm' !== equipType ? (
+                        <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
+                    ) : false}
+                    <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
                 </div>
             </div>
+
+            {(Helper.isNotEmpty(equipItem.slots) && 0 !== equipItem.slots.length) ? (
+                <div className="col-12 mhrc-content">
+                    {equipItem.slots.map((slotData, slotIndex) => {
+                        return renderJewelOption(
+                            equipType,
+                            slotIndex,
+                            slotData.size,
+                            Helper.isNotEmpty(requiredEquipData.jewelIds[slotIndex])
+                                ? requiredEquipData.jewelIds[slotIndex] : null
+                        )
+                    })}
+                </div>
+            ) : false}
+
         </div>
     )
 }

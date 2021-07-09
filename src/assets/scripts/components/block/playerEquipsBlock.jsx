@@ -420,7 +420,7 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
             <div className="col-12 mhrc-name">
                 <span>{_(equipType)}: {_(equipExtendItem.name)}</span>
                 <div className="mhrc-icons_bundle">
-                    {isNotRequire ? (
+                    {'petalace' !== equipType && isNotRequire ? (
                         <IconButton
                             iconName="arrow-left" altName={_('include')}
                             onClick={() => {
@@ -434,7 +434,9 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
                                 States.setter.setPlayerEquip(equipType, 'custom')
                             }} />
                     ) : false}
-                    <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
+                    {'charm' !== equipType ? (
+                        <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
+                    ) : false}
                     <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
                 </div>
             </div>

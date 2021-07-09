@@ -29,22 +29,22 @@ import States from 'states'
 /**
  * Render Functions
  */
-const renderEquipItem = (equipType, requiredEquip) => {
-    if (Helper.isEmpty(requiredEquip)) {
+const renderEquipItem = (equipType, requiredEquipData) => {
+    if (Helper.isEmpty(requiredEquipData)) {
         return false
     }
 
-    let equipInfo = null
+    let equipItem = null
 
     if ('weapon' === equipType) {
-        if ('customWeapon' === requiredEquip.id) {
+        if ('customWeapon' === requiredEquipData.id) {
             return (
-                <div key={requiredEquip.id} className="col-12 mhrc-content">
+                <div key={requiredEquipData.id} className="col-12 mhrc-content">
                     <div className="col-4 mhrc-name">
                         <span>{_(equipType)}</span>
                     </div>
                     <div className="col-8 mhrc-value">
-                        <span>{_('customWeapon')}: {_(requiredEquip.customWeapon.type)}</span>
+                        <span>{_('customWeapon')}: {_(requiredEquipData.customWeapon.type)}</span>
 
                         <div className="mhrc-icons_bundle">
                             <IconButton
@@ -56,33 +56,33 @@ const renderEquipItem = (equipType, requiredEquip) => {
             )
         }
 
-        equipInfo = WeaponDataset.getInfo(requiredEquip.id)
+        equipItem = WeaponDataset.getItem(requiredEquipData.id)
     } else if ('helm' === equipType
         || 'chest' === equipType
         || 'arm' === equipType
         || 'waist' === equipType
         || 'leg' === equipType
     ) {
-        equipInfo = ArmorDataset.getInfo(requiredEquip.id)
+        equipItem = ArmorDataset.getItem(requiredEquipData.id)
     } else if ('petalace' === equipType) {
-        equipInfo = PetalaceDataset.getInfo(requiredEquip.id)
+        equipItem = PetalaceDataset.getItem(requiredEquipData.id)
     } else if('charm' === equipType) {
-        // equipInfo = CharmDataset.getInfo(requiredEquip.id)
+        // equipItem = CharmDataset.getItem(requiredEquipData.id)
     } else {
         return false
     }
 
-    if (Helper.isEmpty(equipInfo)) {
+    if (Helper.isEmpty(equipItem)) {
         return false
     }
 
     return (
-        <div key={equipInfo.id} className="col-12 mhrc-content">
+        <div key={equipItem.id} className="col-12 mhrc-content">
             <div className="col-4 mhrc-name">
                 <span>{_(equipType)}</span>
             </div>
             <div className="col-8 mhrc-value">
-                <span>{_(equipInfo.name)}</span>
+                <span>{_(equipItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
                     <IconButton

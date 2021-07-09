@@ -13,35 +13,35 @@ import md5 from 'md5'
 // Load Config
 import Config from 'config'
 
-function log(...params) {
+export const log = (...params) => {
     if ('production' !== Config.env) {
         console.log.apply(this, params)
     }
 }
 
-function debug(...params) {
+export const debug = (...params) => {
     if ('production' !== Config.env) {
         console.debug.apply(this, params)
     }
 }
 
-function isEmpty(variable) {
+export const isEmpty = (variable) => {
     return (undefined === variable || null === variable)
 }
 
-function isNotEmpty(variable) {
+export const isNotEmpty = (variable) => {
     return (undefined !== variable && null !== variable)
 }
 
-function deepCopy(data) {
+export const deepCopy = (data) => {
     return JSON.parse(JSON.stringify(data))
 }
 
-function jsonHash(data) {
+export const jsonHash = (data) => {
     return md5(JSON.stringify(data))
 }
 
-function base64Encode(text) {
+export const base64Encode = (text) => {
     text = window.btoa(text)
 
     return text
@@ -49,7 +49,7 @@ function base64Encode(text) {
         .replace(/\//g, '_')
 }
 
-function base64Decode(text) {
+export const base64Decode = (text) => {
     text = text
         .replace(/\-/g, '+')
         .replace(/\_/g, '/')

@@ -10,7 +10,7 @@
 let prefix = 'mhrc:2021:6'
 let storage = window.localStorage
 
-function get(key) {
+export const get = (key) => {
     if (undefined === storage[`${prefix}:${key}`]) {
         return undefined
     }
@@ -20,7 +20,7 @@ function get(key) {
     return dataSet
 }
 
-function set(key, value) {
+export const set = (key, value) => {
     let dataSet = (undefined !== storage[`${prefix}:${key}`])
         ? JSON.parse(storage[`${prefix}:${key}`]) : {}
 
@@ -29,7 +29,7 @@ function set(key, value) {
     storage[`${prefix}:${key}`] = JSON.stringify(dataSet)
 }
 
-function has(key) {
+export const has = (key) => {
     if (undefined === storage[`${prefix}:${key}`]) {
         return undefined
     }
@@ -39,8 +39,15 @@ function has(key) {
     return undefined !== dataSet
 }
 
+export const reset = () => {
+    for (let key of storage) {
+        delete storage[key]
+    }
+}
+
 export default {
     get,
     set,
-    has
+    has,
+    reset
 }

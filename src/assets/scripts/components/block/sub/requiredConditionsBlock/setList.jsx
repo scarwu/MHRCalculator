@@ -26,41 +26,33 @@ import States from 'states'
 /**
  * Render Functions
  */
-const renderSetItem = (set, enableSetIdList) => {
-    let setInfo = SetDataset.getInfo(set.id)
+const renderSetItem = (setData) => {
+    let setItem = SetDataset.getItem(setData.id)
 
-    if (Helper.isEmpty(setInfo)) {
+    if (Helper.isEmpty(setItem)) {
         return false
     }
 
-    let currentSetCount = 0
-
-    setInfo.list.forEach((item) => {
-        if (false === item.isHidden || -1 !== enableSetIdList.indexOf(setInfo.id)) {
-            currentSetCount++
-        }
-    })
-
     return (
-        <div key={setInfo.id} className="col-12 mhrc-content">
+        <div key={setItem.id} className="col-12 mhrc-content">
             <div className="col-12 mhrc-name">
-                <span>{_(setInfo.name)} x {currentSetCount}</span>
+                <span>{_(setItem.name)} x {setData.count}</span>
 
                 <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="minus-circle" altName={_('down')}
                         onClick={() => {
-                            States.setter.decreaseRequiredConditionsSetCount(set.id)
+                            States.setter.decreaseRequiredConditionsSetCount(setItem.id)
                         }} />
                     <IconButton
                         iconName="plus-circle" altName={_('up')}
                         onClick={() => {
-                            States.setter.increaseRequiredConditionsSetCount(set.id)
+                            States.setter.increaseRequiredConditionsSetCount(setItem.id)
                         }} />
                     <IconButton
                         iconName="times" altName={_('clean')}
                         onClick={() => {
-                            States.setter.removeRequiredConditionsSet(set.id)
+                            States.setter.removeRequiredConditionsSet(setItem.id)
                         }} />
                 </div>
             </div>
@@ -73,7 +65,6 @@ export default function SetList(props) {
     /**
      * Hooks
      */
-    // const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
     const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     // Like Did Mount & Will Unmount Cycle
@@ -90,23 +81,30 @@ export default function SetList(props) {
     return useMemo(() => {
         Helper.debug('Component: ConditionOptions -> SetList')
 
+        const showModal = () => {
+            States.setter.showModal('setSelector', {
+                ids: stateRequiredConditions.sets.map((setData) => {
+                    return setData.id
+                }),
+
+                // Bypass
+                bypass: {
+                    target: 'requiredConditions'
+                }
+            })
+        }
+
         return (
             <div className="mhrc-item mhrc-item-3-step">
                 <div className="col-12 mhrc-name">
                     <span>{_('set')}</span>
                     <div className="mhrc-icons_bundle">
-                        <IconButton
-                            iconName="plus" altName={_('add')}
-                            onClick={() => {
-                                States.setter.showModal('setSelector', {
-                                    target: 'requiredConditions'
-                                })
-                            }} />
+                        <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
                     </div>
                 </div>
 
-                {stateRequiredConditions.sets.map((set) => {
-                    return renderSetItem(set, enableSetIdList)
+                {stateRequiredConditions.sets.map((setData) => {
+                    return renderSetItem(setData)
                 })}
              </div>
         )

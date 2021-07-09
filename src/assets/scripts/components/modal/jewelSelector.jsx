@@ -27,13 +27,13 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (itemId, modalData) => {
-    if ('playerEquips' === modalData.target) {
-        States.setter.setPlayerEquipJewel(modalData.equipType, modalData.idIndex, itemId)
+const handleItemPickUp = (itemId, bypassData) => {
+    if ('playerEquips' === bypassData.target) {
+        States.setter.setPlayerEquipJewel(bypassData.equipType, bypassData.idIndex, itemId)
     }
 
-    if ('requiredConditions' === modalData.target) {
-        States.setter.setRequiredConditionsEquipJewel(modalData.equipType, modalData.idIndex, itemId)
+    if ('requiredConditions' === bypassData.target) {
+        States.setter.setRequiredConditionsEquipJewel(bypassData.equipType, bypassData.idIndex, itemId)
     }
 
     States.setter.hideModal('jewelSelector')
@@ -50,26 +50,26 @@ const renderJewelItem = (jewelItem, modalData) => {
                 <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(jewelItem.id !== modalData.equipId) ? (
+                    {(jewelItem.id !== modalData.id && Helper.isNotEmpty(modalData.bypass)) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => {
-                                handleItemPickUp(jewelItem.id, modalData)
+                                handleItemPickUp(jewelItem.id, modalData.bypass)
                             }} />
                     ) : false}
                 </div>
             </div>
             <div className="col-12 mhrc-content">
-                {jewelItem.skills.map((skillItem, index) => {
-                    let skillInfo = SkillDataset.getInfo(skillItem.id)
+                {jewelItem.skills.map((skillData, index) => {
+                    let skillItem = SkillDataset.getItem(skillData.id)
 
-                    return Helper.isNotEmpty(skillInfo) ? (
+                    return Helper.isNotEmpty(skillItem) ? (
                         <Fragment key={index}>
                             <div className="col-12 mhrc-name">
-                                <span>{_(skillInfo.name)} Lv.{skillItem.level}</span>
+                                <span>{_(skillItem.name)} Lv.{skillData.level}</span>
                             </div>
                             <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillInfo.list[skillItem.level - 1].effect)}</span>
+                                <span>{_(skillItem.list[skillData.level - 1].effect)}</span>
                             </div>
                         </Fragment>
                     ) : false
@@ -94,12 +94,12 @@ export default function JewelSelectorModal(props) {
             return
         }
 
-        let sortedList = JewelDataset.getItems()
+        let sortedList = JewelDataset.getList()
 
         // for (let size = stateModalData.slotSize; size >= 1; size--) {
         //     for (let rare = 9; rare >= 1; rare--) {
         //         sortedList = sortedList.concat(
-        //             JewelDataset.rareIs(rare).sizeIs(size).getItems().map((jewelInfo) => {
+        //             JewelDataset.rareIs(rare).sizeIs(size).getList().map((jewelInfo) => {
         //                 jewelInfo.isSelect = (stateModalData.jewelId === jewelInfo.id)
 
         //                 return jewelInfo
@@ -130,7 +130,7 @@ export default function JewelSelectorModal(props) {
             return
         }
 
-        States.setter.hideModel('jewelSelector')
+        States.setter.hideModal('jewelSelector')
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -149,16 +149,16 @@ export default function JewelSelectorModal(props) {
 
         let modalData = Helper.deepCopy(stateModalData)
 
-        return stateSortedList.filter((data) => {
+        return stateSortedList.filter((item) => {
 
             // Create Text
-            let text = _(data.name)
+            let text = _(item.name)
 
-            data.skills.forEach((skill) => {
-                let skillInfo = SkillDataset.getInfo(skill.id)
+            item.skills.forEach((skillData) => {
+                let skillItem = SkillDataset.getItem(skillData.id)
 
-                if (Helper.isNotEmpty(skillInfo)) {
-                    text += _(skillInfo.name)
+                if (Helper.isNotEmpty(skillItem)) {
+                    text += _(skillItem.name)
                 }
             })
 
@@ -170,10 +170,10 @@ export default function JewelSelectorModal(props) {
             }
 
             return true
-        }).sort((dataA, dataB) => {
-            return _(dataA.id) > _(dataB.id) ? 1 : -1
-        }).map((data) => {
-            return renderJewelItem(data, modalData)
+        }).sort((itemA, itemB) => {
+            return _(itemA.id) > _(itemB.id) ? 1 : -1
+        }).map((item) => {
+            return renderJewelItem(item, modalData)
         })
     }, [
         stateModalData,

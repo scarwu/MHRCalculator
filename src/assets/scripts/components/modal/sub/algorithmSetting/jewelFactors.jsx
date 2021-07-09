@@ -53,17 +53,17 @@ export default function JewelFactors(props) {
         let jewelFactor = stateAlgorithmParams.usingFactor.jewel
 
         if (true === byRequiredConditions) {
-            const skillIds = stateRequiredSkills.map((skill) => {
-                skillLevelMapping[skill.id] = skill.level
+            const skillIds = stateRequiredSkills.map((skillData) => {
+                skillLevelMapping[skillData.id] = skillData.level
 
-                return skill.id
+                return skillData.id
             })
 
             dataset = dataset.hasSkills(skillIds, true)
         }
 
-        dataset.getItems().filter((jewelInfo) => {
-            let text = _(jewelInfo.name)
+        dataset.getList().filter((jewelItem) => {
+            let text = _(jewelItem.name)
 
             if (Helper.isNotEmpty(segment)
                 && -1 === text.toLowerCase().search(segment.toLowerCase())
@@ -72,20 +72,20 @@ export default function JewelFactors(props) {
             }
 
             return true
-        }).forEach((jewelInfo) => {
-            if (false === jewelFactor['size' + jewelInfo.size]) {
+        }).forEach((jewelItem) => {
+            if (false === jewelFactor['size' + jewelItem.size]) {
                 return false
             }
 
             if (true === byRequiredConditions) {
                 let isSkip = false
 
-                jewelInfo.skills.forEach((skill) => {
+                jewelItem.skills.forEach((skillData) => {
                     if (true === isSkip) {
                         return
                     }
 
-                    if (0 === skillLevelMapping[skill.id]) {
+                    if (0 === skillLevelMapping[skillData.id]) {
                         isSkip = true
 
                         return
@@ -97,23 +97,23 @@ export default function JewelFactors(props) {
                 }
             }
 
-            if (Helper.isEmpty(jewelSizeMapping[jewelInfo.size])) {
-                jewelSizeMapping[jewelInfo.size] = {}
+            if (Helper.isEmpty(jewelSizeMapping[jewelItem.size])) {
+                jewelSizeMapping[jewelItem.size] = {}
             }
 
-            if (Helper.isEmpty(jewelSizeMapping[jewelInfo.size][jewelInfo.id])) {
-                jewelSizeMapping[jewelInfo.size][jewelInfo.id] = {
-                    name: jewelInfo.name,
+            if (Helper.isEmpty(jewelSizeMapping[jewelItem.size][jewelItem.id])) {
+                jewelSizeMapping[jewelItem.size][jewelItem.id] = {
+                    name: jewelItem.name,
                     min: 1,
                     max: 1
                 }
             }
 
-            jewelInfo.skills.forEach((skill) => {
-                let skillInfo = SkillDataset.getInfo(skill.id)
+            jewelItem.skills.forEach((skillData) => {
+                let skillItem = SkillDataset.getItem(skillData.id)
 
-                if (jewelSizeMapping[jewelInfo.size][jewelInfo.id].max < skillInfo.list.length) {
-                    jewelSizeMapping[jewelInfo.size][jewelInfo.id].max = skillInfo.list.length
+                if (jewelSizeMapping[jewelItem.size][jewelItem.id].max < skillItem.list.length) {
+                    jewelSizeMapping[jewelItem.size][jewelItem.id].max = skillItem.list.length
                 }
             })
         })

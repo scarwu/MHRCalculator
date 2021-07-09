@@ -72,18 +72,18 @@ class PetalaceDataset {
         return Object.keys(this.mapping)
     }
 
-    getItems = () => {
+    getList = () => {
         let result = Object.values(this.mapping)
 
         return result
     }
 
-    getInfo = (id) => {
+    getItem = (id) => {
         return (Helper.isNotEmpty(this.mapping[id]))
             ? Helper.deepCopy(this.mapping[id]) : null
     }
 
-    setInfo = (id, info) => {
+    setItem = (id, info) => {
         if (Helper.isNotEmpty(info)) {
             this.mapping[id] = info
         } else {

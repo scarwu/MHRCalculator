@@ -91,22 +91,22 @@ const handleBundlePickUp = (bundle, required) => {
 
     if (Helper.isNotEmpty(bundle.jewelPackages[jewelPackageIndex])) {
         Object.keys(bundle.jewelPackages[jewelPackageIndex]).sort((jewelIdA, jewelIdB) => {
-            let jewelInfoA = JewelDataset.getInfo(jewelIdA)
-            let jewelInfoB = JewelDataset.getInfo(jewelIdB)
+            let jewelItemA = JewelDataset.getItem(jewelIdA)
+            let jewelItemB = JewelDataset.getItem(jewelIdB)
 
-            if (Helper.isEmpty(jewelInfoA) || Helper.isEmpty(jewelInfoB)) {
+            if (Helper.isEmpty(jewelItemA) || Helper.isEmpty(jewelItemB)) {
                 return 0
             }
 
-            return jewelInfoA.size - jewelInfoB.size
+            return jewelItemA.size - jewelItemB.size
         }).forEach((jewelId) => {
-            let jewelInfo = JewelDataset.getInfo(jewelId)
+            let jewelItem = JewelDataset.getItem(jewelId)
 
-            if (Helper.isEmpty(jewelInfo)) {
+            if (Helper.isEmpty(jewelItem)) {
                 return
             }
 
-            let currentSize = jewelInfo.size
+            let currentSize = jewelItem.size
 
             let jewelCount = bundle.jewelPackages[jewelPackageIndex][jewelId]
             let data = null
@@ -252,10 +252,10 @@ export default function BundleList(props) {
 
             if (Helper.isNotEmpty(bundle.jewelPackages[jewelPackageIndex])) {
                 bundleJewels = Object.keys(bundle.jewelPackages[jewelPackageIndex]).map((jewelId) => {
-                    let jewelInfo = JewelDataset.getInfo(jewelId)
+                    let jewelItem = JewelDataset.getItem(jewelId)
                     let jewelCount = bundle.jewelPackages[jewelPackageIndex][jewelId]
 
-                    for (let slotSize = jewelInfo.size; slotSize <= 4; slotSize++) {
+                    for (let slotSize = jewelItem.size; slotSize <= 4; slotSize++) {
                         if (0 === remainingSlotCountMapping[slotSize]) {
                             continue
                         }
@@ -279,16 +279,16 @@ export default function BundleList(props) {
                         count: bundle.jewelPackages[jewelPackageIndex][jewelId]
                     }
                 }).sort((jewelA, jewelB) => {
-                    let jewelInfoA = JewelDataset.getInfo(jewelA.id)
-                    let jewelInfoB = JewelDataset.getInfo(jewelB.id)
+                    let jewelItemA = JewelDataset.getItem(jewelA.id)
+                    let jewelItemB = JewelDataset.getItem(jewelB.id)
 
-                    return jewelInfoA.size < jewelInfoB.size ? 1 : -1
+                    return jewelItemA.size < jewelItemB.size ? 1 : -1
                 })
             }
 
             // Additional Sets & Skills
             // const additionalSets = Object.keys(bundle.setCountMapping).map((setId) => {
-            //     let setInfo = SetDataset.getInfo(setId)
+            //     let setInfo = SetDataset.getItem(setId)
 
             //     if (Helper.isEmpty(setInfo)) {
             //         return false
@@ -406,16 +406,16 @@ export default function BundleList(props) {
                                         ) : false
                                     }
 
-                                    equipInfo = WeaponDataset.getInfo(equip.id)
+                                    equipInfo = WeaponDataset.getItem(equip.id)
                                 } else if ('helm' === equip.type
                                     || 'chest' === equip.type
                                     || 'arm' === equip.type
                                     || 'waist' === equip.type
                                     || 'leg' === equip.type
                                 ) {
-                                    equipInfo = ArmorDataset.getInfo(equip.id)
+                                    equipInfo = ArmorDataset.getItem(equip.id)
                                 } else if ('charm' === equip.type) {
-                                    // equipInfo = CharmDataset.getInfo(equip.id)
+                                    // equipInfo = CharmDataset.getItem(equip.id)
                                 }
 
                                 return Helper.isNotEmpty(equipInfo) ? (
@@ -457,11 +457,11 @@ export default function BundleList(props) {
                             </div>
                             <div className="col-12 mhrc-content">
                                 {bundleJewels.map((jewel) => {
-                                    let jewelInfo = JewelDataset.getInfo(jewel.id)
+                                    let jewelItem = JewelDataset.getItem(jewel.id)
 
-                                    return (Helper.isNotEmpty(jewelInfo)) ? (
+                                    return (Helper.isNotEmpty(jewelItem)) ? (
                                         <div key={jewel.id} className="col-6 mhrc-value">
-                                            <span>{`[${jewelInfo.size}] ${_(jewelInfo.name)} x ${jewel.count}`}</span>
+                                            <span>{`[${jewelItem.size}] ${_(jewelItem.name)} x ${jewel.count}`}</span>
                                         </div>
                                     ) : false
                                 })}
@@ -499,7 +499,7 @@ export default function BundleList(props) {
                             </div>
                             <div className="col-12 mhrc-content">
                                 {additionalSets.map((set) => {
-                                    let setInfo = SetDataset.getInfo(set.id)
+                                    let setInfo = SetDataset.getItem(set.id)
 
                                     return (
                                         <div key={set.id} className="col-6 mhrc-value">
@@ -529,7 +529,7 @@ export default function BundleList(props) {
                             </div>
                             <div className="col-12 mhrc-content">
                                 {additionalSkills.map((skill) => {
-                                    let skillInfo = SkillDataset.getInfo(skill.id)
+                                    let skillInfo = SkillDataset.getItem(skill.id)
 
                                     return (Helper.isNotEmpty(skillInfo)) ? (
                                         <div key={skill.id} className="col-6 mhrc-value">

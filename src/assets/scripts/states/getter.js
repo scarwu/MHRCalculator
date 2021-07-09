@@ -12,7 +12,11 @@ import Helper from 'core/helper'
 
 import store from './store'
 
-export const getModalData = (target) => {
+export const getModalData = (target = null) => {
+    if (Helper.isEmpty(target)) {
+        return store.getState().modalHub
+    }
+
     if (Helper.isEmpty(store.getState().modalHub[target])) {
         return null
     }
@@ -20,16 +24,40 @@ export const getModalData = (target) => {
     return store.getState().modalHub[target]
 }
 
-export const getDataStore = () => {
-    return store.getState().dataStore
+export const getDataStore = (target = null) => {
+    if (Helper.isEmpty(target)) {
+        return store.getState().dataStore
+    }
+
+    if (Helper.isEmpty(store.getState().dataStore[target])) {
+        return null
+    }
+
+    return store.getState().dataStore[target]
 }
 
-export const getPlayerEquips = () => {
-    return store.getState().playerEquips
+export const getPlayerEquips = (target = null) => {
+    if (Helper.isEmpty(target)) {
+        return store.getState().playerEquips
+    }
+
+    if (Helper.isEmpty(store.getState().playerEquips[target])) {
+        return null
+    }
+
+    return store.getState().playerEquips[target]
 }
 
-export const getRequiredConditions = () => {
-    return store.getState().requiredConditions
+export const getRequiredConditions = (target = null) => {
+    if (Helper.isEmpty(target)) {
+        return store.getState().requiredConditions
+    }
+
+    if (Helper.isEmpty(store.getState().requiredConditions[target])) {
+        return null
+    }
+
+    return store.getState().requiredConditions[target]
 }
 
 export default {
@@ -38,18 +66,6 @@ export default {
     getPlayerEquips,
     getRequiredConditions,
 
-    getRequiredSets: () => {
-        return store.getState().requiredSets
-    },
-    getRequiredSkills: () => {
-        return store.getState().requiredSkills
-    },
-    getRequiredEquips: () => {
-        return store.getState().requiredEquips
-    },
-    getCurrentEquips: () => {
-        return store.getState().currentEquips
-    },
     getAlgorithmParams: () => {
         return store.getState().algorithmParams
     },
@@ -58,8 +74,5 @@ export default {
     },
     getReservedBundles: () => {
         return store.getState().reservedBundles
-    },
-    getCustomWeapon: () => {
-        return store.getState().customWeapon
     }
 }

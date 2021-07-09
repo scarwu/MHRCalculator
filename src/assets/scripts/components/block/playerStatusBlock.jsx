@@ -63,12 +63,12 @@ const generateEquipInfos = (equips) => {
     //         isCompleted = false
     //     }
 
-    //     WeaponDataset.setInfo('customWeapon', (true === isCompleted)
+    //     WeaponDataset.setItem('customWeapon', (true === isCompleted)
     //         ? Helper.deepCopy(customWeapon) : undefined)
     // }
 
     Object.keys(equips).forEach((equipType) => {
-        equipInfos[equipType] = Misc.getEquipExtendInfo(equipType, equips[equipType])
+        equipInfos[equipType] = Misc.getEquipExtendItem(equipType, equips[equipType])
     })
 
     return equipInfos
@@ -82,16 +82,16 @@ const generatePassiveSkills = (equipInfos) => {
             continue
         }
 
-        equipInfos[equipType].skills.forEach((skill) => {
-            let skillInfo = SkillDataset.getInfo(skill.id)
+        equipInfos[equipType].skills.forEach((skillData) => {
+            let skillItem = SkillDataset.getItem(skillData.id)
 
-            if (Helper.isEmpty(skillInfo)) {
+            if (Helper.isEmpty(skillItem)) {
                 return
             }
 
-            if ('passive' === skillInfo.type) {
-                if (Helper.isEmpty(passiveSkills[skillInfo.id])) {
-                    passiveSkills[skillInfo.id] = {
+            if ('passive' === skillItem.type) {
+                if (Helper.isEmpty(passiveSkills[skillItem.id])) {
+                    passiveSkills[skillItem.id] = {
                         isActive: false
                     }
                 }
@@ -176,41 +176,41 @@ const generateStatus = (equipInfos, passiveSkills) => {
         })
     }
 
-    Object.keys(setMapping).forEach((setId) => {
-        let setCount = setMapping[setId]
-        let setInfo = SetDataset.getInfo(setId)
+    // Object.keys(setMapping).forEach((setId) => {
+    //     let setCount = setMapping[setId]
+    //     let setItem = SetDataset.getItem(setId)
 
-        if (Helper.isEmpty(setInfo)) {
-            return
-        }
+    //     if (Helper.isEmpty(setItem)) {
+    //         return
+    //     }
 
-        setInfo.skills.forEach((skill) => {
-            if (skill.require > setCount) {
-                return
-            }
+    //     setItem.skills.forEach((skillData) => {
+    //         if (skillData.require > setCount) {
+    //             return
+    //         }
 
-            let skillInfo = SkillDataset.getInfo(skill.id)
+    //         let skillItem = SkillDataset.getItem(skillData.id)
 
-            if (Helper.isEmpty(skillInfo)) {
-                return
-            }
+    //         if (Helper.isEmpty(skillItem)) {
+    //             return
+    //         }
 
-            status.sets.push({
-                id: setId,
-                require: skill.require,
-                skill: {
-                    id: skillInfo.id,
-                    level: 1
-                }
-            })
+    //         status.sets.push({
+    //             id: setId,
+    //             require: skillData.require,
+    //             skill: {
+    //                 id: skillItem.id,
+    //                 level: 1
+    //             }
+    //         })
 
-            if (Helper.isEmpty(allSkills[skill.id])) {
-                allSkills[skill.id] = 0
-            }
+    //         if (Helper.isEmpty(allSkills[skillData.id])) {
+    //             allSkills[skillData.id] = 0
+    //         }
 
-            allSkills[skill.id] += 1
-        })
-    })
+    //         allSkills[skillData.id] += 1
+    //     })
+    // })
 
     let noneElementAttackMultiple = null
     let resistanceMultiple = null
@@ -221,26 +221,26 @@ const generateStatus = (equipInfos, passiveSkills) => {
     let defenseMultipleList = []
 
     for (let skillId in allSkills) {
-        let skillInfo = SkillDataset.getInfo(skillId)
+        let skillItem = SkillDataset.getItem(skillId)
 
-        if (Helper.isEmpty(skillInfo)) {
+        if (Helper.isEmpty(skillItem)) {
             continue
         }
 
         let skillLevel = allSkills[skillId]
 
         // Fix Skill Level Overflow
-        if (skillLevel > skillInfo.list.length) {
-            skillLevel = skillInfo.list.length
+        if (skillLevel > skillItem.list.length) {
+            skillLevel = skillItem.list.length
         }
 
         status.skills.push({
             id: skillId,
             level: skillLevel,
-            effect: skillInfo.list[skillLevel - 1].effect
+            effect: skillItem.list[skillLevel - 1].effect
         })
 
-        if ('passive' === skillInfo.type) {
+        if ('passive' === skillItem.type) {
             if (Helper.isEmpty(passiveSkills[skillId])) {
                 passiveSkills[skillId] = {
                     isActive: false
@@ -252,12 +252,12 @@ const generateStatus = (equipInfos, passiveSkills) => {
             }
         }
 
-        if (Helper.isEmpty(skillInfo.list[skillLevel - 1].reaction)) {
+        if (Helper.isEmpty(skillItem.list[skillLevel - 1].reaction)) {
             continue
         }
 
-        for (let reactionType in skillInfo.list[skillLevel - 1].reaction) {
-            let data = skillInfo.list[skillLevel - 1].reaction[reactionType]
+        for (let reactionType in skillItem.list[skillLevel - 1].reaction) {
+            let data = skillItem.list[skillLevel - 1].reaction[reactionType]
 
             switch (reactionType) {
             case 'health':
@@ -943,18 +943,18 @@ export default function PlayerStatusBlock(props) {
                             <span>{_('set')}</span>
                         </div>
                         {status.sets.map((data, index) => {
-                            let setInfo = SetDataset.getInfo(data.id)
-                            let skillInfo = SkillDataset.getInfo(data.skill.id)
+                            let setItem = SetDataset.getItem(data.id)
+                            let skillItem = SkillDataset.getItem(data.skill.id)
 
-                            return (Helper.isNotEmpty(setInfo)
-                                && Helper.isNotEmpty(skillInfo))
+                            return (Helper.isNotEmpty(setItem)
+                                && Helper.isNotEmpty(skillItem))
                             ? (
                                 <div key={`${index}:${data.id}`} className="col-12 mhrc-content">
                                     <div className="col-12 mhrc-name">
-                                        <span>{_(setInfo.name)} ({data.require})</span>
+                                        <span>{_(setItem.name)} ({data.require})</span>
                                     </div>
                                     <div className="col-12 mhrc-value">
-                                        <span>{_(skillInfo.name)} Lv.{data.skill.level}</span>
+                                        <span>{_(skillItem.name)} Lv.{data.skill.level}</span>
                                     </div>
                                 </div>
                             ) : false
@@ -970,12 +970,12 @@ export default function PlayerStatusBlock(props) {
                         {status.skills.sort((skillA, skillB) => {
                             return skillB.level - skillA.level
                         }).map((data) => {
-                            let skillInfo = SkillDataset.getInfo(data.id)
+                            let skillItem = SkillDataset.getItem(data.id)
 
-                            return (Helper.isNotEmpty(skillInfo)) ? (
+                            return (Helper.isNotEmpty(skillItem)) ? (
                                 <div key={data.id} className="col-12 mhrc-content">
                                     <div className="col-12 mhrc-name">
-                                        <span>{_(skillInfo.name)} Lv.{data.level}</span>
+                                        <span>{_(skillItem.name)} Lv.{data.level}</span>
 
                                         <div className="mhrc-icons_bundle">
                                             {Helper.isNotEmpty(passiveSkills[data.id]) ? (

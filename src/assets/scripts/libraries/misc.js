@@ -22,73 +22,73 @@ import JewelDataset from 'libraries/dataset/jewel'
 import EnhanceDataset from 'libraries/dataset/enhance'
 import SkillDataset from 'libraries/dataset/skill'
 
-export const getWeaponExtendInfo = (equipItem) => {
+export const getWeaponExtendItem = (equipItem) => {
     if ('object' !== typeof equipItem
         || 'string' !== typeof equipItem.id
     ) {
         return null
     }
 
-    let info = WeaponDataset.getInfo(equipItem.id)
+    let weaponItem = WeaponDataset.getItem(equipItem.id)
 
-    if (Helper.isEmpty(info)) {
+    if (Helper.isEmpty(weaponItem)) {
         return null
     }
 
-    if (Helper.isNotEmpty(info.element)
-        && Helper.isNotEmpty(info.element.attack)
+    if (Helper.isNotEmpty(weaponItem.element)
+        && Helper.isNotEmpty(weaponItem.element.attack)
     ) {
-        info.element.attack.value = info.element.attack.minValue
+        weaponItem.element.attack.value = weaponItem.element.attack.minValue
     }
 
-    if (Helper.isNotEmpty(info.element)
-        && Helper.isNotEmpty(info.element.status)
+    if (Helper.isNotEmpty(weaponItem.element)
+        && Helper.isNotEmpty(weaponItem.element.status)
     ) {
-        info.element.status.value = info.element.status.minValue
+        weaponItem.element.status.value = weaponItem.element.status.minValue
     }
 
     // // Handle Enhance
     // let enhanceSize = 0
 
-    // if (6 <= info.rare && info.rare <= 8) {
-    //     enhanceSize = 9 - info.rare
+    // if (6 <= weaponItem.rare && weaponItem.rare <= 8) {
+    //     enhanceSize = 9 - weaponItem.rare
     // }
 
-    // if (10 <= info.rare && info.rare <= 12) {
-    //     enhanceSize = (15 - info.rare) * 2
+    // if (10 <= weaponItem.rare && weaponItem.rare <= 12) {
+    //     enhanceSize = (15 - weaponItem.rare) * 2
     // }
 
-    // info.enhanceSize = enhanceSize
-    // info.enhances = Helper.isNotEmpty(equipItem.enhances)
+    // weaponItem.enhanceSize = enhanceSize
+    // weaponItem.enhances = Helper.isNotEmpty(equipItem.enhances)
     //     ? equipItem.enhances : []
 
-    // info.enhances.forEach((enhance) => {
+    // weaponItem.enhances.forEach((enhance) => {
     //     let enhanceLevel = enhance.level
-    //     let enhanceInfo = EnhanceDataset.getInfo(enhance.id)
+    //     let enhanceItem = EnhanceDataset.getItem(enhance.id)
 
-    //     if (Helper.isEmpty(enhanceInfo.list[enhanceLevel - 1].reaction)) {
+    //     if (Helper.isEmpty(enhanceItem.list[enhanceLevel - 1].reaction)) {
     //         return false
     //     }
 
-    //     Object.keys(enhanceInfo.list[enhanceLevel - 1].reaction).forEach((reactionType) => {
-    //         let data = enhanceInfo.list[enhanceLevel - 1].reaction[reactionType]
+    //     Object.keys(enhanceItem.list[enhanceLevel - 1].reaction).forEach((reactionType) => {
+    //         let data = enhanceItem.list[enhanceLevel - 1].reaction[reactionType]
 
     //         switch (reactionType) {
     //         case 'attack':
-    //             info.attack += data.value * Constant.weaponMultiple[info.type]
-    //             info.attack = parseInt(Math.round(info.attack))
+    //             weaponItem.attack += data.value * Constant.weaponMultiple[weaponItem.type]
+    //             weaponItem.attack = parseInt(Math.round(weaponItem.attack))
 
     //             break
     //         case 'criticalRate':
-    //             info.criticalRate += data.value
+    //             weaponItem.criticalRate += data.value
 
     //             break
     //         case 'defense':
-    //             info.defense = data.value
+    //             weaponItem.defense = data.value
 
     //             break
     //         case 'addSlot':
-    //             info.slots.push({
+    //             weaponItem.slots.push({
     //                 size: data.size
     //             })
 
@@ -100,38 +100,38 @@ export const getWeaponExtendInfo = (equipItem) => {
     // Handler Slot
     let skillLevelMapping = {}
 
-    info.skills && info.skills.forEach((data, index) => {
-        let skillId = data.id
+    weaponItem.skills && weaponItem.skills.forEach((skillData) => {
+        let skillId = skillData.id
 
         if (Helper.isEmpty(skillLevelMapping[skillId])) {
             skillLevelMapping[skillId] = 0
         }
 
-        skillLevelMapping[skillId] += data.level
+        skillLevelMapping[skillId] += skillData.level
     })
 
-    info.slots && info.slots.forEach((data, index) => {
-        let jewelInfo = null
+    weaponItem.slots && weaponItem.slots.forEach((data, index) => {
+        let jewelItem = null
 
         if (Helper.isNotEmpty(equipItem.jewelIds)
             && Helper.isNotEmpty(equipItem.jewelIds[index])
         ) {
-            jewelInfo = JewelDataset.getInfo(equipItem.jewelIds[index])
+            jewelItem = JewelDataset.getItem(equipItem.jewelIds[index])
         }
 
-        if (Helper.isEmpty(jewelInfo)) {
-            info.slots[index].jewel = {}
+        if (Helper.isEmpty(jewelItem)) {
+            weaponItem.slots[index].jewel = {}
 
             return false
         }
 
-        // Update Info
-        info.slots[index].jewel = {
-            id: jewelInfo.id,
-            size: jewelInfo.size
+        // Update Item
+        weaponItem.slots[index].jewel = {
+            id: jewelItem.id,
+            size: jewelItem.size
         }
 
-        jewelInfo.skills && jewelInfo.skills.forEach((data, index) => {
+        jewelItem.skills && jewelItem.skills.forEach((data, index) => {
             let skillId = data.id
 
             if (Helper.isEmpty(skillLevelMapping[skillId])) {
@@ -143,108 +143,108 @@ export const getWeaponExtendInfo = (equipItem) => {
     })
 
     // Reset Skill
-    info.skills = []
+    weaponItem.skills = []
 
     Object.keys(skillLevelMapping).forEach((skillId) => {
         let skillLevel = skillLevelMapping[skillId]
-        let skillInfo = SkillDataset.getInfo(skillId)
+        let skillItem = SkillDataset.getItem(skillId)
 
         // Fix Skill Level Overflow
-        if (skillLevel > skillInfo.list.length) {
-            skillLevel = skillInfo.list.length
+        if (skillLevel > skillItem.list.length) {
+            skillLevel = skillItem.list.length
         }
 
-        info.skills.push({
+        weaponItem.skills.push({
             id: skillId,
             level: skillLevel,
-            description: skillInfo.list[skillLevel - 1].description
+            description: skillItem.list[skillLevel - 1].description
         })
     })
 
-    info.skills = info.skills.sort((skillA, skillB) => {
-        return skillB.level - skillA.level
+    weaponItem.skills = weaponItem.skills.sort((skillDataA, skillDataB) => {
+        return skillDataB.level - skillDataA.level
     })
 
-    return Helper.deepCopy(info)
+    return Helper.deepCopy(weaponItem)
 }
 
-export const getArmorExtendInfo = (equipItem) => {
+export const getArmorExtendItem = (equipItem) => {
     if ('object' !== typeof equipItem
         || 'string' !== typeof equipItem.id
     ) {
         return null
     }
 
-    let info = ArmorDataset.getInfo(equipItem.id)
+    let armorItem = ArmorDataset.getItem(equipItem.id)
 
-    if (Helper.isEmpty(info)) {
+    if (Helper.isEmpty(armorItem)) {
         return null
     }
 
     // Handler Skill & Slot
     let skillLevelMapping = {}
 
-    info.skills && info.skills.forEach((data, index) => {
-        let skillId = data.id
+    armorItem.skills && armorItem.skills.forEach((skillData) => {
+        let skillId = skillData.id
 
         if (Helper.isEmpty(skillLevelMapping[skillId])) {
             skillLevelMapping[skillId] = 0
         }
 
-        skillLevelMapping[skillId] += data.level
+        skillLevelMapping[skillId] += skillData.level
     })
 
-    info.slots && info.slots.forEach((data, index) => {
-        let jewelInfo = null
+    armorItem.slots && armorItem.slots.forEach((slotData, index) => {
+        let jewelItem = null
 
         if (Helper.isNotEmpty(equipItem.jewelIds)
             && Helper.isNotEmpty(equipItem.jewelIds[index])
         ) {
-            jewelInfo = JewelDataset.getInfo(equipItem.jewelIds[index])
+            jewelItem = JewelDataset.getItem(equipItem.jewelIds[index])
         }
 
-        if (Helper.isEmpty(jewelInfo)) {
-            info.slots[index].jewel = {}
+        if (Helper.isEmpty(jewelItem)) {
+            armorItem.slots[index].jewel = {}
 
             return false
         }
 
-        // Update Info
-        info.slots[index].jewel = {
-            id: jewelInfo.id,
-            size: jewelInfo.size
+        // Update Item
+        armorItem.slots[index].jewel = {
+            id: jewelItem.id,
+            size: jewelItem.size
         }
 
-        jewelInfo.skills && jewelInfo.skills.forEach((data, index) => {
-            let skillId = data.id
+        jewelItem.skills && jewelItem.skills.forEach((skillData, index) => {
+            let skillId = skillData.id
 
             if (Helper.isEmpty(skillLevelMapping[skillId])) {
                 skillLevelMapping[skillId] = 0
             }
 
-            skillLevelMapping[skillId] += data.level
+            skillLevelMapping[skillId] += skillData.level
         })
     })
 
     // Reset Skill
-    info.skills = []
+    armorItem.skills = []
 
     Object.keys(skillLevelMapping).forEach((skillId) => {
         let skillLevel = skillLevelMapping[skillId]
-        let skillInfo = SkillDataset.getInfo(skillId)
+        let skillItem = SkillDataset.getItem(skillId)
 
-        info.skills.push({
+        armorItem.skills.push({
             id: skillId,
             level: skillLevel,
-            description: skillInfo.list[skillLevel - 1].description
+            description: skillItem.list[skillLevel - 1].description
         })
     })
 
-    info.skills = info.skills.sort((skillA, skillB) => {
+    armorItem.skills = armorItem.skills.sort((skillA, skillB) => {
         return skillB.level - skillA.level
     })
 
-    return Helper.deepCopy(info)
+    return Helper.deepCopy(armorItem)
 }
 
 export const equipTypeToDatasetType = (equipType) => {
@@ -264,14 +264,14 @@ export const equipTypeToDatasetType = (equipType) => {
     }
 }
 
-export const getEquipExtendInfo = (equipType, equipItem) => {
+export const getEquipExtendItem = (equipType, equipItem) => {
     switch (equipTypeToDatasetType(equipType)) {
         case 'weapon':
-            return getWeaponExtendInfo(equipItem)
+            return getWeaponExtendItem(equipItem)
         case 'armor':
-            return getArmorExtendInfo(equipItem)
+            return getArmorExtendItem(equipItem)
         case 'petalace':
-            return Helper.deepCopy(PetalaceDataset.getInfo(equipItem.id))
+            return Helper.deepCopy(PetalaceDataset.getItem(equipItem.id))
         case 'charm':
             return null
         default:
@@ -280,8 +280,8 @@ export const getEquipExtendInfo = (equipType, equipItem) => {
 }
 
 export default {
-    getWeaponExtendInfo,
-    getArmorExtendInfo,
-    getEquipExtendInfo,
+    getWeaponExtendItem,
+    getArmorExtendItem,
+    getEquipExtendItem,
     equipTypeToDatasetType
 }

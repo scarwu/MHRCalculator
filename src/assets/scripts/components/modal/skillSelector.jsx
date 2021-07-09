@@ -14,12 +14,10 @@ import _ from 'core/lang'
 import Helper from 'core/helper'
 
 // Load Libraries
-// import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
-import IconSelector from 'components/common/iconSelector'
 import IconInput from 'components/common/iconInput'
 
 // Load States
@@ -28,43 +26,53 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleModeChange = (event) => {
-    States.setter.showConditionItemSelector({
-        mode: event.target.value
-    })
+const handleItemPickUp = (itemId, action, bypassData) => {
+    if ('requiredConditions' === bypassData.target) {
+        if ('add' === action) {
+            States.setter.addRequiredConditionsSkill(itemId)
+        }
+
+        if ('remove' === action) {
+            States.setter.removeRequiredConditionsSkill(itemId)
+        }
+    }
+
+    States.setter.hideModal('petalaceSelector')
 }
 
 /**
  * Render Functions
  */
-const renderSkillItem = (skill) => {
+const renderSkillItem = (skillItem, modalData) => {
     return (
-        <div key={skill.id} className="mhrc-item mhrc-item-2-step">
+        <div key={skillItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
-                <span>{_(skill.name)}</span>
+                <span>{_(skillItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {skill.isSelect ? (
-                        <IconButton
-                            iconName="minus" altName={_('remove')}
-                            onClick={() => {States.setter.removeRequiredSkill(skill.id)}} />
-                    ) : (
-                        <IconButton
-                            iconName="plus" altName={_('add')}
-                            onClick={() => {States.setter.addRequiredSkill(skill.id)}} />
-                    )}
+                    {Helper.isNotEmpty(modalData.bypass) ? (
+                        (-1 === modalData.ids.indexOf(skillItem.id)) ? (
+                            <IconButton
+                                iconName="plus" altName={_('add')}
+                                onClick={() => {
+                                    handleItemPickUp(skillItem.id, 'add', modalData.bypass)
+                                }} />
+                        ) : (
+                            <IconButton
+                                iconName="minus" altName={_('remove')}
+                                onClick={() => {
+                                    handleItemPickUp(skillItem.id, 'remove', modalData.bypass)
+                                }} />
+                        )
+                    ) : false}
                 </div>
             </div>
             <div className="col-12 mhrc-content">
-                {skill.list.map((item, index) => {
+                {skillItem.list.map((item, index) => {
                     return (
                         <Fragment key={index}>
                             <div className="col-2 mhrc-name">
-                                {item.isHidden ? (
-                                    <span>(Lv.{item.level})</span>
-                                ) : (
-                                    <span>Lv.{item.level}</span>
-                                )}
+                                <span>Lv.{item.level}</span>
                             </div>
                             <div className="col-10 mhrc-value mhrc-description">
                                 <span>{_(item.effect)}</span>
@@ -77,26 +85,12 @@ const renderSkillItem = (skill) => {
     )
 }
 
-/**
- * Sub Components
- */
-const SkillList = (props) => {
-    const {data} = props
-
-    return useMemo(() => {
-        Helper.debug('Component: ConditionItemSelector -> SkillList')
-
-        return data.map(renderSkillItem)
-    }, [data])
-}
-
 export default function SkillSelectorModal(props) {
 
     /**
      * Hooks
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('skillSelector'))
-    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
     const [stateSortedList, updateSortedList] = useState([])
     const [stateSegment, updateSegment] = useState(undefined)
     const refModal = useRef()
@@ -106,37 +100,26 @@ export default function SkillSelectorModal(props) {
             return
         }
 
-        let idList = []
         let selectedList = []
         let unselectedList = []
 
-        idList = stateRequiredConditions.skills.map((skill) => {
-            return skill.id
-        })
-
-        SkillDataset.getItems().forEach((skillInfo) => {
-            if (-1 !== idList.indexOf(skillInfo.id)) {
-                skillInfo.isSelect = true
-
-                selectedList.push(skillInfo)
+        SkillDataset.getList().forEach((skillItem) => {
+            if (-1 !== stateModalData.ids.indexOf(skillItem.id)) {
+                selectedList.push(skillItem)
             } else {
-                skillInfo.isSelect = false
-
-                unselectedList.push(skillInfo)
+                unselectedList.push(skillItem)
             }
         })
 
         updateSortedList(selectedList.concat(unselectedList))
     }, [
-        stateModalData,
-        stateRequiredConditions
+        stateModalData
     ])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('skillSelector'))
-            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -145,19 +128,9 @@ export default function SkillSelectorModal(props) {
     }, [])
 
     /**
-     * Variables
-     */
-    const getModeList = () => {
-        return [
-            { key: 'set',   value: _('set') },
-            { key: 'skill', value: _('skill') }
-        ]
-    }
-
-    /**
      * Handle Functions
      */
-    const handleFastClose = useCallback((event) => {
+    const handleFastCloseModal = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
@@ -174,36 +147,43 @@ export default function SkillSelectorModal(props) {
         updateSegment(segment)
     }, [])
 
-    const getContent = useCallback(() => {
-        return (
-            <SkillList data={stateSortedList.filter((skill) => {
+    const getContent = useMemo(() => {
+        if (Helper.isEmpty(stateModalData)) {
+            return false
+        }
 
-                // Create Text
-                let text = _(skill.name)
+        let modalData = Helper.deepCopy(stateModalData)
 
-                skill.list.forEach((item) => {
-                    text += _(item.name) + _(item.description)
-                })
+        return stateSortedList.filter((item) => {
 
-                // Search Nameword
-                if (Helper.isNotEmpty(stateSegment)
-                    && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
-                ) {
-                    return false
-                }
+            // Create Text
+            let text = _(item.name)
 
-                return true
-            }).sort((dataA, dataB) => {
-                return _(dataA.id) > _(dataB.id) ? 1 : -1
-            })} />
-        )
+            item.list.forEach((skillData) => {
+                text += _(skillData.name) + _(skillData.description)
+            })
+
+            // Search Nameword
+            if (Helper.isNotEmpty(stateSegment)
+                && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
+            ) {
+                return false
+            }
+
+            return true
+        }).sort((itemA, itemB) => {
+            return _(itemA.id) > _(itemB.id) ? 1 : -1
+        }).map((item) => {
+            return renderSkillItem(item, modalData)
+        })
     }, [
+        stateModalData,
         stateSortedList,
         stateSegment
     ])
 
     return Helper.isNotEmpty(stateModalData) ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_('skillList')}</span>
@@ -224,7 +204,7 @@ export default function SkillSelectorModal(props) {
                 </div>
                 <div className="mhrc-list">
                     <div className="mhrc-wrapper">
-                        {getContent()}
+                        {getContent}
                     </div>
                 </div>
             </div>

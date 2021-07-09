@@ -33,13 +33,13 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (itemId, modalData) => {
-    if ('playerEquips' === modalData.target) {
-        States.setter.setPlayerEquip(modalData.equipType, itemId)
+const handleItemPickUp = (itemId, bypassData) => {
+    if ('playerEquips' === bypassData.target) {
+        States.setter.setPlayerEquip(bypassData.equipType, itemId)
     }
 
-    if ('requiredConditions' === modalData.target) {
-        States.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
+    if ('requiredConditions' === bypassData.target) {
+        States.setter.setRequiredConditionsEquip(bypassData.equipType, itemId)
     }
 
     States.setter.hideModal('weaponSelector')
@@ -67,11 +67,11 @@ const renderWeaponItem = (weaponItem, modalData) => {
                 <span>{_(weaponItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(weaponItem.id !== modalData.equipId) ? (
+                    {(weaponItem.id !== modalData.id && Helper.isNotEmpty(modalData.bypass)) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => {
-                                handleItemPickUp(weaponItem.id, modalData)
+                                handleItemPickUp(weaponItem.id, modalData.bypass)
                             }} />
                     ) : false}
                 </div>
@@ -149,23 +149,23 @@ const renderWeaponItem = (weaponItem, modalData) => {
                     <span>{_('slot')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    {weaponItem.slots.map((slot, index) => {
+                    {weaponItem.slots.map((slotData, index) => {
                         return (
-                            <span key={index}>[{slot.size}]</span>
+                            <span key={index}>[{slotData.size}]</span>
                         )
                     })}
                 </div>
 
-                {/* {weaponItem.skills.map((skillItem, index) => {
-                    let skillInfo = SkillDataset.getInfo(skillItem.id)
+                {/* {weaponItem.skills.map((skillData, index) => {
+                    let skillItem = SkillDataset.getItem(skillData.id)
 
-                    return Helper.isNotEmpty(skillInfo) ? (
+                    return Helper.isNotEmpty(skillItem) ? (
                         <Fragment key={index}>
                             <div className="col-12 mhrc-name">
-                                <span>{_(skillInfo.name)} Lv.{skillItem.level}</span>
+                                <span>{_(skillItem.name)} Lv.{skillItem.level}</span>
                             </div>
                             <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillInfo.list[skillItem.level - 1].effect)}</span>
+                                <span>{_(skillItem.list[skillItem.level - 1].effect)}</span>
                             </div>
                         </Fragment>
                     ) : false
@@ -194,28 +194,28 @@ export default function WeaponSelectorModal(props) {
             return
         }
 
-        let sortedList = WeaponDataset.getItems()
+        let sortedList = WeaponDataset.getList()
         let typeList = {}
         let rareList = {}
         let type = null
         let rare = null
 
-        let weaponInfo = WeaponDataset.getInfo(stateModalData.equipId)
+        let weaponItem = WeaponDataset.getItem(stateModalData.id)
 
         typeList = Constant.weaponTypes.map((type) => {
             return { key: type, value: _(type) }
         })
-        type = (Helper.isNotEmpty(weaponInfo) && Helper.isNotEmpty(weaponInfo.type))
-            ? weaponInfo.type : typeList[0].key
+        type = (Helper.isNotEmpty(weaponItem) && Helper.isNotEmpty(weaponItem.type))
+            ? weaponItem.type : typeList[0].key
 
-        sortedList.forEach((weaponInfo) => {
-            rareList[weaponInfo.rare] = weaponInfo.rare
+        sortedList.forEach((weaponItem) => {
+            rareList[weaponItem.rare] = weaponItem.rare
         })
 
         rareList = Object.values(rareList).reverse().map((rare) => {
             return { key: rare, value: _('rare') + `: ${rare}` }
         })
-        rare = (Helper.isNotEmpty(weaponInfo)) ? weaponInfo.rare : rareList[0].key
+        rare = (Helper.isNotEmpty(weaponItem)) ? weaponItem.rare : rareList[0].key
 
         updateSortedList(sortedList)
         updateTypeList(typeList)
@@ -270,37 +270,37 @@ export default function WeaponSelectorModal(props) {
 
         let modalData = Helper.deepCopy(stateModalData)
 
-        return stateSortedList.filter((data) => {
-            if (data.type !== stateType) {
+        return stateSortedList.filter((item) => {
+            if (item.type !== stateType) {
                 return false
             }
 
-            if (data.rare !== stateRare) {
+            if (item.rare !== stateRare) {
                 return false
             }
 
             // Create Text
-            let text = _(data.name)
-            text += _(data.series)
-            text += _(data.type)
+            let text = _(item.name)
+            text += _(item.series)
+            text += _(item.type)
 
-            if (Helper.isNotEmpty(data.element)
-                && Helper.isNotEmpty(data.element.attack)
+            if (Helper.isNotEmpty(item.element)
+                && Helper.isNotEmpty(item.element.attack)
             ) {
-                text += _(data.element.attack.type)
+                text += _(item.element.attack.type)
             }
 
-            if (Helper.isNotEmpty(data.element)
-                && Helper.isNotEmpty(data.element.status)
+            if (Helper.isNotEmpty(item.element)
+                && Helper.isNotEmpty(item.element.status)
             ) {
-                text += _(data.element.status.type)
+                text += _(item.element.status.type)
             }
 
-            // data.skills.forEach((data) => {
-            //     let skillInfo = SkillDataset.getInfo(data.id)
+            // item.skills.forEach((skillData) => {
+            //     let skillItem = SkillDataset.getItem(skillData.id)
 
-            //     if (Helper.isNotEmpty(skillInfo)) {
-            //         text += _(skillInfo.name)
+            //     if (Helper.isNotEmpty(skillItem)) {
+            //         text += _(skillItem.name)
             //     }
             // })
 
@@ -312,10 +312,10 @@ export default function WeaponSelectorModal(props) {
             }
 
             return true
-        }).sort((dataA, dataB) => {
-            return _(dataA.id) > _(dataB.id) ? 1 : -1
-        }).map((data) => {
-            return renderWeaponItem(data, modalData)
+        }).sort((itemA, itemB) => {
+            return _(itemA.id) > _(itemB.id) ? 1 : -1
+        }).map((item) => {
+            return renderWeaponItem(item, modalData)
         })
     }, [
         stateModalData,

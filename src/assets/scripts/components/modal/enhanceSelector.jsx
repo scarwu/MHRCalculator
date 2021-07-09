@@ -26,49 +26,37 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (modalData, itemId) => {
-    if (Helper.isNotEmpty(modalData.enhanceIndex)) {
-        modalData.enhanceId = itemId
-    } else if (Helper.isNotEmpty(modalData.slotIndex)) {
-        modalData.jewelId = itemId
-    } else {
-        modalData.equipId = itemId
+const handleItemPickUp = (itemId, bypassData) => {
+    if ('playerEquips' === bypassData.target) {
+        States.setter.setPlayerEquipEnhance(bypassData.equipType, bypassData.idIndex, itemId)
     }
 
-    States.setter.setCurrentEquip(modalData)
-    States.setter.hideEquipItemSelector()
+    States.setter.hideModal('jewelSelector')
 }
 
 /**
  * Render Functions
  */
-const renderEnhanceItem = (enhance, modalData) => {
+const renderEnhanceItem = (enhanceItem, modalData) => {
     return (
-        <div key={enhance.id} className="mhrc-item mhrc-item-2-step">
+        <div key={enhanceItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
-                <span>{_(enhance.name)}</span>
+                <span>{_(enhanceItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(false === enhance.isSelect) ? (
+                    {(enhanceItem.id !== modalData.id && Helper.isNotEmpty(modalData.bypass)) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
-                            onClick={() => {handleItemPickUp(modalData, enhance.id)}} />
+                            onClick={() => {
+                                handleItemPickUp(enhanceItem.id, modalData.bypass)
+                            }} />
                     ) : false}
                 </div>
             </div>
             <div className="col-12 mhrc-content">
-                {enhance.list.map((item, index) => {
-                    return (
-                        <Fragment key={index}>
-                            <div className="col-2 mhrc-name">
-                                <span>Lv.{item.level}</span>
-                            </div>
-                            <div className="col-10 mhrc-value mhrc-description">
-                                <span>{_(item.description)}</span>
-                            </div>
-                        </Fragment>
-                    )
-                })}
+                <div className="col-12 mhrc-value mhrc-description">
+                    <span>{_(enhanceItem.description)}</span>
+                </div>
             </div>
         </div>
     )
@@ -89,13 +77,7 @@ export default function EnhanceSelectorModal(props) {
             return
         }
 
-        let sortedList = []
-
-        sortedList = EnhanceDataset.getItems().map((enhanceInfo) => {
-            enhanceInfo.isSelect = (stateModalData.enhanceId === enhanceInfo.id)
-
-            return enhanceInfo
-        })
+        let sortedList = EnhanceDataset.getList()
 
         updateSortedList(sortedList)
     }, [stateModalData])
@@ -138,14 +120,10 @@ export default function EnhanceSelectorModal(props) {
 
         let modalData = Helper.deepCopy(stateModalData)
 
-        return stateSortedList.filter((data) => {
+        return stateSortedList.filter((item) => {
 
             // Create Text
-            let text = _(data.name)
-
-            data.list.forEach((data) => {
-                text += _(data.description)
-            })
+            let text = _(item.name)
 
             // Search Nameword
             if (Helper.isNotEmpty(stateSegment)
@@ -155,13 +133,13 @@ export default function EnhanceSelectorModal(props) {
             }
 
             return true
-        }).filter((data) => {
-            return -1 !== data.allowRares.indexOf(modalData.equipRare)
-                && -1 === modalData.enhanceIds.indexOf(data.id)
-        }).sort((dataA, dataB) => {
-            return _(dataA.id) > _(dataB.id) ? 1 : -1
-        }).map((data) => {
-            return renderEnhanceItem(data, modalData)
+        }).filter((item) => {
+            return -1 !== item.allowRares.indexOf(modalData.equipRare)
+                && -1 === modalData.enhanceIds.indexOf(item.id)
+        }).sort((itemA, itemB) => {
+            return _(itemA.id) > _(itemB.id) ? 1 : -1
+        }).map((item) => {
+            return renderEnhanceItem(item, modalData)
         })
     }, [
         stateModalData,

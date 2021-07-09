@@ -125,48 +125,48 @@ export default function RequiredConditions(props) {
                                     }
                                 }
 
-                                let equipInfo = null
+                                let equipItem = null
 
                                 if ('weapon' === equip.type) {
                                     if ('customWeapon' === equip.id) {
-                                        equipInfo = equip.customWeapon
+                                        equipItem = equip.customWeapon
 
-                                        return Helper.isNotEmpty(equipInfo) ? (
+                                        return Helper.isNotEmpty(equipItem) ? (
                                             <div key={equip.type} className="col-6 mhrc-value">
-                                                <span>{_(equipInfo.name)}: {_(equipInfo.type)}</span>
+                                                <span>{_(equipItem.name)}: {_(equipItem.type)}</span>
 
                                                 <div className="mhrc-icons_bundle">
                                                     {isNotRequire ? (
                                                         <IconButton
                                                             iconName="arrow-left" altName={_('include')}
-                                                            onClick={() => {States.setter.setRequiredEquips(equip.type, equipInfo)}} />
+                                                            onClick={() => {States.setter.setRequiredEquips(equip.type, equipItem)}} />
                                                     ) : false}
                                                 </div>
                                             </div>
                                         ) : false
                                     }
 
-                                    equipInfo = WeaponDataset.getInfo(equip.id)
+                                    equipItem = WeaponDataset.getItem(equip.id)
                                 } else if ('helm' === equip.type
                                     || 'chest' === equip.type
                                     || 'arm' === equip.type
                                     || 'waist' === equip.type
                                     || 'leg' === equip.type
                                 ) {
-                                    equipInfo = ArmorDataset.getInfo(equip.id)
+                                    equipItem = ArmorDataset.getItem(equip.id)
                                 } else if ('charm' === equip.type) {
-                                    // equipInfo = CharmDataset.getInfo(equip.id)
+                                    // equipItem = CharmDataset.getItem(equip.id)
                                 }
 
-                                return Helper.isNotEmpty(equipInfo) ? (
+                                return Helper.isNotEmpty(equipItem) ? (
                                     <div key={equip.type} className="col-6 mhrc-value">
-                                        <span>{_(equipInfo.name)}</span>
+                                        <span>{_(equipItem.name)}</span>
 
                                         <div className="mhrc-icons_bundle">
                                             {isNotRequire ? (
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
-                                                    onClick={() => {States.setter.setRequiredEquips(equip.type, equipInfo)}} />
+                                                    onClick={() => {States.setter.setRequiredEquips(equip.type, equipItem)}} />
                                             ) : false}
                                         </div>
                                     </div>
@@ -184,7 +184,7 @@ export default function RequiredConditions(props) {
 
                         <div className="col-12 mhrc-content">
                             {currentRequiredSets.map((set) => {
-                                let setInfo = SetDataset.getInfo(set.id)
+                                let setInfo = SetDataset.getItem(set.id)
 
                                 return (
                                     <div key={set.id} className="col-6 mhrc-value">
@@ -215,7 +215,7 @@ export default function RequiredConditions(props) {
 
                         <div className="col-12 mhrc-content">
                             {currentRequiredSkills.map((skill) => {
-                                let skillInfo = SkillDataset.getInfo(skill.id)
+                                let skillInfo = SkillDataset.getItem(skill.id)
 
                                 return (Helper.isNotEmpty(skillInfo)) ? (
                                     <div key={skill.id} className="col-6 mhrc-value">

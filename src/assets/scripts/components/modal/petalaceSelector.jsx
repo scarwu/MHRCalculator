@@ -26,13 +26,13 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (itemId, modalData) => {
-    if ('playerEquips' === modalData.target) {
-        States.setter.setPlayerEquip(modalData.equipType, itemId)
+const handleItemPickUp = (itemId, bypassData) => {
+    if ('playerEquips' === bypassData.target) {
+        States.setter.setPlayerEquip(bypassData.equipType, itemId)
     }
 
-    if ('requiredConditions' === modalData.target) {
-        States.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
+    if ('requiredConditions' === bypassData.target) {
+        States.setter.setRequiredConditionsEquip(bypassData.equipType, itemId)
     }
 
     States.setter.hideModal('petalaceSelector')
@@ -48,11 +48,11 @@ const renderPetalaceItem = (petalaceItem, modalData) => {
                 <span>{_(petalaceItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(petalaceItem.id !== modalData.equipId) ? (
+                    {(petalaceItem.id !== modalData.id && Helper.isNotEmpty(modalData.bypass)) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => {
-                                handleItemPickUp(petalaceItem.id, modalData)
+                                handleItemPickUp(petalaceItem.id, modalData.bypass)
                             }} />
                     ) : false}
                 </div>
@@ -126,7 +126,7 @@ export default function PetalaceSelectorModal(props) {
             return
         }
 
-        let sortedList = PetalaceDataset.getItems()
+        let sortedList = PetalaceDataset.getList()
 
         updateSortedList(sortedList)
     }, [stateModalData])
@@ -169,10 +169,10 @@ export default function PetalaceSelectorModal(props) {
 
         let modalData = Helper.deepCopy(stateModalData)
 
-        return stateSortedList.filter((data) => {
+        return stateSortedList.filter((item) => {
 
             // Create Text
-            let text = _(data.name)
+            let text = _(item.name)
 
             // Search Nameword
             if (Helper.isNotEmpty(stateSegment)
@@ -182,10 +182,10 @@ export default function PetalaceSelectorModal(props) {
             }
 
             return true
-        }).sort((dataA, dataB) => {
-            return _(dataA.rare) > _(dataB.rare) ? 1 : -1
-        }).map((data) => {
-            return renderPetalaceItem(data, modalData)
+        }).sort((itemA, itemB) => {
+            return _(itemA.rare) > _(itemB.rare) ? 1 : -1
+        }).map((item) => {
+            return renderPetalaceItem(item, modalData)
         })
     }, [
         stateModalData,

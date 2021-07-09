@@ -73,7 +73,7 @@ export default function QuickSetting(props) {
             return skill.id
         })
 
-        ArmorDataset.typesIs(equipTypes).getItems().forEach((armorInfo) => {
+        ArmorDataset.typesIs(equipTypes).getList().forEach((armorInfo) => {
             if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorInfo.rare]) {
                 return
             }
@@ -105,7 +105,7 @@ export default function QuickSetting(props) {
             }
         })
 
-        ArmorDataset.typesIs(equipTypes).hasSkills(skillIds).getItems().forEach((armorInfo) => {
+        ArmorDataset.typesIs(equipTypes).hasSkills(skillIds).getList().forEach((armorInfo) => {
             if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorInfo.rare]) {
                 return
             }
@@ -138,7 +138,7 @@ export default function QuickSetting(props) {
         })
 
         // if (Helper.isEmpty(stateRequiredConditions.equips.charm)) {
-        //     CharmDataset.hasSkills(skillIds).getItems().forEach((charmInfo) => {
+        //     CharmDataset.hasSkills(skillIds).getList().forEach((charmInfo) => {
         //         let isSkip = false
 
         //         charmInfo.skills.forEach((skill) => {
@@ -171,15 +171,15 @@ export default function QuickSetting(props) {
         //     })
         // }
 
-        JewelDataset.hasSkills(skillIds, true).getItems().forEach((jewelInfo) => {
+        JewelDataset.hasSkills(skillIds, true).getList().forEach((jewelItem) => {
             let isSkip = false
 
-            jewelInfo.skills.forEach((skill) => {
+            jewelItem.skills.forEach((skillData) => {
                 if (true === isSkip) {
                     return
                 }
 
-                if (0 === skillLevelMapping[skill.id]) {
+                if (0 === skillLevelMapping[skillData.id]) {
                     isSkip = true
 
                     return
@@ -190,23 +190,23 @@ export default function QuickSetting(props) {
                 return
             }
 
-            if (Helper.isEmpty(jewelMapping[jewelInfo.size])) {
-                jewelMapping[jewelInfo.size] = {}
+            if (Helper.isEmpty(jewelMapping[jewelItem.size])) {
+                jewelMapping[jewelItem.size] = {}
             }
 
-            if (Helper.isEmpty(jewelMapping[jewelInfo.size][jewelInfo.id])) {
-                jewelMapping[jewelInfo.size][jewelInfo.id] = {
-                    name: jewelInfo.name,
+            if (Helper.isEmpty(jewelMapping[jewelItem.size][jewelItem.id])) {
+                jewelMapping[jewelItem.size][jewelItem.id] = {
+                    name: jewelItem.name,
                     min: 1,
                     max: 1
                 }
             }
 
-            jewelInfo.skills.forEach((skill) => {
-                let skillInfo = SkillDataset.getInfo(skill.id)
+            jewelItem.skills.forEach((skillData) => {
+                let skillItem = SkillDataset.getItem(skillData.id)
 
-                if (jewelMapping[jewelInfo.size][jewelInfo.id].max < skillInfo.list.length) {
-                    jewelMapping[jewelInfo.size][jewelInfo.id].max = skillInfo.list.length
+                if (jewelMapping[jewelItem.size][jewelItem.id].max < skillItem.list.length) {
+                    jewelMapping[jewelItem.size][jewelItem.id].max = skillItem.list.length
                 }
             })
         })

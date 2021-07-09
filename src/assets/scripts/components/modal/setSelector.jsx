@@ -28,31 +28,45 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleModeChange = (event) => {
-    States.setter.showConditionItemSelector({
-        mode: event.target.value
-    })
+const handleItemPickUp = (itemId, action, bypassData) => {
+    if ('requiredConditions' === bypassData.target) {
+        if ('add' === action) {
+            States.setter.addRequiredConditionsSet(itemId)
+        }
+
+        if ('remove' === action) {
+            States.setter.removeRequiredConditionsSet(itemId)
+        }
+    }
+
+    States.setter.hideModal('petalaceSelector')
 }
 
 /**
  * Render Functions
  */
-const renderSetItem = (setItem) => {
+const renderSetItem = (setItem, modalData) => {
     return (
         <div key={setItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
                 <span>{_(setItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {setItem.isSelect ? (
-                        <IconButton
-                            iconName="minus" altName={_('remove')}
-                            onClick={() => { States.setter.removeRequiredSet(setItem.id)}} />
-                    ) : (
-                        <IconButton
-                            iconName="plus" altName={_('add')}
-                                onClick={() => { States.setter.addRequiredSet(setItem.id)}} />
-                    )}
+                    {Helper.isNotEmpty(modalData.bypass) ? (
+                        (-1 === modalData.ids.indexOf(setItem.id)) ? (
+                            <IconButton
+                                iconName="plus" altName={_('add')}
+                                onClick={() => {
+                                    handleItemPickUp(setItem.id, 'add', modalData.bypass)
+                                }} />
+                        ) : (
+                            <IconButton
+                                iconName="minus" altName={_('remove')}
+                                onClick={() => {
+                                    handleItemPickUp(setItem.id, 'remove', modalData.bypass)
+                                }} />
+                        )
+                    ) : false}
                 </div>
             </div>
             <div className="col-12 mhrc-content">
@@ -63,16 +77,16 @@ const renderSetItem = (setItem) => {
                     <span>{setItem.rare}</span>
                 </div>
 
-                {setItem.items.map((armorItem, index) => {
-                    let armorInfo = ArmorDataset.getInfo(armorItem.id)
+                {setItem.items.map((armorData, index) => {
+                    let armorItem = ArmorDataset.getItem(armorData.id)
 
-                    return Helper.isNotEmpty(armorInfo) ? (
+                    return Helper.isNotEmpty(armorItem) ? (
                         <Fragment key={index}>
                             <div className="col-2 mhrc-name">
-                                <span>{_(armorInfo.type)}</span>
+                                <span>{_(armorItem.type)}</span>
                             </div>
                             <div className="col-4 mhrc-value">
-                                <span>{_(armorInfo.name)}</span>
+                                <span>{_(armorItem.name)}</span>
                             </div>
                         </Fragment>
                     ) : false
@@ -82,26 +96,12 @@ const renderSetItem = (setItem) => {
     )
 }
 
-/**
- * Sub Components
- */
-const SetList = (props) => {
-    const {data} = props
-
-    return useMemo(() => {
-        Helper.debug('Component: ConditionItemSelector -> SetList')
-
-        return data.map(renderSetItem)
-    }, [data])
-}
-
 export default function SetSelectorModal(props) {
 
     /**
      * Hooks
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('setSelector'))
-    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
     const [stateSortedList, updateSortedList] = useState([])
     const [stateSegment, updateSegment] = useState(undefined)
     const refModal = useRef()
@@ -111,37 +111,26 @@ export default function SetSelectorModal(props) {
             return
         }
 
-        let idList = []
         let selectedList = []
         let unselectedList = []
 
-        idList = stateRequiredConditions.sets.map((set) => {
-            return set.id
-        })
-
-        SetDataset.getItems().forEach((setInfo) => {
-            if (-1 !== idList.indexOf(setInfo.id)) {
-                setInfo.isSelect = true
-
-                selectedList.push(setInfo)
+        SetDataset.getList().forEach((setItem) => {
+            if (-1 !== stateModalData.ids.indexOf(setItem.id)) {
+                selectedList.push(setItem)
             } else {
-                setInfo.isSelect = false
-
-                unselectedList.push(setInfo)
+                unselectedList.push(setItem)
             }
         })
 
         updateSortedList(selectedList.concat(unselectedList))
     }, [
-        stateModalData,
-        stateRequiredConditions
+        stateModalData
     ])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('setSelector'))
-            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -150,19 +139,9 @@ export default function SetSelectorModal(props) {
     }, [])
 
     /**
-     * Variables
-     */
-    const getModeList = () => {
-        return [
-            { key: 'set',   value: _('set') },
-            { key: 'skill', value: _('skill') }
-        ]
-    }
-
-    /**
      * Handle Functions
      */
-    const handleFastClose = useCallback((event) => {
+    const handleFastCloseModal = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
@@ -179,32 +158,39 @@ export default function SetSelectorModal(props) {
         updateSegment(segment)
     }, [])
 
-    const getContent = useCallback(() => {
-        return (
-            <SetList data={stateSortedList.filter((set) => {
+    const getContent = useMemo(() => {
+        if (Helper.isEmpty(stateModalData)) {
+            return false
+        }
 
-                // Create Text
-                let text = _(set.name)
+        let modalData = Helper.deepCopy(stateModalData)
 
-                // Search Nameword
-                if (Helper.isNotEmpty(stateSegment)
-                    && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
-                ) {
-                    return false
-                }
+        return stateSortedList.filter((item) => {
 
-                return true
-            }).sort((dataA, dataB) => {
-                return _(dataA.rare) > _(dataB.rare) ? 1 : -1
-            })} />
-        )
+            // Create Text
+            let text = _(item.name)
+
+            // Search Nameword
+            if (Helper.isNotEmpty(stateSegment)
+                && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
+            ) {
+                return false
+            }
+
+            return true
+        }).sort((itemA, itemB) => {
+            return _(itemA.rare) > _(itemB.rare) ? 1 : -1
+        }).map((item) => {
+            return renderSetItem(item, modalData)
+        })
     }, [
+        stateModalData,
         stateSortedList,
         stateSegment
     ])
 
     return Helper.isNotEmpty(stateModalData) ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_('setList')}</span>
@@ -225,7 +211,7 @@ export default function SetSelectorModal(props) {
                 </div>
                 <div className="mhrc-list">
                     <div className="mhrc-wrapper">
-                        {getContent()}
+                        {getContent}
                     </div>
                 </div>
             </div>

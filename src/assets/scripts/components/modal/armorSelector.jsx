@@ -31,13 +31,13 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (itemId, modalData) => {
-    if ('playerEquips' === modalData.target) {
-        States.setter.setPlayerEquip(modalData.equipType, itemId)
+const handleItemPickUp = (itemId, bypassData) => {
+    if ('playerEquips' === bypassData.target) {
+        States.setter.setPlayerEquip(bypassData.equipType, itemId)
     }
 
-    if ('requiredConditions' === modalData.target) {
-        States.setter.setRequiredConditionsEquip(modalData.equipType, itemId)
+    if ('requiredConditions' === bypassData.target) {
+        States.setter.setRequiredConditionsEquip(bypassData.equipType, itemId)
     }
 
     States.setter.hideModal('armorSelector')
@@ -53,11 +53,11 @@ const renderArmorItem = (armorItem, modalData) => {
                 <span>{_(armorItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(armorItem.id !== modalData.equipId) ? (
+                    {(armorItem.id !== modalData.id && Helper.isNotEmpty(modalData.bypass)) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => {
-                                handleItemPickUp(armorItem.id, modalData)
+                                handleItemPickUp(armorItem.id, modalData.bypass)
                             }} />
                     ) : false}
                 </div>
@@ -94,23 +94,23 @@ const renderArmorItem = (armorItem, modalData) => {
                     <span>{_('slot')}</span>
                 </div>
                 <div className="col-9 mhrc-value">
-                    {armorItem.slots.map((slotItem, index) => {
+                    {armorItem.slots.map((slotData, index) => {
                         return (
-                            <span key={index}>[{slotItem.size}]</span>
+                            <span key={index}>[{slotData.size}]</span>
                         )
                     })}
                 </div>
 
-                {armorItem.skills.map((skillItem, index) => {
-                    let skillInfo = SkillDataset.getInfo(skillItem.id)
+                {armorItem.skills.map((skillData, index) => {
+                    let skillItem = SkillDataset.getItem(skillData.id)
 
-                    return Helper.isNotEmpty(skillInfo) ? (
+                    return Helper.isNotEmpty(skillItem) ? (
                         <Fragment key={index}>
                             <div className="col-12 mhrc-name">
-                                <span>{_(skillInfo.name)} Lv.{skillItem.level}</span>
+                                <span>{_(skillItem.name)} Lv.{skillData.level}</span>
                             </div>
                             <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillInfo.list[skillItem.level - 1].effect)}</span>
+                                <span>{_(skillItem.list[skillData.level - 1].effect)}</span>
                             </div>
                         </Fragment>
                     ) : false
@@ -139,19 +139,19 @@ export default function ArmorSelectorModal(props) {
             return
         }
 
-        let sortedList = ArmorDataset.getItems()
+        let sortedList = ArmorDataset.getList()
         let typeList = {}
         let rareList = {}
         let type = null
         let rare = null
 
-        let armorInfo = ArmorDataset.getInfo(stateModalData.equipId)
+        let armorInfo = ArmorDataset.getItem(stateModalData.id)
 
         typeList = Constant.armorTypes.map((type) => {
             return { key: type, value: _(type) }
         })
-        type = (Helper.isNotEmpty(stateModalData.equipType))
-            ? stateModalData.equipType : typeList[0].key
+        type = (Helper.isNotEmpty(stateModalData.type))
+            ? stateModalData.type : typeList[0].key
 
         sortedList.forEach((armorInfo) => {
             rareList[armorInfo.rare] = armorInfo.rare
@@ -214,24 +214,24 @@ export default function ArmorSelectorModal(props) {
 
         let modalData = Helper.deepCopy(stateModalData)
 
-        return stateSortedList.filter((data) => {
-            if (data.type !== stateType) {
+        return stateSortedList.filter((item) => {
+            if (item.type !== stateType) {
                 return false
             }
 
-            if (data.rare !== stateRare) {
+            if (item.rare !== stateRare) {
                 return false
             }
 
             // Create Text
-            let text = _(data.name)
-            text += _(data.series)
+            let text = _(item.name)
+            text += _(item.series)
 
-            data.skills.forEach((data) => {
-                let skillInfo = SkillDataset.getInfo(data.id)
+            item.skills.forEach((skillData) => {
+                let skillItem = SkillDataset.getItem(skillData.id)
 
-                if (Helper.isNotEmpty(skillInfo)) {
-                    text += _(skillInfo.name)
+                if (Helper.isNotEmpty(skillItem)) {
+                    text += _(skillItem.name)
                 }
             })
 
@@ -243,10 +243,10 @@ export default function ArmorSelectorModal(props) {
             }
 
             return true
-        }).sort((dataA, dataB) => {
-            return _(dataA.id) > _(dataB.id) ? 1 : -1
-        }).map((data) => {
-            return renderArmorItem(data, modalData)
+        }).sort((itemA, itemB) => {
+            return _(itemA.id) > _(itemB.id) ? 1 : -1
+        }).map((item) => {
+            return renderArmorItem(item, modalData)
         })
     }, [
         stateModalData,

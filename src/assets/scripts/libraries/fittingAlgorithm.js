@@ -176,7 +176,7 @@ class FittingAlgorithm {
 
             requiredSkillIds.push(skill.id)
 
-            JewelDataset.hasSkill(skill.id).getItems().forEach((jewelInfo) => {
+            JewelDataset.hasSkill(skill.id).getList().forEach((jewelInfo) => {
                 if (4 === jewelInfo.size) {
                     return
                 }
@@ -189,7 +189,7 @@ class FittingAlgorithm {
             this.totalExpectedLevel += skill.level
         })
 
-        JewelDataset.hasSkills(requiredSkillIds, true).getItems().forEach((jewelInfo) => {
+        JewelDataset.hasSkills(requiredSkillIds, true).getList().forEach((jewelInfo) => {
             let isSkip = false
 
             jewelInfo.skills.forEach((skill) => {
@@ -288,23 +288,23 @@ class FittingAlgorithm {
      */
     // initConditionSets = (requiredSets) => {
     //     requiredSets.sort((setA, setB) => {
-    //         let setInfoA = SetDataset.getInfo(setA.id)
-    //         let setInfoB = SetDataset.getInfo(setB.id)
+    //         let setItemA = SetDataset.getItem(setA.id)
+    //         let setItemB = SetDataset.getItem(setB.id)
 
-    //         if (Helper.isEmpty(setInfoA) || Helper.isEmpty(setInfoB)) {
+    //         if (Helper.isEmpty(setItemA) || Helper.isEmpty(setItemB)) {
     //             return 0
     //         }
 
-    //         return setInfoB.skills.pop().require - setInfoA.skills.pop().require
+    //         return setItemB.skills.pop().require - setItemA.skills.pop().require
     //     }).forEach((set) => {
-    //         let setInfo = SetDataset.getInfo(set.id)
+    //         let setItem = SetDataset.getItem(set.id)
 
-    //         if (Helper.isEmpty(setInfo)) {
+    //         if (Helper.isEmpty(setItem)) {
     //             return
     //         }
 
     //         this.currentSetMapping[set.id] = {
-    //             require: setInfo.skills[set.step - 1].require
+    //             require: setItem.skills[set.step - 1].require
     //         }
     //     })
     // }
@@ -364,7 +364,7 @@ class FittingAlgorithm {
                         isCompleted = false
                     }
 
-                    WeaponDataset.setInfo('customWeapon', (true === isCompleted)
+                    WeaponDataset.setItem('customWeapon', (true === isCompleted)
                         ? Helper.deepCopy(customWeapon) : undefined)
 
                     Helper.log('FA: Input: Custom Weapon', customWeapon)
@@ -437,7 +437,7 @@ class FittingAlgorithm {
 
             // Create Set Equips
             Object.keys(this.currentSetMapping).forEach((setId) => {
-                let equipInfos = ArmorDataset.typeIs(equipType).setIs(setId).getItems()
+                let equipInfos = ArmorDataset.typeIs(equipType).setIs(setId).getList()
 
                 // Merge Candidate Equips
                 candidateEquipPool[equipType] = Object.assign(
@@ -456,9 +456,9 @@ class FittingAlgorithm {
                     || 'waist' === equipType
                     || 'leg' === equipType
                 ) {
-                    equipInfos = ArmorDataset.typeIs(equipType).hasSkill(skillId).getItems()
+                    equipInfos = ArmorDataset.typeIs(equipType).hasSkill(skillId).getList()
                 } else if ('charm' === equipType) {
-                    // equipInfos = CharmDataset.hasSkill(skillId).getItems()
+                    // equipInfos = CharmDataset.hasSkill(skillId).getList()
                 }
 
                 // Merge Candidate Equips
@@ -468,7 +468,7 @@ class FittingAlgorithm {
                 )
 
                 if ('charm' !== equipType) {
-                    equipInfos = ArmorDataset.typeIs(equipType).rareIs(0).getItems()
+                    equipInfos = ArmorDataset.typeIs(equipType).rareIs(0).getList()
 
                     // Merge Candidate Equips
                     candidateEquipPool[equipType] = Object.assign(

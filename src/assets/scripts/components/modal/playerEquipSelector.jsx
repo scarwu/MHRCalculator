@@ -144,34 +144,34 @@ export default function PlayerEquipSelectorModal(props) {
                             return false
                         }
 
-                        let equipInfo = null
+                        let equipItem = null
 
                         if ('weapon' === equipType) {
                             if ('customWeapon' === stateCurrentEquips[equipType].id) {
-                                equipInfo = States.getter.getCustomWeapon()
+                                equipItem = States.getter.getCustomWeapon()
 
-                                return Helper.isNotEmpty(equipInfo) ? (
+                                return Helper.isNotEmpty(equipItem) ? (
                                     <div key={equipType} className="col-6 mhrc-value">
-                                        <span>{_(equipInfo.name)}: {_(equipInfo.type)}</span>
+                                        <span>{_(equipItem.name)}: {_(equipItem.type)}</span>
                                     </div>
                                 ) : false
                             }
 
-                            equipInfo = WeaponDataset.getInfo(stateCurrentEquips[equipType].id)
+                            equipItem = WeaponDataset.getItem(stateCurrentEquips[equipType].id)
                         } else if ('helm' === equipType
                             || 'chest' === equipType
                             || 'arm' === equipType
                             || 'waist' === equipType
                             || 'leg' === equipType
                         ) {
-                            equipInfo = ArmorDataset.getInfo(stateCurrentEquips[equipType].id)
+                            equipItem = ArmorDataset.getItem(stateCurrentEquips[equipType].id)
                         } else if ('charm' === equipType) {
-                            // equipInfo = CharmDataset.getInfo(stateCurrentEquips[equipType].id)
+                            // equipItem = CharmDataset.getItem(stateCurrentEquips[equipType].id)
                         }
 
-                        return Helper.isNotEmpty(equipInfo) ? (
+                        return Helper.isNotEmpty(equipItem) ? (
                             <div key={index} className="col-6 mhrc-value">
-                                <span>{_(equipInfo.name)}</span>
+                                <span>{_(equipItem.name)}</span>
                             </div>
                         ) : false
                     })}
@@ -205,34 +205,34 @@ export default function PlayerEquipSelectorModal(props) {
                             return false
                         }
 
-                        let equipInfo = null
+                        let equipItem = null
 
                         if ('weapon' === equipType) {
                             if ('customWeapon' === data.equips[equipType].id) {
-                                equipInfo = data.customWeapon
+                                equipItem = data.customWeapon
 
-                                return Helper.isNotEmpty(equipInfo) ? (
+                                return Helper.isNotEmpty(equipItem) ? (
                                     <div key={equipType} className="col-6 mhrc-value">
-                                        <span>{_(equipInfo.name)}: {_(equipInfo.type)}</span>
+                                        <span>{_(equipItem.name)}: {_(equipItem.type)}</span>
                                     </div>
                                 ) : false
                             }
 
-                            equipInfo = WeaponDataset.getInfo(data.equips[equipType].id)
+                            equipItem = WeaponDataset.getItem(data.equips[equipType].id)
                         } else if ('helm' === equipType
                             || 'chest' === equipType
                             || 'arm' === equipType
                             || 'waist' === equipType
                             || 'leg' === equipType
                         ) {
-                            equipInfo = ArmorDataset.getInfo(data.equips[equipType].id)
+                            equipItem = ArmorDataset.getItem(data.equips[equipType].id)
                         } else if ('charm' === equipType) {
-                            // equipInfo = CharmDataset.getInfo(data.equips[equipType].id)
+                            // equipItem = CharmDataset.getItem(data.equips[equipType].id)
                         }
 
-                        return Helper.isNotEmpty(equipInfo) ? (
+                        return Helper.isNotEmpty(equipItem) ? (
                             <div key={index} className="col-6 mhrc-value">
-                                <span>{_(equipInfo.name)}</span>
+                                <span>{_(equipItem.name)}</span>
                             </div>
                         ) : false
                     })}

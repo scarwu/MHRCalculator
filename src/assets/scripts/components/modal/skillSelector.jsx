@@ -36,14 +36,12 @@ const handleItemPickUp = (itemId, action, bypassData) => {
             States.setter.removeRequiredConditionsSkill(itemId)
         }
     }
-
-    States.setter.hideModal('petalaceSelector')
 }
 
 /**
  * Render Functions
  */
-const renderSkillItem = (skillItem, modalData) => {
+const renderSkillItem = (skillItem, selectedIds, modalData) => {
     return (
         <div key={skillItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
@@ -51,7 +49,7 @@ const renderSkillItem = (skillItem, modalData) => {
 
                 <div className="mhrc-icons_bundle">
                     {Helper.isNotEmpty(modalData.bypass) ? (
-                        (-1 === modalData.ids.indexOf(skillItem.id)) ? (
+                        (-1 === selectedIds.indexOf(skillItem.id)) ? (
                             <IconButton
                                 iconName="plus" altName={_('add')}
                                 onClick={() => {
@@ -91,6 +89,8 @@ export default function SkillSelectorModal(props) {
      * Hooks
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('skillSelector'))
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
+    const [stateSelectedIds, updateSelectedIds] = useState([])
     const [stateSortedList, updateSortedList] = useState([])
     const [stateSegment, updateSegment] = useState(undefined)
     const refModal = useRef()
@@ -100,26 +100,39 @@ export default function SkillSelectorModal(props) {
             return
         }
 
+        let selectedIds = []
+
+        if (Helper.isNotEmpty(stateModalData.bypass)
+            && 'requiredConditions' === stateModalData.bypass.target
+        ) {
+            selectedIds = stateRequiredConditions.skills.map((skillData) => {
+                return skillData.id
+            })
+        }
+
         let selectedList = []
         let unselectedList = []
 
         SkillDataset.getList().forEach((skillItem) => {
-            if (-1 !== stateModalData.ids.indexOf(skillItem.id)) {
+            if (-1 === selectedIds.indexOf(skillItem.id)) {
                 selectedList.push(skillItem)
             } else {
                 unselectedList.push(skillItem)
             }
         })
 
+        updateSelectedIds(selectedIds)
         updateSortedList(selectedList.concat(unselectedList))
     }, [
-        stateModalData
+        stateModalData,
+        stateRequiredConditions
     ])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('skillSelector'))
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -174,11 +187,12 @@ export default function SkillSelectorModal(props) {
         }).sort((itemA, itemB) => {
             return _(itemA.id) > _(itemB.id) ? 1 : -1
         }).map((item) => {
-            return renderSkillItem(item, modalData)
+            return renderSkillItem(item, stateSelectedIds, modalData)
         })
     }, [
         stateModalData,
         stateSortedList,
+        stateSelectedIds,
         stateSegment
     ])
 

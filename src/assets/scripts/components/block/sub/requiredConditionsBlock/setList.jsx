@@ -83,9 +83,6 @@ export default function SetList(props) {
 
         const showModal = () => {
             States.setter.showModal('setSelector', {
-                ids: stateRequiredConditions.sets.map((setData) => {
-                    return setData.id
-                }),
 
                 // Bypass
                 bypass: {

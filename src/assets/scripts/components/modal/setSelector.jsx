@@ -38,14 +38,12 @@ const handleItemPickUp = (itemId, action, bypassData) => {
             States.setter.removeRequiredConditionsSet(itemId)
         }
     }
-
-    States.setter.hideModal('petalaceSelector')
 }
 
 /**
  * Render Functions
  */
-const renderSetItem = (setItem, modalData) => {
+const renderSetItem = (setItem, selectedIds, modalData) => {
     return (
         <div key={setItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
@@ -53,7 +51,7 @@ const renderSetItem = (setItem, modalData) => {
 
                 <div className="mhrc-icons_bundle">
                     {Helper.isNotEmpty(modalData.bypass) ? (
-                        (-1 === modalData.ids.indexOf(setItem.id)) ? (
+                        (-1 === selectedIds.indexOf(setItem.id)) ? (
                             <IconButton
                                 iconName="plus" altName={_('add')}
                                 onClick={() => {
@@ -102,6 +100,8 @@ export default function SetSelectorModal(props) {
      * Hooks
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('setSelector'))
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
+    const [stateSelectedIds, updateSelectedIds] = useState([])
     const [stateSortedList, updateSortedList] = useState([])
     const [stateSegment, updateSegment] = useState(undefined)
     const refModal = useRef()
@@ -111,26 +111,39 @@ export default function SetSelectorModal(props) {
             return
         }
 
+        let selectedIds = []
+
+        if (Helper.isNotEmpty(stateModalData.bypass)
+            && 'requiredConditions' === stateModalData.bypass.target
+        ) {
+            selectedIds = stateRequiredConditions.sets.map((setData) => {
+                return setData.id
+            })
+        }
+
         let selectedList = []
         let unselectedList = []
 
         SetDataset.getList().forEach((setItem) => {
-            if (-1 !== stateModalData.ids.indexOf(setItem.id)) {
+            if (-1 === selectedIds.indexOf(setItem.id)) {
                 selectedList.push(setItem)
             } else {
                 unselectedList.push(setItem)
             }
         })
 
+        updateSelectedIds(selectedIds)
         updateSortedList(selectedList.concat(unselectedList))
     }, [
-        stateModalData
+        stateModalData,
+        stateRequiredConditions
     ])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('setSelector'))
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -181,11 +194,12 @@ export default function SetSelectorModal(props) {
         }).sort((itemA, itemB) => {
             return _(itemA.rare) > _(itemB.rare) ? 1 : -1
         }).map((item) => {
-            return renderSetItem(item, modalData)
+            return renderSetItem(item, stateSelectedIds, modalData)
         })
     }, [
         stateModalData,
         stateSortedList,
+        stateSelectedIds,
         stateSegment
     ])
 

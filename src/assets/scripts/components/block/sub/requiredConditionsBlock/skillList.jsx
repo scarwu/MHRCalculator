@@ -91,9 +91,6 @@ export default function SkillList(props) {
 
         const showModal = () => {
             States.setter.showModal('skillSelector', {
-                ids: stateRequiredConditions.skills.map((skillData) => {
-                    return skillData.id
-                }),
 
                 // Bypass
                 bypass: {

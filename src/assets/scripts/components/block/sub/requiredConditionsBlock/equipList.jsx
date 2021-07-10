@@ -33,15 +33,12 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
 
     const showModal = () => {
         States.setter.showModal('jewelSelector', {
-            id: (Helper.isNotEmpty(jewelItem)) ? jewelItem.id : null,
-            size: slotSize,
+            target: 'requiredConditions',
+            equipType: equipType,
+            idIndex: slotIndex,
 
-            // Bypass
-            bypass: {
-                target: 'requiredConditions',
-                equipType: equipType,
-                idIndex: slotIndex,
-            }
+            // filter
+            size: slotSize
         })
     }
 
@@ -83,14 +80,11 @@ const renderEquipItem = (equipType, requiredEquipData) => {
 
     const showModal = () => {
         States.setter.showModal(Misc.equipTypeToDatasetType(equipType) + 'Selector', {
-            id: (Helper.isNotEmpty(equipItem)) ? equipItem.id : null,
-            type: equipType,
+            target: 'requiredConditions',
+            equipType: equipType,
 
-            // Bypass
-            bypass: {
-                target: 'requiredConditions',
-                equipType: equipType
-            }
+            // Filter
+            type: equipType
         })
     }
 

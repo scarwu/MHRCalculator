@@ -112,7 +112,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
     if (Helper.isNotEmpty(equipInfos.weapon)) {
         status.critical.rate = equipInfos.weapon.criticalRate
         status.sharpness = {
-            value: equipInfos.weapon.sharpness.minValue,
+            value: equipInfos.weapon.sharpness.value,
             steps: equipInfos.weapon.sharpness.steps
         }
         status.element = equipInfos.weapon.element
@@ -139,24 +139,18 @@ const generateStatus = (equipInfos, passiveSkills) => {
             continue
         }
 
-        if (Helper.isNotEmpty(equipInfos[equipType].set)) {
-            let setId = equipInfos[equipType].set.id
+        // if (Helper.isNotEmpty(equipInfos[equipType].set)) {
+        //     let setId = equipInfos[equipType].set.id
 
-            if (Helper.isEmpty(setMapping[setId])) {
-                setMapping[setId] = 0
-            }
+        //     if (Helper.isEmpty(setMapping[setId])) {
+        //         setMapping[setId] = 0
+        //     }
 
-            setMapping[setId]++
-        }
+        //     setMapping[setId]++
+        // }
 
-        if ('weapon' === equipType) {
-            status.defense += Helper.isNotEmpty(equipInfos[equipType].defense)
-                ? equipInfos[equipType].defense : 0
-        } else {
-            status.defense += Helper.isNotEmpty(equipInfos[equipType].maxDefense)
-                ? equipInfos[equipType].maxDefense
-                : equipInfos[equipType].minDefense
-        }
+        status.defense += Helper.isNotEmpty(equipInfos[equipType].defense)
+            ? equipInfos[equipType].defense : 0
     }
 
     // Skills
@@ -167,13 +161,15 @@ const generateStatus = (equipInfos, passiveSkills) => {
             continue
         }
 
-        equipInfos[equipType].skills.forEach((skill) => {
-            if (Helper.isEmpty(allSkills[skill.id])) {
-                allSkills[skill.id] = 0
-            }
+        if (Helper.isNotEmpty(equipInfos[equipType].skills)) {
+            equipInfos[equipType].skills.forEach((skill) => {
+                if (Helper.isEmpty(allSkills[skill.id])) {
+                    allSkills[skill.id] = 0
+                }
 
-            allSkills[skill.id] += skill.level
-        })
+                allSkills[skill.id] += skill.level
+            })
+        }
     }
 
     // Object.keys(setMapping).forEach((setId) => {
@@ -843,10 +839,7 @@ export default function PlayerStatusBlock (props) {
                                 <div className="col-9 mhrc-value mhrc-sharpness">
                                     <SharpnessBar
                                         key={Helper.jsonHash(originalSharpness) + ':1'}
-                                        data={{
-                                            value: originalSharpness.minValue,
-                                            steps: originalSharpness.steps
-                                        }} />
+                                        data={originalSharpness} />
                                     <SharpnessBar
                                         key={Helper.jsonHash(status.sharpness) + ':2'}
                                         data={status.sharpness} />

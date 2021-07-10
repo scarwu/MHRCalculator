@@ -26,13 +26,9 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (itemId, bypassData) => {
-    if ('playerEquips' === bypassData.target) {
-        States.setter.setPlayerEquip(bypassData.equipType, itemId)
-    }
-
-    if ('requiredConditions' === bypassData.target) {
-        States.setter.setRequiredConditionsEquip(bypassData.equipType, itemId)
+const handleItemPickUp = (itemId, tempData) => {
+    if ('playerEquips' === tempData.target) {
+        States.setter.setPlayerEquip(tempData.equipType, itemId)
     }
 
     States.setter.hideModal('petalaceSelector')
@@ -41,18 +37,18 @@ const handleItemPickUp = (itemId, bypassData) => {
 /**
  * Render Functions
  */
-const renderPetalaceItem = (petalaceItem, modalData) => {
+const renderPetalaceItem = (petalaceItem, tempData) => {
     return (
         <div key={petalaceItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
                 <span>{_(petalaceItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(petalaceItem.id !== modalData.id && Helper.isNotEmpty(modalData.bypass)) ? (
+                    {(Helper.isNotEmpty(tempData.target) && petalaceItem.id !== tempData.id) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => {
-                                handleItemPickUp(petalaceItem.id, modalData.bypass)
+                                handleItemPickUp(petalaceItem.id, tempData)
                             }} />
                     ) : false}
                 </div>
@@ -117,24 +113,48 @@ export default function PetalaceSelectorModal (props) {
      * Hooks
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('petalaceSelector'))
-    const [stateSortedList, updateSortedList] = useState([])
-    const [stateSegment, updateSegment] = useState(undefined)
+    const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
+
+    const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
+            updateTempData(null)
+
             return
         }
 
-        let sortedList = PetalaceDataset.getList()
+        let tempData = Helper.deepCopy(stateModalData)
 
-        updateSortedList(sortedList)
-    }, [stateModalData])
+        // Set Id
+        tempData.id = null
+
+        if (Helper.isNotEmpty(tempData.target)) {
+            let equipType = tempData.equipType
+            let idIndex = tempData.idIndex
+
+            if ('playerEquips' === tempData.target
+                && Helper.isNotEmpty(statePlayerEquips[equipType])
+            ) {
+                tempData.id = statePlayerEquips[equipType].id
+            }
+        }
+
+        // Set List
+        tempData.list = PetalaceDataset.getList()
+
+        updateTempData(tempData)
+    }, [
+        stateModalData,
+        statePlayerEquips
+    ])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('petalaceSelector'))
+            updatePlayerEquips(States.getter.getPlayerEquips())
         })
 
         return () => {
@@ -156,27 +176,25 @@ export default function PetalaceSelectorModal (props) {
     const handleSegmentInput = useCallback((event) => {
         let segment = event.target.value
 
-        segment = (0 !== segment.length)
-            ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
-
-        updateSegment(segment)
-    }, [])
+        updateTempData(Object.assign({}, stateTempData, {
+            segment: (0 !== segment.length)
+                ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
+        }))
+    }, [stateTempData])
 
     const getContent = useMemo(() => {
-        if (Helper.isEmpty(stateModalData)) {
+        if (Helper.isEmpty(stateTempData)) {
             return false
         }
 
-        let modalData = Helper.deepCopy(stateModalData)
-
-        return stateSortedList.filter((item) => {
+        return stateTempData.list.filter((item) => {
 
             // Create Text
             let text = _(item.name)
 
             // Search Nameword
-            if (Helper.isNotEmpty(stateSegment)
-                && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
+            if (Helper.isNotEmpty(stateTempData.segment)
+                && -1 === text.toLowerCase().search(stateTempData.segment.toLowerCase())
             ) {
                 return false
             }
@@ -185,15 +203,11 @@ export default function PetalaceSelectorModal (props) {
         }).sort((itemA, itemB) => {
             return _(itemA.rare) > _(itemB.rare) ? 1 : -1
         }).map((item) => {
-            return renderPetalaceItem(item, modalData)
+            return renderPetalaceItem(item, stateTempData)
         })
-    }, [
-        stateModalData,
-        stateSortedList,
-        stateSegment
-    ])
+    }, [stateTempData])
 
-    return Helper.isNotEmpty(stateModalData) ? (
+    return Helper.isNotEmpty(stateTempData) ? (
         <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
@@ -202,10 +216,12 @@ export default function PetalaceSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateSegment} onChange={handleSegmentInput} />
+                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={() => { States.setter.hideModal('petalaceSelector') }} />
+                            onClick={() => {
+                                States.setter.hideModal('petalaceSelector')
+                            }} />
                     </div>
                 </div>
                 <div className="mhrc-list">

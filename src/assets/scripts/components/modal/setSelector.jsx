@@ -19,7 +19,6 @@ import ArmorDataset from 'libraries/dataset/armor'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
-import IconSelector from 'components/common/iconSelector'
 import IconInput from 'components/common/iconInput'
 
 // Load States
@@ -28,8 +27,8 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (itemId, action, bypassData) => {
-    if ('requiredConditions' === bypassData.target) {
+const handleItemPickUp = (itemId, action, tempData) => {
+    if ('requiredConditions' === tempData.target) {
         if ('add' === action) {
             States.setter.addRequiredConditionsSet(itemId)
         }
@@ -43,25 +42,25 @@ const handleItemPickUp = (itemId, action, bypassData) => {
 /**
  * Render Functions
  */
-const renderSetItem = (setItem, selectedIds, modalData) => {
+const renderSetItem = (setItem, tempData) => {
     return (
         <div key={setItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
                 <span>{_(setItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {Helper.isNotEmpty(modalData.bypass) ? (
-                        (-1 === selectedIds.indexOf(setItem.id)) ? (
+                    {Helper.isNotEmpty(tempData.target) ? (
+                        (-1 === tempData.ids.indexOf(setItem.id)) ? (
                             <IconButton
                                 iconName="plus" altName={_('add')}
                                 onClick={() => {
-                                    handleItemPickUp(setItem.id, 'add', modalData.bypass)
+                                    handleItemPickUp(setItem.id, 'add', tempData)
                                 }} />
                         ) : (
                             <IconButton
                                 iconName="minus" altName={_('remove')}
                                 onClick={() => {
-                                    handleItemPickUp(setItem.id, 'remove', modalData.bypass)
+                                    handleItemPickUp(setItem.id, 'remove', tempData)
                                 }} />
                         )
                     ) : false}
@@ -101,39 +100,49 @@ export default function SetSelectorModal (props) {
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('setSelector'))
     const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
-    const [stateSelectedIds, updateSelectedIds] = useState([])
-    const [stateSortedList, updateSortedList] = useState([])
-    const [stateSegment, updateSegment] = useState(undefined)
+
+    const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
+            updateTempData(null)
+
             return
         }
 
-        let selectedIds = []
+        let tempData = Helper.deepCopy(stateModalData)
 
-        if (Helper.isNotEmpty(stateModalData.bypass)
-            && 'requiredConditions' === stateModalData.bypass.target
-        ) {
-            selectedIds = stateRequiredConditions.sets.map((setData) => {
-                return setData.id
-            })
+        // Set Ids
+        tempData.ids = []
+
+        if (Helper.isNotEmpty(tempData.target)) {
+            if ('requiredConditions' === tempData.target) {
+                tempData.ids = stateRequiredConditions.sets.map((setData) => {
+                    return setData.id
+                })
+            }
         }
 
+        // Set List
         let selectedList = []
         let unselectedList = []
 
         SetDataset.getList().forEach((setItem) => {
-            if (-1 === selectedIds.indexOf(setItem.id)) {
+            if (3 > setItem.items.length) {
+                return
+            }
+
+            if (-1 === tempData.ids.indexOf(setItem.id)) {
                 selectedList.push(setItem)
             } else {
                 unselectedList.push(setItem)
             }
         })
 
-        updateSelectedIds(selectedIds)
-        updateSortedList(selectedList.concat(unselectedList))
+        tempData.list = selectedList.concat(unselectedList)
+
+        updateTempData(tempData)
     }, [
         stateModalData,
         stateRequiredConditions
@@ -165,27 +174,25 @@ export default function SetSelectorModal (props) {
     const handleSegmentInput = useCallback((event) => {
         let segment = event.target.value
 
-        segment = (0 !== segment.length)
-            ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
-
-        updateSegment(segment)
-    }, [])
+        updateTempData(Object.assign({}, stateTempData, {
+            segment: (0 !== segment.length)
+                ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
+        }))
+    }, [stateTempData])
 
     const getContent = useMemo(() => {
-        if (Helper.isEmpty(stateModalData)) {
+        if (Helper.isEmpty(stateTempData)) {
             return false
         }
 
-        let modalData = Helper.deepCopy(stateModalData)
-
-        return stateSortedList.filter((item) => {
+        return stateTempData.list.filter((item) => {
 
             // Create Text
             let text = _(item.name)
 
             // Search Nameword
-            if (Helper.isNotEmpty(stateSegment)
-                && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
+            if (Helper.isNotEmpty(stateTempData.segment)
+                && -1 === text.toLowerCase().search(stateTempData.segment.toLowerCase())
             ) {
                 return false
             }
@@ -194,16 +201,11 @@ export default function SetSelectorModal (props) {
         }).sort((itemA, itemB) => {
             return _(itemA.rare) > _(itemB.rare) ? 1 : -1
         }).map((item) => {
-            return renderSetItem(item, stateSelectedIds, modalData)
+            return renderSetItem(item, stateTempData)
         })
-    }, [
-        stateModalData,
-        stateSortedList,
-        stateSelectedIds,
-        stateSegment
-    ])
+    }, [stateTempData])
 
-    return Helper.isNotEmpty(stateModalData) ? (
+    return Helper.isNotEmpty(stateTempData) ? (
         <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
@@ -212,10 +214,7 @@ export default function SetSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateSegment} onChange={handleSegmentInput} />
-                        {/* <IconSelector
-                            iconName="globe" defaultValue={stateMode}
-                            options={getModeList()} onChange={handleModeChange} /> */}
+                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {

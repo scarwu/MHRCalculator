@@ -144,15 +144,12 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
 
     const showModal = () => {
         States.setter.showModal('jewelSelector', {
-            id: (Helper.isNotEmpty(jewelItem)) ? jewelItem.id : null,
-            size: slotSize,
+            target: 'playerEquips',
+            equipType: equipType,
+            idIndex: slotIndex,
 
-            // Bypass
-            bypass: {
-                target: 'playerEquips',
-                equipType: equipType,
-                idIndex: slotIndex,
-            }
+            // filter
+            size: slotSize
         })
     }
 
@@ -378,14 +375,11 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
 
     const showModal = () => {
         States.setter.showModal(Misc.equipTypeToDatasetType(equipType) + 'Selector', {
-            id: (Helper.isNotEmpty(equipExtendItem)) ? equipExtendItem.id : null,
-            type: equipType,
+            target: 'playerEquips',
+            equipType: equipType,
 
-            // Bypass
-            bypass: {
-                target: 'playerEquips',
-                equipType: equipType
-            }
+            // Filter
+            type: equipType
         })
     }
 

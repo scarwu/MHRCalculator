@@ -31,13 +31,13 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (itemId, bypassData) => {
-    if ('playerEquips' === bypassData.target) {
-        States.setter.setPlayerEquip(bypassData.equipType, itemId)
+const handleItemPickUp = (itemId, tempData) => {
+    if ('playerEquips' === tempData.target) {
+        States.setter.setPlayerEquip(tempData.equipType, itemId)
     }
 
-    if ('requiredConditions' === bypassData.target) {
-        States.setter.setRequiredConditionsEquip(bypassData.equipType, itemId)
+    if ('requiredConditions' === tempData.target) {
+        States.setter.setRequiredConditionsEquip(tempData.equipType, itemId)
     }
 
     States.setter.hideModal('armorSelector')
@@ -46,7 +46,7 @@ const handleItemPickUp = (itemId, bypassData) => {
 /**
  * Render Functions
  */
-const renderArmorItem = (armorItem, modalData) => {
+const renderArmorItem = (armorItem, tempData) => {
     if (Helper.isEmpty(armorItem.maxDefense)) {
         armorItem.maxDefense = '?'
     }
@@ -57,11 +57,11 @@ const renderArmorItem = (armorItem, modalData) => {
                 <span>{_(armorItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(armorItem.id !== modalData.id && Helper.isNotEmpty(modalData.bypass)) ? (
+                    {(Helper.isNotEmpty(tempData.target) && armorItem.id !== tempData.id) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => {
-                                handleItemPickUp(armorItem.id, modalData.bypass)
+                                handleItemPickUp(armorItem.id, tempData)
                             }} />
                     ) : false}
                 </div>
@@ -134,52 +134,91 @@ export default function ArmorSelectorModal (props) {
      * Hooks
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('armorSelector'))
-    const [stateSortedList, updateSortedList] = useState([])
-    const [stateType, updateType] = useState(undefined)
-    const [stateRare, updateRare] = useState(undefined)
-    const [stateTypeList, updateTypeList] = useState([])
-    const [stateRareList, updateRareList] = useState([])
-    const [stateSegment, updateSegment] = useState(undefined)
+    const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
+
+    const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
+            updateTempData(null)
+
             return
         }
 
-        let sortedList = ArmorDataset.getList()
-        let typeList = {}
-        let rareList = {}
-        let type = null
-        let rare = null
+        let tempData = Helper.deepCopy(stateModalData)
 
-        let armorInfo = ArmorDataset.getItem(stateModalData.id)
+        // Set Id
+        tempData.id = null
 
-        typeList = Constant.armorTypes.map((type) => {
-            return { key: type, value: _(type) }
+        if (Helper.isNotEmpty(tempData.target)) {
+            let equipType = tempData.equipType
+
+            if ('playerEquips' === tempData.target
+                && Helper.isNotEmpty(statePlayerEquips[equipType])
+            ) {
+                tempData.id = statePlayerEquips[equipType].id
+            }
+
+            if ('requiredConditions' === tempData.target
+                && Helper.isNotEmpty(stateRequiredConditions.equips)
+                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType])
+            ) {
+                tempData.id = stateRequiredConditions.equips[equipType].id
+            }
+        }
+
+        // Set List
+        tempData.list = ArmorDataset.getList()
+
+        // Set Rare & Type Default
+        tempData.typeList = {}
+        tempData.rareList = {}
+        tempData.type = null
+        tempData.rare = null
+
+        // Set Type
+        let armorItem = ArmorDataset.getItem(tempData.id)
+
+        tempData.typeList = Constant.armorTypes.map((type) => {
+            return {
+                key: type,
+                value: _(type)
+            }
         })
-        type = (Helper.isNotEmpty(stateModalData.type))
-            ? stateModalData.type : typeList[0].key
+        tempData.type = (Helper.isNotEmpty(armorItem) && Helper.isNotEmpty(armorItem.type))
+            ? armorItem.type : tempData.typeList[0].key
 
-        sortedList.forEach((armorInfo) => {
-            rareList[armorInfo.rare] = armorInfo.rare
-        })
-        rareList = Object.values(rareList).reverse().map((rare) => {
-            return { key: rare, value: _('rare') + `: ${rare}` }
-        })
-        rare = (Helper.isNotEmpty(armorInfo)) ? armorInfo.rare : rareList[0].key
+        if (Helper.isEmpty(tempData.type)) {
+            tempData.type = tempData.equipType
+        }
 
-        updateSortedList(sortedList)
-        updateTypeList(typeList)
-        updateRareList(rareList)
-        updateType(type)
-        updateRare(rare)
-    }, [stateModalData])
+        // Set Rare
+        tempData.list.forEach((armorItem) => {
+            tempData.rareList[armorItem.rare] = armorItem.rare
+        })
+        tempData.rareList = Object.values(tempData.rareList).reverse().map((rare) => {
+            return {
+                key: rare,
+                value: _('rare') + `: ${rare}`
+            }
+        })
+        tempData.rare = (Helper.isNotEmpty(armorItem)) ? armorItem.rare : tempData.rareList[0].key
+
+        updateTempData(tempData)
+    }, [
+        stateModalData,
+        statePlayerEquips,
+        stateRequiredConditions
+    ])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('armorSelector'))
+            updatePlayerEquips(States.getter.getPlayerEquips())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -201,33 +240,40 @@ export default function ArmorSelectorModal (props) {
     const handleSegmentInput = useCallback((event) => {
         let segment = event.target.value
 
-        segment = (0 !== segment.length)
-            ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
-
-        updateSegment(segment)
-    }, [])
+        updateTempData(Object.assign({}, stateTempData, {
+            segment: (0 !== segment.length)
+                ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
+        }))
+    }, [stateTempData])
 
     const handleTypeChange = useCallback((event) => {
-        updateType(event.target.value)
-    }, [])
+        let type = event.target.value
+
+        updateTempData(Object.assign({}, stateTempData, {
+            equipType: type,
+            type: type
+        }))
+    }, [stateTempData])
 
     const handleRareChange = useCallback((event) => {
-        updateRare(parseInt(event.target.value, 10))
-    }, [])
+        let rare = event.target.value
+
+        updateTempData(Object.assign({}, stateTempData, {
+            rare: parseInt(rare, 10)
+        }))
+    }, [stateTempData])
 
     const getContent = useMemo(() => {
-        if (Helper.isEmpty(stateModalData)) {
+        if (Helper.isEmpty(stateTempData)) {
             return false
         }
 
-        let modalData = Helper.deepCopy(stateModalData)
-
-        return stateSortedList.filter((item) => {
-            if (item.type !== stateType) {
+        return stateTempData.list.filter((item) => {
+            if (item.type !== stateTempData.type) {
                 return false
             }
 
-            if (item.rare !== stateRare) {
+            if (item.rare !== stateTempData.rare) {
                 return false
             }
 
@@ -244,8 +290,8 @@ export default function ArmorSelectorModal (props) {
             })
 
             // Search Nameword
-            if (Helper.isNotEmpty(stateSegment)
-                && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
+            if (Helper.isNotEmpty(stateTempData.segment)
+                && -1 === text.toLowerCase().search(stateTempData.segment.toLowerCase())
             ) {
                 return false
             }
@@ -254,34 +300,26 @@ export default function ArmorSelectorModal (props) {
         }).sort((itemA, itemB) => {
             return _(itemA.id) > _(itemB.id) ? 1 : -1
         }).map((item) => {
-            return renderArmorItem(item, modalData)
+            return renderArmorItem(item, stateTempData)
         })
-    }, [
-        stateModalData,
-        stateSortedList,
-        stateTypeList,
-        stateRareList,
-        stateType,
-        stateRare,
-        stateSegment
-    ])
+    }, [stateTempData])
 
-    return Helper.isNotEmpty(stateModalData) ? (
+    return Helper.isNotEmpty(stateTempData) ? (
         <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
-                    <span className="mhrc-title">{_('ArmorList')}</span>
+                    <span className="mhrc-title">{_('armorList')}</span>
 
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateSegment} onChange={handleSegmentInput} />
+                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
                         <IconSelector
-                            iconName="filter" defaultValue={stateType}
-                            options={stateTypeList} onChange={handleTypeChange} />
+                            iconName="filter" defaultValue={stateTempData.type}
+                            options={stateTempData.typeList} onChange={handleTypeChange} />
                         <IconSelector
-                            iconName="filter" defaultValue={stateRare}
-                            options={stateRareList} onChange={handleRareChange} />
+                            iconName="filter" defaultValue={stateTempData.rare}
+                            options={stateTempData.rareList} onChange={handleRareChange} />
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => { States.setter.hideModal('armorSelector') }} />

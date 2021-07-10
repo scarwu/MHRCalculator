@@ -91,11 +91,7 @@ export default function SkillList (props) {
 
         const showModal = () => {
             States.setter.showModal('skillSelector', {
-
-                // Bypass
-                bypass: {
-                    target: 'requiredConditions'
-                }
+                target: 'requiredConditions'
             })
         }
 

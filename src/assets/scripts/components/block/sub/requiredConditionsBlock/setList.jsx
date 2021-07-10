@@ -36,7 +36,7 @@ const renderSetItem = (setData) => {
     return (
         <div key={setItem.id} className="col-12 mhrc-content">
             <div className="col-12 mhrc-name">
-                <span>{_(setItem.name)} x {setData.count}</span>
+                <span>{_(setItem.name)} x {setData.count} / {setItem.items.length}</span>
 
                 <div className="mhrc-icons_bundle">
                     <IconButton
@@ -83,11 +83,7 @@ export default function SetList (props) {
 
         const showModal = () => {
             States.setter.showModal('setSelector', {
-
-                // Bypass
-                bypass: {
-                    target: 'requiredConditions'
-                }
+                target: 'requiredConditions'
             })
         }
 

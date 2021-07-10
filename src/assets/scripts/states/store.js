@@ -275,15 +275,20 @@ export default createStore((state = initialState, action) => {
                     return state
                 }
 
+                if (3 > setItem.items.length) {
+                    return state
+                }
+
                 for (let setData of requiredConditions.sets) {
                     if (setData.id === setId) {
                         return state
                     }
                 }
 
+                requiredConditions.sets = [] // Force Reset
                 requiredConditions.sets.push({
                     id: setId,
-                    count: 1
+                    count: 3
                 })
 
                 return Object.assign({}, state, {
@@ -360,7 +365,7 @@ export default createStore((state = initialState, action) => {
                         continue
                     }
 
-                    if ((setData.count - 1) < 1) {
+                    if ((setData.count - 1) < 3) {
                         return state
                     }
 

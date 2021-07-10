@@ -101,6 +101,7 @@
     "candidateBundle":          null,
     "equipBundle":              null,
     "status":                   null,
+    "setList":                  null,
     "skillList":                null,
     "petalaceList":             null,
     "enhanceList":              null,

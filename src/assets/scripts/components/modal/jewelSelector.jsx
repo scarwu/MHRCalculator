@@ -27,13 +27,13 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleItemPickUp = (itemId, bypassData) => {
-    if ('playerEquips' === bypassData.target) {
-        States.setter.setPlayerEquipJewel(bypassData.equipType, bypassData.idIndex, itemId)
+const handleItemPickUp = (itemId, tempData) => {
+    if ('playerEquips' === tempData.target) {
+        States.setter.setPlayerEquipJewel(tempData.equipType, tempData.idIndex, itemId)
     }
 
-    if ('requiredConditions' === bypassData.target) {
-        States.setter.setRequiredConditionsEquipJewel(bypassData.equipType, bypassData.idIndex, itemId)
+    if ('requiredConditions' === tempData.target) {
+        States.setter.setRequiredConditionsEquipJewel(tempData.equipType, tempData.idIndex, itemId)
     }
 
     States.setter.hideModal('jewelSelector')
@@ -43,18 +43,18 @@ const handleItemPickUp = (itemId, bypassData) => {
  * Render Functions
  */
 
-const renderJewelItem = (jewelItem, modalData) => {
+const renderJewelItem = (jewelItem, tempData) => {
     return (
         <div key={jewelItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
                 <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(jewelItem.id !== modalData.id && Helper.isNotEmpty(modalData.bypass)) ? (
+                    {(Helper.isNotEmpty(tempData.target) && jewelItem.id !== tempData.id) ? (
                         <IconButton
                             iconName="check" altName={_('select')}
                             onClick={() => {
-                                handleItemPickUp(jewelItem.id, modalData.bypass)
+                                handleItemPickUp(jewelItem.id, tempData)
                             }} />
                     ) : false}
                 </div>
@@ -85,36 +85,73 @@ export default function JewelSelectorModal (props) {
      * Hooks
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('jewelSelector'))
-    const [stateSortedList, updateSortedList] = useState([])
-    const [stateSegment, updateSegment] = useState(undefined)
+    const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
+
+    const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
+            updateTempData(null)
+
             return
         }
 
-        let sortedList = []
+        let tempData = Helper.deepCopy(stateModalData)
 
-        for (let size = stateModalData.size; size >= 1; size--) {
-            for (let rare = 9; rare >= 1; rare--) {
-                sortedList = sortedList.concat(
-                    JewelDataset.rareIs(rare).sizeIs(size).getList().map((jewelInfo) => {
-                        jewelInfo.isSelect = (stateModalData.jewelId === jewelInfo.id)
+        // Set Id
+        tempData.id = null
 
-                        return jewelInfo
-                    })
-                )
+        if (Helper.isNotEmpty(tempData.target)) {
+            let equipType = tempData.equipType
+            let idIndex = tempData.idIndex
+
+            if ('playerEquips' === tempData.target
+                && Helper.isNotEmpty(statePlayerEquips[equipType])
+                && Helper.isNotEmpty(statePlayerEquips[equipType].jeweldIds)
+                && Helper.isNotEmpty(statePlayerEquips[equipType].jeweldIds[idIndex])
+            ) {
+                tempData.id = statePlayerEquips[equipType].jeweldIds[idIndex]
+            }
+
+            if ('requiredConditions' === tempData.target
+                && Helper.isNotEmpty(stateRequiredConditions.equips)
+                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType])
+                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType].jeweldIds)
+                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType].jeweldIds[idIndex])
+            ) {
+                tempData.id = stateRequiredConditions.equips[equipType].jeweldIds[idIndex]
             }
         }
 
-        updateSortedList(sortedList)
-    }, [stateModalData])
+        // Set Size
+        if (Helper.isEmpty(tempData.size)) {
+            tempData.size = 3
+        }
+
+        // Set List
+        tempData.list = []
+
+        for (let size = tempData.size; size >= 1; size--) {
+            for (let rare = 9; rare >= 1; rare--) {
+                tempData.list = tempData.list.concat(JewelDataset.rareIs(rare).sizeIs(size).getList())
+            }
+        }
+
+        updateTempData(tempData)
+    }, [
+        stateModalData,
+        statePlayerEquips,
+        stateRequiredConditions
+    ])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('jewelSelector'))
+            updatePlayerEquips(States.getter.getPlayerEquips())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -136,20 +173,18 @@ export default function JewelSelectorModal (props) {
     const handleSegmentInput = useCallback((event) => {
         let segment = event.target.value
 
-        segment = (0 !== segment.length)
-            ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
-
-        updateSegment(segment)
-    }, [])
+        updateTempData(Object.assign({}, stateTempData, {
+            segment: (0 !== segment.length)
+                ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
+        }))
+    }, [stateTempData])
 
     const getContent = useMemo(() => {
-        if (Helper.isEmpty(stateModalData)) {
+        if (Helper.isEmpty(stateTempData)) {
             return false
         }
 
-        let modalData = Helper.deepCopy(stateModalData)
-
-        return stateSortedList.filter((item) => {
+        return stateTempData.list.filter((item) => {
 
             // Create Text
             let text = _(item.name)
@@ -163,8 +198,8 @@ export default function JewelSelectorModal (props) {
             })
 
             // Search Nameword
-            if (Helper.isNotEmpty(stateSegment)
-                && -1 === text.toLowerCase().search(stateSegment.toLowerCase())
+            if (Helper.isNotEmpty(stateTempData.segment)
+                && -1 === text.toLowerCase().search(stateTempData.segment.toLowerCase())
             ) {
                 return false
             }
@@ -173,15 +208,11 @@ export default function JewelSelectorModal (props) {
         }).sort((itemA, itemB) => {
             return _(itemA.id) > _(itemB.id) ? 1 : -1
         }).map((item) => {
-            return renderJewelItem(item, modalData)
+            return renderJewelItem(item, stateTempData)
         })
-    }, [
-        stateModalData,
-        stateSortedList,
-        stateSegment
-    ])
+    }, [stateTempData])
 
-    return Helper.isNotEmpty(stateModalData) ? (
+    return Helper.isNotEmpty(stateTempData) ? (
         <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
@@ -190,7 +221,7 @@ export default function JewelSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                             defaultValue={stateSegment} onChange={handleSegmentInput} />
+                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {

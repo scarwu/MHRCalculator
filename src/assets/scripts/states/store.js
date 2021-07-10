@@ -29,9 +29,6 @@ import SkillDataset from 'libraries/dataset/skill'
 const statusMapping = {
     modalHub: 'state:modalHub',
     dataStore: 'state:dataStore',
-    // requiredEquip: 'state:requiredEquip',
-    // requiredSets:  'state:requiredSets',
-    // requiredSkills: 'state:requiredSkills',
     requiredConditions: 'state:requiredConditions',
     playerEquips: 'state:playerEquips',
     algorithmParams: 'state:algorithmParams',
@@ -126,17 +123,18 @@ export default createStore((state = initialState, action) => {
                 let index = action.payload.index
 
                 if (Helper.isEmpty(dataStore[target])) {
-                    dataStore[target] = {
-                        index: 0,
-                        list: []
-                    }
+                    return state
                 }
 
                 if (index === dataStore[target].index) {
                     return state
                 }
 
-                let newData = Helper.deepCopy(state.playerEquips)
+                if (Helper.isEmpty(state[target])) {
+                    return state
+                }
+
+                let newData = Helper.deepCopy(state[target])
                 let oldData = Helper.isNotEmpty(dataStore[target].list[index])
                     ? Helper.deepCopy(dataStore[target].list[index])
                     : Helper.deepCopy(dataStore[target].emptyItem)
@@ -144,10 +142,12 @@ export default createStore((state = initialState, action) => {
                 dataStore[target].list[dataStore[target].index] = newData
                 dataStore[target].index = index
 
-                return Object.assign({}, state, {
-                    dataStore: dataStore,
-                    playerEquips: oldData
-                })
+                let newState = {}
+
+                newState.dataStore = dataStore
+                newState[target] = oldData
+
+                return Object.assign({}, state, newState)
             })()
 
         // Player Equips

@@ -48,6 +48,14 @@ export const getWeaponExtendItem = (equipData) => {
     // Handle Skills
     let skillMapping = {}
 
+    if (Helper.isNotEmpty(weaponItem.skills)) {
+        weaponItem.skills.forEach((skillData) => {
+            if (Helper.isEmpty(skillMapping[skillData.id])) {
+                skillMapping[skillData.id] = skillData
+            }
+        })
+    }
+
     weaponItem.extends.jewelIds.forEach((jewelId) => {
         let jewelItem = JewelDataset.getItem(jewelId)
 
@@ -105,11 +113,13 @@ export const getArmorExtendItem = (equipData) => {
     // Handle Skills
     let skillMapping = {}
 
-    armorItem.skills.forEach((skillData) => {
-        if (Helper.isEmpty(skillMapping[skillData.id])) {
-            skillMapping[skillData.id] = skillData
-        }
-    })
+    if (Helper.isNotEmpty(armorItem.skills)) {
+        armorItem.skills.forEach((skillData) => {
+            if (Helper.isEmpty(skillMapping[skillData.id])) {
+                skillMapping[skillData.id] = skillData
+            }
+        })
+    }
 
     armorItem.extends.jewelIds.forEach((jewelId) => {
         let jewelItem = JewelDataset.getItem(jewelId)
@@ -172,11 +182,13 @@ export const getCharmExtendItem = (equipData) => {
     // Handle Skills
     let skillMapping = {}
 
-    charmItem.skills.forEach((skillData) => {
-        if (Helper.isEmpty(skillMapping[skillData.id])) {
-            skillMapping[skillData.id] = skillData
-        }
-    })
+    if (Helper.isNotEmpty(charmItem.skills)) {
+        charmItem.skills.forEach((skillData) => {
+            if (Helper.isEmpty(skillMapping[skillData.id])) {
+                skillMapping[skillData.id] = skillData
+            }
+        })
+    }
 
     charmItem.extends.jewelIds.forEach((jewelId) => {
         let jewelItem = JewelDataset.getItem(jewelId)

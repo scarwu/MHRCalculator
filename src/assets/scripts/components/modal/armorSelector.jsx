@@ -47,6 +47,10 @@ const handleItemPickUp = (itemId, bypassData) => {
  * Render Functions
  */
 const renderArmorItem = (armorItem, modalData) => {
+    if (Helper.isEmpty(armorItem.maxDefense)) {
+        armorItem.maxDefense = '?'
+    }
+
     return (
         <div key={armorItem.id} className="mhrc-item mhrc-item-2-step">
             <div className="col-12 mhrc-name">
@@ -74,7 +78,7 @@ const renderArmorItem = (armorItem, modalData) => {
                     <span>{_('defense')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    <span>{armorItem.minDefense}-{Helper.isNotEmpty(armorItem.maxDefense) ? armorItem.maxDefense : '?'}</span>
+                    <span>{armorItem.minDefense} - {armorItem.maxDefense}</span>
                 </div>
 
                 {Constant.resistanceTypes.map((resistanceType) => {
@@ -94,27 +98,31 @@ const renderArmorItem = (armorItem, modalData) => {
                     <span>{_('slot')}</span>
                 </div>
                 <div className="col-9 mhrc-value">
-                    {armorItem.slots.map((slotData, index) => {
-                        return (
-                            <span key={index}>[{slotData.size}]</span>
-                        )
-                    })}
+                    {(Helper.isNotEmpty(armorItem.slots) && 0 !== armorItem.slots.length) ? (
+                        armorItem.slots.map((slotData, index) => {
+                            return (
+                                <span key={index}>[{slotData.size}]</span>
+                            )
+                        })
+                    ) : false}
                 </div>
 
-                {armorItem.skills.map((skillData, index) => {
-                    let skillItem = SkillDataset.getItem(skillData.id)
+                {(Helper.isNotEmpty(armorItem.skills) && 0 !== armorItem.skills.length) ? (
+                    armorItem.skills.map((skillData, index) => {
+                        let skillItem = SkillDataset.getItem(skillData.id)
 
-                    return Helper.isNotEmpty(skillItem) ? (
-                        <Fragment key={index}>
-                            <div className="col-12 mhrc-name">
-                                <span>{_(skillItem.name)} Lv.{skillData.level}</span>
-                            </div>
-                            <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillItem.list[skillData.level - 1].effect)}</span>
-                            </div>
-                        </Fragment>
-                    ) : false
-                })}
+                        return Helper.isNotEmpty(skillItem) ? (
+                            <Fragment key={index}>
+                                <div className="col-12 mhrc-name">
+                                    <span>{_(skillItem.name)} Lv.{skillData.level}</span>
+                                </div>
+                                <div className="col-12 mhrc-value mhrc-description">
+                                    <span>{_(skillItem.list[skillData.level - 1].effect)}</span>
+                                </div>
+                            </Fragment>
+                        ) : false
+                    })
+                ): false}
             </div>
         </div>
     )

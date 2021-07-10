@@ -116,28 +116,6 @@ const renderWeaponItem = (weaponItem, modalData) => {
                     </Fragment>
                 ) : false}
 
-                {Helper.isNotEmpty(weaponItem.element.attack) ? (
-                    <Fragment>
-                        <div className="col-3 mhrc-name">
-                            <span>{_(weaponItem.element.attack.type)}</span>
-                        </div>
-                        <div className="col-3 mhrc-value">
-                            <span>{weaponItem.element.attack.minValue}-{weaponItem.element.attack.maxValue}</span>
-                        </div>
-                    </Fragment>
-                ) : false}
-
-                {Helper.isNotEmpty(weaponItem.element.status) ? (
-                    <Fragment>
-                        <div className="col-3 mhrc-name">
-                            <span>{_(weaponItem.element.status.type)}</span>
-                        </div>
-                        <div className="col-3 mhrc-value">
-                            <span>{weaponItem.element.status.minValue}-{weaponItem.element.status.maxValue}</span>
-                        </div>
-                    </Fragment>
-                ) : false}
-
                 <div className="col-3 mhrc-name">
                     <span>{_('defense')}</span>
                 </div>
@@ -149,27 +127,36 @@ const renderWeaponItem = (weaponItem, modalData) => {
                     <span>{_('slot')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    {weaponItem.slots.map((slotData, index) => {
-                        return (
-                            <span key={index}>[{slotData.size}]</span>
-                        )
-                    })}
+                    {(Helper.isNotEmpty(weaponItem.slots) && 0 !== weaponItem.slots.length) ? (
+                        weaponItem.slots.map((slotData, index) => {
+                            return (
+                                <span key={index}>[{slotData.size}]</span>
+                            )
+                        })
+                    ) : false}
                 </div>
 
-                {/* {weaponItem.skills.map((skillData, index) => {
-                    let skillItem = SkillDataset.getItem(skillData.id)
+                {Helper.isNotEmpty(weaponItem.element.attack) ? (
+                    <Fragment>
+                        <div className="col-3 mhrc-name">
+                            <span>{_(weaponItem.element.attack.type)}</span>
+                        </div>
+                        <div className="col-3 mhrc-value">
+                            <span>{weaponItem.element.attack.minValue} - {weaponItem.element.attack.maxValue}</span>
+                        </div>
+                    </Fragment>
+                ) : false}
 
-                    return Helper.isNotEmpty(skillItem) ? (
-                        <Fragment key={index}>
-                            <div className="col-12 mhrc-name">
-                                <span>{_(skillItem.name)} Lv.{skillItem.level}</span>
-                            </div>
-                            <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillItem.list[skillItem.level - 1].effect)}</span>
-                            </div>
-                        </Fragment>
-                    ) : false
-                })} */}
+                {Helper.isNotEmpty(weaponItem.element.status) ? (
+                    <Fragment>
+                        <div className="col-3 mhrc-name">
+                            <span>{_(weaponItem.element.status.type)}</span>
+                        </div>
+                        <div className="col-3 mhrc-value">
+                            <span>{weaponItem.element.status.minValue} - {weaponItem.element.status.maxValue}</span>
+                        </div>
+                    </Fragment>
+                ) : false}
             </div>
         </div>
     )

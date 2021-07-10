@@ -15,13 +15,14 @@ import Armors from 'datasets/armors.json'
 
 let dataset = Armors.map((armorBundle) => {
     return armorBundle[1].map((armorItem) => {
-        return {
+        let armorResult = {
             seriesId: armorBundle[0][0],
             series: armorBundle[0][1],
             rare: armorBundle[0][2],
             gender: armorBundle[0][3],
             minDefense: armorBundle[0][4],
             maxDefense: armorBundle[0][5],
+            defense: null,
             resistance: {
                 fire: armorBundle[0][6][0],
                 water: armorBundle[0][6][1],
@@ -32,18 +33,43 @@ let dataset = Armors.map((armorBundle) => {
             id: armorItem[0],
             name: armorItem[1],
             type: armorItem[2],
-            slots: (Helper.isNotEmpty(armorItem[3])) ? armorItem[3].map((slotData) => {
+            slots: armorItem[3].map((slotData) => {
                 return {
                     size: slotData[0]
                 }
-            }) : [],
-            skills: (Helper.isNotEmpty(armorItem[4])) ? armorItem[4].map((skillData) => {
+            }),
+            skills: armorItem[4].map((skillData) => {
                 return {
                     id: skillData[0],
                     level: skillData[1]
                 }
-            }) : []
+            })
         }
+
+        // Set Defense
+        armorResult.defense = Helper.isNotEmpty(armorResult.maxDefense)
+            ? armorResult.maxDefense : armorResult.minDefense
+
+        // Filter Slots
+        armorResult.slots = armorResult.slots.filter((slotData) => {
+            return Helper.isNotEmpty(slotData.size)
+        })
+
+        if (0 === armorResult.slots.length) {
+            armorResult.slots = null
+        }
+
+        // Filter Skills
+        armorResult.skills = armorResult.skills.filter((skillData) => {
+            return Helper.isNotEmpty(skillData.id)
+                && Helper.isNotEmpty(skillData.level)
+        })
+
+        if (0 === armorResult.skills.length) {
+            armorResult.skills = null
+        }
+
+        return armorResult
     })
 }).reduce((armorsA, armorsB) => {
     return armorsA.concat(armorsB)

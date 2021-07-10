@@ -291,7 +291,7 @@ const renderArmorProperties = (equipExtendItem) => {
                     <span>{_('defense')}</span>
                 </div>
                 <div className="col-3 mhrc-value">
-                    <span>{equipExtendItem.minDefense}-{Helper.isNotEmpty(equipExtendItem.maxDefense) ? equipExtendItem.maxDefense : '?'}</span>
+                    <span>{equipExtendItem.defense}</span>
                 </div>
 
                 {Constant.resistanceTypes.map((resistanceType) => {

@@ -14,7 +14,7 @@ import Helper from 'core/helper'
 import Weapons from 'datasets/weapons.json'
 
 let dataset = Weapons.map((weaponItem) => {
-    return {
+    let weaponResult = {
         id: weaponItem[0],
         series: weaponItem[1],
         name: weaponItem[2],
@@ -27,17 +27,20 @@ let dataset = Weapons.map((weaponItem) => {
             attack: {
                 type: weaponItem[8][0][0],
                 minValue: weaponItem[8][0][1],
-                maxValue: weaponItem[8][0][2]
+                maxValue: weaponItem[8][0][2],
+                value: null
             },
             status: {
                 type: weaponItem[8][1][0],
                 minValue: weaponItem[8][1][1],
-                maxValue: weaponItem[8][1][2]
+                maxValue: weaponItem[8][1][2],
+                value: null
             }
         },
         sharpness: {
             minValue: weaponItem[9][0],
             maxValue: weaponItem[9][1],
+            value: null,
             steps: {
                 red: weaponItem[9][2][0],
                 orange: weaponItem[9][2][1],
@@ -62,6 +65,73 @@ let dataset = Weapons.map((weaponItem) => {
             })
         }
     }
+
+    // Set Values
+    if (Helper.isEmpty(weaponResult.attack)) {
+        weaponResult.attack = 0
+    }
+
+    if (Helper.isEmpty(weaponResult.criticalRate)) {
+        weaponResult.criticalRate = 0
+    }
+
+    if (Helper.isEmpty(weaponResult.defense)) {
+        weaponResult.defense = 0
+    }
+
+    // Filter Element Attack & Set Value
+    if (Helper.isNotEmpty(weaponResult.element.attack)
+        && Helper.isNotEmpty(weaponResult.element.attack.type)
+        && Helper.isNotEmpty(weaponResult.element.attack.minValue)
+    ) {
+        weaponResult.element.attack.value = Helper.isNotEmpty(weaponResult.element.attack.maxValue)
+            ? weaponResult.element.attack.maxValue
+            : weaponResult.element.attack.minValue
+    } else {
+        weaponResult.element.attack = null
+    }
+
+    // Filter Element Status & Set Value
+    if (Helper.isNotEmpty(weaponResult.element.status)
+        && Helper.isNotEmpty(weaponResult.element.status.type)
+        && Helper.isNotEmpty(weaponResult.element.status.minValue)
+    ) {
+        weaponResult.element.status.value = Helper.isNotEmpty(weaponResult.element.status.maxValue)
+            ? weaponResult.element.status.maxValue
+            : weaponResult.element.status.minValue
+    } else {
+        weaponResult.element.status = null
+    }
+
+    // Filter Sharpness
+    if (Helper.isNotEmpty(weaponResult.sharpness.minValue)
+        && Helper.isNotEmpty(weaponResult.sharpness.steps)
+        && (Helper.isNotEmpty(weaponResult.sharpness.steps.red)
+            || Helper.isNotEmpty(weaponResult.sharpness.steps.orange)
+            || Helper.isNotEmpty(weaponResult.sharpness.steps.yellow)
+            || Helper.isNotEmpty(weaponResult.sharpness.steps.green)
+            || Helper.isNotEmpty(weaponResult.sharpness.steps.blue)
+            || Helper.isNotEmpty(weaponResult.sharpness.steps.white)
+            || Helper.isNotEmpty(weaponResult.sharpness.steps.purple)
+        )
+    ) {
+        weaponResult.sharpness.value = Helper.isNotEmpty(weaponResult.sharpness.maxValue)
+            ? weaponResult.sharpness.maxValue
+            : weaponResult.sharpness.minValue
+    } else {
+        weaponResult.sharpness = null
+    }
+
+    // Filter Slots
+    weaponResult.slots = weaponResult.slots.filter((slotData) => {
+        return Helper.isNotEmpty(slotData.size)
+    })
+
+    if (0 === weaponResult.slots.length) {
+        weaponResult.slots = null
+    }
+
+    return weaponResult
 })
 
 class WeaponDataset {

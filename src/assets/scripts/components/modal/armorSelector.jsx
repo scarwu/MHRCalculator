@@ -182,7 +182,7 @@ export default function ArmorSelectorModal (props) {
             }
         })
 
-        if (Helper.isEmpty(tempData.type)) {
+        if (Helper.isEmpty(tempData.type) || 'armor' === tempData.type) {
             tempData.type = Helper.isNotEmpty(armorItem) ? armorItem.type : tempData.typeList[0].key
         }
 

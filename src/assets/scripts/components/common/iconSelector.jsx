@@ -32,6 +32,9 @@ export default function IconSelector (props) {
                         })}
                     </select>
                 </div>
+                <div className="mhrc-arrow-icon">
+                    <i className="fa fa-caret-down"></i>
+                </div>
             </div>
         )
     }, [iconName, defaultValue, options, onChange])

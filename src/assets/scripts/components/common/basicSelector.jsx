@@ -27,6 +27,9 @@ export default function BasicSelector (props) {
                         )
                     })}
                 </select>
+                <div className="mhrc-arrow-icon">
+                    <i className="fa fa-caret-down"></i>
+                </div>
             </div>
         )
     }, [defaultValue, options, onChange])

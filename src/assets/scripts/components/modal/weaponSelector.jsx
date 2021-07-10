@@ -216,7 +216,7 @@ export default function WeaponSelectorModal (props) {
             }
         })
 
-        if (Helper.isEmpty(tempData.type)) {
+        if (Helper.isEmpty(tempData.type) || 'weapon' === tempData.type) {
             tempData.type = Helper.isNotEmpty(weaponItem) ? weaponItem.type : tempData.typeList[0].key
         }
 

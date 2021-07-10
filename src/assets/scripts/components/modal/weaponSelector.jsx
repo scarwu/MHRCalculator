@@ -206,35 +206,37 @@ export default function WeaponSelectorModal (props) {
         // Set List
         tempData.list = WeaponDataset.getList()
 
-        // Set Rare & Type Default
-        tempData.typeList = {}
-        tempData.rareList = {}
-        tempData.type = null
-        tempData.rare = null
-
-        // Set Rare & Type
         let weaponItem = WeaponDataset.getItem(tempData.id)
 
+        // Set Type
         tempData.typeList = Constant.weaponTypes.map((type) => {
             return {
                 key: type,
                 value: _(type)
             }
         })
-        tempData.type = (Helper.isNotEmpty(weaponItem) && Helper.isNotEmpty(weaponItem.type))
-            ? weaponItem.type : tempData.typeList[0].key
 
-        // Set Rare & Type
+        if (Helper.isEmpty(tempData.type)) {
+            tempData.type = Helper.isNotEmpty(weaponItem) ? weaponItem.type : tempData.typeList[0].key
+        }
+
+        // Set Rare
+        tempData.rareList = {}
+
         tempData.list.forEach((weaponItem) => {
             tempData.rareList[weaponItem.rare] = weaponItem.rare
         })
+
         tempData.rareList = Object.values(tempData.rareList).reverse().map((rare) => {
             return {
                 key: rare,
                 value: _('rare') + `: ${rare}`
             }
         })
-        tempData.rare = (Helper.isNotEmpty(weaponItem)) ? weaponItem.rare : tempData.rareList[0].key
+
+        if (Helper.isEmpty(tempData.rare)) {
+            tempData.rare = (Helper.isNotEmpty(weaponItem)) ? weaponItem.rare : tempData.rareList[0].key
+        }
 
         updateTempData(tempData)
     }, [

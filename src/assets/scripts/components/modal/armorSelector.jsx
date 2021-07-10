@@ -172,39 +172,37 @@ export default function ArmorSelectorModal (props) {
         // Set List
         tempData.list = ArmorDataset.getList()
 
-        // Set Rare & Type Default
-        tempData.typeList = {}
-        tempData.rareList = {}
-        tempData.type = null
-        tempData.rare = null
-
-        // Set Type
         let armorItem = ArmorDataset.getItem(tempData.id)
 
+        // Set Type
         tempData.typeList = Constant.armorTypes.map((type) => {
             return {
                 key: type,
                 value: _(type)
             }
         })
-        tempData.type = (Helper.isNotEmpty(armorItem) && Helper.isNotEmpty(armorItem.type))
-            ? armorItem.type : tempData.typeList[0].key
 
         if (Helper.isEmpty(tempData.type)) {
-            tempData.type = tempData.equipType
+            tempData.type = Helper.isNotEmpty(armorItem) ? armorItem.type : tempData.typeList[0].key
         }
 
         // Set Rare
+        tempData.rareList = {}
+
         tempData.list.forEach((armorItem) => {
             tempData.rareList[armorItem.rare] = armorItem.rare
         })
+
         tempData.rareList = Object.values(tempData.rareList).reverse().map((rare) => {
             return {
                 key: rare,
                 value: _('rare') + `: ${rare}`
             }
         })
-        tempData.rare = (Helper.isNotEmpty(armorItem)) ? armorItem.rare : tempData.rareList[0].key
+
+        if (Helper.isEmpty(tempData.rare)) {
+            tempData.rare = (Helper.isNotEmpty(armorItem)) ? armorItem.rare : tempData.rareList[0].key
+        }
 
         updateTempData(tempData)
     }, [

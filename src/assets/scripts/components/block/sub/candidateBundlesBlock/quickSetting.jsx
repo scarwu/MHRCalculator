@@ -25,8 +25,6 @@ import BasicSelector from 'components/common/basicSelector'
 // Load States
 import States from 'states'
 
-const levelMapping = [ 'I', 'II', 'III', 'IV', 'V' ]
-
 export default function QuickSetting (props) {
     const {data} = props
 
@@ -62,28 +60,28 @@ export default function QuickSetting (props) {
 
             return Helper.isEmpty(stateRequiredConditions.equips[equipType])
         })
-        // const setIds = stateRequiredConditions.sets.map((set) => {
-        //     return set.id
-        // })
-        const skillIds = stateRequiredConditions.skills.map((skill) => {
-            skillLevelMapping[skill.id] = skill.level
+        const setIds = stateRequiredConditions.sets.map((setData) => {
+            return setData.id
+        })
+        const skillIds = stateRequiredConditions.skills.map((skillData) => {
+            skillLevelMapping[skillData.id] = skillData.level
 
-            return skill.id
+            return skillData.id
         })
 
-        ArmorDataset.typesIs(equipTypes).getList().forEach((armorInfo) => {
-            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorInfo.rare]) {
+        ArmorDataset.typesIs(equipTypes).getList().forEach((armorItem) => {
+            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorItem.rare]) {
                 return
             }
 
             let isSkip = false
 
-            armorInfo.skills.forEach((skill) => {
+            armorItem.skills.forEach((skillData) => {
                 if (true === isSkip) {
                     return
                 }
 
-                if (0 === skillLevelMapping[skill.id]) {
+                if (0 === skillLevelMapping[skillData.id]) {
                     isSkip = true
 
                     return
@@ -94,28 +92,28 @@ export default function QuickSetting (props) {
                 return
             }
 
-            if (Helper.isEmpty(armorSeriesMapping[armorInfo.rare])) {
-                armorSeriesMapping[armorInfo.rare] = {}
+            if (Helper.isEmpty(armorSeriesMapping[armorItem.rare])) {
+                armorSeriesMapping[armorItem.rare] = {}
             }
 
-            armorSeriesMapping[armorInfo.rare][armorInfo.seriesId] = {
-                name: armorInfo.series
+            armorSeriesMapping[armorItem.rare][armorItem.seriesId] = {
+                name: armorItem.series
             }
         })
 
-        ArmorDataset.typesIs(equipTypes).hasSkills(skillIds).getList().forEach((armorInfo) => {
-            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorInfo.rare]) {
+        ArmorDataset.typesIs(equipTypes).hasSkills(skillIds).getList().forEach((armorItem) => {
+            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorItem.rare]) {
                 return
             }
 
             let isSkip = false
 
-            armorInfo.skills.forEach((skill) => {
+            armorItem.skills.forEach((skillData) => {
                 if (true === isSkip) {
                     return
                 }
 
-                if (0 === skillLevelMapping[skill.id]) {
+                if (0 === skillLevelMapping[skillData.id]) {
                     isSkip = true
 
                     return
@@ -126,12 +124,12 @@ export default function QuickSetting (props) {
                 return
             }
 
-            if (Helper.isEmpty(armorSeriesMapping[armorInfo.rare])) {
-                armorSeriesMapping[armorInfo.rare] = {}
+            if (Helper.isEmpty(armorSeriesMapping[armorItem.rare])) {
+                armorSeriesMapping[armorItem.rare] = {}
             }
 
-            armorSeriesMapping[armorInfo.rare][armorInfo.seriesId] = {
-                name: armorInfo.series
+            armorSeriesMapping[armorItem.rare][armorItem.seriesId] = {
+                name: armorItem.series
             }
         })
 
@@ -176,7 +174,6 @@ export default function QuickSetting (props) {
         })
 
         let armorFactor = stateAlgorithmParams.usingFactor.armor
-        let charmFactor = stateAlgorithmParams.usingFactor.charm
         let jewelFactor = stateAlgorithmParams.usingFactor.jewel
 
         return (

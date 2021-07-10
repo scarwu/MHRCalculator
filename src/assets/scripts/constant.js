@@ -148,17 +148,21 @@ export const defaultAlgorithmParams = {
     order: 'desc', // asc | desc
     usingFactor: {
         armor: {
-            'rare12': true,
-            'rare11': false,
-            'rare10': false,
-            'rare9': false,
-            'rare8': false,
-            'rare7': false,
-            'rare6': false,
-            'rare5': false
+            // 'rare12': true,
+            // 'rare11': false,
+            // 'rare10': false,
+            // 'rare9': false,
+            // 'rare8': false,
+            'rare7': true,
+            'rare6': true,
+            'rare5': false,
+            'rare4': false,
+            'rare3': false,
+            'rare2': false,
+            'rare1': false
         },
         jewel: {
-            'size4': true,
+            // 'size4': true,
             'size3': true,
             'size2': true,
             'size1': true
@@ -183,7 +187,7 @@ export const defaultBundle = {
         1: 0,
         2: 0,
         3: 0,
-        4: 0
+        // 4: 0
     },
     jewelPackages: [],
     meta: {
@@ -202,7 +206,7 @@ export const defaultBundle = {
             1: 0,
             2: 0,
             3: 0,
-            4: 0,
+            // 4: 0,
             all: 0
         },
         totalExpectedValue: 0,
@@ -229,7 +233,7 @@ export const defaultCandidateEquip = {
         1: 0,
         2: 0,
         3: 0,
-        4: 0
+        // 4: 0
     },
     totalExpectedValue: 0,
     totalExpectedLevel: 0,

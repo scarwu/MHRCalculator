@@ -29,17 +29,13 @@ export default function ArmorFactors (props) {
      * Hooks
      */
     const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
-    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
-    const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateAlgorithmParams(States.getter.getAlgorithmParams())
-            updateRequiredEquips(States.getter.getRequiredEquips())
-            updateRequiredSets(States.getter.getRequiredSets())
-            updateRequiredSkills(States.getter.getRequiredSkills())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -55,24 +51,24 @@ export default function ArmorFactors (props) {
         let dataset = ArmorDataset
         let armorFactor = stateAlgorithmParams.usingFactor.armor
 
-        const equipTypes = Object.keys(stateRequiredEquips).filter((equipType) => {
+        const equipTypes = Object.keys(stateRequiredConditions.equips).filter((equipType) => {
             if ('weapon' === equipType || 'charm' === equipType) {
                 return false
             }
 
-            return Helper.isEmpty(stateRequiredEquips[equipType])
+            return Helper.isEmpty(stateRequiredConditions.equips[equipType])
         })
 
         if (true === byRequiredConditions) {
-            const setIds = stateRequiredSets.map((set) => {
+            const setIds = stateRequiredConditions.sets.map((set) => {
                 return set.id
             })
 
             dataset = dataset.typesIs(equipTypes).setsIs(setIds)
         }
 
-        dataset.getItems().filter((armorInfo) => {
-            let text = _(armorInfo.series)
+        dataset.getList().filter((armorItem) => {
+            let text = _(armorItem.series)
 
             if (Helper.isNotEmpty(segment)
                 && -1 === text.toLowerCase().search(segment.toLowerCase())
@@ -81,14 +77,14 @@ export default function ArmorFactors (props) {
             }
 
             return true
-        }).forEach((armorInfo) => {
-            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorInfo.rare]) {
+        }).forEach((armorItem) => {
+            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorItem.rare]) {
                 return
             }
 
             let isSkip = false
 
-            armorInfo.skills.forEach((skill) => {
+            armorItem.skills.forEach((skill) => {
                 if (true === isSkip) {
                     return
                 }
@@ -104,17 +100,17 @@ export default function ArmorFactors (props) {
                 return
             }
 
-            if (Helper.isEmpty(armorSeriesMapping[armorInfo.rare])) {
-                armorSeriesMapping[armorInfo.rare] = {}
+            if (Helper.isEmpty(armorSeriesMapping[armorItem.rare])) {
+                armorSeriesMapping[armorItem.rare] = {}
             }
 
-            armorSeriesMapping[armorInfo.rare][armorInfo.seriesId] = {
-                name: armorInfo.series
+            armorSeriesMapping[armorItem.rare][armorItem.seriesId] = {
+                name: armorItem.series
             }
         })
 
         if (true === byRequiredConditions) {
-            const skillIds = stateRequiredSkills.map((skill) => {
+            const skillIds = stateRequiredConditions.skills.map((skill) => {
                 skillLevelMapping[skill.id] = skill.level
 
                 return skill.id
@@ -123,8 +119,8 @@ export default function ArmorFactors (props) {
             dataset = dataset.typesIs(equipTypes).hasSkills(skillIds)
         }
 
-        dataset.getItems().filter((armorInfo) => {
-            let text = _(armorInfo.series)
+        dataset.getList().filter((armorItem) => {
+            let text = _(armorItem.series)
 
             if (Helper.isNotEmpty(segment)
                 && -1 === text.toLowerCase().search(segment.toLowerCase())
@@ -133,15 +129,15 @@ export default function ArmorFactors (props) {
             }
 
             return true
-        }).forEach((armorInfo) => {
-            if (false === armorFactor['rare' + armorInfo.rare]) {
+        }).forEach((armorItem) => {
+            if (false === armorFactor['rare' + armorItem.rare]) {
                 return
             }
 
             if (true === byRequiredConditions) {
                 let isSkip = false
 
-                armorInfo.skills.forEach((skill) => {
+                armorItem.skills.forEach((skill) => {
                     if (true === isSkip) {
                         return
                     }
@@ -158,12 +154,12 @@ export default function ArmorFactors (props) {
                 }
             }
 
-            if (Helper.isEmpty(armorSeriesMapping[armorInfo.rare])) {
-                armorSeriesMapping[armorInfo.rare] = {}
+            if (Helper.isEmpty(armorSeriesMapping[armorItem.rare])) {
+                armorSeriesMapping[armorItem.rare] = {}
             }
 
-            armorSeriesMapping[armorInfo.rare][armorInfo.seriesId] = {
-                name: armorInfo.series
+            armorSeriesMapping[armorItem.rare][armorItem.seriesId] = {
+                name: armorItem.series
             }
         })
 
@@ -223,5 +219,10 @@ export default function ArmorFactors (props) {
 
             return blocks
         })
-    }, [segment, byRequiredConditions, stateAlgorithmParams, stateRequiredEquips, stateRequiredSets, stateRequiredSkills])
+    }, [
+        segment,
+        byRequiredConditions,
+        stateAlgorithmParams,
+        stateRequiredConditions
+    ])
 }

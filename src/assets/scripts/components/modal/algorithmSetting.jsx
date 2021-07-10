@@ -58,8 +58,11 @@ const getModeList = () => {
     ]
 }
 
-const armorRareList = [ 5, 6, 7, 8, 9, 10, 11, 12 ]
-const jewelSizeList = [ 1, 2, 3, 4 ]
+// const armorRareList = [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+// const jewelSizeList = [ 1, 2, 3, 4 ]
+
+const armorRareList = [ 1, 2, 3, 4, 5, 6, 7 ]
+const jewelSizeList = [ 1, 2, 3 ]
 
 /**
  * Handler Functions
@@ -103,7 +106,8 @@ export default function AlgorithmSettingModal (props) {
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('algorithmSetting'))
     const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
-    const [stateSegment, updateSegment] = useState(undefined)
+    const [stateMode, updateMode] = useState(null)
+    const [stateSegment, updateSegment] = useState(null)
     const refModal = useRef()
 
     useEffect(() => {

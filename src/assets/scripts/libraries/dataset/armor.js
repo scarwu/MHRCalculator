@@ -178,16 +178,16 @@ class ArmorDataset {
                 if (this.filterSkillIsConsistent) {
                     isSkip = false
 
-                    data.skills.forEach((skill) => {
-                        if (-1 === this.filterSkillNames.indexOf(skill.id)) {
+                    data.skills.forEach((skillData) => {
+                        if (-1 === this.filterSkillNames.indexOf(skillData.id)) {
                             isSkip = true
                         }
                     })
                 } else {
                     isSkip = true
 
-                    data.skills.forEach((skill) => {
-                        if (-1 !== this.filterSkillNames.indexOf(skill.id)) {
+                    data.skills.forEach((skillData) => {
+                        if (-1 !== this.filterSkillNames.indexOf(skillData.id)) {
                             isSkip = false
                         }
                     })

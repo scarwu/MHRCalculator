@@ -30,13 +30,13 @@ export default function JewelFactors (props) {
      * Hooks
      */
     const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateAlgorithmParams(States.getter.getAlgorithmParams())
-            updateRequiredSkills(States.getter.getRequiredSkills())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -53,7 +53,7 @@ export default function JewelFactors (props) {
         let jewelFactor = stateAlgorithmParams.usingFactor.jewel
 
         if (true === byRequiredConditions) {
-            const skillIds = stateRequiredSkills.map((skillData) => {
+            const skillIds = stateRequiredConditions.skills.map((skillData) => {
                 skillLevelMapping[skillData.id] = skillData.level
 
                 return skillData.id
@@ -179,5 +179,10 @@ export default function JewelFactors (props) {
 
             return blocks
         })
-    }, [segment, byRequiredConditions, stateAlgorithmParams, stateRequiredSkills])
+    }, [
+        segment,
+        byRequiredConditions,
+        stateAlgorithmParams,
+        stateRequiredConditions
+    ])
 }

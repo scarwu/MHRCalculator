@@ -151,7 +151,7 @@ class WeaponDataset {
         this.filterType = null
         this.filterTypes = null
         this.filterRare = null
-        this.filterSkillName = null
+        // this.filterSkillName = null
     }
 
     getIds = () => {
@@ -190,19 +190,19 @@ class WeaponDataset {
             }
 
             // Has Skill
-            if (Helper.isNotEmpty(this.filterSkillName)) {
-                for (let index in data.skills) {
-                    if (this.filterSkillName !== data.skills[index].id) {
-                        continue
-                    }
+            // if (Helper.isNotEmpty(this.filterSkillName)) {
+            //     for (let index in data.skills) {
+            //         if (this.filterSkillName !== data.skills[index].id) {
+            //             continue
+            //         }
 
-                    isSkip = false
-                }
+            //         isSkip = false
+            //     }
 
-                if (isSkip) {
-                    return false
-                }
-            }
+            //     if (isSkip) {
+            //         return false
+            //     }
+            // }
 
             return true
         })
@@ -244,11 +244,11 @@ class WeaponDataset {
         return this
     }
 
-    hasSkill = (name) => {
-        this.filterSkillName = name
+    // hasSkill = (name) => {
+    //     this.filterSkillName = name
 
-        return this
-    }
+    //     return this
+    // }
 }
 
 export default new WeaponDataset(dataset)

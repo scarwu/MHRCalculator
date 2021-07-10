@@ -38,7 +38,7 @@ let workers = {}
  * Handle Functions
  */
 const handleShowAllAlgorithmSetting = () => {
-    States.setter.showModal('algorithmSetting')({
+    States.setter.showModal('algorithmSetting', {
         mode: 'all'
     })
 }

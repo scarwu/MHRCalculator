@@ -132,7 +132,7 @@ const handleBundlePickUp = (bundle, required) => {
     States.setter.replaceCurrentEquips(currentEquips)
 }
 
-export default function BundleList(props) {
+export default function BundleList (props) {
 
     /**
      * Hooks

@@ -62,7 +62,7 @@ const renderEnhanceItem = (enhanceItem, modalData) => {
     )
 }
 
-export default function EnhanceSelectorModal(props) {
+export default function EnhanceSelectorModal (props) {
 
     /**
      * Hooks

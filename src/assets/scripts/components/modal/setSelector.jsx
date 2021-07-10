@@ -94,7 +94,7 @@ const renderSetItem = (setItem, selectedIds, modalData) => {
     )
 }
 
-export default function SetSelectorModal(props) {
+export default function SetSelectorModal (props) {
 
     /**
      * Hooks

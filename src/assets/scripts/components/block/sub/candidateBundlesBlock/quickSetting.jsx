@@ -27,7 +27,7 @@ import States from 'states'
 
 const levelMapping = [ 'I', 'II', 'III', 'IV', 'V' ]
 
-export default function QuickSetting(props) {
+export default function QuickSetting (props) {
     const {data} = props
 
     /**

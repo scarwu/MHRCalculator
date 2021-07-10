@@ -13,51 +13,51 @@ import Helper from 'core/helper'
 // Load Dataset
 import Weapons from 'datasets/weapons.json'
 
-let dataset = Weapons.map((weapon) => {
+let dataset = Weapons.map((weaponItem) => {
     return {
-        id: weapon[0],
-        series: weapon[1],
-        name: weapon[2],
-        rare: weapon[3],
-        type: weapon[4],
-        attack: weapon[5],
-        criticalRate: weapon[6],
-        defense: weapon[7],
+        id: weaponItem[0],
+        series: weaponItem[1],
+        name: weaponItem[2],
+        rare: weaponItem[3],
+        type: weaponItem[4],
+        attack: weaponItem[5],
+        criticalRate: weaponItem[6],
+        defense: weaponItem[7],
         element: {
             attack: {
-                type: weapon[8][0][0],
-                minValue: weapon[8][0][1],
-                maxValue: weapon[8][0][2]
+                type: weaponItem[8][0][0],
+                minValue: weaponItem[8][0][1],
+                maxValue: weaponItem[8][0][2]
             },
             status: {
-                type: weapon[8][1][0],
-                minValue: weapon[8][1][1],
-                maxValue: weapon[8][1][2]
+                type: weaponItem[8][1][0],
+                minValue: weaponItem[8][1][1],
+                maxValue: weaponItem[8][1][2]
             }
         },
         sharpness: {
-            minValue: weapon[9][0],
-            maxValue: weapon[9][1],
+            minValue: weaponItem[9][0],
+            maxValue: weaponItem[9][1],
             steps: {
-                red: weapon[9][2][0],
-                orange: weapon[9][2][1],
-                yellow: weapon[9][2][2],
-                green: weapon[9][2][3],
-                blue: weapon[9][2][4],
-                white: weapon[9][2][5],
-                purple: weapon[9][2][6]
+                red: weaponItem[9][2][0],
+                orange: weaponItem[9][2][1],
+                yellow: weaponItem[9][2][2],
+                green: weaponItem[9][2][3],
+                blue: weaponItem[9][2][4],
+                white: weaponItem[9][2][5],
+                purple: weaponItem[9][2][6]
             }
         },
-        slots: weapon[10].map((size) => {
+        slots: weaponItem[10].map((slotData) => {
             return {
-                size: size
+                size: slotData[0]
             }
         }),
         enhance: {
-            amount: weapon[11][0],
-            list: weapon[11][1].map((name) => {
+            amount: weaponItem[11][0],
+            list: weaponItem[11][1].map((enhanceData) => {
                 return {
-                    name: name
+                    name: enhanceData[0]
                 }
             })
         }

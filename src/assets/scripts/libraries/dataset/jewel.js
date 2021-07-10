@@ -26,16 +26,16 @@ import Jewels from 'datasets/jewels.json'
 //         [ ... ]
 //     ]
 // ]
-let dataset = Jewels.map((jewel) => {
+let dataset = Jewels.map((jewelItem) => {
     return {
-        id: jewel[0],
-        name: jewel[1],
-        rare: jewel[2],
-        size: jewel[3],
-        skills: jewel[4].map((skill) => {
+        id: jewelItem[0],
+        name: jewelItem[1],
+        rare: jewelItem[2],
+        size: jewelItem[3],
+        skills: jewelItem[4].map((skillData) => {
             return {
-                id: skill[0],
-                level: skill[1]
+                id: skillData[0],
+                level: skillData[1]
             }
         })
     }

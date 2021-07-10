@@ -611,7 +611,7 @@ const getSharpnessMultiple = (data) => {
     }
 }
 
-export default function PlayerStatusBlock(props) {
+export default function PlayerStatusBlock (props) {
 
     /**
      * Hooks

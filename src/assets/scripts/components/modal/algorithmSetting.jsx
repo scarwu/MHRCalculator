@@ -96,7 +96,7 @@ const handleStrategyChange = (event) => {
     States.setter.setAlgorithmParamsStrategy(event.target.value)
 }
 
-export default function AlgorithmSettingModal(props) {
+export default function AlgorithmSettingModal (props) {
 
     /**
      * Hooks

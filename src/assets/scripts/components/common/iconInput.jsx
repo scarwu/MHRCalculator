@@ -12,7 +12,7 @@ import React, { useMemo } from 'react'
 // Load Core
 import Helper from 'core/helper'
 
-export default function IconInput(props) {
+export default function IconInput (props) {
     const {iconName, defaultValue, placeholder, onChange} = props
 
     return useMemo(() => {

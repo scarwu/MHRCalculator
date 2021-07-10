@@ -111,7 +111,7 @@ const renderPetalaceItem = (petalaceItem, modalData) => {
     )
 }
 
-export default function PetalaceSelectorModal(props) {
+export default function PetalaceSelectorModal (props) {
 
     /**
      * Hooks

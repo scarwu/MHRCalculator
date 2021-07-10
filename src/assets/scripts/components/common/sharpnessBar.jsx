@@ -12,7 +12,7 @@ import React, { useMemo } from 'react'
 // Load Core
 import Helper from 'core/helper'
 
-export default function SharpnessBar(props) {
+export default function SharpnessBar (props) {
     const {data} = props
 
     return useMemo(() => {

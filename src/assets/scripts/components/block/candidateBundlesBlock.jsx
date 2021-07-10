@@ -69,7 +69,7 @@ const convertTimeFormat = (seconds) => {
     return text
 }
 
-export default function CandidateBundlesBlock(props) {
+export default function CandidateBundlesBlock (props) {
 
     /**
      * Hooks

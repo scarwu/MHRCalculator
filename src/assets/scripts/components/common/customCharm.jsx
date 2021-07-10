@@ -230,7 +230,7 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
     )
 }
 
-export default function CustomWeapon(props) {
+export default function CustomWeapon (props) {
 
     /**
      * Hooks

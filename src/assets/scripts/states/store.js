@@ -158,6 +158,13 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
+        case 'REPLACE_PLAYER_EQUIP':
+            return (() => {
+                return Object.assign({}, state, {
+                    playerEquips: Helper.deepCopy(action.payload.playerEquips)
+                })
+            })()
+
         case 'SET_PLAYER_EQUIP':
             return (() => {
                 let playerEquips = Helper.deepCopy(state.playerEquips)

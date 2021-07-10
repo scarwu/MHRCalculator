@@ -34,26 +34,26 @@ import Petalaces from 'datasets/petalaces.json'
 //         1: obtain
 //     ]
 // ]
-let dataset = Petalaces.map((item) => {
+let dataset = Petalaces.map((petalaceItem) => {
     return {
-        id: item[0],
-        name: item[1],
-        rare: item[2],
+        id: petalaceItem[0],
+        name: petalaceItem[1],
+        rare: petalaceItem[2],
         health: {
-            increment: item[3][0],
-            obtain: item[3][1]
+            increment: petalaceItem[3][0],
+            obtain: petalaceItem[3][1]
         },
         stamina: {
-            increment: item[4][0],
-            obtain: item[4][1]
+            increment: petalaceItem[4][0],
+            obtain: petalaceItem[4][1]
         },
         attack: {
-            increment: item[5][0],
-            obtain: item[5][1]
+            increment: petalaceItem[5][0],
+            obtain: petalaceItem[5][1]
         },
         defense: {
-            increment: item[6][0],
-            obtain: item[6][1]
+            increment: petalaceItem[6][0],
+            obtain: petalaceItem[6][1]
         }
     }
 })

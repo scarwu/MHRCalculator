@@ -23,7 +23,7 @@ import BasicSelector from 'components/common/basicSelector'
 // Load States
 import States from 'states'
 
-export default function JewelFactors(props) {
+export default function JewelFactors (props) {
     const {segment, byRequiredConditions} = props
 
     /**

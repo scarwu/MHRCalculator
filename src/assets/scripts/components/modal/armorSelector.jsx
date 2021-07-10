@@ -120,7 +120,7 @@ const renderArmorItem = (armorItem, modalData) => {
     )
 }
 
-export default function ArmorSelectorModal(props) {
+export default function ArmorSelectorModal (props) {
 
     /**
      * Hooks

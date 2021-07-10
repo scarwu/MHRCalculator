@@ -60,7 +60,7 @@ const getChangeLog = () => {
     })
 }
 
-export default function ChangeLogModal(props) {
+export default function ChangeLogModal (props) {
 
     /**
      * Hooks

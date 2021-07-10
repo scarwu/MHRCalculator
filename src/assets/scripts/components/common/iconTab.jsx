@@ -12,7 +12,7 @@ import React, { useMemo } from 'react'
 // Load Core
 import Helper from 'core/helper'
 
-export default function IconTab(props) {
+export default function IconTab (props) {
     const {iconName, altName, isActive, onClick} = props
 
     return useMemo(() => {

@@ -12,7 +12,7 @@ import React, { useMemo } from 'react'
 // Load Core
 import Helper from 'core/helper'
 
-export default function IconSelector(props) {
+export default function IconSelector (props) {
     const {iconName, defaultValue, options, onChange} = props
 
     return useMemo(() => {

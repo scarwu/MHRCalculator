@@ -60,7 +60,7 @@ const renderSetItem = (setData) => {
     )
 }
 
-export default function SetList(props) {
+export default function SetList (props) {
 
     /**
      * Hooks

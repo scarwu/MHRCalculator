@@ -12,7 +12,7 @@ import React, { useMemo } from 'react'
 // Load Core
 import Helper from 'core/helper'
 
-export default function IconButton(props) {
+export default function IconButton (props) {
     const {iconName, altName, onClick} = props
 
     return useMemo(() => {

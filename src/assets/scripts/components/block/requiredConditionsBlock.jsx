@@ -35,7 +35,7 @@ const handleSwitchDataStore = (index) => {
     States.setter.switchDataStore('requiredConditions', index)
 }
 
-export default function RequiredConditionsBlock(props) {
+export default function RequiredConditionsBlock (props) {
 
     /**
      * Hooks

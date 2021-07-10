@@ -317,8 +317,8 @@ export const runAction = () => {
     rawDataMapping.jewels.forEach((jewelItem) => {
 
         // Filter Empty Items
-        jewelItem.skills = jewelItem.skills.filter((skillItem) => {
-            return Helper.isNotEmpty(skillItem.name)
+        jewelItem.skills = jewelItem.skills.filter((skillData) => {
+            return Helper.isNotEmpty(skillData.name)
         })
 
         // Check Propeties Using as Unique Key
@@ -353,10 +353,10 @@ export const runAction = () => {
         jewelItem.name = translateCode
 
         // Filter Empty
-        jewelItem.skills = jewelItem.skills.map((skillItem) => {
-            skillItem.name = createCode(`skills:id:${skillItem.name}`)
+        jewelItem.skills = jewelItem.skills.map((skillData) => {
+            skillData.name = createCode(`skills:id:${skillData.name}`)
 
-            return skillItem
+            return skillData
         })
 
         // Create Dataset Mapping
@@ -369,10 +369,10 @@ export const runAction = () => {
             jewelItem.name,
             jewelItem.rare,
             jewelItem.size,
-            jewelItem.skills.map((skillItem) => {
+            jewelItem.skills.map((skillData) => {
                 return [
-                    skillItem.name,
-                    skillItem.level
+                    skillData.name,
+                    skillData.level
                 ]
             })
         ])
@@ -386,12 +386,12 @@ export const runAction = () => {
     rawDataMapping.armors.forEach((armorItem) => {
 
         // Filter Empty Items
-        armorItem.slots = armorItem.slots.filter((slotItem) => {
-            return Helper.isNotEmpty(slotItem.size)
+        armorItem.slots = armorItem.slots.filter((slotData) => {
+            return Helper.isNotEmpty(slotData.size)
         })
 
-        armorItem.skills = armorItem.skills.filter((skillItem) => {
-            return Helper.isNotEmpty(skillItem.name)
+        armorItem.skills = armorItem.skills.filter((skillData) => {
+            return Helper.isNotEmpty(skillData.name)
         })
 
         // If armor's minDefense is empty or 0, meaning it's a layered armor
@@ -489,10 +489,10 @@ export const runAction = () => {
             armorItem.name = translateCode
 
             // Find Code Id
-            armorItem.skills = armorItem.skills.map((skillItem) => {
-                skillItem.name = createCode(`skills:id:${skillItem.name}`)
+            armorItem.skills = armorItem.skills.map((skillData) => {
+                skillData.name = createCode(`skills:id:${skillData.name}`)
 
-                return skillItem
+                return skillData
             })
 
             return armorItem
@@ -524,15 +524,15 @@ export const runAction = () => {
                     armorItem.id,
                     armorItem.name,
                     armorItem.type,
-                    armorItem.slots.map((slotItem) => {
+                    armorItem.slots.map((slotData) => {
                         return [
-                            slotItem.size
+                            slotData.size
                         ]
                     }),
-                    armorItem.skills.map((skillItem) => {
+                    armorItem.skills.map((skillData) => {
                         return [
-                            skillItem.name,
-                            skillItem.level
+                            skillData.name,
+                            skillData.level
                         ]
                     })
                 ]
@@ -546,12 +546,12 @@ export const runAction = () => {
     rawDataMapping.weapons.forEach((weaponItem) => {
 
         // Filter Empty Items
-        weaponItem.slots = weaponItem.slots.filter((slotItem) => {
-            return Helper.isNotEmpty(slotItem.size)
+        weaponItem.slots = weaponItem.slots.filter((slotData) => {
+            return Helper.isNotEmpty(slotData.size)
         })
 
-        weaponItem.enhance.list = weaponItem.enhance.list.filter((enhanceItem) => {
-            return Helper.isNotEmpty(enhanceItem.name)
+        weaponItem.enhance.list = weaponItem.enhance.list.filter((enhanceData) => {
+            return Helper.isNotEmpty(enhanceData.name)
         })
 
         // Check Propeties Using as Unique Key
@@ -588,10 +588,10 @@ export const runAction = () => {
         }
 
         // Find Code Id
-        weaponItem.enhance.list = weaponItem.enhance.list.map((enhanceItem) => {
-            enhanceItem.name = createCode(`enhances:id:${enhanceItem.name}`)
+        weaponItem.enhance.list = weaponItem.enhance.list.map((enhanceData) => {
+            enhanceData.name = createCode(`enhances:id:${enhanceData.name}`)
 
-            return enhanceItem
+            return enhanceData
         })
 
         // Create Dataset Mapping
@@ -633,16 +633,16 @@ export const runAction = () => {
                     weaponItem.sharpness.steps.purple
                 ]
             ],
-            weaponItem.slots.map((slotItem) => {
+            weaponItem.slots.map((slotData) => {
                 return [
-                    slotItem.size
+                    slotData.size
                 ]
             }),
             [
                 weaponItem.enhance.amount,
-                weaponItem.enhance.list.map((enhanceItem) => {
+                weaponItem.enhance.list.map((enhanceData) => {
                     return [
-                        enhanceItem.name
+                        enhanceData.name
                     ]
                 })
             ]

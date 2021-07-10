@@ -25,7 +25,7 @@ import IconButton from 'components/common/iconButton'
 // Load States
 import States from 'states'
 
-export default function RequiredConditions(props) {
+export default function RequiredConditions (props) {
     const {data} = props
 
     /**

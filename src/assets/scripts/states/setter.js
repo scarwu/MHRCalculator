@@ -47,6 +47,15 @@ export const cleanPlayerEquips = () => {
     })
 }
 
+export const replacePlayerEquips = (playerEquips) => {
+    store.dispatch({
+        type: 'REPLACE_PLAYER_EQUIP',
+        payload: {
+            playerEquips: playerEquips
+        }
+    })
+}
+
 export const setPlayerEquip = (equipType, equipId) => {
     store.dispatch({
         type: 'SET_PLAYER_EQUIP',
@@ -96,13 +105,13 @@ export const setRequiredConditionsEquip = (equipType, equipId) => {
     })
 }
 
-export const setRequiredConditionsEquipJewel = (equipType, jewelId, idIndex) => {
+export const setRequiredConditionsEquipJewel = (equipType, idIndex, jewelId) => {
     store.dispatch({
         type: 'SET_REQUIRED_CONDITIONS_EQUIP_JEWEL',
         payload: {
             equipType: equipType,
-            jewelId: jewelId,
-            idIndex: idIndex
+            idIndex: idIndex,
+            jewelId: jewelId
         }
     })
 }

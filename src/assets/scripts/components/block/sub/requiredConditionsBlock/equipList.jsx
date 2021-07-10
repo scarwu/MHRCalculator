@@ -15,7 +15,7 @@ import Helper from 'core/helper'
 
 // Load Libraries
 import Misc from 'libraries/misc'
-import JewelDataset from 'libraries/dataset/petalace'
+import JewelDataset from 'libraries/dataset/jewel'
 
 // Load Components
 import IconButton from 'components/common/iconButton'

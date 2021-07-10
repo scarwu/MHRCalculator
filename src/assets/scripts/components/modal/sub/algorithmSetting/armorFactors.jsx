@@ -22,7 +22,7 @@ import IconButton from 'components/common/iconButton'
 // Load States
 import States from 'states'
 
-export default function ArmorFactors(props) {
+export default function ArmorFactors (props) {
     const {segment, byRequiredConditions} = props
 
     /**

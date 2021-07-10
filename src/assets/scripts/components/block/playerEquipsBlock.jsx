@@ -492,7 +492,7 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
     )
 }
 
-export default function PlayerEquipsBlock(props) {
+export default function PlayerEquipsBlock (props) {
 
     /**
      * Hooks

@@ -32,15 +32,15 @@ let dataset = Armors.map((armorBundle) => {
             id: armorItem[0],
             name: armorItem[1],
             type: armorItem[2],
-            slots: (Helper.isNotEmpty(armorItem[3])) ? armorItem[3].map((size) => {
+            slots: (Helper.isNotEmpty(armorItem[3])) ? armorItem[3].map((slotData) => {
                 return {
-                    size: size
+                    size: slotData[0]
                 }
             }) : [],
-            skills: (Helper.isNotEmpty(armorItem[4])) ? armorItem[4].map((skillItem) => {
+            skills: (Helper.isNotEmpty(armorItem[4])) ? armorItem[4].map((skillData) => {
                 return {
-                    id: skillItem[0],
-                    level: skillItem[1]
+                    id: skillData[0],
+                    level: skillData[1]
                 }
             }) : []
         }

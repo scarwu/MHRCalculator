@@ -12,7 +12,7 @@ import React, { useMemo } from 'react'
 // Load Core
 import Helper from 'core/helper'
 
-export default function BasicSelector(props) {
+export default function BasicSelector (props) {
     const {defaultValue, options, onChange} = props
 
     return useMemo(() => {

@@ -12,7 +12,7 @@ import React, { useMemo } from 'react'
 // Load Core
 import Helper from 'core/helper'
 
-export default function IconSwitch(props) {
+export default function IconSwitch (props) {
     const {defaultValue, options, onChange} = props
 
     return useMemo(() => {

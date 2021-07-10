@@ -83,7 +83,7 @@ const renderSkillItem = (skillItem, selectedIds, modalData) => {
     )
 }
 
-export default function SkillSelectorModal(props) {
+export default function SkillSelectorModal (props) {
 
     /**
      * Hooks

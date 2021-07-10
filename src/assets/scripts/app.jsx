@@ -53,7 +53,10 @@ if ('production' === Config.env) {
  * Variables
  */
 const langList = Object.keys(Constant.langs).map((lang) => {
-    return { key: lang, value: Constant.langs[lang] }
+    return {
+        key: lang,
+        value: Constant.langs[lang]
+    }
 })
 
 /**
@@ -74,7 +77,7 @@ const handleOpenReadme = () => {
     window.open('https://scar.tw/article/2018/05/02/mhw-calculator-readme/','_blank')
 }
 
-export default function App(props) {
+export default function App (props) {
 
     /**
      * Hooks
@@ -86,7 +89,7 @@ export default function App(props) {
 
         // Restore Equips from Url to State
         if (Helper.isNotEmpty(props.match.params.hash)) {
-            States.setter.replaceCurrentEquips(
+            States.setter.replacePlayerEquips(
                 JSON.parse(Helper.base64Decode(props.match.params.hash))
             )
         }
@@ -103,67 +106,63 @@ export default function App(props) {
     /**
      * Render Functions
      */
-    try {
-        return (
-            <div key={stateLang} id="mhrc-app" className="container-fluid">
-                <div className="mhrc-header">
-                    <a className="mhrc-title" href="./">
-                        <h1>{_('title')}</h1>
-                    </a>
+    return (
+        <div key={stateLang} id="mhrc-app" className="container-fluid">
+            <div className="mhrc-header">
+                <a className="mhrc-title" href="./">
+                    <h1>{_('title')}</h1>
+                </a>
 
-                    <div className="mhrc-icons_bundle">
-                        <IconButton
-                            iconName="link" altName={_('exportBundle')}
-                            onClick={handleBundleExport} />
-                        <IconButton
-                            iconName="info" altName={_('changeLog')}
-                            onClick={() => { States.setter.showModal('changeLog') }} />
-                        <IconButton
-                            iconName="question" altName={_('readme')}
-                            onClick={handleOpenReadme} />
-                        <IconSelector
-                            iconName="globe"
-                            defaultValue={stateLang} options={langList}
-                            onChange={handleLangChange} />
-                    </div>
+                <div className="mhrc-icons_bundle">
+                    <IconButton
+                        iconName="link" altName={_('exportBundle')}
+                        onClick={handleBundleExport} />
+                    <IconButton
+                        iconName="info" altName={_('changeLog')}
+                        onClick={() => { States.setter.showModal('changeLog') }} />
+                    <IconButton
+                        iconName="question" altName={_('readme')}
+                        onClick={handleOpenReadme} />
+                    <IconSelector
+                        iconName="globe"
+                        defaultValue={stateLang} options={langList}
+                        onChange={handleLangChange} />
                 </div>
-
-                <div className="row mhrc-container">
-                    <RequiredConditionsBlock />
-                    <CandidateBundlesBlock />
-                    <PlayerEquipsBlock />
-                    <PlayerStatusBlock />
-                </div>
-
-                <div className="row mhrc-footer">
-                    <div className="col-12">
-                        <span>Copyright (c) Scar Wu</span>
-                    </div>
-
-                    <div className="col-12">
-                        <a href="//scar.tw" target="_blank">
-                            <span>Blog</span>
-                        </a>
-                        &nbsp;|&nbsp;
-                        <a href="https://github.com/scarwu/MHRCalculator" target="_blank">
-                            <span>Github</span>
-                        </a>
-                    </div>
-                </div>
-
-                <ChangeLogModal />
-                <AlgorithmSettingModal />
-                <WeaponSelectorModal />
-                <ArmorSelectorModal />
-                <SetSelectorModal />
-                <JewelSelectorModal />
-                <PetalaceSelectorModal />
-                <EnhanceSelectorModal />
-                <SkillSelectorModal />
-                {/* <PlayerEquipSelectorModal /> */}
             </div>
-        )
-    } catch (error) {
-        throw error
-    }
+
+            <div className="row mhrc-container">
+                <RequiredConditionsBlock />
+                <CandidateBundlesBlock />
+                <PlayerEquipsBlock />
+                <PlayerStatusBlock />
+            </div>
+
+            <div className="row mhrc-footer">
+                <div className="col-12">
+                    <span>Copyright (c) Scar Wu</span>
+                </div>
+
+                <div className="col-12">
+                    <a href="//scar.tw" target="_blank">
+                        <span>Blog</span>
+                    </a>
+                    &nbsp;|&nbsp;
+                    <a href="https://github.com/scarwu/MHRCalculator" target="_blank">
+                        <span>Github</span>
+                    </a>
+                </div>
+            </div>
+
+            <ChangeLogModal />
+            <AlgorithmSettingModal />
+            <WeaponSelectorModal />
+            <ArmorSelectorModal />
+            <SetSelectorModal />
+            <JewelSelectorModal />
+            <PetalaceSelectorModal />
+            <EnhanceSelectorModal />
+            <SkillSelectorModal />
+            {/* <PlayerEquipSelectorModal /> */}
+        </div>
+    )
 }

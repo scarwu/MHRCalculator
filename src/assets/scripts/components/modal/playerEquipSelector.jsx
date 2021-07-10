@@ -26,7 +26,7 @@ import BasicInput from 'components/common/basicInput'
 // Load States
 import States from 'states'
 
-export default function PlayerEquipSelectorModal(props) {
+export default function PlayerEquipSelectorModal (props) {
 
     /**
      * Hooks

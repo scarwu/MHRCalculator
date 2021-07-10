@@ -175,7 +175,7 @@ const renderWeaponItem = (weaponItem, modalData) => {
     )
 }
 
-export default function WeaponSelectorModal(props) {
+export default function WeaponSelectorModal (props) {
 
     /**
      * Hooks

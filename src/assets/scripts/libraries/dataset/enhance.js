@@ -28,12 +28,12 @@ import Enhances from 'datasets/enhances.json'
 //         [ ... ]
 //     ]
 // ]
-let dataset = Enhances.map((enhance) => {
+let dataset = Enhances.map((enhanceItem) => {
     return {
-        id: enhance[0],
-        name: enhance[1],
-        description: enhance[2],
-        reaction: enhance[3]
+        id: enhanceItem[0],
+        name: enhanceItem[1],
+        description: enhanceItem[2],
+        reaction: enhanceItem[3]
     }
 })
 

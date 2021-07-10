@@ -12,7 +12,7 @@ import React, { useMemo } from 'react'
 // Load Core
 import Helper from 'core/helper'
 
-export default function BasicInput(props) {
+export default function BasicInput (props) {
     const {defaultValue, placeholder, onChange, bypassRef} = props
 
     return useMemo(() => {

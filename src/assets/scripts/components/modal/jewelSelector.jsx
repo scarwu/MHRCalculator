@@ -79,7 +79,7 @@ const renderJewelItem = (jewelItem, modalData) => {
     )
 }
 
-export default function JewelSelectorModal(props) {
+export default function JewelSelectorModal (props) {
 
     /**
      * Hooks
@@ -94,19 +94,19 @@ export default function JewelSelectorModal(props) {
             return
         }
 
-        let sortedList = JewelDataset.getList()
+        let sortedList = []
 
-        // for (let size = stateModalData.slotSize; size >= 1; size--) {
-        //     for (let rare = 9; rare >= 1; rare--) {
-        //         sortedList = sortedList.concat(
-        //             JewelDataset.rareIs(rare).sizeIs(size).getList().map((jewelInfo) => {
-        //                 jewelInfo.isSelect = (stateModalData.jewelId === jewelInfo.id)
+        for (let size = stateModalData.size; size >= 1; size--) {
+            for (let rare = 9; rare >= 1; rare--) {
+                sortedList = sortedList.concat(
+                    JewelDataset.rareIs(rare).sizeIs(size).getList().map((jewelInfo) => {
+                        jewelInfo.isSelect = (stateModalData.jewelId === jewelInfo.id)
 
-        //                 return jewelInfo
-        //             })
-        //         )
-        //     }
-        // }
+                        return jewelInfo
+                    })
+                )
+            }
+        }
 
         updateSortedList(sortedList)
     }, [stateModalData])

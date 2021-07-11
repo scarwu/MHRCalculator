@@ -147,26 +147,20 @@ export const defaultAlgorithmParams = {
     sort: 'complex', // complex | defense | amount | slot | expectedValue | expectedLevel
     order: 'desc', // asc | desc
     usingFactor: {
-        armor: {
-            // 'rare12': true,
-            // 'rare11': false,
-            // 'rare10': false,
-            // 'rare9': false,
-            // 'rare8': false,
-            'rare7': true,
-            'rare6': true,
-            'rare5': false,
-            'rare4': false,
-            'rare3': false,
-            'rare2': false,
-            'rare1': false
-        },
-        jewel: {
-            // 'size4': true,
-            'size3': true,
-            'size2': true,
-            'size1': true
-        }
+
+        // Armor Rare
+        'armor:rare:7': true,
+        'armor:rare:6': true,
+        'armor:rare:5': false,
+        'armor:rare:4': false,
+        'armor:rare:3': false,
+        'armor:rare:2': false,
+        'armor:rare:1': false,
+
+        // Jewel Size
+        'jewel:size:3': true,
+        'jewel:size:2': true,
+        'jewel:size:1': true
     }
 }
 

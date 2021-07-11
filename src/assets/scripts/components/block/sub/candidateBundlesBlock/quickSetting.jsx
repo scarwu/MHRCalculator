@@ -14,7 +14,9 @@ import _ from 'core/lang'
 import Helper from 'core/helper'
 
 // Load Libraries
+import Misc from 'libraries/misc'
 import ArmorDataset from 'libraries/dataset/armor'
+import SetDataset from 'libraries/dataset/set'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
 
@@ -26,7 +28,6 @@ import BasicSelector from 'components/common/basicSelector'
 import States from 'states'
 
 export default function QuickSetting (props) {
-    const {data} = props
 
     /**
      * Hooks
@@ -49,55 +50,14 @@ export default function QuickSetting (props) {
     return useMemo(() => {
         Helper.debug('Component: CandidateBundles -> QuickFactorSetting')
 
+        let armorList = Misc.getArmorListByRequiredConditions(stateRequiredConditions)
+        let jewelList = Misc.getJewelListByRequiredConditions(stateRequiredConditions)
+
         let armorSeriesMapping = {}
-        let jewelMapping = {}
-        let skillLevelMapping = {}
+        let jewelSizeMapping = {}
 
-        const equipTypes = Object.keys(stateRequiredConditions.equips).filter((equipType) => {
-            if ('weapon' === equipType || 'charm' === equipType || 'petalace' === equipType) {
-                return false
-            }
-
-            if (Helper.isEmpty(stateRequiredConditions.equips[equipType])) {
-                return true
-            }
-
-            return Helper.isEmpty(stateRequiredConditions.equips[equipType].id)
-        })
-        const setIds = stateRequiredConditions.sets.map((setData) => {
-            return setData.id
-        })
-        const skillIds = stateRequiredConditions.skills.map((skillData) => {
-            skillLevelMapping[skillData.id] = skillData.level
-
-            return skillData.id
-        })
-
-        console.log(stateRequiredConditions.equips)
-        console.log(equipTypes)
-        console.log(setIds)
-        console.log(skillIds)
-
-        ArmorDataset.typesIs(equipTypes).getList().forEach((armorItem) => {
-            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorItem.rare]) {
-                return
-            }
-
-            let isSkip = false
-
-            armorItem.skills.forEach((skillData) => {
-                if (true === isSkip) {
-                    return
-                }
-
-                if (0 === skillLevelMapping[skillData.id]) {
-                    isSkip = true
-
-                    return
-                }
-            })
-
-            if (true === isSkip) {
+        armorList.forEach((armorItem) => {
+            if (false === stateAlgorithmParams.usingFactor['armor:rare:' + armorItem.rare]) {
                 return
             }
 
@@ -110,63 +70,17 @@ export default function QuickSetting (props) {
             }
         })
 
-        ArmorDataset.typesIs(equipTypes).hasSkills(skillIds).getList().forEach((armorItem) => {
-            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorItem.rare]) {
+        jewelList.forEach((jewelItem) => {
+            if (false === stateAlgorithmParams.usingFactor['jewel:size:' + jewelItem.size]) {
                 return
             }
 
-            let isSkip = false
-
-            armorItem.skills.forEach((skillData) => {
-                if (true === isSkip) {
-                    return
-                }
-
-                if (0 === skillLevelMapping[skillData.id]) {
-                    isSkip = true
-
-                    return
-                }
-            })
-
-            if (true === isSkip) {
-                return
+            if (Helper.isEmpty(jewelSizeMapping[jewelItem.size])) {
+                jewelSizeMapping[jewelItem.size] = {}
             }
 
-            if (Helper.isEmpty(armorSeriesMapping[armorItem.rare])) {
-                armorSeriesMapping[armorItem.rare] = {}
-            }
-
-            armorSeriesMapping[armorItem.rare][armorItem.seriesId] = {
-                name: armorItem.series
-            }
-        })
-
-        JewelDataset.hasSkills(skillIds, true).getList().forEach((jewelItem) => {
-            let isSkip = false
-
-            jewelItem.skills.forEach((skillData) => {
-                if (true === isSkip) {
-                    return
-                }
-
-                if (0 === skillLevelMapping[skillData.id]) {
-                    isSkip = true
-
-                    return
-                }
-            })
-
-            if (true === isSkip) {
-                return
-            }
-
-            if (Helper.isEmpty(jewelMapping[jewelItem.size])) {
-                jewelMapping[jewelItem.size] = {}
-            }
-
-            if (Helper.isEmpty(jewelMapping[jewelItem.size][jewelItem.id])) {
-                jewelMapping[jewelItem.size][jewelItem.id] = {
+            if (Helper.isEmpty(jewelSizeMapping[jewelItem.size][jewelItem.id])) {
+                jewelSizeMapping[jewelItem.size][jewelItem.id] = {
                     name: jewelItem.name,
                     min: 1,
                     max: 1
@@ -176,14 +90,11 @@ export default function QuickSetting (props) {
             jewelItem.skills.forEach((skillData) => {
                 let skillItem = SkillDataset.getItem(skillData.id)
 
-                if (jewelMapping[jewelItem.size][jewelItem.id].max < skillItem.list.length) {
-                    jewelMapping[jewelItem.size][jewelItem.id].max = skillItem.list.length
+                if (jewelSizeMapping[jewelItem.size][jewelItem.id].max < skillItem.list.length) {
+                    jewelSizeMapping[jewelItem.size][jewelItem.id].max = skillItem.list.length
                 }
             })
         })
-
-        let armorFactor = stateAlgorithmParams.usingFactor.armor
-        let jewelFactor = stateAlgorithmParams.usingFactor.jewel
 
         return (
             <div className="mhrc-item mhrc-item-3-step">
@@ -204,8 +115,8 @@ export default function QuickSetting (props) {
                                 {Object.keys(armorSeriesMapping[rare]).sort((seriesIdA, seriesIdB) => {
                                     return _(seriesIdA) > _(seriesIdB) ? 1 : -1
                                 }).map((seriesId) => {
-                                    let isInclude = Helper.isNotEmpty(armorFactor[seriesId])
-                                        ? armorFactor[seriesId] : true
+                                    let isInclude = Helper.isNotEmpty(stateAlgorithmParams.usingFactor['armor:series:' + seriesId])
+                                        ? stateAlgorithmParams.usingFactor['armor:series:' + seriesId] : true
 
                                     return (
                                         <div key={seriesId} className="col-6 mhrc-value">
@@ -213,14 +124,16 @@ export default function QuickSetting (props) {
                                             <div className="mhrc-icons_bundle">
                                                 {isInclude ? (
                                                     <IconButton
-                                                        iconName="star"
-                                                        altName={_('exclude')}
-                                                        onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', seriesId, false)}} />
+                                                        iconName="star" altName={_('exclude')}
+                                                        onClick={() => {
+                                                            States.setter.setAlgorithmParamsUsingFactor('armor:series:' + seriesId, false)
+                                                        }} />
                                                 ) : (
                                                     <IconButton
-                                                        iconName="star-o"
-                                                        altName={_('include')}
-                                                        onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', seriesId, true)}} />
+                                                        iconName="star-o" altName={_('include')}
+                                                        onClick={() => {
+                                                            States.setter.setAlgorithmParamsUsingFactor('armor:series:' + seriesId, true)
+                                                        }} />
                                                 )}
                                             </div>
                                         </div>
@@ -231,7 +144,7 @@ export default function QuickSetting (props) {
                     )
                 }) : false}
 
-                {0 !== Object.keys(jewelMapping).length ? Object.keys(jewelMapping).sort((sizeA, sizeB) => {
+                {0 !== Object.keys(jewelSizeMapping).length ? Object.keys(jewelSizeMapping).sort((sizeA, sizeB) => {
                     return sizeA > sizeB ? 1 : -1
                 }).map((size) => {
                     return (
@@ -241,12 +154,12 @@ export default function QuickSetting (props) {
                             </div>
 
                             <div className="col-12 mhrc-content">
-                                {Object.keys(jewelMapping[size]).sort((jewelIdA, jewelIdB) => {
+                                {Object.keys(jewelSizeMapping[size]).sort((jewelIdA, jewelIdB) => {
                                     return _(jewelIdA) > _(jewelIdB) ? 1 : -1
                                 }).map((jewelId) => {
-                                    let selectLevel = Helper.isNotEmpty(jewelFactor[jewelId])
-                                        ? jewelFactor[jewelId] : -1
-                                    let diffLevel = jewelMapping[size][jewelId].max - jewelMapping[size][jewelId].min + 1
+                                    let selectLevel = Helper.isNotEmpty(stateAlgorithmParams.usingFactor['jewel:id:' + jewelId])
+                                        ? stateAlgorithmParams.usingFactor['jewel:id:' + jewelId] : -1
+                                    let diffLevel = jewelSizeMapping[size][jewelId].max - jewelSizeMapping[size][jewelId].min + 1
                                     let levelList = [
                                         { key: -1, value: _('unlimited') },
                                         { key: 0, value: _('exclude') }
@@ -259,14 +172,13 @@ export default function QuickSetting (props) {
 
                                     return (
                                         <div key={jewelId} className="col-6 mhrc-value">
-                                            <span>{_(jewelMapping[size][jewelId].name)}</span>
+                                            <span>{_(jewelSizeMapping[size][jewelId].name)}</span>
 
                                             <div className="mhrc-icons_bundle">
                                                 <BasicSelector
-                                                    iconName="sort-numeric-asc"
-                                                    defaultValue={selectLevel}
-                                                    options={levelList} onChange={(event) => {
-                                                        States.setter.setAlgorithmParamsUsingFactor('jewel', jewelId, parseInt(event.target.value))
+                                                    iconName="sort-numeric-asc" defaultValue={selectLevel} options={levelList}
+                                                    onChange={(event) => {
+                                                        States.setter.setAlgorithmParamsUsingFactor('jewel:id:' + jewelId, parseInt(event.target.value))
                                                     }} />
                                             </div>
                                         </div>
@@ -279,7 +191,6 @@ export default function QuickSetting (props) {
             </div>
         )
     }, [
-        data,
         stateAlgorithmParams,
         stateRequiredConditions
     ])

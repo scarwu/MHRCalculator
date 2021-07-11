@@ -92,8 +92,6 @@ class ArmorDataset {
         this.filterType = null
         this.filterTypes = null
         this.filterRare = null
-        // this.filterSetId = null
-        // this.filterSetIds = null
         this.filterSkillId = null
         this.filterSkillIds = null
         this.filterSkillIsConsistent = null
@@ -122,7 +120,7 @@ class ArmorDataset {
                     isSkip = true
                 }
 
-                if (isSkip) {
+                if (true === isSkip) {
                     return false
                 }
             }
@@ -134,72 +132,50 @@ class ArmorDataset {
                 }
             }
 
-            // // Set Is
-            // if (Helper.isNotEmpty(this.filterSetId)) {
-            //     if (Helper.isEmpty(item.set)
-            //         || this.filterSetId !== item.set.id
-            //     ) {
-            //         return false
-            //     }
-            // }
-
-            // // Sets Is
-            // if (Helper.isNotEmpty(this.filterSetIds)) {
-            //     isSkip = false
-
-            //     if (Helper.isEmpty(item.set)
-            //         || -1 === this.filterSetIds.indexOf(item.set.id)
-            //     ) {
-            //         isSkip = true
-            //     }
-
-            //     if (isSkip) {
-            //         return false
-            //     }
-            // }
-
             // Has Skill
             if (Helper.isNotEmpty(this.filterSkillId)) {
-                if (Helper.isNotEmpty(item.skills)) {
-                    for (let index in item.skills) {
-                        if (this.filterSkillId !== item.skills[index].id) {
-                            continue
-                        }
+                if (Helper.isEmpty(item.skills)) {
+                    return false
+                }
 
-                        isSkip = false
+                for (let index in item.skills) {
+                    if (this.filterSkillId !== item.skills[index].id) {
+                        continue
                     }
 
-                    if (isSkip) {
-                        return false
-                    }
+                    isSkip = false
+                }
+
+                if (true === isSkip) {
+                    return false
                 }
             }
 
             // Has Skills
             if (Helper.isNotEmpty(this.filterSkillIds)) {
+                if (Helper.isEmpty(item.skills)) {
+                    return false
+                }
+
                 if (this.filterSkillIsConsistent) {
                     isSkip = false
 
-                    if (Helper.isNotEmpty(item.skills)) {
-                        item.skills.forEach((skillData) => {
-                            if (-1 === this.filterSkillIds.indexOf(skillData.id)) {
-                                isSkip = true
-                            }
-                        })
-                    }
+                    item.skills.forEach((skillData) => {
+                        if (-1 === this.filterSkillIds.indexOf(skillData.id)) {
+                            isSkip = true
+                        }
+                    })
                 } else {
                     isSkip = true
 
-                    if (Helper.isNotEmpty(item.skills)) {
-                        item.skills.forEach((skillData) => {
-                            if (-1 !== this.filterSkillIds.indexOf(skillData.id)) {
-                                isSkip = false
-                            }
-                        })
-                    }
+                    item.skills.forEach((skillData) => {
+                        if (-1 !== this.filterSkillIds.indexOf(skillData.id)) {
+                            isSkip = false
+                        }
+                    })
                 }
 
-                if (isSkip) {
+                if (true === isSkip) {
                     return false
                 }
             }
@@ -243,18 +219,6 @@ class ArmorDataset {
 
         return this
     }
-
-    // setIs = (setId) => {
-    //     this.filterSetId = setId
-
-    //     return this
-    // }
-
-    // setsIs = (setIds) => {
-    //     this.filterSetIds = setIds
-
-    //     return this
-    // }
 
     hasSkill = (skillId) => {
         this.filterSkillId = skillId

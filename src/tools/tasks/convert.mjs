@@ -163,7 +163,7 @@ export const runAction = () => {
         skillBundle.list = skillBundle.list.map((skillItem) => {
 
             // Get Translate Code & Create Dataset Lang Mapping
-            let translateCode = createCode(`skills:translate:effect:${idCode}`)
+            let translateCode = createCode(`skills:translate:effect:${idCode}:${skillItem.level}`)
 
             Object.keys(skillItem.effect).forEach((lang) => {
                 if (Helper.isEmpty(datasetLangMapping[lang])) {

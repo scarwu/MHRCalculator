@@ -175,9 +175,9 @@ export default function AlgorithmSettingModal (props) {
                             options={getModeList()} onChange={handleModeChange} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={
+                            onClick={() => {
                                 States.setter.hideModal('algorithmSetting')
-                            } />
+                            }} />
                     </div>
                 </div>
 
@@ -232,16 +232,14 @@ export default function AlgorithmSettingModal (props) {
                                             <div key={rare} className="col-6 mhrc-value">
                                                 <span>{_('rare') + `: ${rare}`}</span>
                                                 <div className="mhrc-icons_bundle">
-                                                    {stateAlgorithmParams.usingFactor.armor['rare' + rare] ? (
+                                                    {stateAlgorithmParams.usingFactor['armor:rare:' + rare] ? (
                                                         <IconButton
-                                                            iconName="star"
-                                                            altName={_('exclude')}
-                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', 'rare' + rare, false)}} />
+                                                            iconName="star" altName={_('exclude')}
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor:rare:' + rare, false)}} />
                                                     ) : (
                                                         <IconButton
-                                                            iconName="star-o"
-                                                            altName={_('include')}
-                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', 'rare' + rare, true)}} />
+                                                            iconName="star-o" altName={_('include')}
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor:rare:' + rare, true)}} />
                                                     )}
                                                 </div>
                                             </div>
@@ -262,16 +260,14 @@ export default function AlgorithmSettingModal (props) {
                                             <div key={size} className="col-6 mhrc-value">
                                                 <span>{_('size') + `: ${size}`}</span>
                                                 <div className="mhrc-icons_bundle">
-                                                    {stateAlgorithmParams.usingFactor.jewel['size' + size] ? (
+                                                    {stateAlgorithmParams.usingFactor['jewel:size:' + size] ? (
                                                         <IconButton
-                                                            iconName="star"
-                                                            altName={_('exclude')}
-                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('jewel', 'size' + size, false)}} />
+                                                            iconName="star" altName={_('exclude')}
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('jewel:size:' + size, false)}} />
                                                     ) : (
                                                         <IconButton
-                                                            iconName="star-o"
-                                                            altName={_('include')}
-                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('jewel', 'size' + size, true)}} />
+                                                            iconName="star-o" altName={_('include')}
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('jewel:size:' + size, true)}} />
                                                     )}
                                                 </div>
                                             </div>

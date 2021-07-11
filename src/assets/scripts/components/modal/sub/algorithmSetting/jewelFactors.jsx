@@ -14,6 +14,7 @@ import _ from 'core/lang'
 import Helper from 'core/helper'
 
 // Load Libraries
+import Misc from 'libraries/misc'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
 
@@ -47,22 +48,12 @@ export default function JewelFactors (props) {
     return useMemo(() => {
         Helper.debug('Component: AlgorithmSetting -> JewelFactors')
 
+        let jewelList = (true === byRequiredConditions)
+            ? Misc.getJewelListByRequiredConditions(stateRequiredConditions)
+            : JewelDataset.getList()
         let jewelSizeMapping = {}
-        let skillLevelMapping = {}
-        let dataset = JewelDataset
-        let jewelFactor = stateAlgorithmParams.usingFactor.jewel
 
-        if (true === byRequiredConditions) {
-            const skillIds = stateRequiredConditions.skills.map((skillData) => {
-                skillLevelMapping[skillData.id] = skillData.level
-
-                return skillData.id
-            })
-
-            dataset = dataset.hasSkills(skillIds, true)
-        }
-
-        dataset.getList().filter((jewelItem) => {
+        jewelList.filter((jewelItem) => {
             let text = _(jewelItem.name)
 
             if (Helper.isNotEmpty(segment)
@@ -73,28 +64,8 @@ export default function JewelFactors (props) {
 
             return true
         }).forEach((jewelItem) => {
-            if (false === jewelFactor['size' + jewelItem.size]) {
+            if (false === stateAlgorithmParams.usingFactor['jewel:size:' + jewelItem.size]) {
                 return false
-            }
-
-            if (true === byRequiredConditions) {
-                let isSkip = false
-
-                jewelItem.skills.forEach((skillData) => {
-                    if (true === isSkip) {
-                        return
-                    }
-
-                    if (0 === skillLevelMapping[skillData.id]) {
-                        isSkip = true
-
-                        return
-                    }
-                })
-
-                if (true === isSkip) {
-                    return
-                }
             }
 
             if (Helper.isEmpty(jewelSizeMapping[jewelItem.size])) {
@@ -144,8 +115,8 @@ export default function JewelFactors (props) {
 
                         <div className="col-12 mhrc-content">
                             {jewelIds.slice(blockIndex * 10, (blockIndex + 1) * 10).map((jewelId) => {
-                                let selectLevel = Helper.isNotEmpty(jewelFactor[jewelId])
-                                    ? jewelFactor[jewelId] : -1
+                                let selectLevel = Helper.isNotEmpty(stateAlgorithmParams.usingFactor['jewel:id:' + jewelId])
+                                    ? stateAlgorithmParams.usingFactor['jewel:id:' + jewelId] : -1
                                 let diffLevel = jewelSizeMapping[size][jewelId].max - jewelSizeMapping[size][jewelId].min + 1
                                 let levelList = [
                                     { key: -1, value: _('unlimited') },
@@ -163,10 +134,9 @@ export default function JewelFactors (props) {
 
                                         <div className="mhrc-icons_bundle">
                                             <BasicSelector
-                                                iconName="sort-numeric-asc"
-                                                defaultValue={selectLevel}
-                                                options={levelList} onChange={(event) => {
-                                                    States.setter.setAlgorithmParamsUsingFactor('jewel', jewelId, parseInt(event.target.value))
+                                                iconName="sort-numeric-asc" defaultValue={selectLevel} options={levelList}
+                                                onChange={(event) => {
+                                                    States.setter.setAlgorithmParamsUsingFactor('jewel:id:' + jewelId, parseInt(event.target.value))
                                                 }} />
                                         </div>
                                     </div>

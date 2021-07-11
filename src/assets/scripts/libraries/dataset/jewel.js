@@ -98,46 +98,48 @@ class JewelDataset {
 
             // Has Skill
             if (Helper.isNotEmpty(this.filterSkillId)) {
-                if (Helper.isNotEmpty(item.skills)) {
-                    for (let index in item.skills) {
-                        if (this.filterSkillId !== item.skills[index].id) {
-                            continue
-                        }
+                if (Helper.isEmpty(item.skills)) {
+                    return false
+                }
 
-                        isSkip = false
+                for (let index in item.skills) {
+                    if (this.filterSkillId !== item.skills[index].id) {
+                        continue
                     }
 
-                    if (isSkip) {
-                        return false
-                    }
+                    isSkip = false
+                }
+
+                if (true === isSkip) {
+                    return false
                 }
             }
 
             // Has Skills
             if (Helper.isNotEmpty(this.filterSkillIds)) {
+                if (Helper.isEmpty(item.skills)) {
+                    return false
+                }
+
                 if (this.filterSkillIsConsistent) {
                     isSkip = false
 
-                    if (Helper.isNotEmpty(item.skills)) {
-                        item.skills.forEach((skillData) => {
-                            if (-1 === this.filterSkillIds.indexOf(skillData.id)) {
-                                isSkip = true
-                            }
-                        })
-                    }
+                    item.skills.forEach((skillData) => {
+                        if (-1 === this.filterSkillIds.indexOf(skillData.id)) {
+                            isSkip = true
+                        }
+                    })
                 } else {
                     isSkip = true
 
-                    if (Helper.isNotEmpty(item.skills)) {
-                        item.skills.forEach((skillData) => {
-                            if (-1 !== this.filterSkillIds.indexOf(skillData.id)) {
-                                isSkip = false
-                            }
-                        })
-                    }
+                    item.skills.forEach((skillData) => {
+                        if (-1 !== this.filterSkillIds.indexOf(skillData.id)) {
+                            isSkip = false
+                        }
+                    })
                 }
 
-                if (isSkip) {
+                if (true === isSkip) {
                     return false
                 }
             }

@@ -286,8 +286,154 @@ export const getEquipItem = (equipType, equipData) => {
     }
 }
 
+export const getArmorListByRequiredConditions = (requiredConditions) => {
+    let armorMapping = {}
+    let skillLevelMapping = {}
+
+    const equipTypes = Object.keys(requiredConditions.equips).filter((equipType) => {
+        if ('weapon' === equipType || 'charm' === equipType || 'petalace' === equipType) {
+            return false
+        }
+
+        if (Helper.isEmpty(requiredConditions.equips[equipType])) {
+            return true
+        }
+
+        return Helper.isEmpty(requiredConditions.equips[equipType].id)
+    })
+    const setIds = requiredConditions.sets.map((setData) => {
+        return setData.id
+    })
+    const skillIds = requiredConditions.skills.map((skillData) => {
+        skillLevelMapping[skillData.id] = skillData.level
+
+        return skillData.id
+    })
+
+    // Find Armor By Set Ids
+    if (0 !== setIds.length) {
+        SetDataset.getList().forEach((setItem) => {
+            if (-1 === setIds.indexOf(setItem.id)) {
+                return
+            }
+
+            setItem.items.forEach((armorData) => {
+                if (-1 === equipTypes.indexOf(armorData.type)) {
+                    return
+                }
+
+                let armorItem = ArmorDataset.getItem(armorData.id)
+
+                if (Helper.isEmpty(armorItem)) {
+                    return
+                }
+
+                if (Helper.isNotEmpty(armorItem.skills)) {
+                    let isSkip = false
+
+                    armorItem.skills.forEach((skillData) => {
+                        if (true === isSkip) {
+                            return
+                        }
+
+                        if (0 === skillLevelMapping[skillData.id]) {
+                            isSkip = true
+
+                            return
+                        }
+                    })
+
+                    if (true === isSkip) {
+                        return
+                    }
+                }
+
+                // Set Mapping
+                if (Helper.isEmpty(armorMapping[armorItem.id])) {
+                    armorMapping[armorItem.id] = armorItem
+                }
+            })
+        })
+    }
+
+    // Find Armors By Skill Ids
+    let isConsistent = false
+
+    ArmorDataset.typesIs(equipTypes).hasSkills(skillIds, isConsistent).getList().forEach((armorItem) => {
+        if (Helper.isNotEmpty(armorItem.skills)) {
+            let isSkip = false
+
+            armorItem.skills.forEach((skillData) => {
+                if (true === isSkip) {
+                    return
+                }
+
+                if (0 === skillLevelMapping[skillData.id]) {
+                    isSkip = true
+
+                    return
+                }
+            })
+
+            if (true === isSkip) {
+                return
+            }
+        }
+
+        // Set Mapping
+        if (Helper.isEmpty(armorMapping[armorItem.id])) {
+            armorMapping[armorItem.id] = armorItem
+        }
+    })
+
+    return Object.values(armorMapping)
+}
+
+export const getJewelListByRequiredConditions = (requiredConditions) => {
+    let jewelMapping = {}
+    let skillLevelMapping = {}
+
+    const skillIds = requiredConditions.skills.map((skillData) => {
+        skillLevelMapping[skillData.id] = skillData.level
+
+        return skillData.id
+    })
+
+    // Find Jewels By Skill Ids
+    let isConsistent = true
+
+    JewelDataset.hasSkills(skillIds, isConsistent).getList().forEach((jewelItem) => {
+        let isSkip = false
+
+        jewelItem.skills.forEach((skillData) => {
+            if (true === isSkip) {
+                return
+            }
+
+            if (0 === skillLevelMapping[skillData.id]) {
+                isSkip = true
+
+                return
+            }
+        })
+
+        if (true === isSkip) {
+            return
+        }
+
+        if (Helper.isEmpty(jewelMapping[jewelItem.id])) {
+            jewelMapping[jewelItem.id] = jewelItem
+        }
+    })
+
+    return Object.values(jewelMapping)
+}
+
 export default {
     getEquipExtendItem,
     getEquipItem,
-    equipTypeToDatasetType
+    equipTypeToDatasetType,
+
+    getArmorListByRequiredConditions,
+    getJewelListByRequiredConditions
 }

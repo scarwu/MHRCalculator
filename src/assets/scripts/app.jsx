@@ -39,7 +39,6 @@ import PetalaceSelectorModal from 'components/modal/petalaceSelector'
 import JewelSelectorModal from 'components/modal/jewelSelector'
 import EnhanceSelectorModal from 'components/modal/enhanceSelector'
 import SkillSelectorModal from 'components/modal/skillSelector'
-// import PlayerEquipSelectorModal from 'components/modal/playerEquipSelector'
 
 if ('production' === Config.env) {
     if (Config.buildTime !== Status.get('sys:buildTime')) {
@@ -162,7 +161,6 @@ export default function App (props) {
             <PetalaceSelectorModal />
             <EnhanceSelectorModal />
             <SkillSelectorModal />
-            {/* <PlayerEquipSelectorModal /> */}
         </div>
     )
 }

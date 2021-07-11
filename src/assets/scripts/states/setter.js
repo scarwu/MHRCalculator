@@ -226,11 +226,10 @@ export const toggleAlgorithmParamsFlag = (target) => {
     })
 }
 
-export const setAlgorithmParamsUsingFactor = (target, flag, value) => {
+export const setAlgorithmParamsUsingFactor = (flag, value) => {
     store.dispatch({
         type: 'SET_ALGORITHM_PARAMS_USING_FACTOR',
         payload: {
-            target: target,
             flag: flag,
             value: value
         }

@@ -14,6 +14,7 @@ import _ from 'core/lang'
 import Helper from 'core/helper'
 
 // Load Libraries
+import Misc from 'libraries/misc'
 import ArmorDataset from 'libraries/dataset/armor'
 
 // Load Components
@@ -46,28 +47,12 @@ export default function ArmorFactors (props) {
     return useMemo(() => {
         Helper.debug('Component: AlgorithmSetting -> ArmorFactors')
 
+        let armorList = (true === byRequiredConditions)
+            ? Misc.getArmorListByRequiredConditions(stateRequiredConditions)
+            : ArmorDataset.getList()
         let armorSeriesMapping = {}
-        let skillLevelMapping = {}
-        let dataset = ArmorDataset
-        let armorFactor = stateAlgorithmParams.usingFactor.armor
 
-        const equipTypes = Object.keys(stateRequiredConditions.equips).filter((equipType) => {
-            if ('weapon' === equipType || 'charm' === equipType) {
-                return false
-            }
-
-            return Helper.isEmpty(stateRequiredConditions.equips[equipType])
-        })
-
-        // if (true === byRequiredConditions) {
-        //     const setIds = stateRequiredConditions.sets.map((set) => {
-        //         return set.id
-        //     })
-
-        //     dataset = dataset.typesIs(equipTypes).setsIs(setIds)
-        // }
-
-        dataset.getList().filter((armorItem) => {
+        armorList.filter((armorItem) => {
             let text = _(armorItem.series)
 
             if (Helper.isNotEmpty(segment)
@@ -78,80 +63,8 @@ export default function ArmorFactors (props) {
 
             return true
         }).forEach((armorItem) => {
-            if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorItem.rare]) {
+            if (false === stateAlgorithmParams.usingFactor['armor:rare:' + armorItem.rare]) {
                 return
-            }
-
-            let isSkip = false
-
-            armorItem.skills.forEach((skill) => {
-                if (true === isSkip) {
-                    return
-                }
-
-                if (0 === skillLevelMapping[skill.id]) {
-                    isSkip = true
-
-                    return
-                }
-            })
-
-            if (true === isSkip) {
-                return
-            }
-
-            if (Helper.isEmpty(armorSeriesMapping[armorItem.rare])) {
-                armorSeriesMapping[armorItem.rare] = {}
-            }
-
-            armorSeriesMapping[armorItem.rare][armorItem.seriesId] = {
-                name: armorItem.series
-            }
-        })
-
-        if (true === byRequiredConditions) {
-            const skillIds = stateRequiredConditions.skills.map((skill) => {
-                skillLevelMapping[skill.id] = skill.level
-
-                return skill.id
-            })
-
-            dataset = dataset.typesIs(equipTypes).hasSkills(skillIds)
-        }
-
-        dataset.getList().filter((armorItem) => {
-            let text = _(armorItem.series)
-
-            if (Helper.isNotEmpty(segment)
-                && -1 === text.toLowerCase().search(segment.toLowerCase())
-            ) {
-                return false
-            }
-
-            return true
-        }).forEach((armorItem) => {
-            if (false === armorFactor['rare' + armorItem.rare]) {
-                return
-            }
-
-            if (true === byRequiredConditions) {
-                let isSkip = false
-
-                armorItem.skills.forEach((skill) => {
-                    if (true === isSkip) {
-                        return
-                    }
-
-                    if (0 === skillLevelMapping[skill.id]) {
-                        isSkip = true
-
-                        return
-                    }
-                })
-
-                if (true === isSkip) {
-                    return
-                }
             }
 
             if (Helper.isEmpty(armorSeriesMapping[armorItem.rare])) {
@@ -190,8 +103,8 @@ export default function ArmorFactors (props) {
 
                         <div className="col-12 mhrc-content">
                             {seriesIds.slice(blockIndex * 10, (blockIndex + 1) * 10).map((seriesId) => {
-                                let isInclude = Helper.isNotEmpty(armorFactor[seriesId])
-                                    ? armorFactor[seriesId] : true
+                                let isInclude = Helper.isNotEmpty(stateAlgorithmParams.usingFactor['armor:series:' + seriesId])
+                                    ? stateAlgorithmParams.usingFactor['armor:series:' + seriesId] : true
 
                                 return (
                                     <div key={seriesId} className="col-6 mhrc-value">
@@ -199,14 +112,16 @@ export default function ArmorFactors (props) {
                                         <div className="mhrc-icons_bundle">
                                             {isInclude ? (
                                                 <IconButton
-                                                    iconName="star"
-                                                    altName={_('exclude')}
-                                                    onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', seriesId, false)}} />
+                                                    iconName="star" altName={_('exclude')}
+                                                    onClick={() => {
+                                                        States.setter.setAlgorithmParamsUsingFactor('armor:series:' + seriesId, false)
+                                                    }} />
                                             ) : (
                                                 <IconButton
-                                                    iconName="star-o"
-                                                    altName={_('include')}
-                                                    onClick={() => {States.setter.setAlgorithmParamsUsingFactor('armor', seriesId, true)}} />
+                                                    iconName="star-o" altName={_('include')}
+                                                    onClick={() => {
+                                                        States.setter.setAlgorithmParamsUsingFactor('armor:series:' + seriesId, true)
+                                                    }} />
                                             )}
                                         </div>
                                     </div>

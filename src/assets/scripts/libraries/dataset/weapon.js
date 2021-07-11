@@ -177,7 +177,7 @@ class WeaponDataset {
                     isSkip = true
                 }
 
-                if (isSkip) {
+                if (true === isSkip) {
                     return false
                 }
             }
@@ -190,21 +190,23 @@ class WeaponDataset {
             }
 
             // Has Skill
-            if (Helper.isNotEmpty(this.filterSkillId)) {
-                if (Helper.isNotEmpty(item.skills)) {
-                    for (let index in item.skills) {
-                        if (this.filterSkillId !== item.skills[index].id) {
-                            continue
-                        }
+            // if (Helper.isNotEmpty(this.filterSkillId)) {
+            //     if (Helper.isEmpty(item.skills)) {
+            //         return false
+            //     }
 
-                        isSkip = false
-                    }
+            //     for (let index in item.skills) {
+            //         if (this.filterSkillId !== item.skills[index].id) {
+            //             continue
+            //         }
 
-                    if (isSkip) {
-                        return false
-                    }
-                }
-            }
+            //         isSkip = false
+            //     }
+
+            //     if (true === isSkip) {
+            //         return false
+            //     }
+            // }
 
             return true
         })

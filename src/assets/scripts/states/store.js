@@ -543,15 +543,10 @@ export default createStore((state = initialState, action) => {
         case 'SET_ALGORITHM_PARAMS_USING_FACTOR':
             return (() => {
                 let algorithmParams = Helper.deepCopy(state.algorithmParams)
-                let target = action.payload.target
                 let flag = action.payload.flag
                 let value = action.payload.value
 
-                if (Helper.isEmpty(algorithmParams.usingFactor[target])) {
-                    return algorithmParams.usingFactor[target] = {}
-                }
-
-                algorithmParams.usingFactor[target][flag] = value
+                algorithmParams.usingFactor[flag] = value
 
                 return Object.assign({}, state, {
                     algorithmParams: algorithmParams

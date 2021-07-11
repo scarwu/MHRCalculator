@@ -20,7 +20,7 @@ import Helper from 'core/helper'
 // Load Libraries
 import Misc from 'libraries/misc'
 import JewelDataset from 'libraries/dataset/jewel'
-import EnhanceDataset from 'libraries/dataset/enhance'
+// import EnhanceDataset from 'libraries/dataset/enhance'
 import SkillDataset from 'libraries/dataset/skill'
 
 // Load Components
@@ -570,11 +570,6 @@ export default function PlayerEquipsBlock (props) {
                     <IconButton
                         iconName="refresh" altName={_('reset')}
                         onClick={handleEquipsDisplayerRefresh} />
-                    {/* <IconButton
-                        iconName="th-list" altName={_('bundleList')}
-                        onClick={() => {
-                            States.setter.showModal('playerEquipSelector')
-                        }} /> */}
                 </div>
             </div>
 

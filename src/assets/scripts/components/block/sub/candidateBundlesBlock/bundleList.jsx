@@ -37,8 +37,7 @@ const handleBundlePickUp = (bundle, required) => {
     let slotMap = {
         1: [],
         2: [],
-        3: [],
-        4: []
+        3: []
     }
 
     Object.keys(bundle.equipIdMapping).forEach((equipType) => {
@@ -53,7 +52,7 @@ const handleBundlePickUp = (bundle, required) => {
         currentEquips[equipType].id = bundle.equipIdMapping[equipType]
         currentEquips[equipType].slotIds = []
 
-        let equipInfo = null
+        let equipItem = null
 
         if ('weapon' === equipType) {
             if (Helper.isNotEmpty(required.equips.weapon.customWeapon)) {
@@ -64,21 +63,21 @@ const handleBundlePickUp = (bundle, required) => {
                 currentEquips.weapon.enhances = required.equips.weapon.enhances // Restore Enhance
             }
 
-            equipInfo = Misc.getAppliedWeaponInfo(currentEquips.weapon)
+            equipItem = Misc.getAppliedWeaponInfo(currentEquips.weapon)
         } else if ('helm' === equipType
             || 'chest' === equipType
             || 'arm' === equipType
             || 'waist' === equipType
             || 'leg' === equipType
         ) {
-            equipInfo = Misc.getAppliedArmorInfo(currentEquips[equipType])
+            equipItem = Misc.getAppliedArmorInfo(currentEquips[equipType])
         }
 
-        if (Helper.isEmpty(equipInfo)) {
+        if (Helper.isEmpty(equipItem)) {
             return
         }
 
-        equipInfo.slots.forEach((data, index) => {
+        equipItem.slots.forEach((data, index) => {
             slotMap[data.size].push({
                 type: equipType,
                 index: index
@@ -129,7 +128,7 @@ const handleBundlePickUp = (bundle, required) => {
         })
     }
 
-    States.setter.replaceCurrentEquips(currentEquips)
+    States.setter.replacePlayerEquips(currentEquips)
 }
 
 export default function BundleList (props) {
@@ -137,18 +136,14 @@ export default function BundleList (props) {
     /**
      * Hooks
      */
-    const [stateComputedResult, updateComputedResult] = useState(States.getter.getComputedResult())
-    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
-    const [stateRequiredSets, updateRequiredSets] = useState(States.getter.getRequiredSets())
-    const [stateRequiredSkills, updateRequiredSkills] = useState(States.getter.getRequiredSkills())
+    const [stateCandidateBundles, updateCandidateBundles] = useState(States.getter.getCandidateBundles())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
-            updateComputedResult(States.getter.getComputedResult())
-            updateRequiredEquips(States.getter.getRequiredEquips())
-            updateRequiredSets(States.getter.getRequiredSets())
-            updateRequiredSkills(States.getter.getRequiredSkills())
+            updateCandidateBundles(States.getter.getCandidateBundles())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -160,24 +155,24 @@ export default function BundleList (props) {
      * Handle Functions
      */
     const handleJewelPackageChange = useCallback((bundleIndex, packageIndex) => {
-        let computedResult = Helper.deepCopy(stateComputedResult)
+        let computedResult = Helper.deepCopy(stateCandidateBundles)
 
         computedResult.list[bundleIndex].jewelPackageIndex = packageIndex
 
-        States.setter.saveComputedResult(computedResult)
-    }, [stateComputedResult])
+        States.setter.saveCandidateBundles(computedResult)
+    }, [stateCandidateBundles])
 
     return useMemo(() => {
         Helper.debug('Component: CandidateBundles -> BundleList')
 
-        if (Helper.isEmpty(stateComputedResult)
-            || Helper.isEmpty(stateComputedResult.required)
-            || Helper.isEmpty(stateComputedResult.list)
+        if (Helper.isEmpty(stateCandidateBundles)
+            || Helper.isEmpty(stateCandidateBundles.requiredConditions)
+            || Helper.isEmpty(stateCandidateBundles.list)
         ) {
             return false
         }
 
-        if (0 === stateComputedResult.list.length) {
+        if (0 === stateCandidateBundles.list.length) {
             return (
                 <div className="mhrc-item mhrc-item-3-step">
                     <div className="col-12 mhrc-name">
@@ -187,29 +182,29 @@ export default function BundleList (props) {
             )
         }
 
-        let bundleList = stateComputedResult.list
-        let bundleRequired = stateComputedResult.required
+        let bundleList = stateCandidateBundles.list
+        let bundleRequiredConditions = stateCandidateBundles.requiredConditions
 
         // Required Ids
-        const requiredEquipIds = Object.keys(stateRequiredEquips).map((equipType) => {
-            if (Helper.isEmpty(stateRequiredEquips[equipType])) {
+        const requiredEquipIds = Object.keys(stateRequiredConditions.equips).map((equipType) => {
+            if (Helper.isEmpty(stateRequiredConditions.equips[equipType])) {
                 return false
             }
 
-            return stateRequiredEquips[equipType].id
+            return stateRequiredConditions.equips[equipType].id
         })
-        const requiredSetIds = stateRequiredSets.map((set) => {
+        const requiredSetIds = stateRequiredConditions.sets.map((set) => {
             return set.id
         })
-        const requiredSkillIds = stateRequiredSkills.map((skill) => {
+        const requiredSkillIds = stateRequiredConditions.skills.map((skill) => {
             return skill.id
         })
 
         // Current Required Ids
-        const currentRequiredSetIds = bundleRequired.sets.map((set) => {
+        const currentRequiredSetIds = bundleRequiredConditions.sets.map((set) => {
             return set.id
         })
-        const currentRequiredSkillIds = bundleRequired.skills.map((skill) => {
+        const currentRequiredSkillIds = bundleRequiredConditions.skills.map((skill) => {
             return skill.id
         })
 
@@ -223,7 +218,6 @@ export default function BundleList (props) {
                 1: 0,
                 2: 0,
                 3: 0,
-                4: 0,
                 all: 0
             }
 
@@ -237,7 +231,7 @@ export default function BundleList (props) {
                 return Helper.isNotEmpty(bundle.equipIdMapping[equipType])
             }).map((equipType) => {
                 if ('weapon' === equipType) {
-                    return Object.assign({}, bundleRequired.equips[equipType], {
+                    return Object.assign({}, bundleRequiredConditions.equips[equipType], {
                         type: equipType
                     })
                 }
@@ -338,7 +332,7 @@ export default function BundleList (props) {
                         <div className="mhrc-icons_bundle">
                             <IconButton
                                 iconName="check" altName={_('equip')}
-                                onClick={() => {handleBundlePickUp(bundle, bundleRequired)}} />
+                                onClick={() => {handleBundlePickUp(bundle, bundleRequiredConditions)}} />
                         </div>
                     </div>
 
@@ -358,75 +352,34 @@ export default function BundleList (props) {
                             <span>{_('requiredEquips')}</span>
                         </div>
                         <div className="col-12 mhrc-content">
-                            {bundleEquips.map((equip) => {
+                            {bundleEquips.map((currentEquipData) => {
+                                let requiredEquipData = stateRequiredConditions.equips[currentEquipData.type]
+
+                                // Can Add to Required Contditions
                                 let isNotRequire = true
 
-                                if (Helper.isNotEmpty(stateRequiredEquips[equip.type])) {
-                                    if ('weapon' === equip.type) {
-                                        if ('customWeapon' === equip.id) {
-                                            isNotRequire = Helper.jsonHash({
-                                                customWeapon: equip.customWeapon,
-                                                enhances: equip.enhances
-                                            }) !== Helper.jsonHash({
-                                                customWeapon: stateRequiredEquips[equip.type].customWeapon,
-                                                enhances: stateRequiredEquips[equip.type].enhances
-                                            })
-                                        } else {
-                                            isNotRequire = Helper.jsonHash({
-                                                id: equip.id,
-                                                enhances: equip.enhances
-                                            }) !== Helper.jsonHash({
-                                                id: stateRequiredEquips[equip.type].id,
-                                                enhances: stateRequiredEquips[equip.type].enhances
-                                            })
-                                        }
-                                    } else {
-                                        isNotRequire = equip.id !== stateRequiredEquips[equip.type].id
-                                    }
-                                }
-
-                                let equipInfo = null
-
-                                if ('weapon' === equip.type) {
-                                    if ('customWeapon' === equip.id) {
-                                        equipInfo = equip.customWeapon
-
-                                        return Helper.isNotEmpty(equipInfo) ? (
-                                            <div key={equip.type} className="col-6 mhrc-value">
-                                                <span>{_(equipInfo.name)}: {_(equipInfo.type)}</span>
-
-                                                <div className="mhrc-icons_bundle">
-                                                    {isNotRequire ? (
-                                                        <IconButton
-                                                            iconName="arrow-left" altName={_('include')}
-                                                            onClick={() => {States.setter.setRequiredEquips(equip.type, equipInfo)}} />
-                                                    ) : false}
-                                                </div>
-                                            </div>
-                                        ) : false
-                                    }
-
-                                    equipInfo = WeaponDataset.getItem(equip.id)
-                                } else if ('helm' === equip.type
-                                    || 'chest' === equip.type
-                                    || 'arm' === equip.type
-                                    || 'waist' === equip.type
-                                    || 'leg' === equip.type
+                                if (('weapon' === currentEquipData.type || 'charm' === currentEquipData.type)
+                                    && 'custom' === currentEquipData.id
+                                    && 'custom' === requiredEquipData.id
                                 ) {
-                                    equipInfo = ArmorDataset.getItem(equip.id)
-                                } else if ('charm' === equip.type) {
-                                    // equipInfo = CharmDataset.getItem(equip.id)
+                                    isNotRequire = Helper.jsonHash(currentEquipData.custom) !== Helper.jsonHash(requiredEquipData.custom)
+                                } else {
+                                    isNotRequire = currentEquipData.id !== requiredEquipData.id
                                 }
 
-                                return Helper.isNotEmpty(equipInfo) ? (
+                                let equipItem = Misc.getEquipItem(currentEquipData.type)
+
+                                return Helper.isNotEmpty(equipItem) ? (
                                     <div key={equip.type} className="col-6 mhrc-value">
-                                        <span>{_(equipInfo.name)}</span>
+                                        <span>{_(equipItem.name)}</span>
 
                                         <div className="mhrc-icons_bundle">
                                             {isNotRequire ? (
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
-                                                    onClick={() => {States.setter.setRequiredEquips(equip.type, equipInfo)}} />
+                                                    onClick={() => {
+                                                        States.setter.setRequiredConditionsEquip(currentEquipData.type, currentEquipData.id)
+                                                    }} />
                                             ) : false}
                                         </div>
                                     </div>
@@ -550,5 +503,8 @@ export default function BundleList (props) {
                 </div>
             )
         })
-    }, [stateComputedResult, stateRequiredEquips, stateRequiredSets, stateRequiredSkills])
+    }, [
+        stateCandidateBundles,
+        stateRequiredConditions
+    ])
 }

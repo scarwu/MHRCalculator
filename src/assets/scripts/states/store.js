@@ -32,9 +32,7 @@ const statusMapping = {
     requiredConditions: 'state:requiredConditions',
     playerEquips: 'state:playerEquips',
     algorithmParams: 'state:algorithmParams',
-    // computedResult: 'state:computedResult',
-    // reservedPlayerEquip: 'state:reservedPlayerEquip',
-    // customWeapon: 'state:customWeapon'
+    candidateBundles: 'state:candidateBundles'
 }
 
 // Middleware
@@ -83,8 +81,7 @@ const initialState = {
     requiredConditions: Status.get(statusMapping.requiredConditions) || Helper.deepCopy(Constant.defaultRequiredConditions),
     playerEquips: Status.get(statusMapping.playerEquips) || Helper.deepCopy(Constant.defaultPlayerEquips),
     algorithmParams: Status.get(statusMapping.algorithmParams) || Helper.deepCopy(Constant.defaultAlgorithmParams),
-    // computedResult: Status.get(statusMapping.computedResult) || null,
-    // reservedPlayerEquip: Status.get(statusMapping.reservedPlayerEquip) || []
+    candidateBundles: Status.get(statusMapping.candidateBundles) || {}
 }
 
 export default createStore((state = initialState, action) => {
@@ -553,254 +550,16 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
-        // // Computed Bundles
-        // case 'UPDATE_COMPUTED_RESULT':
-        //     return Object.assign({}, state, {
-        //         computedResult: action.payload.data
-        //     })
+        // Computed Bundles
+        case 'CLEAN_CANDIDATE_BUNDLES':
+            return Object.assign({}, state, {
+                candidateBundles: {}
+            })
 
-        // // Reserved Bundles
-        // case 'ADD_RESERVED_BUNDLE':
-        //     return Object.assign({}, state, {
-        //         reservedPlayerEquip: (() => {
-        //             let reservedPlayerEquip = Helper.deepCopy(state.reservedPlayerEquip)
-
-        //             reservedPlayerEquip.push(action.payload.data)
-
-        //             return reservedPlayerEquip
-        //         })()
-        //     })
-        // case 'UPDATE_RESERVED_BUNDLE_NAME':
-        //     return Object.assign({}, state, {
-        //         reservedPlayerEquip: (() => {
-        //             let reservedPlayerEquip = Helper.deepCopy(state.reservedPlayerEquip)
-
-        //             if (Helper.isEmpty(reservedPlayerEquip[action.payload.index])) {
-        //                 return reservedPlayerEquip
-        //             }
-
-        //             reservedPlayerEquip[action.payload.index].name = action.payload.name
-
-        //             return reservedPlayerEquip
-        //         })()
-        //     })
-        // case 'REMOVE_RESERVED_BUNDLE':
-        //     return Object.assign({}, state, {
-        //         reservedPlayerEquip: (() => {
-        //             let reservedPlayerEquip = Helper.deepCopy(state.reservedPlayerEquip)
-
-        //             if (Helper.isEmpty(reservedPlayerEquip[action.payload.index])) {
-        //                 return reservedPlayerEquip
-        //             }
-
-        //             reservedPlayerEquip = reservedPlayerEquip.filter((euqipBundle, index) => {
-        //                 return index !== action.payload.index
-        //             })
-
-        //             return reservedPlayerEquip
-        //         })()
-        //     })
-
-        // // Custom Weapon
-        // case 'REPLACE_CUSTOM_WEAPON':
-        //     return (() => {
-        //         return Object.assign({}, state, {
-        //             customWeapon: action.payload.data
-        //         })
-        //     })()
-        // case 'SET_CUSTOM_WEAPON_VALUE':
-        //     return (() => {
-        //         let target = action.payload.target
-        //         let value = action.payload.value
-        //         let playerEquips = Helper.deepCopy(state.playerEquips)
-        //         let customWeapon = Helper.deepCopy(state.customWeapon)
-
-        //         customWeapon[target] = value
-
-        //         if ('rare' === target) {
-        //             playerEquips.weapon.enhances = []
-        //         }
-
-        //         if ('type' === target) {
-        //             if (-1 !== ['lightBowgun', 'heavyBowgun', 'bow'].indexOf(value)) {
-        //                 customWeapon.sharpness = null
-        //             } else if (Helper.isEmpty(customWeapon.sharpness)) {
-        //                 customWeapon.sharpness = {
-        //                     value: 350,
-        //                     steps: {
-        //                         red: 0,
-        //                         orange: 0,
-        //                         yellow: 0,
-        //                         green: 0,
-        //                         blue: 0,
-        //                         white: 0,
-        //                         purple: 400
-        //                     }
-        //                 }
-        //             }
-        //         }
-
-        //         return Object.assign({}, state, {
-        //             playerEquips: playerEquips,
-        //             customWeapon: customWeapon
-        //         })
-        //     })()
-        // case 'SET_CUSTOM_WEAPON_ELDERSEAL':
-        //     return (() => {
-        //         let affinity = action.payload.affinity
-        //         let customWeapon = Helper.deepCopy(state.customWeapon)
-
-        //         customWeapon.elderseal = {
-        //             affinity: affinity
-        //         }
-
-        //         return Object.assign({}, state, {
-        //             customWeapon: customWeapon
-        //         })
-        //     })()
-        // case 'SET_CUSTOM_WEAPON_SHARPNESS':
-        //     return (() => {
-        //         let step = action.payload.step
-        //         let customWeapon = Helper.deepCopy(state.customWeapon)
-
-        //         if (Helper.isEmpty(step)) {
-        //             customWeapon.sharpness = null
-        //         } else {
-        //             customWeapon.sharpness = {
-        //                 value: 350,
-        //                 steps: {
-        //                     red: 0,
-        //                     orange: 0,
-        //                     yellow: 0,
-        //                     green: 0,
-        //                     blue: 0,
-        //                     white: 0,
-        //                     purple: 0
-        //                 }
-        //             }
-
-        //             customWeapon.sharpness.steps[step] = 400
-        //         }
-
-        //         return Object.assign({}, state, {
-        //             customWeapon: customWeapon
-        //         })
-        //     })()
-        // case 'SET_CUSTOM_WEAPON_ELEMENT_TYPE':
-        //     return (() => {
-        //         let target = action.payload.target
-        //         let type = action.payload.type
-        //         let customWeapon = Helper.deepCopy(state.customWeapon)
-
-        //         if (Helper.isEmpty(type)) {
-        //             customWeapon.element[target] = null
-
-        //             if ('attack' === target) {
-        //                 customWeapon.elderseal = null
-        //             }
-        //         } else {
-        //             if (Helper.isEmpty(customWeapon.element[target])) {
-        //                 customWeapon.element[target] = {
-        //                     minValue: 100,
-        //                     maxValue: null,
-        //                     isHidden: false
-        //                 }
-        //             }
-
-        //             customWeapon.element[target].type = type
-
-        //             if ('attack' === target && 'dragon' === type) {
-        //                 customWeapon.elderseal = {
-        //                     affinity: 'low'
-        //                 }
-        //             }
-        //         }
-
-        //         return Object.assign({}, state, {
-        //             customWeapon: customWeapon
-        //         })
-        //     })()
-
-        // case 'SET_CUSTOM_WEAPON_ELEMENT_VALUE':
-        //     return (() => {
-        //         let target = action.payload.target
-        //         let value = action.payload.value
-        //         let customWeapon = Helper.deepCopy(state.customWeapon)
-
-        //         customWeapon.element[target].minValue = value
-
-        //         return Object.assign({}, state, {
-        //             customWeapon: customWeapon
-        //         })
-        //     })()
-        // case 'SET_CUSTOM_WEAPON_SLOT':
-        //     return (() => {
-        //         let index = action.payload.index
-        //         let size = action.payload.size
-        //         let playerEquips = Helper.deepCopy(state.playerEquips)
-        //         let customWeapon = Helper.deepCopy(state.customWeapon)
-
-        //         if (Helper.isEmpty(playerEquips.weapon.slotIds)) {
-        //             playerEquips.weapon.slotIds = []
-        //         }
-
-        //         if (Helper.isEmpty(size)) {
-        //             playerEquips.weapon.slotIds = playerEquips.weapon.slotIds.filter((id, slotIndex) => {
-        //                 return index !== slotIndex
-        //             })
-        //             customWeapon.slots = customWeapon.slots.filter((id, slotIndex) => {
-        //                 return index !== slotIndex
-        //             })
-        //         } else {
-        //             playerEquips.weapon.slotIds[index] = undefined
-        //             customWeapon.slots[index] = {
-        //                 size: size
-        //             }
-        //         }
-
-        //         return Object.assign({}, state, {
-        //             playerEquips: playerEquips,
-        //             customWeapon: customWeapon
-        //         })
-        //     })()
-        // case 'SET_CUSTOM_WEAPON_SKILL':
-        //     return (() => {
-        //         let index = action.payload.index
-        //         let id = action.payload.id
-        //         let customWeapon = Helper.deepCopy(state.customWeapon)
-
-        //         if (Helper.isEmpty(id)) {
-        //             customWeapon.skills = customWeapon.skills.filter((id, skillIndex) => {
-        //                 return index !== skillIndex
-        //             })
-        //         } else {
-        //             customWeapon.skills[index] = {
-        //                 id: id,
-        //                 level: 1
-        //             }
-        //         }
-
-        //         return Object.assign({}, state, {
-        //             customWeapon: customWeapon
-        //         })
-        //     })()
-        // case 'SET_CUSTOM_WEAPON_SET':
-        //     return (() => {
-        //         let id = action.payload.id
-        //         let customWeapon = Helper.deepCopy(state.customWeapon)
-
-        //         if (Helper.isEmpty(id)) {
-        //             customWeapon.set = null
-        //         } else {
-        //             customWeapon.set = {
-        //                 id: id
-        //             }
-        //         }
-
-        //         return Object.assign({}, state, {
-        //             customWeapon: customWeapon
-        //         })
-        //     })()
+        case 'REPLACE_CANDIDATE_BUNDLES':
+            return Object.assign({}, state, {
+                candidateBundles: action.payload.candidateBundles
+            })
 
         // Default
         default:

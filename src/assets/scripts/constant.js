@@ -210,7 +210,7 @@ export const defaultBundle = {
     }
 }
 
-export const defaultCandidateEquip = {
+export const defaultCandidateEquipItem = {
     id: null,
     type: null,
     defense: 0,
@@ -226,8 +226,7 @@ export const defaultCandidateEquip = {
     slotCountMapping: {
         1: 0,
         2: 0,
-        3: 0,
-        // 4: 0
+        3: 0
     },
     totalExpectedValue: 0,
     totalExpectedLevel: 0,
@@ -371,7 +370,7 @@ export default {
     weaponMultiple,
     defaultLang,
     defaultAlgorithmParams,
-    defaultCandidateEquip,
+    defaultCandidateEquipItem,
     defaultBundle,
     defaultCustomWeapon,
     defaultCustomCharm,

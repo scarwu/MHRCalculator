@@ -30,16 +30,12 @@ if ('production' === Config.env) {
 }
 
 onmessage = (event) => {
-    const requiredEquips = event.data.requiredEquips
-    const requiredSets = event.data.requiredSets
-    const requiredSkills = event.data.requiredSkills
+    const requiredConditions = event.data.requiredConditions
     const algorithmParams = event.data.algorithmParams
 
     let startTime = new Date().getTime()
     let list = FittingAlgorithm.search(
-        requiredEquips,
-        requiredSets,
-        requiredSkills,
+        requiredConditions,
         algorithmParams,
         (payload) => {
             postMessage({
@@ -61,13 +57,9 @@ onmessage = (event) => {
     postMessage({
         action: 'result',
         payload: {
-            computedResult: {
+            candidateBundles: {
                 list: list,
-                required: {
-                    equips: requiredEquips,
-                    sets: requiredSets,
-                    skills: requiredSkills
-                }
+                requiredConditions: requiredConditions
             }
         }
     })

@@ -75,14 +75,14 @@ export default function CandidateBundlesBlock (props) {
      * Hooks
      */
     const [stateDataStore, updateDataStore] = useState(States.getter.getDataStore())
-    const [stateComputedResult, updateComputedResult] = useState(States.getter.getComputedResult())
+    const [stateCandidateBundles, updateCandidateBundles] = useState(States.getter.getCandidateBundles())
     const [stateTasks, updateTasks] = useState({})
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
             updateDataStore(States.getter.getDataStore())
-            updateComputedResult(States.getter.getComputedResult())
+            updateCandidateBundles(States.getter.getCandidateBundles())
         })
 
         return () => {
@@ -117,7 +117,7 @@ export default function CandidateBundlesBlock (props) {
             case 'result':
                 handleSwitchDataStore(tabIndex)
 
-                States.setter.saveComputedResult(payload.computedResult)
+                States.setter.replaceCandidateBundles(payload.candidateBundles)
 
                 // workers[tabIndex].terminate()
                 // workers[tabIndex] = undefined
@@ -171,13 +171,14 @@ export default function CandidateBundlesBlock (props) {
         }
 
         // Get All Data From Store
-        let customWeapon = States.getter.getCustomWeapon()
-        let requiredEquips = States.getter.getRequiredEquips()
-        let requiredSets = States.getter.getRequiredSets()
-        let requiredSkills = States.getter.getRequiredSkills()
+        let requiredConditions = States.getter.getRequiredConditions()
         let algorithmParams = States.getter.getAlgorithmParams()
 
-        if (0 === requiredSets.length && 0 === requiredSkills.length) {
+        if (Helper.isEmpty(requiredConditions.sets) && Helper.isEmpty(requiredConditions.skills)) {
+            return
+        }
+
+        if (0 === requiredConditions.sets.length && 0 === requiredConditions.skills.length) {
             return
         }
 
@@ -185,11 +186,7 @@ export default function CandidateBundlesBlock (props) {
             bundleCount: 0,
             searchPercent: 0,
             timeRemaining: 0,
-            required: {
-                equips: requiredEquips,
-                sets: requiredSets,
-                skills: requiredSkills
-            }
+            requiredConditions: requiredConditions
         }
 
         updateTasks(Helper.deepCopy(stateTasks))
@@ -206,10 +203,7 @@ export default function CandidateBundlesBlock (props) {
         }
 
         workers[tabIndex].postMessage({
-            customWeapon: customWeapon,
-            requiredSets: requiredSets,
-            requiredSkills: requiredSkills,
-            requiredEquips: requiredEquips,
+            requiredConditions: requiredConditions,
             algorithmParams: algorithmParams
         })
     }, [stateTasks, stateDataStore])
@@ -258,7 +252,7 @@ export default function CandidateBundlesBlock (props) {
                 <div className="mhrc-icons_bundle-right">
                     <IconButton
                         iconName="refresh" altName={_('reset')}
-                        onClick={States.setter.cleanComputedResult} />
+                        onClick={States.setter.cleanCandidateBundles} />
                     <IconButton
                         iconName="cog" altName={_('setting')}
                         onClick={handleShowAllAlgorithmSetting} />
@@ -301,14 +295,14 @@ export default function CandidateBundlesBlock (props) {
                                 </div>
                             </div>
                         </div>
-                        <RequiredConditions data={stateTasks[tabIndex].required} />
+                        <RequiredConditions data={stateTasks[tabIndex].requiredConditions} />
                     </Fragment>
                 ) : (
-                    Helper.isEmpty(stateComputedResult) ? (
+                    Helper.isEmpty(stateCandidateBundles.requiredConditions) ? (
                         <QuickSetting />
                     ) : (
                         <Fragment>
-                            <RequiredConditions data={stateComputedResult.required} />
+                            <RequiredConditions data={stateCandidateBundles.requiredConditions} />
                             <BundleList />
                         </Fragment>
                     )

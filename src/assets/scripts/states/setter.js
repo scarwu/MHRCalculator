@@ -236,6 +236,22 @@ export const setAlgorithmParamsUsingFactor = (flag, value) => {
     })
 }
 
+// Candidate Bundles
+export const cleanCandidateBundles = () => {
+    store.dispatch({
+        type: 'CLEAN_CANDIDATE_BUNDLES'
+    })
+}
+
+export const replaceCandidateBundles = (candidateBundles) => {
+    store.dispatch({
+        type: 'REPLACE_CANDIDATE_BUNDLES',
+        payload: {
+            candidateBundles: candidateBundles
+        }
+    })
+}
+
 export default {
     showModal,
     hideModal,
@@ -243,6 +259,7 @@ export default {
     switchDataStore,
 
     cleanPlayerEquips,
+    replacePlayerEquips,
     setPlayerEquip,
     setPlayerEquipJewel,
     setPlayerEquipEnhance,
@@ -250,12 +267,10 @@ export default {
     cleanRequiredConditions,
     setRequiredConditionsEquip,
     setRequiredConditionsEquipJewel,
-
     addRequiredConditionsSet,
     removeRequiredConditionsSet,
     increaseRequiredConditionsSetCount,
     decreaseRequiredConditionsSetCount,
-
     addRequiredConditionsSkill,
     removeRequiredConditionsSkill,
     increaseRequiredConditionsSkillLevel,
@@ -267,48 +282,6 @@ export default {
     toggleAlgorithmParamsFlag,
     setAlgorithmParamsUsingFactor,
 
-    // Computed Result
-    // saveComputedResult: (data) => {
-    //     store.dispatch({
-    //         type: 'UPDATE_COMPUTED_RESULT',
-    //         payload: {
-    //             data: data
-    //         }
-    //     })
-    // },
-    // cleanComputedResult: () => {
-    //     store.dispatch({
-    //         type: 'UPDATE_COMPUTED_RESULT',
-    //         payload: {
-    //             data: null
-    //         }
-    //     })
-    // },
-
-    // Reserved Bundles
-    // addReservedBundle: (data) => {
-    //     store.dispatch({
-    //         type: 'ADD_RESERVED_BUNDLE',
-    //         payload: {
-    //             data: data
-    //         }
-    //     })
-    // },
-    // updateReservedBundleName: (index, name) => {
-    //     store.dispatch({
-    //         type: 'UPDATE_RESERVED_BUNDLE_NAME',
-    //         payload: {
-    //             index: index,
-    //             name: name
-    //         }
-    //     })
-    // },
-    // removeReservedBundle: (index) => {
-    //     store.dispatch({
-    //         type: 'REMOVE_RESERVED_BUNDLE',
-    //         payload: {
-    //             index: index
-    //         }
-    //     })
-    // }
+    cleanCandidateBundles,
+    replaceCandidateBundles
 }

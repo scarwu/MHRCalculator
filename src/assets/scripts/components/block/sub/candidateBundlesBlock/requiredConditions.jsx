@@ -27,7 +27,7 @@ import IconButton from 'components/common/iconButton'
 import States from 'states'
 
 export default function RequiredConditions (props) {
-    const {propData} = props
+    const {data} = props
 
     /**
      * Hooks
@@ -48,7 +48,7 @@ export default function RequiredConditions (props) {
     return useMemo(() => {
         Helper.debug('Component: CandidateBundles -> RequiredConditions')
 
-        if (Helper.isEmpty(propData)) {
+        if (Helper.isEmpty(data)) {
             return false
         }
 
@@ -60,25 +60,25 @@ export default function RequiredConditions (props) {
 
             return stateRequiredConditions.equips[equipType].id
         })
-        const requiredSetIds = stateRequiredConditions.sets.map((set) => {
-            return set.id
+        const requiredSetIds = stateRequiredConditions.sets.map((setData) => {
+            return setData.id
         })
-        const requiredSkillIds = stateRequiredConsitions.skills.map((skill) => {
-            return skill.id
+        const requiredSkillIds = stateRequiredConditions.skills.map((skillData) => {
+            return skillData.id
         })
 
         // Current Required
-        const currentRequiredConditionsEquips = Object.keys(propData.equips).filter((equipType) => {
-            return Helper.isNotEmpty(propData.equips[equipType])
+        const currentRequiredConditionsEquips = Object.keys(data.equips).filter((equipType) => {
+            return Helper.isNotEmpty(data.equips[equipType]) && Helper.isNotEmpty(data.equips[equipType].id)
         }).map((equipType) => {
-            return Object.assign({}, propData.equips[equipType], {
+            return Object.assign({}, data.equips[equipType], {
                 type: equipType
             })
         })
-        const currentRequiredConditionsSets = propData.sets.sort((setDataA, setDataB) => {
+        const currentRequiredConditionsSets = data.sets.sort((setDataA, setDataB) => {
             return setDataB.step - setDataA.step
         })
-        const currentRequiredConsitionsSkills = propData.skills.sort((skillDataA, skillDataB) => {
+        const currentRequiredConsitionsSkills = data.skills.sort((skillDataA, skillDataB) => {
             return skillDataB.level - skillDataA.level
         })
 
@@ -101,7 +101,7 @@ export default function RequiredConditions (props) {
                                 // Can Add to Required Contditions
                                 let isNotRequire = true
 
-                                if (('weapon' === equipType || 'charm' === equipType)
+                                if (('weapon' === currentEquipData.type || 'charm' === currentEquipData.type)
                                     && 'custom' === currentEquipData.id
                                     && 'custom' === requiredEquipData.id
                                 ) {
@@ -194,7 +194,7 @@ export default function RequiredConditions (props) {
             </div>
         )
     }, [
-        propData,
+        data,
         stateRequiredConditions
     ])
 }

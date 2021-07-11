@@ -60,19 +60,19 @@ export const getRequiredConditions = (target = null) => {
     return store.getState().requiredConditions[target]
 }
 
+export const getAlgorithmParams = () => {
+    return store.getState().algorithmParams
+}
+
+export const getCandidateBundles = () => {
+    return store.getState().candidateBundles
+}
+
 export default {
     getModalData,
     getDataStore,
     getPlayerEquips,
     getRequiredConditions,
-
-    getAlgorithmParams: () => {
-        return store.getState().algorithmParams
-    },
-    getComputedResult: () => {
-        return store.getState().computedResult
-    },
-    getReservedBundles: () => {
-        return store.getState().reservedBundles
-    }
+    getAlgorithmParams,
+    getCandidateBundles
 }

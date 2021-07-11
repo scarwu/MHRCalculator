@@ -42,8 +42,8 @@ class EnhanceDataset {
     constructor (list) {
         this.mapping = {}
 
-        list.forEach((data) => {
-            this.mapping[data.id] = data
+        list.forEach((item) => {
+            this.mapping[item.id] = item
         })
     }
 
@@ -62,9 +62,9 @@ class EnhanceDataset {
             ? Helper.deepCopy(this.mapping[id]) : null
     }
 
-    setItem = (id, info) => {
-        if (Helper.isNotEmpty(info)) {
-            this.mapping[id] = info
+    setItem = (id, item) => {
+        if (Helper.isNotEmpty(item)) {
+            this.mapping[id] = item
         } else {
             delete this.mapping[id]
         }

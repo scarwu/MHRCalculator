@@ -67,12 +67,6 @@ const jewelSizeList = [ 1, 2, 3 ]
 /**
  * Handler Functions
  */
-const handleModeChange = (event) => {
-    States.setter.showAlgorithmSetting({
-        mode: event.target.value
-    })
-}
-
 const handleLimitChange = (event) => {
     if ('' === event.target.value) {
         return
@@ -95,10 +89,6 @@ const handleOrderChange = (event) => {
     States.setter.setAlgorithmParamsOrder(event.target.value)
 }
 
-const handleStrategyChange = (event) => {
-    States.setter.setAlgorithmParamsStrategy(event.target.value)
-}
-
 export default function AlgorithmSettingModal (props) {
 
     /**
@@ -106,20 +96,25 @@ export default function AlgorithmSettingModal (props) {
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('algorithmSetting'))
     const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
-    const [stateMode, updateMode] = useState(null)
-    const [stateSegment, updateSegment] = useState(null)
+
+    const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
+            updateTempData(null)
+
             return
         }
 
-        if (Helper.isEmpty(stateModalData.mode)) {
-            return
+        let tempData = Helper.deepCopy(stateModalData)
+
+        // Set Mode
+        if (Helper.isEmpty(tempData.mode)) {
+            tempData.mode = 'all'
         }
 
-        updateMode(stateModalData.mode)
+        updateTempData(tempData)
     }, [stateModalData])
 
     // Like Did Mount & Will Unmount Cycle
@@ -137,7 +132,7 @@ export default function AlgorithmSettingModal (props) {
     /**
      * Handle Functions
      */
-    const handleFastClose = useCallback((event) => {
+    const handleFastCloseModal = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
@@ -148,17 +143,25 @@ export default function AlgorithmSettingModal (props) {
     const handleSegmentInput = useCallback((event) => {
         let segment = event.target.value
 
-        segment = (0 !== segment.length)
-            ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
+        updateTempData(Object.assign({}, stateTempData, {
+            segment: (0 !== segment.length)
+                ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
+        }))
+    }, [stateTempData])
 
-        updateSegment(segment)
-    }, [])
+    const handleModeChange = useCallback((event) => {
+        let mode = event.target.value
+
+        updateTempData(Object.assign({}, stateTempData, {
+            mode: mode
+        }))
+    }, [stateTempData])
 
     /**
      * Render Functions
      */
-    return Helper.isNotEmpty(stateModalData) ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
+    return Helper.isNotEmpty(stateTempData) ? (
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
                     <strong>{_('algorithmSetting')}</strong>
@@ -166,21 +169,25 @@ export default function AlgorithmSettingModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateSegment} onChange={handleSegmentInput} />
+                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
                         <IconSelector
-                            iconName="globe" defaultValue={stateModalData.mode}
+                            iconName="globe" defaultValue={stateTempData.mode}
                             options={getModeList()} onChange={handleModeChange} />
                         <IconButton
                             iconName="times" altName={_('close')}
-                            onClick={States.setter.hideAlgorithmSetting} />
+                            onClick={
+                                States.setter.hideModal('algorithmSetting')
+                            } />
                     </div>
                 </div>
+
                 <div className="mhrc-list">
                     <div className="mhrc-wrapper">
                         <div className="mhrc-item mhrc-item-2-step">
                             <div className="col-12 mhrc-name">
                                 <span>{_('strategy')}</span>
                             </div>
+
                             <div className="col-12 mhrc-content">
                                 <div className="col-6 mhrc-name">
                                     <span>{_('resultLimit')}</span>
@@ -191,6 +198,7 @@ export default function AlgorithmSettingModal (props) {
                                         defaultValue={stateAlgorithmParams.limit}
                                         onChange={handleLimitChange} />
                                 </div>
+
                                 <div className="col-6 mhrc-name">
                                     <span>{_('sortBy')}</span>
                                 </div>
@@ -200,6 +208,7 @@ export default function AlgorithmSettingModal (props) {
                                         defaultValue={stateAlgorithmParams.sort}
                                         options={getSortList()} onChange={handleSortChange} />
                                 </div>
+
                                 <div className="col-6 mhrc-name">
                                     <span>{_('sortOrder')}</span>
                                 </div>
@@ -212,7 +221,7 @@ export default function AlgorithmSettingModal (props) {
                             </div>
                         </div>
 
-                        {'all' === stateModalData.mode || 'armorFactor' === stateModalData.mode || 'byRequiredConditions' === stateModalData.mode ? (
+                        {'all' === stateTempData.mode || 'armorFactor' === stateTempData.mode || 'byRequiredConditions' === stateTempData.mode ? (
                             <div className="mhrc-item mhrc-item-2-step">
                                 <div className="col-12 mhrc-name">
                                     <span>{_('armorFactor')}</span>
@@ -242,7 +251,7 @@ export default function AlgorithmSettingModal (props) {
                             </div>
                         ) : false}
 
-                        {'all' === stateModalData.mode || 'jewelFactor' === stateModalData.mode || 'byRequiredConditions' === stateModalData.mode ? (
+                        {'all' === stateTempData.mode || 'jewelFactor' === stateTempData.mode || 'byRequiredConditions' === stateTempData.mode ? (
                             <div className="mhrc-item mhrc-item-2-step">
                                 <div className="col-12 mhrc-name">
                                     <span>{_('jewelFactor')}</span>
@@ -272,13 +281,13 @@ export default function AlgorithmSettingModal (props) {
                             </div>
                         ) : false}
 
-                        {'all' === stateModalData.mode || 'armorFactor' === stateModalData.mode || 'byRequiredConditions' === stateModalData.mode
-                            ? <ArmorFactors segment={stateSegment}
-                                byRequiredConditions={'byRequiredConditions' === stateModalData.mode} />
+                        {'all' === stateTempData.mode || 'armorFactor' === stateTempData.mode || 'byRequiredConditions' === stateTempData.mode
+                            ? <ArmorFactors segment={stateTempData.segment}
+                                byRequiredConditions={'byRequiredConditions' === stateTempData.mode} />
                             : false}
-                        {'all' === stateModalData.mode || 'jewelFactor' === stateModalData.mode || 'byRequiredConditions' === stateModalData.mode
-                            ? <JewelFactors segment={stateSegment}
-                                byRequiredConditions={'byRequiredConditions' === stateModalData.mode} />
+                        {'all' === stateTempData.mode || 'jewelFactor' === stateTempData.mode || 'byRequiredConditions' === stateTempData.mode
+                            ? <JewelFactors segment={stateTempData.segment}
+                                byRequiredConditions={'byRequiredConditions' === stateTempData.mode} />
                             : false}
                     </div>
                 </div>

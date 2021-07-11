@@ -188,6 +188,55 @@ export const decreaseRequiredConditionsSkillLevel = (skillId) => {
     })
 }
 
+
+// Algorithm Params
+export const setAlgorithmParamsLimit = (limit) => {
+    store.dispatch({
+        type: 'SET_ALGORITHM_PARAMS_LIMIT',
+        payload: {
+            limit: limit
+        }
+    })
+}
+
+export const setAlgorithmParamsSort = (sort) => {
+    store.dispatch({
+        type: 'SET_ALGORITHM_PARAMS_SORT',
+        payload: {
+            sort: sort
+        }
+    })
+}
+
+export const setAlgorithmParamsOrder = (order) => {
+    store.dispatch({
+        type: 'SET_ALGORITHM_PARAMS_ORDER',
+        payload: {
+            order: order
+        }
+    })
+}
+
+export const toggleAlgorithmParamsFlag = (target) => {
+    store.dispatch({
+        type: 'TOGGLE_ALGORITHM_PARAMS_FLAG',
+        payload: {
+            target: target
+        }
+    })
+}
+
+export const setAlgorithmParamsUsingFactor = (target, flag, value) => {
+    store.dispatch({
+        type: 'SET_ALGORITHM_PARAMS_USING_FACTOR',
+        payload: {
+            target: target,
+            flag: flag,
+            value: value
+        }
+    })
+}
+
 export default {
     showModal,
     hideModal,
@@ -213,92 +262,54 @@ export default {
     increaseRequiredConditionsSkillLevel,
     decreaseRequiredConditionsSkillLevel,
 
-    // Algorithm Params
-    setAlgorithmParamsLimit: (limit) => {
-        store.dispatch({
-            type: 'SET_ALGORITHM_PARAMS_LIMIT',
-            payload: {
-                limit: limit
-            }
-        })
-    },
-    setAlgorithmParamsSort: (sort) => {
-        store.dispatch({
-            type: 'SET_ALGORITHM_PARAMS_SORT',
-            payload: {
-                sort: sort
-            }
-        })
-    },
-    setAlgorithmParamsOrder: (order) => {
-        store.dispatch({
-            type: 'SET_ALGORITHM_PARAMS_ORDER',
-            payload: {
-                order: order
-            }
-        })
-    },
-    toggleAlgorithmParamsFlag: (target) => {
-        store.dispatch({
-            type: 'TOGGLE_ALGORITHM_PARAMS_FLAG',
-            payload: {
-                target: target
-            }
-        })
-    },
-    setAlgorithmParamsUsingFactor: (target, flag, value) => {
-        store.dispatch({
-            type: 'SET_ALGORITHM_PARAMS_USING_FACTOR',
-            payload: {
-                target: target,
-                flag: flag,
-                value: value
-            }
-        })
-    },
+    setAlgorithmParamsLimit,
+    setAlgorithmParamsSort,
+    setAlgorithmParamsOrder,
+    toggleAlgorithmParamsFlag,
+    setAlgorithmParamsUsingFactor,
 
     // Computed Result
-    saveComputedResult: (data) => {
-        store.dispatch({
-            type: 'UPDATE_COMPUTED_RESULT',
-            payload: {
-                data: data
-            }
-        })
-    },
-    cleanComputedResult: () => {
-        store.dispatch({
-            type: 'UPDATE_COMPUTED_RESULT',
-            payload: {
-                data: null
-            }
-        })
-    },
+    // saveComputedResult: (data) => {
+    //     store.dispatch({
+    //         type: 'UPDATE_COMPUTED_RESULT',
+    //         payload: {
+    //             data: data
+    //         }
+    //     })
+    // },
+    // cleanComputedResult: () => {
+    //     store.dispatch({
+    //         type: 'UPDATE_COMPUTED_RESULT',
+    //         payload: {
+    //             data: null
+    //         }
+    //     })
+    // },
 
     // Reserved Bundles
-    addReservedBundle: (data) => {
-        store.dispatch({
-            type: 'ADD_RESERVED_BUNDLE',
-            payload: {
-                data: data
-            }
-        })
-    },
-    updateReservedBundleName: (index, name) => {
-        store.dispatch({
-            type: 'UPDATE_RESERVED_BUNDLE_NAME',
-            payload: {
-                index: index,
-                name: name
-            }
-        })
-    },
-    removeReservedBundle: (index) => {
-        store.dispatch({
-            type: 'REMOVE_RESERVED_BUNDLE',
-            payload: {
-                index: index
-            }
-        })
-    }
+    // addReservedBundle: (data) => {
+    //     store.dispatch({
+    //         type: 'ADD_RESERVED_BUNDLE',
+    //         payload: {
+    //             data: data
+    //         }
+    //     })
+    // },
+    // updateReservedBundleName: (index, name) => {
+    //     store.dispatch({
+    //         type: 'UPDATE_RESERVED_BUNDLE_NAME',
+    //         payload: {
+    //             index: index,
+    //             name: name
+    //         }
+    //     })
+    // },
+    // removeReservedBundle: (index) => {
+    //     store.dispatch({
+    //         type: 'REMOVE_RESERVED_BUNDLE',
+    //         payload: {
+    //             index: index
+    //         }
+    //     })
+    // }
 }

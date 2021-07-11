@@ -490,69 +490,73 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
-        // // Algorithm Params
-        // case 'SET_ALGORITHM_PARAMS_LIMIT':
-        //     return (() => {
-        //         let algorithmParams = Helper.deepCopy(state.algorithmParams)
+        // Algorithm Params
+        case 'SET_ALGORITHM_PARAMS_LIMIT':
+            return (() => {
+                let algorithmParams = Helper.deepCopy(state.algorithmParams)
 
-        //         algorithmParams.limit = action.payload.limit
+                algorithmParams.limit = action.payload.limit
 
-        //         return Object.assign({}, state, {
-        //             algorithmParams: algorithmParams
-        //         })
-        //     })()
-        // case 'SET_ALGORITHM_PARAMS_SORT':
-        //     return (() => {
-        //         let algorithmParams = Helper.deepCopy(state.algorithmParams)
+                return Object.assign({}, state, {
+                    algorithmParams: algorithmParams
+                })
+            })()
 
-        //         algorithmParams.sort = action.payload.sort
+        case 'SET_ALGORITHM_PARAMS_SORT':
+            return (() => {
+                let algorithmParams = Helper.deepCopy(state.algorithmParams)
 
-        //         return Object.assign({}, state, {
-        //             algorithmParams: algorithmParams
-        //         })
-        //     })()
-        // case 'SET_ALGORITHM_PARAMS_ORDER':
-        //     return (() => {
-        //         let algorithmParams = Helper.deepCopy(state.algorithmParams)
+                algorithmParams.sort = action.payload.sort
 
-        //         algorithmParams.order = action.payload.order
+                return Object.assign({}, state, {
+                    algorithmParams: algorithmParams
+                })
+            })()
 
-        //         return Object.assign({}, state, {
-        //             algorithmParams: algorithmParams
-        //         })
-        //     })()
-        // case 'TOGGLE_ALGORITHM_PARAMS_FLAG':
-        //     return (() => {
-        //         let target = action.payload.target
-        //         let algorithmParams = Helper.deepCopy(state.algorithmParams)
+        case 'SET_ALGORITHM_PARAMS_ORDER':
+            return (() => {
+                let algorithmParams = Helper.deepCopy(state.algorithmParams)
 
-        //         if (Helper.isEmpty(algorithmParams.flag[target])) {
-        //             algorithmParams.flag[target] = false
-        //         }
+                algorithmParams.order = action.payload.order
 
-        //         algorithmParams.flag[target] = !algorithmParams.flag[target]
+                return Object.assign({}, state, {
+                    algorithmParams: algorithmParams
+                })
+            })()
 
-        //         return Object.assign({}, state, {
-        //             algorithmParams: algorithmParams
-        //         })
-        //     })()
-        // case 'SET_ALGORITHM_PARAMS_USING_FACTOR':
-        //     return (() => {
-        //         let target = action.payload.target
-        //         let flag = action.payload.flag
-        //         let value = action.payload.value
-        //         let algorithmParams = Helper.deepCopy(state.algorithmParams)
+        case 'TOGGLE_ALGORITHM_PARAMS_FLAG':
+            return (() => {
+                let algorithmParams = Helper.deepCopy(state.algorithmParams)
+                let target = action.payload.target
 
-        //         if (Helper.isEmpty(algorithmParams.usingFactor[target])) {
-        //             return algorithmParams.usingFactor[target] = {}
-        //         }
+                if (Helper.isEmpty(algorithmParams.flag[target])) {
+                    algorithmParams.flag[target] = false
+                }
 
-        //         algorithmParams.usingFactor[target][flag] = value
+                algorithmParams.flag[target] = !algorithmParams.flag[target]
 
-        //         return Object.assign({}, state, {
-        //             algorithmParams: algorithmParams
-        //         })
-        //     })()
+                return Object.assign({}, state, {
+                    algorithmParams: algorithmParams
+                })
+            })()
+
+        case 'SET_ALGORITHM_PARAMS_USING_FACTOR':
+            return (() => {
+                let algorithmParams = Helper.deepCopy(state.algorithmParams)
+                let target = action.payload.target
+                let flag = action.payload.flag
+                let value = action.payload.value
+
+                if (Helper.isEmpty(algorithmParams.usingFactor[target])) {
+                    return algorithmParams.usingFactor[target] = {}
+                }
+
+                algorithmParams.usingFactor[target][flag] = value
+
+                return Object.assign({}, state, {
+                    algorithmParams: algorithmParams
+                })
+            })()
 
         // // Computed Bundles
         // case 'UPDATE_COMPUTED_RESULT':

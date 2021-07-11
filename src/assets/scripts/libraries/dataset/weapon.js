@@ -139,8 +139,8 @@ class WeaponDataset {
     constructor (list) {
         this.mapping = {}
 
-        list.forEach((data) => {
-            this.mapping[data.id] = data
+        list.forEach((item) => {
+            this.mapping[item.id] = item
         })
 
         // Filter Conditional
@@ -151,7 +151,7 @@ class WeaponDataset {
         this.filterType = null
         this.filterTypes = null
         this.filterRare = null
-        // this.filterSkillName = null
+        // this.filterSkillId = null
     }
 
     getIds = () => {
@@ -159,12 +159,12 @@ class WeaponDataset {
     }
 
     getList = () => {
-        let result = Object.values(this.mapping).filter((data) => {
+        let result = Object.values(this.mapping).filter((item) => {
             let isSkip = true
 
             // Type Is
             if (Helper.isNotEmpty(this.filterType)) {
-                if (this.filterType !== data.type) {
+                if (this.filterType !== item.type) {
                     return false
                 }
             }
@@ -173,7 +173,7 @@ class WeaponDataset {
             if (Helper.isNotEmpty(this.filterTypes)) {
                 isSkip = false
 
-                if (-1 === this.filterTypes.indexOf(data.type)) {
+                if (-1 === this.filterTypes.indexOf(item.type)) {
                     isSkip = true
                 }
 
@@ -184,25 +184,27 @@ class WeaponDataset {
 
             // Rare Is
             if (Helper.isNotEmpty(this.filterRare)) {
-                if (this.filterRare !== data.rare) {
+                if (this.filterRare !== item.rare) {
                     return false
                 }
             }
 
             // Has Skill
-            // if (Helper.isNotEmpty(this.filterSkillName)) {
-            //     for (let index in data.skills) {
-            //         if (this.filterSkillName !== data.skills[index].id) {
-            //             continue
-            //         }
+            if (Helper.isNotEmpty(this.filterSkillId)) {
+                if (Helper.isNotEmpty(item.skills)) {
+                    for (let index in item.skills) {
+                        if (this.filterSkillId !== item.skills[index].id) {
+                            continue
+                        }
 
-            //         isSkip = false
-            //     }
+                        isSkip = false
+                    }
 
-            //     if (isSkip) {
-            //         return false
-            //     }
-            // }
+                    if (isSkip) {
+                        return false
+                    }
+                }
+            }
 
             return true
         })
@@ -217,9 +219,9 @@ class WeaponDataset {
             ? Helper.deepCopy(this.mapping[id]) : null
     }
 
-    setItem = (id, info) => {
-        if (Helper.isNotEmpty(info)) {
-            this.mapping[id] = info
+    setItem = (id, item) => {
+        if (Helper.isNotEmpty(item)) {
+            this.mapping[id] = item
         } else {
             delete this.mapping[id]
         }
@@ -238,14 +240,14 @@ class WeaponDataset {
         return this
     }
 
-    rareIs = (number) => {
-        this.filterRare = number
+    rareIs = (rare) => {
+        this.filterRare = rare
 
         return this
     }
 
-    // hasSkill = (name) => {
-    //     this.filterSkillName = name
+    // hasSkill = (skillId) => {
+    //     this.filterSkillId = skillId
 
     //     return this
     // }

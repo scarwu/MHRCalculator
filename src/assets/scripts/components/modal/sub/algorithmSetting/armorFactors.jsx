@@ -59,13 +59,13 @@ export default function ArmorFactors (props) {
             return Helper.isEmpty(stateRequiredConditions.equips[equipType])
         })
 
-        if (true === byRequiredConditions) {
-            const setIds = stateRequiredConditions.sets.map((set) => {
-                return set.id
-            })
+        // if (true === byRequiredConditions) {
+        //     const setIds = stateRequiredConditions.sets.map((set) => {
+        //         return set.id
+        //     })
 
-            dataset = dataset.typesIs(equipTypes).setsIs(setIds)
-        }
+        //     dataset = dataset.typesIs(equipTypes).setsIs(setIds)
+        // }
 
         dataset.getList().filter((armorItem) => {
             let text = _(armorItem.series)

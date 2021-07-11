@@ -58,7 +58,11 @@ export default function QuickSetting (props) {
                 return false
             }
 
-            return Helper.isEmpty(stateRequiredConditions.equips[equipType])
+            if (Helper.isEmpty(stateRequiredConditions.equips[equipType])) {
+                return true
+            }
+
+            return Helper.isEmpty(stateRequiredConditions.equips[equipType].id)
         })
         const setIds = stateRequiredConditions.sets.map((setData) => {
             return setData.id
@@ -68,6 +72,11 @@ export default function QuickSetting (props) {
 
             return skillData.id
         })
+
+        console.log(stateRequiredConditions.equips)
+        console.log(equipTypes)
+        console.log(setIds)
+        console.log(skillIds)
 
         ArmorDataset.typesIs(equipTypes).getList().forEach((armorItem) => {
             if (false === stateAlgorithmParams.usingFactor.armor['rare' + armorItem.rare]) {

@@ -46,8 +46,8 @@ class JewelDataset {
     constructor (list) {
         this.mapping = {}
 
-        list.forEach((data) => {
-            this.mapping[data.id] = data
+        list.forEach((item) => {
+            this.mapping[item.id] = item
         })
 
         // Filter Conditional
@@ -56,10 +56,10 @@ class JewelDataset {
 
     resetFilter = () => {
         this.filterRare = null
-        this.filterSkillName = null
+        this.filterSkillId = null
         this.filterSize = null
         this.filterSizeCondition = null
-        this.filterSkillNames = null
+        this.filterSkillIds = null
         this.filterSkillIsConsistent = null
     }
 
@@ -68,12 +68,12 @@ class JewelDataset {
     }
 
     getList = () => {
-        let result = Object.values(this.mapping).filter((data) => {
+        let result = Object.values(this.mapping).filter((item) => {
             let isSkip = true
 
             // Rare Is
             if (Helper.isNotEmpty(this.filterRare)) {
-                if (this.filterRare !== data.rare) {
+                if (this.filterRare !== item.rare) {
                     return false
                 }
             }
@@ -82,13 +82,13 @@ class JewelDataset {
             if (Helper.isNotEmpty(this.filterSize)) {
                 switch (this.filterSizeCondition) {
                 case 'equal':
-                    if (this.filterSize !== data.size) {
+                    if (this.filterSize !== item.size) {
                         return false
                     }
 
                     break
                 case 'greaterEqual':
-                    if (this.filterSize > data.size) {
+                    if (this.filterSize > item.size) {
                         return false
                     }
 
@@ -97,38 +97,44 @@ class JewelDataset {
             }
 
             // Has Skill
-            if (Helper.isNotEmpty(this.filterSkillName)) {
-                for (let index in data.skills) {
-                    if (this.filterSkillName !== data.skills[index].id) {
-                        continue
+            if (Helper.isNotEmpty(this.filterSkillId)) {
+                if (Helper.isNotEmpty(item.skills)) {
+                    for (let index in item.skills) {
+                        if (this.filterSkillId !== item.skills[index].id) {
+                            continue
+                        }
+
+                        isSkip = false
                     }
 
-                    isSkip = false
-                }
-
-                if (isSkip) {
-                    return false
+                    if (isSkip) {
+                        return false
+                    }
                 }
             }
 
             // Has Skills
-            if (Helper.isNotEmpty(this.filterSkillNames)) {
+            if (Helper.isNotEmpty(this.filterSkillIds)) {
                 if (this.filterSkillIsConsistent) {
                     isSkip = false
 
-                    data.skills.forEach((skillData) => {
-                        if (-1 === this.filterSkillNames.indexOf(skillData.id)) {
-                            isSkip = true
-                        }
-                    })
+                    if (Helper.isNotEmpty(item.skills)) {
+                        item.skills.forEach((skillData) => {
+                            if (-1 === this.filterSkillIds.indexOf(skillData.id)) {
+                                isSkip = true
+                            }
+                        })
+                    }
                 } else {
                     isSkip = true
 
-                    data.skills.forEach((skillData) => {
-                        if (-1 !== this.filterSkillNames.indexOf(skillData.id)) {
-                            isSkip = false
-                        }
-                    })
+                    if (Helper.isNotEmpty(item.skills)) {
+                        item.skills.forEach((skillData) => {
+                            if (-1 !== this.filterSkillIds.indexOf(skillData.id)) {
+                                isSkip = false
+                            }
+                        })
+                    }
                 }
 
                 if (isSkip) {
@@ -149,36 +155,36 @@ class JewelDataset {
             ? Helper.deepCopy(this.mapping[id]) : null
     }
 
-    setItem = (id, info) => {
-        if (Helper.isNotEmpty(info)) {
-            this.mapping[id] = info
+    setItem = (id, item) => {
+        if (Helper.isNotEmpty(item)) {
+            this.mapping[id] = item
         } else {
             delete this.mapping[id]
         }
     }
 
     // Conditional Functions
-    rareIs = (number) => {
-        this.filterRare = number
+    rareIs = (rare) => {
+        this.filterRare = rare
 
         return this
     }
 
-    sizeIs = (value, condition = 'equal') => {
-        this.filterSize = value
+    sizeIs = (size, condition = 'equal') => {
+        this.filterSize = size
         this.filterSizeCondition = condition
 
         return this
     }
 
-    hasSkill = (name) => {
-        this.filterSkillName = name
+    hasSkill = (skillId) => {
+        this.filterSkillId = skillId
 
         return this
     }
 
-    hasSkills = (names, isConsistent = false) => {
-        this.filterSkillNames = names
+    hasSkills = (skillIds, isConsistent = false) => {
+        this.filterSkillIds = skillIds
         this.filterSkillIsConsistent = isConsistent
 
         return this

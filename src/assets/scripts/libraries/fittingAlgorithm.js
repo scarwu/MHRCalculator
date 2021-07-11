@@ -17,11 +17,9 @@ import Helper from 'core/helper'
 
 // Load Libraries
 import Misc from 'libraries/misc'
-import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
 import SetDataset from 'libraries/dataset/set'
 import JewelDataset from 'libraries/dataset/jewel'
-// import CharmDataset from 'libraries/dataset/charm'
 
 class FittingAlgorithm {
 
@@ -50,9 +48,9 @@ class FittingAlgorithm {
         this.currentSetMapping = {}
         this.currentSkillMapping = {}
         this.currentSlotMapping = {
-            1: null,
-            2: null,
-            3: null
+            1: { expectedValue: 0, expectedLevel: 0 },
+            2: { expectedValue: 0, expectedLevel: 0 },
+            3: { expectedValue: 0, expectedLevel: 0 }
         }
         this.totalExpectedValue = 0
         this.totalExpectedLevel = 0
@@ -238,13 +236,6 @@ class FittingAlgorithm {
                 }
             })
 
-            if (Helper.isEmpty(this.currentSlotMapping[jewelItem.size])) {
-                this.currentSlotMapping[jewelItem.size] = {
-                    expectedValue: 0,
-                    expectedLevel: 0
-                }
-            }
-
             if (this.currentSlotMapping[jewelItem.size].expectedValue < expectedValue) {
                 this.currentSlotMapping[jewelItem.size].expectedValue = expectedValue
             }
@@ -274,6 +265,8 @@ class FittingAlgorithm {
         })
 
         Object.keys(this.currentSlotMapping).forEach((size) => {
+            size = parseInt(size, 10)
+
             if (1 === size) {
                 return
             }
@@ -328,8 +321,8 @@ class FittingAlgorithm {
                 continue
             }
 
-            if (Helper.isEmpty(requiredEquips[equipType])) {
-                if ('weapon' !== equipType) {
+            if (Helper.isEmpty(requiredEquips[equipType]) || Helper.isEmpty(requiredEquips[equipType].id)) {
+                if ('weapon' !== equipType && 'charm' !== equipType) {
                     this.currentEquipTypes.push(equipType)
                 }
 
@@ -407,16 +400,8 @@ class FittingAlgorithm {
             Object.keys(this.currentSkillMapping).forEach((skillId) => {
                 let equipItems = null
 
-                if ('helm' === equipType
-                    || 'chest' === equipType
-                    || 'arm' === equipType
-                    || 'waist' === equipType
-                    || 'leg' === equipType
-                ) {
-                    equipItems = ArmorDataset.typeIs(equipType).hasSkill(skillId).getList()
-                } else if ('charm' === equipType) {
-                    // equipItems = CharmDataset.hasSkill(skillId).getList()
-                }
+                // Armor with Skills
+                equipItems = ArmorDataset.typeIs(equipType).hasSkill(skillId).getList()
 
                 // Merge Candidate Equips
                 candidateEquipItemPool[equipType] = Object.assign(
@@ -424,15 +409,14 @@ class FittingAlgorithm {
                     this.createCandidateEquips(equipItems, equipType)
                 )
 
-                if ('charm' !== equipType) {
-                    equipItems = ArmorDataset.typeIs(equipType).rareIs(0).getList()
+                // Empty Armors
+                equipItems = ArmorDataset.typeIs(equipType).rareIs(0).getList()
 
-                    // Merge Candidate Equips
-                    candidateEquipItemPool[equipType] = Object.assign(
-                        candidateEquipItemPool[equipType],
-                        this.createCandidateEquips(equipItems, equipType)
-                    )
-                }
+                // Merge Candidate Equips
+                candidateEquipItemPool[equipType] = Object.assign(
+                    candidateEquipItemPool[equipType],
+                    this.createCandidateEquips(equipItems, equipType)
+                )
             })
 
             // Append Empty Candidate Equip
@@ -1134,23 +1118,14 @@ class FittingAlgorithm {
         equipItems.forEach((equipItem) => {
 
             // Check is Using Factor
-            if ('charm' === equipType) {
-                if (Helper.isNotEmpty(this.algorithmParams.usingFactor['charm:series:' + equipItem.seriesId])
-                    && -1 !== this.algorithmParams.usingFactor['charm:series:' + equipItem.seriesId]
-                    && equipItem.level !== this.algorithmParams.usingFactor['charm:series:' + equipItem.seriesId]
-                ) {
-                    return
-                }
-            } else {
-                if (false === this.algorithmParams.usingFactor['armor:rare:' + equipItem.rare]) {
-                    return
-                }
+            if (false === this.algorithmParams.usingFactor['armor:rare:' + equipItem.rare]) {
+                return
+            }
 
-                if (Helper.isNotEmpty(this.algorithmParams.usingFactor['armor:series' + equipItem.seriesId])
-                    && false === this.algorithmParams.usingFactor['armor:series' + equipItem.seriesId]
-                ) {
-                    return
-                }
+            if (Helper.isNotEmpty(this.algorithmParams.usingFactor['armor:series' + equipItem.seriesId])
+                && false === this.algorithmParams.usingFactor['armor:series' + equipItem.seriesId]
+            ) {
+                return
             }
 
             // Convert Equip to Candidate Equip
@@ -1240,12 +1215,17 @@ class FittingAlgorithm {
     /**
      * Add Jewel to Bundle
      */
-    addJewelToBundle = (bundle, slotSize, jewel, hasJewelCountLimit = false) => {
+    addJewelToBundle = (bundle, slotSize, correspondJewel, hasJewelCountLimit = false) => {
+
+        // Check Correspond Jewel
+        if (Helper.isEmpty(correspondJewel)) {
+            return false
+        }
 
         // Check Jewel Limit
         if (Helper.isNotEmpty(bundle.jewelMapping)
-            && Helper.isNotEmpty(bundle.jewelMapping[jewel.id])
-            && jewel.countLimit === bundle.jewelMapping[jewel.id]
+            && Helper.isNotEmpty(bundle.jewelMapping[correspondJewel.id])
+            && correspondJewel.countLimit === bundle.jewelMapping[correspondJewel.id]
         ) {
             return false
         }
@@ -1254,7 +1234,7 @@ class FittingAlgorithm {
         let isSkip = false
         let jewelCount = bundle.meta.remainingSlotCountMapping[slotSize]
 
-        jewel.skills.forEach((skillData) => {
+        correspondJewel.skills.forEach((skillData) => {
             if (true === isSkip) {
                 return
             }
@@ -1277,8 +1257,8 @@ class FittingAlgorithm {
             return false
         }
 
-        if (null !== jewel.countLimit && jewelCount > jewel.countLimit) {
-            jewelCount = jewel.countLimit
+        if (null !== correspondJewel.countLimit && jewelCount > correspondJewel.countLimit) {
+            jewelCount = correspondJewel.countLimit
         }
 
         if (0 === jewelCount) {
@@ -1297,14 +1277,14 @@ class FittingAlgorithm {
             bundle.jewelMapping = {}
         }
 
-        if (Helper.isEmpty(bundle.jewelMapping[jewel.id])) {
-            bundle.jewelMapping[jewel.id] = 0
+        if (Helper.isEmpty(bundle.jewelMapping[correspondJewel.id])) {
+            bundle.jewelMapping[correspondJewel.id] = 0
         }
 
-        bundle.jewelMapping[jewel.id] += jewelCount
+        bundle.jewelMapping[correspondJewel.id] += jewelCount
 
         // Increase Skill Level
-        jewel.skills.forEach((skill) => {
+        correspondJewel.skills.forEach((skill) => {
             bundle.skillLevelMapping[skill.id] += jewelCount * skill.level
 
             if (this.currentSkillMapping[skill.id].level === bundle.skillLevelMapping[skill.id]) {
@@ -1317,8 +1297,8 @@ class FittingAlgorithm {
         bundle.meta.remainingSlotCountMapping.all -= jewelCount
 
         // Increase Expected Value & Level
-        let expectedValue = jewelCount * jewel.expectedValue
-        let expectedLevel = jewelCount * jewel.expectedLevel
+        let expectedValue = jewelCount * correspondJewel.expectedValue
+        let expectedLevel = jewelCount * correspondJewel.expectedLevel
 
         bundle.meta.skillExpectedValue += expectedValue
         bundle.meta.skillExpectedLevel += expectedLevel

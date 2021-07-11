@@ -367,10 +367,10 @@ export default function BundleList (props) {
                                     isNotRequire = currentEquipData.id !== requiredEquipData.id
                                 }
 
-                                let equipItem = Misc.getEquipItem(currentEquipData.type)
+                                let equipItem = Misc.getEquipItem(currentEquipData.type, currentEquipData)
 
                                 return Helper.isNotEmpty(equipItem) ? (
-                                    <div key={equip.type} className="col-6 mhrc-value">
+                                    <div key={currentEquipData.type} className="col-6 mhrc-value">
                                         <span>{_(equipItem.name)}</span>
 
                                         <div className="mhrc-icons_bundle">

@@ -61,8 +61,8 @@ const langList = Object.keys(Constant.langs).map((lang) => {
 /**
  * Handle Functions
  */
-const handleBundleExport = () => {
-    let equips = Helper.deepCopy(States.getter.getCurrentEquips())
+const handlePlayerEquipsExport = () => {
+    let equips = Helper.deepCopy(States.getter.getPlayerEquips())
     let hash = Helper.base64Encode(JSON.stringify(equips))
 
     let protocol = window.location.protocol
@@ -88,9 +88,11 @@ export default function App (props) {
 
         // Restore Equips from Url to State
         if (Helper.isNotEmpty(props.match.params.hash)) {
-            States.setter.replacePlayerEquips(
-                JSON.parse(Helper.base64Decode(props.match.params.hash))
-            )
+            let playerEquips = JSON.parse(Helper.base64Decode(props.match.params.hash))
+
+            // TODO: need verify
+
+            States.setter.replacePlayerEquips(playerEquips)
         }
     }, [])
 
@@ -115,7 +117,7 @@ export default function App (props) {
                 <div className="mhrc-icons_bundle">
                     <IconButton
                         iconName="link" altName={_('exportBundle')}
-                        onClick={handleBundleExport} />
+                        onClick={handlePlayerEquipsExport} />
                     <IconButton
                         iconName="info" altName={_('changeLog')}
                         onClick={() => { States.setter.showModal('changeLog') }} />

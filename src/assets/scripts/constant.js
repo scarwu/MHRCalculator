@@ -180,8 +180,7 @@ export const defaultBundle = {
     slotCountMapping: {
         1: 0,
         2: 0,
-        3: 0,
-        // 4: 0
+        3: 0
     },
     jewelPackages: [],
     meta: {
@@ -200,7 +199,6 @@ export const defaultBundle = {
             1: 0,
             2: 0,
             3: 0,
-            // 4: 0,
             all: 0
         },
         totalExpectedValue: 0,

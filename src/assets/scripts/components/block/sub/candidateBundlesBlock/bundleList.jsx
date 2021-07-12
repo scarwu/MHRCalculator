@@ -9,6 +9,9 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
+// Load Constant
+import Constant from 'constant'
+
 // Load Core
 import _ from 'core/lang'
 import Helper from 'core/helper'
@@ -31,9 +34,9 @@ import States from 'states'
 /**
  * Handle Functions
  */
-const handleBundlePickUp = (bundle, required) => {
-    let currentEquips = Helper.deepCopy(States.getter.getCurrentEquips())
-    let slotMap = {
+const handleBundlePickUp = (bundle, requiredConditions) => {
+    let playerEquips = Helper.deepCopy(States.getter.getPlayerEquips())
+    let slotMetaMap = {
         1: [],
         2: [],
         3: []
@@ -44,46 +47,32 @@ const handleBundlePickUp = (bundle, required) => {
             return
         }
 
-        if (Helper.isEmpty(currentEquips[equipType])) {
-            currentEquips[equipType] = {}
-        }
+        // Create Temp Equip Data
+        let tempEquipData = Object.assign({}, Helper.deepCopy(Constant.defaultPlayerEquips[equipType]), {
+            id: bundle.equipIdMapping[equipType]
+        })
 
-        currentEquips[equipType].id = bundle.equipIdMapping[equipType]
-        currentEquips[equipType].slotIds = []
-
-        let equipItem = null
-
-        if ('weapon' === equipType) {
-            if (Helper.isNotEmpty(required.equips.weapon.customWeapon)) {
-                States.setter.replaceCustomWeapon(required.equips.weapon.customWeapon)
-            }
-
-            if (Helper.isNotEmpty(required.equips.weapon.enhances)) {
-                currentEquips.weapon.enhances = required.equips.weapon.enhances // Restore Enhance
-            }
-
-            equipItem = Misc.getAppliedWeaponInfo(currentEquips.weapon)
-        } else if ('helm' === equipType
-            || 'chest' === equipType
-            || 'arm' === equipType
-            || 'waist' === equipType
-            || 'leg' === equipType
-        ) {
-            equipItem = Misc.getAppliedArmorInfo(currentEquips[equipType])
-        }
+        // Get Equip Item
+        let equipItem = Misc.getEquipItem(equipType, tempEquipData)
 
         if (Helper.isEmpty(equipItem)) {
             return
         }
 
-        equipItem.slots.forEach((data, index) => {
-            slotMap[data.size].push({
-                type: equipType,
-                index: index
+        playerEquips[equipType] = tempEquipData
+
+        // Create Slot Meta Map
+        if (Helper.isNotEmpty(equipItem.slots) && 0 !== equipItem.slots.length) {
+            equipItem.slots.forEach((slotData, index) => {
+                slotMetaMap[slotData.size].push({
+                    type: equipType,
+                    index: index
+                })
             })
-        })
+        }
     })
 
+    // Select Jewel Package Index
     let jewelPackageIndex = Helper.isNotEmpty(bundle.jewelPackageIndex)
         ? bundle.jewelPackageIndex : 0
 
@@ -107,27 +96,27 @@ const handleBundlePickUp = (bundle, required) => {
             let currentSize = jewelItem.size
 
             let jewelCount = bundle.jewelPackages[jewelPackageIndex][jewelId]
-            let data = null
+            let slotMeta = null
 
             let jewelIndex = 0
 
             while (jewelIndex < jewelCount) {
-                if (0 === slotMap[currentSize].length) {
+                if (0 === slotMetaMap[currentSize].length) {
                     currentSize++
 
                     continue
                 }
 
-                data = slotMap[currentSize].shift()
+                slotMeta = slotMetaMap[currentSize].shift()
 
-                currentEquips[data.type].slotIds[data.index] = jewelId
+                playerEquips[slotMeta.type].jewelIds[slotMeta.index] = jewelId
 
                 jewelIndex++
             }
         })
     }
 
-    States.setter.replacePlayerEquips(currentEquips)
+    States.setter.replacePlayerEquips(playerEquips)
 }
 
 export default function BundleList (props) {
@@ -327,7 +316,9 @@ export default function BundleList (props) {
                         <div className="mhrc-icons_bundle">
                             <IconButton
                                 iconName="check" altName={_('equip')}
-                                onClick={() => {handleBundlePickUp(bundle, bundleRequiredConditions)}} />
+                                onClick={() => {
+                                    handleBundlePickUp(bundle, bundleRequiredConditions)
+                                }} />
                         </div>
                     </div>
 
@@ -486,7 +477,9 @@ export default function BundleList (props) {
                                                 <div className="mhrc-icons_bundle">
                                                     <IconButton
                                                         iconName="arrow-left" altName={_('include')}
-                                                        onClick={() => {States.setter.addRequiredSkill(skillItem.id)}} />
+                                                        onClick={() => {
+                                                            States.setter.addRequiredConditionsSkill(skillItem.id)
+                                                        }} />
                                                 </div>
                                             ) : false}
                                         </div>

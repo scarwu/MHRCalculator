@@ -178,10 +178,6 @@ class FittingAlgorithm {
             requiredSkillIds.push(skill.id)
 
             JewelDataset.hasSkill(skill.id).getList().forEach((jewelItem) => {
-                if (4 === jewelItem.size) {
-                    return
-                }
-
                 this.currentSkillMapping[skill.id].jewelSize = jewelItem.size
             })
 
@@ -793,7 +789,7 @@ class FittingAlgorithm {
 
         let slotSizeList = []
 
-        for (let size = 4; size > 0; size--) {
+        for (let size = 3; size > 0; size--) {
             if (0 === bundle.meta.remainingSlotCountMapping[size]) {
                 continue
             }
@@ -1090,7 +1086,7 @@ class FittingAlgorithm {
         }
 
         // Increase Slot Count
-        for (let size = 1; size <= 4; size++) {
+        for (let size = 1; size <= 3; size++) {
             bundle.slotCountMapping[size] += candidateEquipItem.slotCountMapping[size]
 
             bundle.meta.remainingSlotCountMapping[size] += candidateEquipItem.slotCountMapping[size]

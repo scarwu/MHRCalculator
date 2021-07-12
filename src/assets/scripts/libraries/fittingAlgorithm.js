@@ -283,24 +283,24 @@ class FittingAlgorithm {
      * Init Condition Sets
      */
     initConditionSets = (requiredSets) => {
-        requiredSets.sort((setA, setB) => {
-            let setItemA = SetDataset.getItem(setA.id)
-            let setItemB = SetDataset.getItem(setB.id)
+        requiredSets.sort((setDataA, setDataB) => {
+            let setItemA = SetDataset.getItem(setDataA.id)
+            let setItemB = SetDataset.getItem(setDataB.id)
 
             if (Helper.isEmpty(setItemA) || Helper.isEmpty(setItemB)) {
                 return 0
             }
 
-            return setItemB.skills.pop().require - setItemA.skills.pop().require
-        }).forEach((set) => {
-            let setItem = SetDataset.getItem(set.id)
+            return setItemB.items.length - setItemA.items.length
+        }).forEach((setData) => {
+            let setItem = SetDataset.getItem(setData.id)
 
             if (Helper.isEmpty(setItem)) {
                 return
             }
 
-            this.currentSetMapping[set.id] = {
-                require: setItem.skills[set.step - 1].require
+            this.currentSetMapping[setData.id] = {
+                count: setData.count
             }
         })
     }
@@ -387,13 +387,21 @@ class FittingAlgorithm {
 
             // Create Set Equips
             Object.keys(this.currentSetMapping).forEach((setId) => {
-                let equipItems = ArmorDataset.typeIs(equipType).setIs(setId).getList()
+                let setItem = SetDataset.getItem(setId)
 
-                // Merge Candidate Equips
-                candidateEquipItemPool[equipType] = Object.assign(
-                    candidateEquipItemPool[equipType],
-                    this.createCandidateEquips(equipItems, equipType)
-                )
+                setItem.items.forEach((armorData) => {
+                    if (armorData.type !== equipType) {
+                        return
+                    }
+
+                    let equipItem = ArmorDataset.getItem(armorData.id)
+
+                    // Merge Candidate Equips
+                    candidateEquipItemPool[equipType] = Object.assign(
+                        candidateEquipItemPool[equipType],
+                        this.createCandidateEquips([equipItem], equipType)
+                    )
+                })
             })
 
             // Create Skill Equips
@@ -1067,11 +1075,11 @@ class FittingAlgorithm {
             bundle.setCountMapping[candidateEquipItem.setId] += 1
 
             if (Helper.isNotEmpty(this.currentSetMapping[candidateEquipItem.setId])) {
-                if (this.currentSetMapping[candidateEquipItem.setId].require < bundle.setCountMapping[candidateEquipItem.setId]) {
+                if (this.currentSetMapping[candidateEquipItem.setId].count < bundle.setCountMapping[candidateEquipItem.setId]) {
                     isSetRequireOverflow = true
                 }
 
-                if (this.currentSetMapping[candidateEquipItem.setId].require === bundle.setCountMapping[candidateEquipItem.setId]) {
+                if (this.currentSetMapping[candidateEquipItem.setId].count === bundle.setCountMapping[candidateEquipItem.setId]) {
                     bundle.meta.completedSets[candidateEquipItem.setId] = true
                 }
             }
@@ -1161,7 +1169,7 @@ class FittingAlgorithm {
         candidateEquipItem.type = ('charm' !== equipType && 'weapon' !== equipType) ? equipItem.type : equipType
         candidateEquipItem.defense = Helper.isNotEmpty(equipItem.defense) ? equipItem.defense : 0
         candidateEquipItem.resistance = Helper.isNotEmpty(equipItem.resistance) ? equipItem.resistance : candidateEquipItem.resistance
-        // candidateEquipItem.setId = Helper.isNotEmpty(equipItem.set) ? equipItem.set.id : null
+        candidateEquipItem.setId = equipItem.seriesId // SeriesId is SetId
 
         if (Helper.isEmpty(equipItem.skills)) {
             equipItem.skills = []

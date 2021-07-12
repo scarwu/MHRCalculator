@@ -16,9 +16,8 @@ import Helper from 'core/helper'
 // Load Libraries
 import Misc from 'libraries/misc'
 import ArmorDataset from 'libraries/dataset/armor'
-// import CharmDataset from 'libraries/dataset/charm'
 import SkillDataset from 'libraries/dataset/skill'
-// import SetDataset from 'libraries/dataset/set'
+import SetDataset from 'libraries/dataset/set'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -143,8 +142,8 @@ export default function RequiredConditions (props) {
                                 let setItem = SetDataset.getItem(setData.id)
 
                                 return (
-                                    <div key={set.id} className="col-6 mhrc-value">
-                                        <span>{_(setItem.name)} x {setData.count} / {setItem.items.length}</span>
+                                    <div key={setData.id} className="col-6 mhrc-value">
+                                        <span>{_(setItem.name)} x {setData.count}</span>
 
                                         {(-1 === requiredSetIds.indexOf(setItem.id)) ? (
                                             <div className="mhrc-icons_bundle">

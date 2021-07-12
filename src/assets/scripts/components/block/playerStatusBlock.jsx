@@ -18,7 +18,7 @@ import Helper from 'core/helper'
 
 // Load Libraries
 import Misc from 'libraries/misc'
-// import SetDataset from 'libraries/dataset/set'
+import SetDataset from 'libraries/dataset/set'
 import SkillDataset from 'libraries/dataset/skill'
 import WeaponDataset from 'libraries/dataset/weapon'
 
@@ -134,24 +134,41 @@ const generateStatus = (equipInfos, passiveSkills) => {
     // Defense & Set
     let setMapping = {}
 
-    for (let equipType of ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg']) {
+    for (let equipType of ['helm', 'chest', 'arm', 'waist', 'leg']) {
         if (Helper.isEmpty(equipInfos[equipType])) {
             continue
         }
 
-        // if (Helper.isNotEmpty(equipInfos[equipType].set)) {
-        //     let setId = equipInfos[equipType].set.id
+        let setId = equipInfos[equipType].seriesId // seriesId is setId
 
-        //     if (Helper.isEmpty(setMapping[setId])) {
-        //         setMapping[setId] = 0
-        //     }
+        if (Helper.isEmpty(setMapping[setId])) {
+            setMapping[setId] = 0
+        }
 
-        //     setMapping[setId]++
-        // }
+        setMapping[setId]++
 
         status.defense += Helper.isNotEmpty(equipInfos[equipType].defense)
             ? equipInfos[equipType].defense : 0
     }
+
+    Object.keys(setMapping).forEach((setId) => {
+        let setCount = setMapping[setId]
+
+        if (3 > setCount) {
+            return
+        }
+
+        let setItem = SetDataset.getItem(setId)
+
+        if (Helper.isEmpty(setItem)) {
+            return
+        }
+
+        status.sets.push({
+            id: setId,
+            count: setCount
+        })
+    })
 
     // Skills
     let allSkills = {}
@@ -171,42 +188,6 @@ const generateStatus = (equipInfos, passiveSkills) => {
             })
         }
     }
-
-    // Object.keys(setMapping).forEach((setId) => {
-    //     let setCount = setMapping[setId]
-    //     let setItem = SetDataset.getItem(setId)
-
-    //     if (Helper.isEmpty(setItem)) {
-    //         return
-    //     }
-
-    //     setItem.skills.forEach((skillData) => {
-    //         if (skillData.require > setCount) {
-    //             return
-    //         }
-
-    //         let skillItem = SkillDataset.getItem(skillData.id)
-
-    //         if (Helper.isEmpty(skillItem)) {
-    //             return
-    //         }
-
-    //         status.sets.push({
-    //             id: setId,
-    //             require: skillData.require,
-    //             skill: {
-    //                 id: skillItem.id,
-    //                 level: 1
-    //             }
-    //         })
-
-    //         if (Helper.isEmpty(allSkills[skillData.id])) {
-    //             allSkills[skillData.id] = 0
-    //         }
-
-    //         allSkills[skillData.id] += 1
-    //     })
-    // })
 
     let noneElementAttackMultiple = null
     let resistanceMultiple = null
@@ -930,30 +911,24 @@ export default function PlayerStatusBlock (props) {
                     </div>
                 </div>
 
-                {/* {(0 !== status.sets.length) ? (
+                {(0 !== status.sets.length) ? (
                     <div className="mhrc-item mhrc-item-3-step">
                         <div className="col-12 mhrc-name">
                             <span>{_('set')}</span>
                         </div>
-                        {status.sets.map((data, index) => {
-                            let setItem = SetDataset.getItem(data.id)
-                            let skillItem = SkillDataset.getItem(data.skill.id)
+                        {status.sets.map((setData, index) => {
+                            let setItem = SetDataset.getItem(setData.id)
 
-                            return (Helper.isNotEmpty(setItem)
-                                && Helper.isNotEmpty(skillItem))
-                            ? (
-                                <div key={`${index}:${data.id}`} className="col-12 mhrc-content">
+                            return Helper.isNotEmpty(setItem) ? (
+                                <div key={`${index}:${setData.id}`} className="col-12 mhrc-content">
                                     <div className="col-12 mhrc-name">
-                                        <span>{_(setItem.name)} ({data.require})</span>
-                                    </div>
-                                    <div className="col-12 mhrc-value">
-                                        <span>{_(skillItem.name)} Lv.{data.skill.level}</span>
+                                        <span>{_(setItem.name)} x {setData.count}</span>
                                     </div>
                                 </div>
                             ) : false
                         })}
                     </div>
-                ) : false} */}
+                ) : false}
 
                 {(0 !== status.skills.length) ? (
                     <div className="mhrc-item mhrc-item-3-step">

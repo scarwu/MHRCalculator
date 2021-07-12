@@ -17,10 +17,9 @@ import Helper from 'core/helper'
 import Misc from 'libraries/misc'
 import WeaponDataset from 'libraries/dataset/weapon'
 import ArmorDataset from 'libraries/dataset/armor'
-// import CharmDataset from 'libraries/dataset/charm'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
-// import SetDataset from 'libraries/dataset/set'
+import SetDataset from 'libraries/dataset/set'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -281,38 +280,34 @@ export default function BundleList (props) {
             }
 
             // Additional Sets & Skills
-            // const additionalSets = Object.keys(bundle.setCountMapping).map((setId) => {
-            //     let setInfo = SetDataset.getItem(setId)
+            const additionalSets = Object.keys(bundle.setCountMapping).map((setId) => {
+                let setItem = SetDataset.getItem(setId)
 
-            //     if (Helper.isEmpty(setInfo)) {
-            //         return false
-            //     }
+                if (Helper.isEmpty(setItem)) {
+                    return false
+                }
 
-            //     let setStep = setInfo.skills.filter((skill) => {
-            //         return skill.require <= bundle.setCountMapping[setId]
-            //     }).length
+                return {
+                    id: setId,
+                    count: bundle.setCountMapping[setId]
+                }
+            }).filter((setData) => {
+                if (false === setData) {
+                    return false
+                }
 
-            //     return {
-            //         id: setId,
-            //         step: setStep
-            //     }
-            // }).filter((set) => {
-            //     if (false === set) {
-            //         return false
-            //     }
+                if (-1 !== currentRequiredSetIds.indexOf(setData.id)) {
+                    return false
+                }
 
-            //     if (-1 !== currentRequiredSetIds.indexOf(set.id)) {
-            //         return false
-            //     }
+                if (0 === setData.count) {
+                    return false
+                }
 
-            //     if (0 === set.step) {
-            //         return false
-            //     }
-
-            //     return true
-            // }).sort((setA, setB) => {
-            //     return setB.step - setA.step
-            // })
+                return true
+            }).sort((setA, setB) => {
+                return setB.count - setA.count
+            })
 
             const additionalSkills = Object.keys(bundle.skillLevelMapping).map((skillId) => {
                 return {
@@ -445,27 +440,26 @@ export default function BundleList (props) {
                         </div>
                     ) : false}
 
-                    {/* {(0 !== additionalSets.length) ? (
+                    {(0 !== additionalSets.length) ? (
                         <div className="col-12 mhrc-content">
                             <div className="col-12 mhrc-name">
                                 <span>{_('additionalSets')}</span>
                             </div>
                             <div className="col-12 mhrc-content">
-                                {additionalSets.map((set) => {
-                                    let setInfo = SetDataset.getItem(set.id)
+                                {additionalSets.map((setData) => {
+                                    let setItem = SetDataset.getItem(setData.id)
 
                                     return (
-                                        <div key={set.id} className="col-6 mhrc-value">
-                                            <span>
-                                                {`${_(setInfo.name)}`}{setInfo.skills.slice(0, set.step).map((skill) => {
-                                                    return ` (${skill.require})`
-                                                })}
-                                            </span>
-                                            {(-1 === requiredSetIds.indexOf(setInfo.id)) ? (
+                                        <div key={setData.id} className="col-6 mhrc-value">
+                                            <span>{_(setItem.name)} x {setData.count} / {setItem.items.length}</span>
+
+                                            {(-1 === requiredSetIds.indexOf(setItem.id)) ? (
                                                 <div className="mhrc-icons_bundle">
                                                     <IconButton
                                                         iconName="arrow-left" altName={_('include')}
-                                                        onClick={() => {States.setter.addRequiredSet(setInfo.id)}} />
+                                                        onClick={() => {
+                                                            States.setter.addRequiredConditionsSet(setItem.id)
+                                                        }} />
                                                 </div>
                                             ) : false}
                                         </div>
@@ -473,7 +467,7 @@ export default function BundleList (props) {
                                 })}
                             </div>
                         </div>
-                    ) : false} */}
+                    ) : false}
 
                     {(0 !== additionalSkills.length) ? (
                         <div className="col-12 mhrc-content">
@@ -481,17 +475,18 @@ export default function BundleList (props) {
                                 <span>{_('additionalSkills')}</span>
                             </div>
                             <div className="col-12 mhrc-content">
-                                {additionalSkills.map((skill) => {
-                                    let skillInfo = SkillDataset.getItem(skill.id)
+                                {additionalSkills.map((skillData) => {
+                                    let skillItem = SkillDataset.getItem(skillData.id)
 
-                                    return (Helper.isNotEmpty(skillInfo)) ? (
-                                        <div key={skill.id} className="col-6 mhrc-value">
-                                            <span>{`${_(skillInfo.name)} Lv.${skill.level}`}</span>
-                                            {(-1 === requiredSkillIds.indexOf(skillInfo.id)) ? (
+                                    return (Helper.isNotEmpty(skillItem)) ? (
+                                        <div key={skillData.id} className="col-6 mhrc-value">
+                                            <span>{`${_(skillItem.name)} Lv.${skillData.level}`}</span>
+
+                                            {(-1 === requiredSkillIds.indexOf(skillItem.id)) ? (
                                                 <div className="mhrc-icons_bundle">
                                                     <IconButton
                                                         iconName="arrow-left" altName={_('include')}
-                                                        onClick={() => {States.setter.addRequiredSkill(skillInfo.id)}} />
+                                                        onClick={() => {States.setter.addRequiredSkill(skillItem.id)}} />
                                                 </div>
                                             ) : false}
                                         </div>

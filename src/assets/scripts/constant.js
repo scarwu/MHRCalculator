@@ -263,15 +263,40 @@ export const defaultCustomWeapon = {
             value: null
         }
     },
-    slots: [],
-    skills: []
+    slots: [
+        {
+            size: null
+        },
+        {
+            size: null
+        },
+        {
+            size: null
+        }
+    ]
 }
 
 export const defaultCustomCharm = {
     id: 'customCharm',
     name: 'customCharm',
-    slots: [],
-    skills: []
+    slots: [
+        {
+            size: null
+        },
+        {
+            size: null
+        }
+    ],
+    skills: [
+        {
+            id: null,
+            level: null
+        },
+        {
+            id: null,
+            level: null
+        }
+    ]
 }
 
 export const defaultPlayerEquips = {

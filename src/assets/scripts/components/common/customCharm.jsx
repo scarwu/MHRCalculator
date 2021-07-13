@@ -26,18 +26,6 @@ import BasicInput from 'components/common/basicInput'
 // Load States
 import States from 'states'
 
-const getRareList = () => {
-    return [
-        { key: 1,   value: 1 },
-        { key: 2,   value: 2 },
-        { key: 3,   value: 3 },
-        { key: 4,   value: 4 },
-        { key: 5,   value: 5 },
-        { key: 6,   value: 6 },
-        { key: 7,   value: 7 }
-    ]
-}
-
 const getSlotSizeList = () => {
     return [
         { key: 'none',  value: _('none') },
@@ -50,10 +38,8 @@ const getSlotSizeList = () => {
 const getSkillList = () => {
     return [
         { key: 'none', value: _('none') },
-        ...SkillDataset.getItems().filter((skillInfo) => {
-            return skillInfo.from.charm
-        }).map((skillInfo) => {
-            return { key: skillInfo.id, value: _(skillInfo.name) }
+        ...SkillDataset.getList().map((skillItem) => {
+            return { key: skillItem.id, value: _(skillItem.name) }
         })
     ]
 }
@@ -74,6 +60,14 @@ const getSkillId = (skill) => {
     return skill.id
 }
 
+const getSkillLevel = (skill) => {
+    if (Helper.isEmpty(skill)) {
+        return 'none'
+    }
+
+    return skill.level
+}
+
 const handleRefreshCustomDataset = (tempData) => {
     if ('playerEquips' === tempData.target) {
         States.setter.setPlayerEquipCustomDataset('charm', tempData.custom)
@@ -84,55 +78,45 @@ const handleRefreshCustomDataset = (tempData) => {
     }
 }
 
-const handleItemPickUp = (itemId, tempData) => {
-    if ('playerEquips' === tempData.target) {
-        States.setter.setPlayerEquipJewel('charm', tempData.idIndex, itemId)
-    }
-
-    if ('requiredConditions' === tempData.target) {
-        States.setter.setRequiredConditionsEquipJewel('charm', tempData.idIndex, itemId)
-    }
-}
-
 /**
  * Render Functions
  */
-const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
-    let selectorData = {
-        equipType: equipType,
-        slotIndex: slotIndex,
-        slotSize: slotSize,
-        jewelId: (Helper.isNotEmpty(jewelInfo)) ? jewelInfo.id : null
+const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
+
+    // Get Jewel Item
+    let jewelItem = JewelDataset.getItem(jewelId)
+
+    const showModal = () => {
+        States.setter.showModal('jewelSelector', {
+            target: 'playerEquips',
+            equipType: equipType,
+            idIndex: slotIndex,
+
+            // filter
+            size: slotSize
+        })
     }
 
-    let emptySelectorData = {
-        equipType: equipType,
-        slotIndex: slotIndex,
-        slotSize: slotSize,
-        jewelId: null
-    }
-
-    if (Helper.isEmpty(jewelInfo)) {
-        return (
-            <div key={`${equipType}:${slotIndex}:${slotSize}`} className="mhrc-icons_bundle">
-                <IconButton
-                    iconName="plus" altName={_('add')}
-                    onClick={() => {States.setter.showEquipItemSelector(selectorData)}} />
-            </div>
-        )
+    const removeItem = () => {
+        States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
     }
 
     return (
-        <Fragment key={`${equipType}:${slotIndex}:${slotSize}`}>
-            <span>[{jewelInfo.size}] {_(jewelInfo.name)}</span>
-            <div className="mhrc-icons_bundle">
-                <IconButton
-                    iconName="exchange" altName={_('change')}
-                    onClick={() => {States.setter.showEquipItemSelector(selectorData)}} />
-                <IconButton
-                    iconName="times" altName={_('clean')}
-                    onClick={() => {States.setter.setCurrentEquip(emptySelectorData)}} />
-            </div>
+        <Fragment key={`${equipType}:${slotIndex}`}>
+            {Helper.isNotEmpty(jewelItem) ? (
+                <Fragment>
+                    <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
+
+                    <div className="mhrc-icons_bundle">
+                        <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
+                        <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
+                    </div>
+                </Fragment>
+            ) : (
+                <div className="mhrc-icons_bundle">
+                    <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
+                </div>
+            )}
         </Fragment>
     )
 }
@@ -211,51 +195,71 @@ export default function CustomCharm (props) {
                 </div>
 
                 <div className="col-12 mhrc-content">
-                    {/* {[...Array(stateTempData.custom.slots.length + 1 <= 3
-                        ? stateTempData.custom.slots.length + 1 : 3).keys()].map((index) => {
+                    {stateTempData.custom.slots.map((slotData, slotIndex) => {
                         return (
-                            <Fragment key={index}>
+                            <Fragment key={slotIndex}>
                                 <div className="col-3 mhrc-name">
-                                    <span>{_('slot')}: {index + 1}</span>
+                                    <span>{_('slot')}: {slotIndex + 1}</span>
                                 </div>
                                 <div className="col-3 mhrc-value">
                                     <BasicSelector
-                                        defaultValue={getSlotSize(stateTempData.custom.slots[index])}
-                                        options={getSlotSizeList()} onChange={(event) => {
-                                            let value = ('none' !== event.target.value)
+                                        defaultValue={getSlotSize(stateTempData.custom.slots[slotIndex])}
+                                        options={getSlotSizeList()}
+                                        onChange={(event) => {
+                                            stateTempData.custom.slots[slotIndex].size = ('none' !== event.target.value)
                                                 ? parseInt(event.target.value, 10) : null
 
-                                            States.setter.setCustomCharmSlot(index, value)
+                                            handleRefreshCustomDataset(stateTempData)
                                         }} />
                                 </div>
                                 <div className="col-6 mhrc-value">
-                                    {('none' !== getSlotSize(stateTempData.custom.slots[index])) ? (
+                                    {('none' !== getSlotSize(stateTempData.custom.slots[slotIndex])) ? (
                                         renderJewelOption(
-                                            equipType, index,
-                                            getSlotSize(stateTempData.custom.slots[index]),
-                                            JewelDataset.getInfo(currentEquip.slotIds[index])
+                                            'charm',
+                                            slotIndex,
+                                            slotData.size,
+                                            Helper.isNotEmpty(stateTempData.jewelIds[slotIndex])
+                                                ? stateTempData.jewelIds[slotIndex] : null
                                         )
                                     ) : false}
                                 </div>
                             </Fragment>
                         )
-                    })} */}
+                    })}
                 </div>
 
                 <div className="col-12 mhrc-content">
-                    {/* <div className="col-3 mhrc-name">
-                        <span>{_('skill')}</span>
-                    </div>
-                    <div className="col-9 mhrc-value">
-                        <BasicSelector
-                            defaultValue={getSkillId(stateTempData.custom.skills[0])}
-                            options={getSkillList()} onChange={(event) => {
-                                let value = ('none' !== event.target.value)
-                                    ? event.target.value : null
+                    {stateTempData.custom.skills.map((skillData, skillIndex) => {
+                        return (
+                            <Fragment>
+                                <div className="col-3 mhrc-name">
+                                    <span>{_('skill')}: {skillIndex + 1}</span>
+                                </div>
+                                <div className="col-6 mhrc-value">
+                                    <BasicSelector
+                                        defaultValue={getSkillId(stateTempData.custom.skills[skillIndex])}
+                                        options={getSkillList()}
+                                        onChange={(event) => {
+                                            stateTempData.custom.skills[skillIndex].id = ('none' !== event.target.value)
+                                                ? event.target.value : null
 
-                                States.setter.setCustomCharmSkill(0, value)
-                            }} />
-                    </div> */}
+                                            handleRefreshCustomDataset(stateTempData)
+                                        }} />
+                                </div>
+                                <div className="col-3 mhrc-value">
+                                    <BasicSelector
+                                        defaultValue={getSkillLevel(stateTempData.custom.skills[skillIndex])}
+                                        options={getSkillList()}
+                                        onChange={(event) => {
+                                            stateTempData.custom.skills[skillIndex].level = ('none' !== event.target.value)
+                                                ? parseInt(event.target.value, 10) : null
+
+                                            handleRefreshCustomDataset(stateTempData)
+                                        }} />
+                                </div>
+                            </Fragment>
+                        )
+                    })}
                 </div>
             </div>
         )

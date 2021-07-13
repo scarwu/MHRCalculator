@@ -609,6 +609,7 @@ export default function PlayerStatusBlock (props) {
     const refTuningPhysicalCriticalMultiple = useRef()
     const refTuningElementAttack = useRef()
 
+    // Initialize
     useEffect(() => {
         const equipInfos = generateEquipInfos(statePlayerEquips)
         const passiveSkills = generatePassiveSkills(equipInfos)

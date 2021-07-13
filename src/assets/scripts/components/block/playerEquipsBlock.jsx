@@ -365,8 +365,8 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
     let isNotRequire = null
 
     if (('weapon' === equipType || 'charm' === equipType)
-        && 'custom' === currentEquipData.id
-        && 'custom' === requiredEquipData.id
+        && ('customWeapon' === currentEquipData.id || 'customCharm' === currentEquipData.id)
+        && ('customWeapon' === requiredEquipData.id || 'customCharm' === requiredEquipData.id)
     ) {
         isNotRequire = Helper.jsonHash(currentEquipData.custom) !== Helper.jsonHash(requiredEquipData.custom)
     } else {
@@ -397,7 +397,7 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
                             <IconButton
                                 iconName="wrench" altName={_('customEquip')}
                                 onClick={() => {
-                                    States.setter.setPlayerEquip(equipType, 'custom')
+                                    States.setter.setPlayerEquip(equipType, 'custom' + Helper.ucfirst(equipType))
                                 }} />
                         ) : false}
                         {'charm' !== equipType ? (
@@ -425,7 +425,7 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
                         <IconButton
                             iconName="wrench" altName={_('customEquip')}
                             onClick={() => {
-                                States.setter.setPlayerEquip(equipType, 'custom')
+                                States.setter.setPlayerEquip(equipType, 'custom' + Helper.ucfirst(equipType))
                             }} />
                     ) : false}
                     {'charm' !== equipType ? (
@@ -513,20 +513,20 @@ export default function PlayerEquipsBlock (props) {
 
         Object.keys(statePlayerEquips).forEach((equipType) => {
             if ('weapon' === Misc.equipTypeToDatasetType(equipType)
-                && 'custom' === statePlayerEquips[equipType].id
+                && 'customWeapon' === statePlayerEquips[equipType].id
             ) {
                 blocks.push((
-                    <CustomWeapon key="customWeapon" />
+                    <CustomWeapon key="customWeapon" target="playerEquips" />
                 ))
 
                 return
             }
 
             if ('charm' === Misc.equipTypeToDatasetType(equipType)
-                && 'custom' === statePlayerEquips[equipType].id
+                && 'customCharm' === statePlayerEquips[equipType].id
             ) {
                 blocks.push((
-                    <CustomCharm key="customCharm" />
+                    <CustomCharm key="customCharm" target="playerEquips" />
                 ))
 
                 return

@@ -13,7 +13,7 @@ import Helper from 'core/helper'
 // Load Dataset
 import Armors from 'datasets/armors.json'
 
-let dataset = Armors.map((armorBundle) => {
+const dataset = Armors.map((armorBundle) => {
     return {
         id: armorBundle[0][0],
         name: armorBundle[0][1],

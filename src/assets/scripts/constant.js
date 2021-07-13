@@ -249,13 +249,19 @@ export const defaultCustomWeapon = {
             yellow: 0,
             green: 0,
             blue: 0,
-            white: 0,
-            purple: 400
+            white: 400,
+            purple: 0
         }
     },
     element: {
-        attack: null,
-        status: null
+        attack: {
+            type: null,
+            value: null
+        },
+        status: {
+            type: null,
+            value: null
+        }
     },
     slots: [],
     skills: []

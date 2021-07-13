@@ -144,6 +144,8 @@
     "second":                   "秒",
     "tab":                      null,
     "customEquip":              null,
+    "customWeapon":             null,
+    "customCharm":              null,
     "none":                     null,
     "red":                      null,
     "orange":                   null,

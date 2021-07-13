@@ -144,6 +144,8 @@
     "second":                   "s",
     "tab":                      "Tab",
     "customEquip":              "Custom Equip",
+    "customWeapon":             "Custom Weapon",
+    "customCharm":              "Custom Charm",
     "none":                     "None",
     "red":                      "Red",
     "orange":                   "Orange",

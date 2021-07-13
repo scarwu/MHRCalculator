@@ -101,8 +101,8 @@ export default function RequiredConditions (props) {
                                 let isNotRequire = true
 
                                 if (('weapon' === currentEquipData.type || 'charm' === currentEquipData.type)
-                                    && 'custom' === currentEquipData.id
-                                    && 'custom' === requiredEquipData.id
+                                    && ('customWeapon' === currentEquipData.id || 'customCharm' === currentEquipData.id)
+                                    && ('customWeapon' === requiredEquipData.id || 'customCharm' === requiredEquipData.id)
                                 ) {
                                     isNotRequire = Helper.jsonHash(currentEquipData.custom) !== Helper.jsonHash(requiredEquipData.custom)
                                 } else {

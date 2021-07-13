@@ -28,7 +28,7 @@ import Enhances from 'datasets/enhances.json'
 //         [ ... ]
 //     ]
 // ]
-let dataset = Enhances.map((enhanceItem) => {
+const dataset = Enhances.map((enhanceItem) => {
     return {
         id: enhanceItem[0],
         name: enhanceItem[1],

@@ -27,7 +27,7 @@ import Skills from 'datasets/skills.json'
 //         [ ... ]
 //     ]
 // ]
-let dataset = Skills.map((skillBundle) => {
+const dataset = Skills.map((skillBundle) => {
     return {
         id: skillBundle[0],
         name: skillBundle[1],

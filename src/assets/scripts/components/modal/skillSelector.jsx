@@ -94,6 +94,19 @@ export default function SkillSelectorModal (props) {
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
+    // Like Did Mount & Will Unmount Cycle
+    useEffect(() => {
+        const unsubscribe = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('skillSelector'))
+            updateRequiredConditions(States.getter.getRequiredConditions())
+        })
+
+        return () => {
+            unsubscribe()
+        }
+    }, [])
+
+    // Initialize
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
@@ -133,18 +146,6 @@ export default function SkillSelectorModal (props) {
         stateModalData,
         stateRequiredConditions
     ])
-
-    // Like Did Mount & Will Unmount Cycle
-    useEffect(() => {
-        const unsubscribe = States.store.subscribe(() => {
-            updateModalData(States.getter.getModalData('skillSelector'))
-            updateRequiredConditions(States.getter.getRequiredConditions())
-        })
-
-        return () => {
-            unsubscribe()
-        }
-    }, [])
 
     /**
      * Handle Functions

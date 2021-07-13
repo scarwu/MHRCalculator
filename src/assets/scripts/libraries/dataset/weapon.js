@@ -13,7 +13,7 @@ import Helper from 'core/helper'
 // Load Dataset
 import Weapons from 'datasets/weapons.json'
 
-let dataset = Weapons.map((weaponItem) => {
+const dataset = Weapons.map((weaponItem) => {
     let weaponResult = {
         id: weaponItem[0],
         series: weaponItem[1],

@@ -57,6 +57,10 @@ export const base64Decode = (text) => {
     return window.atob(text)
 }
 
+export const ucfirst = (text) => {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 export default {
     log,
     debug,
@@ -65,5 +69,6 @@ export default {
     deepCopy,
     jsonHash,
     base64Encode,
-    base64Decode
+    base64Decode,
+    ucfirst
 }

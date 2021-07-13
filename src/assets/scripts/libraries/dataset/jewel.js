@@ -26,7 +26,7 @@ import Jewels from 'datasets/jewels.json'
 //         [ ... ]
 //     ]
 // ]
-let dataset = Jewels.map((jewelItem) => {
+const dataset = Jewels.map((jewelItem) => {
     return {
         id: jewelItem[0],
         name: jewelItem[1],

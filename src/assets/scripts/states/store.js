@@ -216,6 +216,27 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
+        case 'SET_PLAYER_EQUIP_CUSTOM':
+            return (() => {
+                let playerEquips = Helper.deepCopy(state.playerEquips)
+                let equipType = action.payload.equipType
+                let customDataset = action.payload.customDataset
+
+                if ('weapon' !== equipType && 'charm' !== equipType) {
+                    return state
+                }
+
+                if (Helper.isEmpty(playerEquips[equipType])) {
+                    return state
+                }
+
+                playerEquips[equipType].custom = Object.assign({}, Constant['defaultCustom' + Helper.ucfirst(equipType)], customDataset)
+
+                return Object.assign({}, state, {
+                    playerEquips: playerEquips
+                })
+            })()
+
         // Required Conditions
         case 'CLEAN_REQUIRED_CONDITIONS':
             return (() => {
@@ -254,6 +275,27 @@ export default createStore((state = initialState, action) => {
                 }
 
                 requiredConditions.equips[equipType].jewelIds[idIndex] = jewelId
+
+                return Object.assign({}, state, {
+                    requiredConditions: requiredConditions
+                })
+            })()
+
+        case 'SET_REQUIRED_CONDITIONS_EQUIP_CUSTOM':
+            return (() => {
+                let requiredConditions = Helper.deepCopy(state.requiredConditions)
+                let equipType = action.payload.equipType
+                let customDataset = action.payload.customDataset
+
+                if ('weapon' !== equipType && 'charm' !== equipType) {
+                    return state
+                }
+
+                if (Helper.isEmpty(requiredConditions.equips[equipType])) {
+                    return state
+                }
+
+                requiredConditions.equips[equipType].custom = Object.assign({}, Constant['defaultCustom' + Helper.ucfirst(equipType)], customDataset)
 
                 return Object.assign({}, state, {
                     requiredConditions: requiredConditions

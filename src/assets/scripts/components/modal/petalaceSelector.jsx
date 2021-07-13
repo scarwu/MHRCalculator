@@ -118,6 +118,19 @@ export default function PetalaceSelectorModal (props) {
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
+    // Like Did Mount & Will Unmount Cycle
+    useEffect(() => {
+        const unsubscribe = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('petalaceSelector'))
+            updatePlayerEquips(States.getter.getPlayerEquips())
+        })
+
+        return () => {
+            unsubscribe()
+        }
+    }, [])
+
+    // Initialize
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
@@ -149,18 +162,6 @@ export default function PetalaceSelectorModal (props) {
         stateModalData,
         statePlayerEquips
     ])
-
-    // Like Did Mount & Will Unmount Cycle
-    useEffect(() => {
-        const unsubscribe = States.store.subscribe(() => {
-            updateModalData(States.getter.getModalData('petalaceSelector'))
-            updatePlayerEquips(States.getter.getPlayerEquips())
-        })
-
-        return () => {
-            unsubscribe()
-        }
-    }, [])
 
     /**
      * Handle Functions

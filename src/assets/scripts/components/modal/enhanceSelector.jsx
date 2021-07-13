@@ -72,16 +72,6 @@ export default function EnhanceSelectorModal (props) {
     const [stateSegment, updateSegment] = useState(undefined)
     const refModal = useRef()
 
-    useEffect(() => {
-        if (Helper.isEmpty(stateModalData)) {
-            return
-        }
-
-        let sortedList = EnhanceDataset.getList()
-
-        updateSortedList(sortedList)
-    }, [stateModalData])
-
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
@@ -92,6 +82,17 @@ export default function EnhanceSelectorModal (props) {
             unsubscribe()
         }
     }, [])
+
+    // Initialize
+    useEffect(() => {
+        if (Helper.isEmpty(stateModalData)) {
+            return
+        }
+
+        let sortedList = EnhanceDataset.getList()
+
+        updateSortedList(sortedList)
+    }, [stateModalData])
 
     /**
      * Handle Functions

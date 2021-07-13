@@ -29,7 +29,7 @@ export const getWeaponExtendItem = (equipData) => {
 
     let weaponItem = null
 
-    if ('custom' === equipData.id) {
+    if ('customWeapon' === equipData.id) {
         weaponItem = Helper.deepCopy(equipData.custom)
     } else {
         weaponItem = WeaponDataset.getItem(equipData.id)
@@ -164,7 +164,7 @@ export const getCharmExtendItem = (equipData) => {
         return null
     }
 
-    if ('custom' !== equipData.id) {
+    if ('customCharm' !== equipData.id) {
         return null
     }
 
@@ -221,7 +221,7 @@ export const getCharmExtendItem = (equipData) => {
 
     // Replace Skills
     charmItem.skills = Object.values(skillMapping)
-    charmItem.skills = armorItem.skills.sort((skillDataA, skillDataB) => {
+    charmItem.skills = charmItem.skills.sort((skillDataA, skillDataB) => {
         return skillDataB.level - skillDataA.level
     })
 
@@ -271,7 +271,7 @@ export const getEquipItem = (equipType, equipData) => {
 
     switch (equipTypeToDatasetType(equipType)) {
     case 'weapon':
-        return ('custom' === equipData.id)
+        return ('customWeapon' === equipData.id)
             ? Helper.deepCopy(equipData.custom)
             : Helper.deepCopy(WeaponDataset.getItem(equipData.id))
     case 'armor':
@@ -279,7 +279,7 @@ export const getEquipItem = (equipType, equipData) => {
     case 'petalace':
         return Helper.deepCopy(PetalaceDataset.getItem(equipData.id))
     case 'charm':
-        return ('custom' === equipData.id)
+        return ('customCharm' === equipData.id)
             ? Helper.deepCopy(equipData.custom) : null
     default:
         return null

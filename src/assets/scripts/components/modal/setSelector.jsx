@@ -104,6 +104,19 @@ export default function SetSelectorModal (props) {
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
+    // Like Did Mount & Will Unmount Cycle
+    useEffect(() => {
+        const unsubscribe = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('setSelector'))
+            updateRequiredConditions(States.getter.getRequiredConditions())
+        })
+
+        return () => {
+            unsubscribe()
+        }
+    }, [])
+
+    // Initialize
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
@@ -147,18 +160,6 @@ export default function SetSelectorModal (props) {
         stateModalData,
         stateRequiredConditions
     ])
-
-    // Like Did Mount & Will Unmount Cycle
-    useEffect(() => {
-        const unsubscribe = States.store.subscribe(() => {
-            updateModalData(States.getter.getModalData('setSelector'))
-            updateRequiredConditions(States.getter.getRequiredConditions())
-        })
-
-        return () => {
-            unsubscribe()
-        }
-    }, [])
 
     /**
      * Handle Functions

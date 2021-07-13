@@ -88,6 +88,16 @@ export const setPlayerEquipEnhance = (equipType, idIndex, enhanceId) => {
     })
 }
 
+export const setPlayerEquipCustomDataset = (equipType, customDataset) => {
+    store.dispatch({
+        type: 'SET_PLAYER_EQUIP_CUSTOM',
+        payload: {
+            equipType: equipType,
+            customDataset: customDataset
+        }
+    })
+}
+
 // Required Conditions
 export const cleanRequiredConditions = () => {
     store.dispatch({
@@ -112,6 +122,16 @@ export const setRequiredConditionsEquipJewel = (equipType, idIndex, jewelId) => 
             equipType: equipType,
             idIndex: idIndex,
             jewelId: jewelId
+        }
+    })
+}
+
+export const setRequiredConditionsEquipCustomDataset = (equipType, customDataset) => {
+    store.dispatch({
+        type: 'SET_REQUIRED_CONDITIONS_EQUIP_CUSTOM',
+        payload: {
+            equipType: equipType,
+            customDataset: customDataset
         }
     })
 }
@@ -263,10 +283,12 @@ export default {
     setPlayerEquip,
     setPlayerEquipJewel,
     setPlayerEquipEnhance,
+    setPlayerEquipCustomDataset,
 
     cleanRequiredConditions,
     setRequiredConditionsEquip,
     setRequiredConditionsEquipJewel,
+    setRequiredConditionsEquipCustomDataset,
     addRequiredConditionsSet,
     removeRequiredConditionsSet,
     increaseRequiredConditionsSetCount,

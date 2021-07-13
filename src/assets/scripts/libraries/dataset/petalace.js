@@ -34,7 +34,7 @@ import Petalaces from 'datasets/petalaces.json'
 //         1: obtain
 //     ]
 // ]
-let dataset = Petalaces.map((petalaceItem) => {
+const dataset = Petalaces.map((petalaceItem) => {
     return {
         id: petalaceItem[0],
         name: petalaceItem[1],

@@ -15,8 +15,6 @@ import Helper from 'core/helper'
 
 // Load Custom Libraries
 import JewelDataset from 'libraries/dataset/jewel'
-import SkillDataset from 'libraries/dataset/skill'
-// import SetDataset from 'libraries/dataset/set'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -53,12 +51,7 @@ const getRareList = () => {
         { key: 4,   value: 4 },
         { key: 5,   value: 5 },
         { key: 6,   value: 6 },
-        { key: 7,   value: 7 },
-        { key: 8,   value: 8 },
-        { key: 9,   value: 9 },
-        { key: 10,  value: 10 },
-        { key: 11,  value: 11 },
-        { key: 12,  value: 12 }
+        { key: 7,   value: 7 }
     ]
 }
 
@@ -69,8 +62,7 @@ const getSharpnessList = () => {
         { key: 'yellow',    value: _('yellow') },
         { key: 'green',     value: _('green') },
         { key: 'blue',      value: _('blue') },
-        { key: 'white',     value: _('white') },
-        { key: 'purple',    value: _('purple') },
+        { key: 'white',     value: _('white') }
     ]
 }
 
@@ -95,45 +87,14 @@ const getStatusElementList = () => {
     ]
 }
 
-const getEldersealList = () => {
-    return [
-        { key: 'low',       value: _('low') },
-        { key: 'medium',    value: _('medium') },
-        { key: 'high',      value: _('high') }
-    ]
-}
-
 const getSlotSizeList = () => {
     return [
         { key: 'none',  value: _('none') },
         { key: 1,       value: 1 },
         { key: 2,       value: 2 },
-        { key: 3,       value: 3 },
-        { key: 4,       value: 4 }
+        { key: 3,       value: 3 }
     ]
 }
-
-const getSkillList = () => {
-    return [
-        { key: 'none', value: _('none') },
-        ...SkillDataset.getItems().filter((skillInfo) => {
-            return skillInfo.from.weapon
-        }).map((skillInfo) => {
-            return { key: skillInfo.id, value: _(skillInfo.name) }
-        })
-    ]
-}
-
-// const getSetList = () => {
-//     return [
-//         { key: 'none', value: _('none') },
-//         ...SetDataset.getItems().filter((setInfo) => {
-//             return setInfo.from.weapon
-//         }).map((setInfo) => {
-//             return { key: setInfo.id, value: _(setInfo.name) }
-//         })
-//     ]
-// }
 
 const getValue = (value) => {
     if (Helper.isEmpty(value)) {
@@ -187,6 +148,26 @@ const getSetId = (set) => {
     return set.id
 }
 
+const handleRefreshCustomDataset = (tempData) => {
+    if ('playerEquips' === tempData.target) {
+        States.setter.setPlayerEquipCustomDataset('weapon', tempData.custom)
+    }
+
+    if ('requiredConditions' === tempData.target) {
+        States.setter.setRequiredConditionsEquipCustomDataset('weapon', tempData.custom)
+    }
+}
+
+const handleItemPickUp = (itemId, tempData) => {
+    if ('playerEquips' === tempData.target) {
+        States.setter.setPlayerEquipJewel('weapon', tempData.idIndex, itemId)
+    }
+
+    if ('requiredConditions' === tempData.target) {
+        States.setter.setRequiredConditionsEquipJewel('weapon', tempData.idIndex, itemId)
+    }
+}
+
 /**
  * Render Functions
  */
@@ -231,20 +212,21 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelInfo) => {
 }
 
 export default function CustomWeapon (props) {
+    const { target } = props
 
     /**
      * Hooks
      */
-    const [stateCustomWeapon, updateCustomWeapon] = useState(States.getter.getCustomWeapon())
-    const [stateCurrentEquips, updateCurrentEquips] = useState(States.getter.getCurrentEquips())
-    const [stateRequiredEquips, updateRequiredEquips] = useState(States.getter.getRequiredEquips())
+    const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
+    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
+
+    const [stateTempData, updateTempData] = useState(null)
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
-            updateCustomWeapon(States.getter.getCustomWeapon())
-            updateCurrentEquips(States.getter.getCurrentEquips())
-            updateRequiredEquips(States.getter.getRequiredEquips())
+            updatePlayerEquips(States.getter.getPlayerEquips())
+            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -252,32 +234,76 @@ export default function CustomWeapon (props) {
         }
     }, [])
 
+    // Initialize
+    useEffect(() => {
+        let tempData = null
+
+        if ('playerEquips' === target) {
+            tempData = Helper.deepCopy(statePlayerEquips.weapon)
+        }
+
+        if ('requiredConditions' === target) {
+            tempData = Helper.deepCopy(stateRequiredConditions.equips.weapon)
+        }
+
+        // Set Target
+        tempData.target = target
+
+        updateTempData(tempData)
+    }, [
+        target,
+        statePlayerEquips,
+        stateRequiredConditions
+    ])
+
     return useMemo(() => {
         Helper.debug('Component: EquipsDisplayer -> CustomWeapon')
 
-        let equipType = 'weapon'
-        let currentEquip = stateCurrentEquips[equipType]
-        let requiredEquip = Helper.isNotEmpty(stateRequiredEquips[equipType])
-            ? stateRequiredEquips[equipType] : null
-
-        let emptySelectorData = {
-            equipType: equipType,
-            equipId: null
+        if (Helper.isEmpty(stateTempData)) {
+            return false
         }
 
-        let isNotRequire = true
+        // let currentEquip = stateCurrentEquips[equipType]
+        // let requiredEquip = Helper.isNotEmpty(stateRequiredEquips[equipType])
+        //     ? stateRequiredEquips[equipType] : null
 
-        if (Helper.isNotEmpty(requiredEquip)) {
-            if ('weapon' === equipType) {
-                isNotRequire = Helper.jsonHash({
-                    customWeapon: stateCustomWeapon,
-                    enhances: currentEquip.enhances
-                }) !== Helper.jsonHash({
-                    customWeapon: requiredEquip.customWeapon,
-                    enhances: requiredEquip.enhances
-                })
-            } else {
-                isNotRequire = currentEquip.id !== requiredEquip.id
+        // let emptySelectorData = {
+        //     equipType: equipType,
+        //     equipId: null
+        // }
+
+        // let isNotRequire = true
+
+        // if (Helper.isNotEmpty(requiredEquip)) {
+        //     if ('weapon' === equipType) {
+        //         isNotRequire = Helper.jsonHash({
+        //             customWeapon: stateTempData.custom,
+        //             enhances: currentEquip.enhances
+        //         }) !== Helper.jsonHash({
+        //             customWeapon: requiredEquip.customWeapon,
+        //             enhances: requiredEquip.enhances
+        //         })
+        //     } else {
+        //         isNotRequire = currentEquip.id !== requiredEquip.id
+        //     }
+        // }
+        const showModal = () => {
+            States.setter.showModal('weaponSelector', {
+                target: stateTempData.target,
+                equipType: 'weapon',
+
+                // Filter
+                type: 'weapon'
+            })
+        }
+
+        const removeItem = () => {
+            if ('playerEquips' === stateTempData.target) {
+                States.setter.setPlayerEquip('weapon', null)
+            }
+
+            if ('requiredConditions' === stateTempData.target) {
+                States.setter.setRequiredConditionsEquip('weapon', null)
             }
         }
 
@@ -285,18 +311,15 @@ export default function CustomWeapon (props) {
             <div key="customWeapon" className="mhrc-item mhrc-item-3-step">
                 <div className="col-12 mhrc-name">
                     <span>{_('customWeapon')}</span>
+
                     <div className="mhrc-icons_bundle">
-                        {isNotRequire ? (
+                        {/* {isNotRequire ? (
                             <IconButton
                                 iconName="arrow-left" altName={_('include')}
-                                onClick={() => {States.setter.setRequiredEquips(equipType, stateCustomWeapon)}} />
-                        ) : false}
-                        <IconButton
-                            iconName="exchange" altName={_('change')}
-                            onClick={() => {States.setter.showEquipItemSelector(emptySelectorData)}} />
-                        <IconButton
-                            iconName="times" altName={_('clean')}
-                            onClick={() => {States.setter.setCurrentEquip(emptySelectorData)}} />
+                                onClick={() => {States.setter.setRequiredEquips(equipType, stateTempData.custom)}} />
+                        ) : false} */}
+                        <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
+                        <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
                     </div>
                 </div>
 
@@ -306,12 +329,13 @@ export default function CustomWeapon (props) {
                     </div>
                     <div className="col-9 mhrc-value">
                         <BasicSelector
-                            defaultValue={getValue(stateCustomWeapon.type)}
-                            options={getTypeList()} onChange={(event) => {
-                                let value = ('none' !== event.target.value)
+                            defaultValue={getValue(stateTempData.custom.type)}
+                            options={getTypeList()}
+                            onChange={(event) => {
+                                stateTempData.custom.type = ('none' !== event.target.value)
                                     ? event.target.value : null
 
-                                States.setter.setCustomWeaponValue('type', value)
+                                handleRefreshCustomDataset(stateTempData)
                             }} />
                     </div>
 
@@ -320,11 +344,13 @@ export default function CustomWeapon (props) {
                     </div>
                     <div className="col-3 mhrc-value">
                         <BasicSelector
-                            defaultValue={getValue(stateCustomWeapon.rare)}
-                            options={getRareList()} onChange={(event) => {
-                                let value = parseInt(event.target.value)
+                            defaultValue={getValue(stateTempData.custom.rare)}
+                            options={getRareList()}
+                            onChange={(event) => {
+                                stateTempData.custom.rare = ('none' !== event.target.value)
+                                    ? parseInt(event.target.value, 10) : null
 
-                                States.setter.setCustomWeaponValue('rare', value)
+                                handleRefreshCustomDataset(stateTempData)
                             }} />
                     </div>
 
@@ -333,12 +359,13 @@ export default function CustomWeapon (props) {
                     </div>
                     <div className="col-3 mhrc-value">
                         <BasicInput
-                            key={stateCustomWeapon.attack}
-                            defaultValue={stateCustomWeapon.attack} onChange={(event) => {
-                                let value = ('' !== event.target.value)
-                                    ? parseInt(event.target.value) : 0
+                            key={stateTempData.custom.attack}
+                            defaultValue={stateTempData.custom.attack}
+                            onChange={(event) => {
+                                stateTempData.custom.attack = ('' !== event.target.value)
+                                    ? parseInt(event.target.value, 10) : 0
 
-                                States.setter.setCustomWeaponValue('attack', value)
+                                handleRefreshCustomDataset(stateTempData)
                             }} />
                     </div>
 
@@ -346,14 +373,19 @@ export default function CustomWeapon (props) {
                         <span>{_('sharpness')}</span>
                     </div>
                     <div className="col-3 mhrc-value">
-                        {(-1 === ['lightBowgun', 'heavyBowgun', 'bow'].indexOf(stateCustomWeapon.type)) ? (
+                        {(-1 === ['lightBowgun', 'heavyBowgun', 'bow'].indexOf(stateTempData.custom.type)) ? (
                             <BasicSelector
-                                defaultValue={getSharpnessStep(stateCustomWeapon.sharpness)}
+                                defaultValue={getSharpnessStep(stateTempData.custom.sharpness)}
                                 options={getSharpnessList()} onChange={(event) => {
-                                    let value = ('none' !== event.target.value)
+                                    let targetStep = ('none' !== event.target.value)
                                         ? event.target.value : null
 
-                                    States.setter.setCustomWeaponSharpness(value)
+                                    Object.keys(stateTempData.custom.sharpness.steps).forEach((step) => {
+                                        stateTempData.custom.sharpness.steps[step] = (step === targetStep)
+                                            ? 400 : 0
+                                    })
+
+                                    handleRefreshCustomDataset(stateTempData)
                                 }} />
                         ) : false}
                     </div>
@@ -363,29 +395,14 @@ export default function CustomWeapon (props) {
                     </div>
                     <div className="col-3 mhrc-value">
                         <BasicInput
-                            key={stateCustomWeapon.criticalRate}
-                            defaultValue={stateCustomWeapon.criticalRate} onChange={() => {
-                                let value = ('' !== event.target.value)
-                                    ? parseInt(event.target.value) : 0
+                            key={stateTempData.custom.criticalRate}
+                            defaultValue={stateTempData.custom.criticalRate}
+                            onChange={(event) => {
+                                stateTempData.custom.criticalRate = ('' !== event.target.value)
+                                    ? parseInt(event.target.value, 10) : 0
 
-                                States.setter.setCustomWeaponValue('criticalRate', value)
+                                handleRefreshCustomDataset(stateTempData)
                             }} />
-                    </div>
-
-                    <div className="col-3 mhrc-name">
-                        <span>{_('elderseal')}</span>
-                    </div>
-                    <div className="col-3 mhrc-value">
-                        {('dragon' === getElementType(stateCustomWeapon.element.attack)) ? (
-                            <BasicSelector
-                                defaultValue={getValue(stateCustomWeapon.elderseal.affinity)}
-                                options={getEldersealList()} onChange={(event) => {
-                                    let value = ('none' !== event.target.value)
-                                        ? event.target.value : null
-
-                                    States.setter.setCustomWeaponElderseal(value)
-                                }} />
-                        ) : false}
                     </div>
 
                     <div className="col-3 mhrc-name">
@@ -393,12 +410,13 @@ export default function CustomWeapon (props) {
                     </div>
                     <div className="col-3 mhrc-value">
                         <BasicInput
-                            key={stateCustomWeapon.defense}
-                            defaultValue={stateCustomWeapon.defense} onChange={() => {
-                                let value = ('' !== event.target.value)
-                                    ? parseInt(event.target.value) : 0
+                            key={stateTempData.custom.defense}
+                            defaultValue={stateTempData.custom.defense}
+                            onChange={(event) => {
+                                stateTempData.custom.defense = ('' !== event.target.value)
+                                    ? parseInt(event.target.value, 10) : 0
 
-                                States.setter.setCustomWeaponValue('defense', value)
+                                handleRefreshCustomDataset(stateTempData)
                             }} />
                     </div>
                 </div>
@@ -409,56 +427,61 @@ export default function CustomWeapon (props) {
                     </div>
                     <div className="col-3 mhrc-value">
                         <BasicSelector
-                            defaultValue={getElementType(stateCustomWeapon.element.attack)}
-                            options={getAttackElementList()} onChange={(event) => {
-                                let value = ('none' !== event.target.value)
+                            defaultValue={getElementType(stateTempData.custom.element.attack.type)}
+                            options={getAttackElementList()}
+                            onChange={(event) => {
+                                stateTempData.custom.element.attack.type = ('' !== event.target.value)
                                     ? event.target.value : null
 
-                                States.setter.setCustomWeaponElementType('attack', value)
+                                handleRefreshCustomDataset(stateTempData)
                             }} />
                     </div>
                     <div className="col-6 mhrc-value">
-                        {('none' !== getElementType(stateCustomWeapon.element.attack)) ? (
+                        {('none' !== getElementType(stateTempData.custom.element.attack)) ? (
                             <BasicInput
-                                key={stateCustomWeapon.element.attack.minValue}
-                                defaultValue={stateCustomWeapon.element.attack.minValue} onChange={() => {
-                                    let value = ('' !== event.target.value)
-                                        ? parseInt(event.target.value) : 0
+                                key={stateTempData.custom.element.attack.minValue}
+                                defaultValue={stateTempData.custom.element.attack.minValue}
+                                onChange={(event) => {
+                                    stateTempData.custom.element.attack.value = ('' !== event.target.value)
+                                        ? parseInt(event.target.value, 10) : 0
 
-                                    States.setter.setCustomWeaponElementValue('attack', value)
+                                    handleRefreshCustomDataset(stateTempData)
                                 }} />
                         ) : false}
                     </div>
+
                     <div className="col-3 mhrc-name">
                         <span>{_('element')}: 2</span>
                     </div>
                     <div className="col-3 mhrc-value">
                         <BasicSelector
-                            defaultValue={getElementType(stateCustomWeapon.element.status)}
-                            options={getStatusElementList()} onChange={(event) => {
-                                let value = ('none' !== event.target.value)
+                            defaultValue={getElementType(stateTempData.custom.element.status.type)}
+                            options={getStatusElementList()}
+                            onChange={(event) => {
+                                stateTempData.custom.element.status.type = ('' !== event.target.value)
                                     ? event.target.value : null
 
-                                States.setter.setCustomWeaponElementType('status', value)
+                                handleRefreshCustomDataset(stateTempData)
                             }} />
                     </div>
                     <div className="col-6 mhrc-value">
-                        {('none' !== getElementType(stateCustomWeapon.element.status)) ? (
+                        {('none' !== getElementType(stateTempData.custom.element.status)) ? (
                             <BasicInput
-                                key={stateCustomWeapon.element.status.minValue}
-                                defaultValue={stateCustomWeapon.element.status.minValue} onChange={() => {
-                                    let value = ('' !== event.target.value)
-                                        ? parseInt(event.target.value) : 0
+                                key={stateTempData.custom.element.status.minValue}
+                                defaultValue={stateTempData.custom.element.status.minValue}
+                                onChange={(event) => {
+                                    stateTempData.custom.element.status.value = ('' !== event.target.value)
+                                        ? parseInt(event.target.value, 10) : 0
 
-                                    States.setter.setCustomWeaponElementValue('status', value)
+                                    handleRefreshCustomDataset(stateTempData)
                                 }} />
                         ) : false}
                     </div>
                 </div>
 
-                <div className="col-12 mhrc-content">
-                    {[...Array(stateCustomWeapon.slots.length + 1 <= 3
-                        ? stateCustomWeapon.slots.length + 1 : 3).keys()].map((index) => {
+                {/* <div className="col-12 mhrc-content">
+                    {[...Array(stateTempData.custom.slots.length + 1 <= 3
+                        ? stateTempData.custom.slots.length + 1 : 3).keys()].map((index) => {
                         return (
                             <Fragment key={index}>
                                 <div className="col-3 mhrc-name">
@@ -466,19 +489,19 @@ export default function CustomWeapon (props) {
                                 </div>
                                 <div className="col-3 mhrc-value">
                                     <BasicSelector
-                                        defaultValue={getSlotSize(stateCustomWeapon.slots[index])}
+                                        defaultValue={getSlotSize(stateTempData.custom.slots[index])}
                                         options={getSlotSizeList()} onChange={(event) => {
                                             let value = ('none' !== event.target.value)
-                                                ? parseInt(event.target.value) : null
+                                                ? parseInt(event.target.value, 10) : null
 
                                             States.setter.setCustomWeaponSlot(index, value)
                                         }} />
                                 </div>
                                 <div className="col-6 mhrc-value">
-                                    {('none' !== getSlotSize(stateCustomWeapon.slots[index])) ? (
+                                    {('none' !== getSlotSize(stateTempData.custom.slots[index])) ? (
                                         renderJewelOption(
                                             equipType, index,
-                                            getSlotSize(stateCustomWeapon.slots[index]),
+                                            getSlotSize(stateTempData.custom.slots[index]),
                                             JewelDataset.getInfo(currentEquip.slotIds[index])
                                         )
                                     ) : false}
@@ -486,38 +509,8 @@ export default function CustomWeapon (props) {
                             </Fragment>
                         )
                     })}
-                </div>
-
-                <div className="col-12 mhrc-content">
-                    <div className="col-3 mhrc-name">
-                        <span>{_('skill')}</span>
-                    </div>
-                    <div className="col-9 mhrc-value">
-                        <BasicSelector
-                            defaultValue={getSkillId(stateCustomWeapon.skills[0])}
-                            options={getSkillList()} onChange={(event) => {
-                                let value = ('none' !== event.target.value)
-                                    ? event.target.value : null
-
-                                States.setter.setCustomWeaponSkill(0, value)
-                            }} />
-                    </div>
-
-                    {/* <div className="col-3 mhrc-name">
-                        <span>{_('set')}</span>
-                    </div>
-                    <div className="col-9 mhrc-value">
-                        <BasicSelector
-                            defaultValue={getSetId(stateCustomWeapon.set)}
-                            options={getSetList()} onChange={(event) => {
-                                let value = ('none' !== event.target.value)
-                                    ? event.target.value : null
-
-                                States.setter.setCustomWeaponSet(value)
-                            }} />
-                    </div> */}
-                </div>
+                </div> */}
             </div>
         )
-    }, [stateCustomWeapon, stateCurrentEquips, stateRequiredEquips])
+    }, [ stateTempData ])
 }

@@ -174,6 +174,20 @@ export default function WeaponSelectorModal (props) {
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
 
+    // Like Did Mount & Will Unmount Cycle
+    useEffect(() => {
+        const unsubscribe = States.store.subscribe(() => {
+            updateModalData(States.getter.getModalData('weaponSelector'))
+            updatePlayerEquips(States.getter.getPlayerEquips())
+            updateRequiredConditions(States.getter.getRequiredConditions())
+        })
+
+        return () => {
+            unsubscribe()
+        }
+    }, [])
+
+    // Initialize
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
@@ -244,19 +258,6 @@ export default function WeaponSelectorModal (props) {
         statePlayerEquips,
         stateRequiredConditions
     ])
-
-    // Like Did Mount & Will Unmount Cycle
-    useEffect(() => {
-        const unsubscribe = States.store.subscribe(() => {
-            updateModalData(States.getter.getModalData('weaponSelector'))
-            updatePlayerEquips(States.getter.getPlayerEquips())
-            updateRequiredConditions(States.getter.getRequiredConditions())
-        })
-
-        return () => {
-            unsubscribe()
-        }
-    }, [])
 
     /**
      * Handle Functions

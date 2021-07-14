@@ -115,9 +115,7 @@ const dataset = Weapons.map((weaponItem) => {
             || Helper.isNotEmpty(weaponResult.sharpness.steps.purple)
         )
     ) {
-        weaponResult.sharpness.value = Helper.isNotEmpty(weaponResult.sharpness.maxValue)
-            ? weaponResult.sharpness.maxValue
-            : weaponResult.sharpness.minValue
+        weaponResult.sharpness.value = weaponResult.sharpness.minValue
     } else {
         weaponResult.sharpness = null
     }
@@ -219,14 +217,6 @@ class WeaponDataset {
     getItem = (id) => {
         return (Helper.isNotEmpty(this.mapping[id]))
             ? Helper.deepCopy(this.mapping[id]) : null
-    }
-
-    setItem = (id, item) => {
-        if (Helper.isNotEmpty(item)) {
-            this.mapping[id] = item
-        } else {
-            delete this.mapping[id]
-        }
     }
 
     // Conditional Functions

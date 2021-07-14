@@ -19,6 +19,8 @@ import JewelDataset from 'libraries/dataset/jewel'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
+import CustomWeapon from 'components/common/customWeapon'
+import CustomCharm from 'components/common/customCharm'
 
 // Load States
 import States from 'states'
@@ -103,7 +105,7 @@ const renderEquipItem = (equipType, requiredEquipData) => {
                             <IconButton
                                 iconName="wrench" altName={_('customEquip')}
                                 onClick={() => {
-                                    States.setter.setRequiredConditionsEquip(equipType, 'custom')
+                                    States.setter.setRequiredConditionsEquip(equipType, 'custom' + Helper.ucfirst(equipType))
                                 }} />
                         ) : false}
                         {'charm' !== equipType ? (
@@ -185,6 +187,22 @@ export default function EquipList (props) {
                 </div>
 
                 {Object.keys(stateRequiredConditions.equips).map((equipType) => {
+                    if ('weapon' === Misc.equipTypeToDatasetType(equipType)
+                        && 'customWeapon' === stateRequiredConditions.equips[equipType].id
+                    ) {
+                        return (
+                            <CustomWeapon key="customWeapon" target="requiredConditions" />
+                        )
+                    }
+
+                    if ('charm' === Misc.equipTypeToDatasetType(equipType)
+                        && 'customCharm' === stateRequiredConditions.equips[equipType].id
+                    ) {
+                        return (
+                            <CustomCharm key="customCharm" target="requiredConditions" />
+                        )
+                    }
+
                     return renderEquipItem(equipType, stateRequiredConditions.equips[equipType])
                 })}
             </div>

@@ -111,10 +111,10 @@ const generateStatus = (equipInfos, passiveSkills) => {
 
     if (Helper.isNotEmpty(equipInfos.weapon)) {
         status.critical.rate = equipInfos.weapon.criticalRate
-        status.sharpness = {
+        status.sharpness = Helper.isNotEmpty(equipInfos.weapon.sharpness) ? {
             value: equipInfos.weapon.sharpness.value,
             steps: equipInfos.weapon.sharpness.steps
-        }
+        } : null
         status.element = equipInfos.weapon.element
 
         weaponType = equipInfos.weapon.type
@@ -820,11 +820,14 @@ export default function PlayerStatusBlock (props) {
                                 </div>
                                 <div className="col-9 mhrc-value mhrc-sharpness">
                                     <SharpnessBar
-                                        key={Helper.jsonHash(originalSharpness) + ':1'}
-                                        data={originalSharpness} />
-                                    <SharpnessBar
-                                        key={Helper.jsonHash(status.sharpness) + ':2'}
+                                        key={Helper.jsonHash(status.sharpness) + ':1'}
                                         data={status.sharpness} />
+                                    <SharpnessBar
+                                        key={Helper.jsonHash(originalSharpness) + ':2'}
+                                        data={{
+                                            value: originalSharpness.maxValue,
+                                            steps: originalSharpness.steps
+                                        }} />
                                 </div>
                             </Fragment>
                         ) : false}

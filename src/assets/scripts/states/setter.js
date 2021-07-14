@@ -105,6 +105,16 @@ export const cleanRequiredConditions = () => {
     })
 }
 
+export const replaceRequiredConditionsEquipData = (equipType, equipData) => {
+    store.dispatch({
+        type: 'REPLACE_REQUIRED_CONDITIONS_EQUIP',
+        payload: {
+            equipType: equipType,
+            equipData: equipData
+        }
+    })
+}
+
 export const setRequiredConditionsEquip = (equipType, equipId) => {
     store.dispatch({
         type: 'SET_REQUIRED_CONDITIONS_EQUIP',
@@ -286,6 +296,7 @@ export default {
     setPlayerEquipCustomDataset,
 
     cleanRequiredConditions,
+    replaceRequiredConditionsEquipData,
     setRequiredConditionsEquip,
     setRequiredConditionsEquipJewel,
     setRequiredConditionsEquipCustomDataset,

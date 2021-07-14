@@ -13,14 +13,18 @@ import React, { useMemo } from 'react'
 import Helper from 'core/helper'
 
 export default function BasicInput (props) {
-    const {defaultValue, placeholder, onChange, bypassRef} = props
+    const {type, defaultValue, placeholder, onChange, bypassRef} = props
+
+    let currentType = (Helper.isEmpty(type) || '' === type) ? 'text' : type
 
     return useMemo(() => {
         Helper.debug('Component: Common -> BasicInput')
 
         return (
             <div className="mhrc-basic_input">
-                <input className="mhrc-input" type="text" ref={bypassRef}
+                <input className="mhrc-input"
+                    type={currentType}
+                    ref={bypassRef}
                     defaultValue={defaultValue}
                     placeholder={placeholder}
                     onBlur={onChange}

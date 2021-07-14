@@ -18,7 +18,6 @@ import Config from 'config'
 // Load App
 import App from 'app'
 
-// Load Components
 // Set Sentry Endpoint
 if ('production' === Config.env) {
     Sentry.configureScope((scope) => {

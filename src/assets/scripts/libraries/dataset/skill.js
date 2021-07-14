@@ -65,14 +65,6 @@ class SkillDataset {
         return (Helper.isNotEmpty(this.mapping[id]))
             ? Helper.deepCopy(this.mapping[id]) : null
     }
-
-    setItem = (id, item) => {
-        if (Helper.isNotEmpty(item)) {
-            this.mapping[id] = item
-        } else {
-            delete this.mapping[id]
-        }
-    }
 }
 
 export default new SkillDataset(dataset)

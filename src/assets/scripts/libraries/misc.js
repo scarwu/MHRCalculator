@@ -22,6 +22,57 @@ import JewelDataset from 'libraries/dataset/jewel'
 import EnhanceDataset from 'libraries/dataset/enhance'
 import SkillDataset from 'libraries/dataset/skill'
 
+export const verifyCustomWeaponItem = (customDataset) => {
+    if ('lightBowgun' === customDataset.type
+        || 'heavyBowgun' === customDataset.type
+        || 'bow' === customDataset.type
+    ) {
+        customDataset.sharpness = null
+    } else if (Helper.isEmpty(customDataset.sharpness.value)
+        || Helper.isEmpty(customDataset.sharpness.steps)
+        || (Helper.isEmpty(customDataset.sharpness.steps.red)
+            && Helper.isEmpty(customDataset.sharpness.steps.orange)
+            && Helper.isEmpty(customDataset.sharpness.steps.yellow)
+            && Helper.isEmpty(customDataset.sharpness.steps.green)
+            && Helper.isEmpty(customDataset.sharpness.steps.blue)
+            && Helper.isEmpty(customDataset.sharpness.steps.white)
+            && Helper.isEmpty(customDataset.sharpness.steps.purple)
+        )
+    ) {
+        customDataset.sharpness = null
+    }
+
+    if (Helper.isEmpty(customDataset.element.attack.type)
+        || Helper.isEmpty(customDataset.element.attack.value)
+    ) {
+        customDataset.element.attack = null
+    }
+
+    if (Helper.isEmpty(customDataset.element.status.type)
+        || Helper.isEmpty(customDataset.element.status.value)
+    ) {
+        customDataset.element.status = null
+    }
+
+    customDataset.slots = customDataset.slots.filter((slotData) => {
+        return Helper.isNotEmpty(slotData.size)
+    })
+
+    return customDataset
+}
+
+export const verifyCustomCharmItem = (customDataset) => {
+    customDataset.slots = customDataset.slots.filter((slotData) => {
+        return Helper.isNotEmpty(slotData.size)
+    })
+
+    customDataset.skills = customDataset.skills.filter((skillData) => {
+        return Helper.isNotEmpty(skillData.id) && Helper.isNotEmpty(skillData.level)
+    })
+
+    return customDataset
+}
+
 export const getWeaponExtendItem = (equipData) => {
     if (Helper.isEmpty(equipData.id)) {
         return null
@@ -31,6 +82,7 @@ export const getWeaponExtendItem = (equipData) => {
 
     if ('customWeapon' === equipData.id) {
         weaponItem = Helper.deepCopy(equipData.custom)
+        weaponItem = verifyCustomWeaponItem(weaponItem)
     } else {
         weaponItem = WeaponDataset.getItem(equipData.id)
     }
@@ -168,7 +220,7 @@ export const getCharmExtendItem = (equipData) => {
         return null
     }
 
-    let charmItem = Helper.deepCopy(equipData.custom)
+    let charmItem = verifyCustomCharmItem(Helper.deepCopy(equipData.custom))
 
     if (Helper.isEmpty(charmItem)) {
         return null
@@ -272,7 +324,7 @@ export const getEquipItem = (equipType, equipData) => {
     switch (equipTypeToDatasetType(equipType)) {
     case 'weapon':
         return ('customWeapon' === equipData.id)
-            ? Helper.deepCopy(equipData.custom)
+            ? verifyCustomWeaponItem(Helper.deepCopy(equipData.custom))
             : Helper.deepCopy(WeaponDataset.getItem(equipData.id))
     case 'armor':
         return Helper.deepCopy(ArmorDataset.getItem(equipData.id))
@@ -280,7 +332,7 @@ export const getEquipItem = (equipType, equipData) => {
         return Helper.deepCopy(PetalaceDataset.getItem(equipData.id))
     case 'charm':
         return ('customCharm' === equipData.id)
-            ? Helper.deepCopy(equipData.custom) : null
+            ? verifyCustomCharmItem(Helper.deepCopy(equipData.custom)) : null
     default:
         return null
     }

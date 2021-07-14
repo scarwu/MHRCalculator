@@ -368,9 +368,23 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
         && ('customWeapon' === currentEquipData.id || 'customCharm' === currentEquipData.id)
         && ('customWeapon' === requiredEquipData.id || 'customCharm' === requiredEquipData.id)
     ) {
-        isNotRequire = Helper.jsonHash(currentEquipData.custom) !== Helper.jsonHash(requiredEquipData.custom)
+        isNotRequire = Helper.jsonHash({
+            id: currentEquipData.id,
+            jewelIds: currentEquipData.jewelIds,
+            custom: currentEquipData.custom
+        }) !== Helper.jsonHash({
+            id: requiredEquipData.id,
+            jewelIds: requiredEquipData.jewelIds,
+            custom: requiredEquipData.custom
+        })
     } else {
-        isNotRequire = currentEquipData.id !== requiredEquipData.id
+        isNotRequire = Helper.jsonHash({
+            id: currentEquipData.id,
+            jewelIds: currentEquipData.jewelIds
+        }) !== Helper.jsonHash({
+            id: requiredEquipData.id,
+            jewelIds: requiredEquipData.jewelIds
+        })
     }
 
     const showModal = () => {
@@ -418,7 +432,7 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
                         <IconButton
                             iconName="arrow-left" altName={_('include')}
                             onClick={() => {
-                                States.setter.setRequiredConditionsEquip(equipType, currentEquipData.id)
+                                States.setter.replaceRequiredConditionsEquipData(equipType, currentEquipData)
                             }} />
                     ) : false}
                     {'weapon' === equipType || 'charm' === equipType ? (

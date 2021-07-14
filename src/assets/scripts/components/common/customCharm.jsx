@@ -14,14 +14,13 @@ import _ from 'core/lang'
 import Helper from 'core/helper'
 
 // Load Libraries
+import Misc from 'libraries/misc'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
-// import SetDataset from 'libraries/dataset/set'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
 import BasicSelector from 'components/common/basicSelector'
-import BasicInput from 'components/common/basicInput'
 
 // Load States
 import States from 'states'
@@ -44,51 +43,50 @@ const getSkillList = () => {
     ]
 }
 
-const getSlotSize = (slot) => {
-    if (Helper.isEmpty(slot)) {
-        return 'none'
+const getSkillLevelList = (currentLevel) => {
+    let list = [
+        { key: 'none', value: _('none') }
+    ]
+
+    for (let level = 1; level <= currentLevel; level++) {
+        list.push({
+            key: level,
+            value: 'Lv.' + level
+        })
     }
 
-    return slot.size
+    return list
 }
 
-const getSkillId = (skill) => {
-    if (Helper.isEmpty(skill)) {
-        return 'none'
+const getValue = (value, defaultValue = '') => {
+    if (Helper.isEmpty(value)) {
+        return defaultValue
     }
 
-    return skill.id
+    return value
 }
 
-const getSkillLevel = (skill) => {
-    if (Helper.isEmpty(skill)) {
-        return 'none'
+const handleRefreshCustomDataset = (majorData) => {
+    if ('playerEquips' === majorData.target) {
+        States.setter.setPlayerEquipCustomDataset('charm', majorData.custom)
     }
 
-    return skill.level
-}
-
-const handleRefreshCustomDataset = (tempData) => {
-    if ('playerEquips' === tempData.target) {
-        States.setter.setPlayerEquipCustomDataset('charm', tempData.custom)
-    }
-
-    if ('requiredConditions' === tempData.target) {
-        States.setter.setRequiredConditionsEquipCustomDataset('charm', tempData.custom)
+    if ('requiredConditions' === majorData.target) {
+        States.setter.setRequiredConditionsEquipCustomDataset('charm', majorData.custom)
     }
 }
 
 /**
  * Render Functions
  */
-const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
+const renderJewelOption = (target, equipType, slotIndex, slotSize, jewelId) => {
 
     // Get Jewel Item
     let jewelItem = JewelDataset.getItem(jewelId)
 
     const showModal = () => {
         States.setter.showModal('jewelSelector', {
-            target: 'playerEquips',
+            target: target,
             equipType: equipType,
             idIndex: slotIndex,
 
@@ -98,7 +96,13 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
     }
 
     const removeItem = () => {
-        States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
+        if ('playerEquips' === target) {
+            States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
+        }
+
+        if ('requiredConditions' === target) {
+            States.setter.setRequiredConditionsEquipJewel(equipType, slotIndex, null)
+        }
     }
 
     return (
@@ -130,7 +134,8 @@ export default function CustomCharm (props) {
     const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
     const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
-    const [stateTempData, updateTempData] = useState(null)
+    const [stateMajorData, updateMajorData] = useState(null)
+    const [stateMinorData, updateMinorData] = useState(null)
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -146,17 +151,23 @@ export default function CustomCharm (props) {
 
     // Initialize
     useEffect(() => {
-        let tempData = null
+        let majorData = null
+        let minorData = null
 
         if ('playerEquips' === target) {
-            tempData = Helper.deepCopy(statePlayerEquips.charm)
+            majorData = Helper.deepCopy(statePlayerEquips.charm)
+            minorData = Helper.deepCopy(stateRequiredConditions.equips.charm)
         }
 
         if ('requiredConditions' === target) {
-            tempData = Helper.deepCopy(stateRequiredConditions.equips.charm)
+            majorData = Helper.deepCopy(stateRequiredConditions.equips.charm)
         }
 
-        updateTempData(tempData)
+        // Set Target
+        majorData.target = target
+
+        updateMajorData(majorData)
+        updateMinorData(minorData)
     }, [
         target,
         statePlayerEquips,
@@ -166,36 +177,81 @@ export default function CustomCharm (props) {
     return useMemo(() => {
         Helper.debug('Component: EquipsDisplayer -> CustomCharm')
 
-        if (Helper.isEmpty(stateTempData)) {
+        if (Helper.isEmpty(stateMajorData)) {
             return false
         }
 
+        let isNotRequire = true
+
+        if ('playerEquips' === stateMajorData.target) {
+            if (('weapon' === stateMajorData.type || 'charm' === stateMajorData.type)
+                && ('customWeapon' === stateMajorData.id || 'customCharm' === stateMajorData.id)
+                && ('customWeapon' === stateMinorData.id || 'customCharm' === stateMinorData.id)
+            ) {
+                isNotRequire = Helper.jsonHash({
+                    id: stateMajorData.id,
+                    jewelIds: stateMajorData.jewelIds,
+                    custom: stateMajorData.custom
+                }) !== Helper.jsonHash({
+                    id: stateMinorData.id,
+                    jewelIds: stateMinorData.jewelIds,
+                    custom: stateMinorData.custom
+                })
+            } else {
+                isNotRequire = Helper.jsonHash({
+                    id: stateMajorData.id,
+                    jewelIds: stateMajorData.jewelIds
+                }) !== Helper.jsonHash({
+                    id: stateMinorData.id,
+                    jewelIds: stateMinorData.jewelIds
+                })
+            }
+        }
+
         const removeItem = () => {
-            if ('playerEquips' === stateTempData.target) {
+            if ('playerEquips' === stateMajorData.target) {
                 States.setter.setPlayerEquip('charm', null)
             }
 
-            if ('requiredConditions' === stateTempData.target) {
+            if ('requiredConditions' === stateMajorData.target) {
                 States.setter.setRequiredConditionsEquip('charm', null)
             }
         }
 
+        // Set Class Names
+        let classNames = [
+            'mhrc-item'
+        ]
+
+        if ('playerEquips' === stateMajorData.target) {
+            classNames.push('mhrc-item-3-step')
+        }
+
+        if ('requiredConditions' === stateMajorData.target) {
+            classNames.push('mhrc-content')
+        }
+
+        // Get Equip Extend Item
+        let equipExtendItem = Misc.getEquipExtendItem('charm', stateMajorData)
+
         return (
-            <div key="customCharm" className="mhrc-item mhrc-item-3-step">
+            <div key="customCharm" className={classNames.join(' ')}>
                 <div className="col-12 mhrc-name">
                     <span>{_('customCharm')}</span>
                     <div className="mhrc-icons_bundle">
-                        {/* {isNotRequire ? (
+                        {('playerEquips' === stateMajorData.target && isNotRequire) ? (
                             <IconButton
                                 iconName="arrow-left" altName={_('include')}
-                                onClick={() => {States.setter.setRequiredEquips(equipType, stateTempData.custom)}} />
-                        ) : false} */}
+                                onClick={() => {
+                                    States.setter.replaceRequiredConditionsEquipData('charm', stateMajorData)
+                                }} />
+                        ) : false}
                         <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
                     </div>
                 </div>
 
                 <div className="col-12 mhrc-content">
-                    {stateTempData.custom.slots.map((slotData, slotIndex) => {
+                    {stateMajorData.custom.slots.map((slotData, slotIndex) => {
                         return (
                             <Fragment key={slotIndex}>
                                 <div className="col-3 mhrc-name">
@@ -203,23 +259,33 @@ export default function CustomCharm (props) {
                                 </div>
                                 <div className="col-3 mhrc-value">
                                     <BasicSelector
-                                        defaultValue={getSlotSize(stateTempData.custom.slots[slotIndex])}
+                                        defaultValue={getValue(stateMajorData.custom.slots[slotIndex].size, 'none')}
                                         options={getSlotSizeList()}
                                         onChange={(event) => {
-                                            stateTempData.custom.slots[slotIndex].size = ('none' !== event.target.value)
+                                            stateMajorData.custom.slots[slotIndex].size = ('none' !== event.target.value)
                                                 ? parseInt(event.target.value, 10) : null
 
-                                            handleRefreshCustomDataset(stateTempData)
+                                            // Clean Jewel
+                                            if ('playerEquips' === stateMajorData.target) {
+                                                States.setter.setPlayerEquipJewel('charm', slotIndex, null)
+                                            }
+
+                                            if ('requiredConditions' === stateMajorData.target) {
+                                                States.setter.setRequiredConditionsEquipJewel('charm', slotIndex, null)
+                                            }
+
+                                            handleRefreshCustomDataset(stateMajorData)
                                         }} />
                                 </div>
                                 <div className="col-6 mhrc-value">
-                                    {('none' !== getSlotSize(stateTempData.custom.slots[slotIndex])) ? (
+                                    {Helper.isNotEmpty(stateMajorData.custom.slots[slotIndex].size) ? (
                                         renderJewelOption(
+                                            stateMajorData.target,
                                             'charm',
                                             slotIndex,
                                             slotData.size,
-                                            Helper.isNotEmpty(stateTempData.jewelIds[slotIndex])
-                                                ? stateTempData.jewelIds[slotIndex] : null
+                                            Helper.isNotEmpty(stateMajorData.jewelIds[slotIndex])
+                                                ? stateMajorData.jewelIds[slotIndex] : null
                                         )
                                     ) : false}
                                 </div>
@@ -229,39 +295,68 @@ export default function CustomCharm (props) {
                 </div>
 
                 <div className="col-12 mhrc-content">
-                    {stateTempData.custom.skills.map((skillData, skillIndex) => {
+                    {stateMajorData.custom.skills.map((skillData, skillIndex) => {
+                        let skillItem = SkillDataset.getItem(skillData.id)
+                        let skillLevel = Helper.isNotEmpty(skillItem) ? skillItem.list.length : null
+
                         return (
-                            <Fragment>
+                            <Fragment key={skillIndex}>
                                 <div className="col-3 mhrc-name">
                                     <span>{_('skill')}: {skillIndex + 1}</span>
                                 </div>
                                 <div className="col-6 mhrc-value">
                                     <BasicSelector
-                                        defaultValue={getSkillId(stateTempData.custom.skills[skillIndex])}
+                                        defaultValue={getValue(stateMajorData.custom.skills[skillIndex].id, 'none')}
                                         options={getSkillList()}
                                         onChange={(event) => {
-                                            stateTempData.custom.skills[skillIndex].id = ('none' !== event.target.value)
+                                            stateMajorData.custom.skills[skillIndex].id = ('none' !== event.target.value)
                                                 ? event.target.value : null
 
-                                            handleRefreshCustomDataset(stateTempData)
+                                            handleRefreshCustomDataset(stateMajorData)
                                         }} />
                                 </div>
                                 <div className="col-3 mhrc-value">
-                                    <BasicSelector
-                                        defaultValue={getSkillLevel(stateTempData.custom.skills[skillIndex])}
-                                        options={getSkillList()}
-                                        onChange={(event) => {
-                                            stateTempData.custom.skills[skillIndex].level = ('none' !== event.target.value)
-                                                ? parseInt(event.target.value, 10) : null
+                                    {Helper.isNotEmpty(stateMajorData.custom.skills[skillIndex].id) ? (
+                                        <BasicSelector
+                                            defaultValue={getValue(stateMajorData.custom.skills[skillIndex].level, 'none')}
+                                            options={getSkillLevelList(skillLevel)}
+                                            onChange={(event) => {
+                                                stateMajorData.custom.skills[skillIndex].level = ('none' !== event.target.value)
+                                                    ? parseInt(event.target.value, 10) : null
 
-                                            handleRefreshCustomDataset(stateTempData)
-                                        }} />
+                                                handleRefreshCustomDataset(stateMajorData)
+                                            }} />
+                                    ) : false}
                                 </div>
                             </Fragment>
                         )
                     })}
                 </div>
+
+                {('playerEquips' === stateMajorData.target
+                    && Helper.isNotEmpty(equipExtendItem.skills)
+                    && 0 !== equipExtendItem.skills.length
+                ) ? (
+                    <div className="col-12 mhrc-content">
+                        <div className="col-12 mhrc-name">
+                            <span>{_('skill')}</span>
+                        </div>
+                        <div className="col-12 mhrc-content">
+                            {equipExtendItem.skills.sort((skillDataA, skillDataB) => {
+                                return skillDataB.level - skillDataA.level
+                            }).map((skillData) => {
+                                let skillItem = SkillDataset.getItem(skillData.id)
+
+                                return (Helper.isNotEmpty(skillItem)) ? (
+                                    <div key={skillItem.id} className="col-6 mhrc-value">
+                                        <span>{_(skillItem.name)} Lv.{skillData.level}</span>
+                                    </div>
+                                ) : false
+                            })}
+                        </div>
+                    </div>
+                ) : false}
             </div>
         )
-    }, [ stateTempData ])
+    }, [ stateMajorData ])
 }

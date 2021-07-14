@@ -193,14 +193,6 @@ class ArmorDataset {
             ? Helper.deepCopy(this.mapping[id]) : null
     }
 
-    setItem = (id, item) => {
-        if (Helper.isNotEmpty(item)) {
-            this.mapping[id] = item
-        } else {
-            delete this.mapping[id]
-        }
-    }
-
     // Conditional Functions
     typeIs = (text) => {
         this.filterType = text

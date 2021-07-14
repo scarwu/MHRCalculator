@@ -13,7 +13,9 @@ import React, { useMemo } from 'react'
 import Helper from 'core/helper'
 
 export default function IconInput (props) {
-    const {iconName, defaultValue, placeholder, onChange} = props
+    const {type, iconName, defaultValue, placeholder, onChange} = props
+
+    let currentType = (Helper.isEmpty(type) || '' === type) ? 'text' : type
 
     return useMemo(() => {
         Helper.debug('Component: Common -> IconInput')
@@ -24,7 +26,8 @@ export default function IconInput (props) {
                     <div className="mhrc-icon">
                         <i className={`fa fa-${iconName}`}></i>
                     </div>
-                    <input className="mhrc-input" type="text"
+                    <input className="mhrc-input"
+                        type={currentType}
                         defaultValue={defaultValue}
                         placeholder={placeholder}
                         onBlur={onChange}

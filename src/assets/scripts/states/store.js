@@ -245,6 +245,36 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
+        case 'REPLACE_REQUIRED_CONDITIONS_EQUIP':
+            return (() => {
+                let requiredConditions = Helper.deepCopy(state.requiredConditions)
+                let equipType = action.payload.equipType
+                let equipData = action.payload.equipData
+
+                if (Helper.isEmpty(requiredConditions.equips[equipType])) {
+                    return state
+                }
+
+                requiredConditions.equips[equipType] = Helper.deepCopy(Constant.defaultPlayerEquips[equipType])
+                requiredConditions.equips[equipType].id = equipData.id
+
+                if ('petalace' !== equipType) {
+                    requiredConditions.equips[equipType].jewelIds = equipData.jewelIds
+                }
+
+                if ('weapon' === equipType) {
+                    requiredConditions.equips[equipType].enhanceIds = equipData.enhanceIds
+                }
+
+                if ('weapon' === equipType || 'charm' === equipType) {
+                    requiredConditions.equips[equipType].custom = equipData.custom
+                }
+
+                return Object.assign({}, state, {
+                    requiredConditions: requiredConditions
+                })
+            })()
+
         case 'SET_REQUIRED_CONDITIONS_EQUIP':
             return (() => {
                 let requiredConditions = Helper.deepCopy(state.requiredConditions)

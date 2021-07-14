@@ -52,6 +52,12 @@ const handleBundlePickUp = (bundle, requiredConditions) => {
             id: bundle.equipIdMapping[equipType]
         })
 
+        if (('weapon' === equipType && 'customWeapon' === bundle.equipIdMapping[equipType])
+            || ('charm' === equipType && 'customCharm' === bundle.equipIdMapping[equipType])
+        ) {
+            tempEquipData.custom = Helper.deepCopy(requiredConditions.equips[equipType].custom)
+        }
+
         // Get Equip Item
         let equipItem = Misc.getEquipItem(equipType, tempEquipData)
 
@@ -218,16 +224,9 @@ export default function BundleList (props) {
             const bundleEquips = Object.keys(bundle.equipIdMapping).filter((equipType) => {
                 return Helper.isNotEmpty(bundle.equipIdMapping[equipType])
             }).map((equipType) => {
-                if ('weapon' === equipType) {
-                    return Object.assign({}, bundleRequiredConditions.equips[equipType], {
-                        type: equipType
-                    })
-                }
-
-                return {
-                    id: bundle.equipIdMapping[equipType],
+                return Object.assign({}, bundleRequiredConditions.equips[equipType], {
                     type: equipType
-                }
+                })
             })
 
             let bundleJewels = []
@@ -348,9 +347,23 @@ export default function BundleList (props) {
                                     && ('customWeapon' === currentEquipData.id || 'customCharm' === currentEquipData.id)
                                     && ('customWeapon' === requiredEquipData.id || 'customCharm' === requiredEquipData.id)
                                 ) {
-                                    isNotRequire = Helper.jsonHash(currentEquipData.custom) !== Helper.jsonHash(requiredEquipData.custom)
+                                    isNotRequire = Helper.jsonHash({
+                                        id: currentEquipData.id,
+                                        jewelIds: currentEquipData.jewelIds,
+                                        custom: currentEquipData.custom
+                                    }) !== Helper.jsonHash({
+                                        id: requiredEquipData.id,
+                                        jewelIds: requiredEquipData.jewelIds,
+                                        custom: requiredEquipData.custom
+                                    })
                                 } else {
-                                    isNotRequire = currentEquipData.id !== requiredEquipData.id
+                                    isNotRequire = Helper.jsonHash({
+                                        id: currentEquipData.id,
+                                        jewelIds: currentEquipData.jewelIds
+                                    }) !== Helper.jsonHash({
+                                        id: requiredEquipData.id,
+                                        jewelIds: requiredEquipData.jewelIds
+                                    })
                                 }
 
                                 let equipItem = Misc.getEquipItem(currentEquipData.type, currentEquipData)
@@ -364,7 +377,7 @@ export default function BundleList (props) {
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
                                                     onClick={() => {
-                                                        States.setter.setRequiredConditionsEquip(currentEquipData.type, currentEquipData.id)
+                                                        States.setter.replaceRequiredConditionsEquipData(currentEquipData.type, currentEquipData)
                                                     }} />
                                             ) : false}
                                         </div>

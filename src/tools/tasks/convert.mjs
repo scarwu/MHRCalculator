@@ -192,7 +192,8 @@ export const runAction = () => {
             skillBundle.description,
             [
                 skillBundle.from.jewel,
-                skillBundle.from.armor
+                skillBundle.from.armor,
+                skillBundle.from.charm
             ],
             skillBundle.type,
             skillBundle.list.map((skillItem) => {
@@ -732,22 +733,22 @@ export const runAction = () => {
 
 export const findSkillSourceAction = () => {
 
-    let skillList = Helper.loadCSVAsJSON(`${fileRoot}/skill.csv`)
-    let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewel.csv`)
-    let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armor.csv`)
+    let skillList = Helper.loadCSVAsJSON(`${fileRoot}/skills.csv`)
+    let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewels.csv`)
+    let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors.csv`)
 
     let jewelSkillMapping = {}
     let armorSkillMapping = {}
 
     jewelList.forEach((jewelItem) => {
         jewelItem.skills.forEach((skillData) => {
-            jewelSkillMapping[skillData.id] = true
+            jewelSkillMapping[skillData.name] = true
         })
     })
 
     armorList.forEach((armorItem) => {
         armorItem.skills.forEach((skillData) => {
-            armorSkillMapping[skillData.id] = true
+            armorSkillMapping[skillData.name] = true
         })
     })
 
@@ -758,7 +759,7 @@ export const findSkillSourceAction = () => {
         return skillItem
     })
 
-    Helper.saveJSONAsCSV(`${fileRoot}/skill.csv`, autoExtendListQuantity(skillList))
+    Helper.saveJSONAsCSV(`${fileRoot}/skills.csv`, autoExtendListQuantity(skillList))
 }
 
 export const infoAction = () => {

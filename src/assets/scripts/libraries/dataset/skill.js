@@ -39,6 +39,7 @@ const dataset = Skills.map((skillBundle) => {
         from: {
             jewel: skillBundle[3][0],
             armor: skillBundle[3][1],
+            charm: skillBundle[3][2]
         },
         type: skillBundle[4],
         list: skillBundle[5].map((skillItem) => {

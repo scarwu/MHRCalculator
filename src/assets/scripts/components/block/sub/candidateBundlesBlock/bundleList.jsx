@@ -224,7 +224,8 @@ export default function BundleList (props) {
             const bundleEquips = Object.keys(bundle.equipIdMapping).filter((equipType) => {
                 return Helper.isNotEmpty(bundle.equipIdMapping[equipType])
             }).map((equipType) => {
-                return Object.assign({}, bundleRequiredConditions.equips[equipType], {
+                return Object.assign({}, Constant.defaultPlayerEquips[equipType], {
+                    id: bundle.equipIdMapping[equipType],
                     type: equipType
                 })
             })

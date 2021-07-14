@@ -125,13 +125,16 @@ export const runAction = () => {
             skillBundlesMapping[skillItem.name.zhTW] = {}
             skillBundlesMapping[skillItem.name.zhTW].name = skillItem.name
             skillBundlesMapping[skillItem.name.zhTW].description = skillItem.description
+            skillBundlesMapping[skillItem.name.zhTW].from = skillItem.from
+            skillBundlesMapping[skillItem.name.zhTW].type = skillItem.type
             skillBundlesMapping[skillItem.name.zhTW].list = {}
         }
 
         if (Helper.isEmpty(skillBundlesMapping[skillItem.name.zhTW].list[skillItem.level])) {
             skillBundlesMapping[skillItem.name.zhTW].list[skillItem.level] = {
                 level: skillItem.level,
-                effect: skillItem.effect
+                effect: skillItem.effect,
+                reaction: skillItem.reaction
             }
         }
     })
@@ -187,12 +190,65 @@ export const runAction = () => {
             skillBundle.id,
             skillBundle.name,
             skillBundle.description,
-            null, // skillBundle.type,
+            [
+                skillBundle.from.jewel,
+                skillBundle.from.armor
+            ],
+            skillBundle.type,
             skillBundle.list.map((skillItem) => {
                 return [
                     skillItem.level,
                     skillItem.effect,
-                    null // skillItem.reaction
+                    [
+                        [
+                            skillItem.reaction.attack.value
+                        ],
+                        [
+                            skillItem.reaction.attackMultiple.value
+                        ],
+                        [
+                            skillItem.reaction.defense.value
+                        ],
+                        [
+                            skillItem.reaction.defenseMultiple.value
+                        ],
+                        [
+                            skillItem.reaction.criticalRate.value
+                        ],
+                        [
+                            skillItem.reaction.criticalMultiple.value
+                        ],
+                        [
+                            skillItem.reaction.elementAttackCriticalMultiple.value
+                        ],
+                        [
+                            skillItem.reaction.elementStatusCriticalMultiple.value
+                        ],
+                        [
+                            skillItem.reaction.sharpness.value
+                        ],
+                        [
+                            skillItem.reaction.resistance.type,
+                            skillItem.reaction.resistance.value
+                        ],
+                        [
+                            skillItem.reaction.resistanceMultiple.type,
+                            skillItem.reaction.resistanceMultiple.value
+                        ],
+                        [
+                            skillItem.reaction.elementAttack.type,
+                            skillItem.reaction.elementAttack.value,
+                            skillItem.reaction.elementAttack.multiple
+                        ],
+                        [
+                            skillItem.reaction.elementStatus.type,
+                            skillItem.reaction.elementStatus.value,
+                            skillItem.reaction.elementStatus.multiple
+                        ],
+                        [
+                            skillItem.reaction.skillLevelUp.value
+                        ]
+                    ]
                 ]
             })
         ])
@@ -250,6 +306,8 @@ export const runAction = () => {
     })
 
     // Handle Petalaces
+    console.log('handle:petalaces')
+
     rawDataMapping.petalaces.forEach((petalaceItem) => {
 
         // Check Propeties Using as Unique Key

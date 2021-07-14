@@ -32,12 +32,65 @@ const dataset = Skills.map((skillBundle) => {
         id: skillBundle[0],
         name: skillBundle[1],
         description: skillBundle[2],
-        type: skillBundle[3],
-        list: skillBundle[4].map((skillItem) => {
+        from: {
+            jewel: skillBundle[3][0],
+            armor: skillBundle[3][1],
+        },
+        type: skillBundle[4],
+        list: skillBundle[5].map((skillItem) => {
             return {
                 level: skillItem[0],
                 effect: skillItem[1],
-                reaction: skillItem[2]
+                reaction: {
+                    attack: {
+                        value: skillItem[2][0][0]
+                    },
+                    attackMultiple: {
+                        value: skillItem[2][1][0]
+                    },
+                    defense: {
+                        value: skillItem[2][2][0]
+                    },
+                    defenseMultiple: {
+                        value: skillItem[2][3][0]
+                    },
+                    criticalRate: {
+                        value: skillItem[2][4][0]
+                    },
+                    criticalMultiple: {
+                        value: skillItem[2][5][0]
+                    },
+                    elementAttackCriticalMultiple: {
+                        value: skillItem[2][6][0]
+                    },
+                    elementStatusCriticalMultiple: {
+                        value: skillItem[2][7][0]
+                    },
+                    sharpness: {
+                        value: skillItem[2][8][0]
+                    },
+                    resistance: {
+                        type: skillItem[2][9][0],
+                        value: skillItem[2][9][1]
+                    },
+                    resistanceMultiple: {
+                        type: skillItem[2][10][0],
+                        value: skillItem[2][10][1]
+                    },
+                    elementAttack: {
+                        type: skillItem[2][11][0],
+                        value: skillItem[2][11][1],
+                        multiple: skillItem[2][11][2]
+                    },
+                    elementStatus: {
+                        type: skillItem[2][12][0],
+                        value: skillItem[2][12][1],
+                        multiple: skillItem[2][12][2]
+                    },
+                    skillLevelUp: {
+                        value: skillItem[2][13][0]
+                    }
+                }
             }
         })
     }

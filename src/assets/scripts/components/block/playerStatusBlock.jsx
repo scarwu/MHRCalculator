@@ -237,8 +237,6 @@ const generateStatus = (equipInfos, passiveSkills) => {
             let data = skillItem.list[skillLevel - 1].reaction[reactionType]
 
             switch (reactionType) {
-            case 'health':
-            case 'stamina':
             case 'attack':
             case 'defense':
                 status[reactionType] += data.value
@@ -320,14 +318,6 @@ const generateStatus = (equipInfos, passiveSkills) => {
                 resistanceMultiple = data
 
                 break
-            case 'noneElementAttackMultiple':
-                noneElementAttackMultiple = data
-
-                break
-            case 'enableElement':
-                enableElement = data
-
-                break
             case 'attackMultiple':
                 attackMultipleList.push(data.value)
 
@@ -340,6 +330,10 @@ const generateStatus = (equipInfos, passiveSkills) => {
                 }
 
                 defenseMultipleList.push(data.value)
+
+                break
+            case 'skillLevelUp':
+                // TODO: 增加所有技能等級
 
                 break
             }

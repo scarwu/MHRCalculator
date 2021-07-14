@@ -246,6 +246,10 @@ function loadCSV(subPath) {
             newRow.push(match[1].replace(/^\"/, '').replace(/\"$/, ''))
 
             if ('' === match[2] || isEmpty(match[2])) {
+                if ('' === match[2]) {
+                    newRow.push('')
+                }
+
                 break
             }
 

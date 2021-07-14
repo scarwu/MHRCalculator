@@ -730,6 +730,37 @@ export const runAction = () => {
     })
 }
 
+export const findSkillSourceAction = () => {
+
+    let skillList = Helper.loadCSVAsJSON(`${fileRoot}/skill.csv`)
+    let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewel.csv`)
+    let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armor.csv`)
+
+    let jewelSkillMapping = {}
+    let armorSkillMapping = {}
+
+    jewelList.forEach((jewelItem) => {
+        jewelItem.skills.forEach((skillData) => {
+            jewelSkillMapping[skillData.id] = true
+        })
+    })
+
+    armorList.forEach((armorItem) => {
+        armorItem.skills.forEach((skillData) => {
+            armorSkillMapping[skillData.id] = true
+        })
+    })
+
+    skillList = skillList.map((skillItem) => {
+        skillItem.from.jewel = Helper.isNotEmpty(jewelSkillMapping[skillItem.name.zhTW])
+        skillItem.from.armor = Helper.isNotEmpty(armorSkillMapping[skillItem.name.zhTW])
+
+        return skillItem
+    })
+
+    Helper.saveJSONAsCSV(`${fileRoot}/skill.csv`, autoExtendListQuantity(skillList))
+}
+
 export const infoAction = () => {
 
     // Generate Result Format
@@ -1008,5 +1039,6 @@ export const infoAction = () => {
 
 export default {
     runAction,
+    findSkillSourceAction,
     infoAction
 }

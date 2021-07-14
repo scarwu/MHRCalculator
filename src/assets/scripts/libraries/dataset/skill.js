@@ -17,7 +17,11 @@ import Skills from 'datasets/skills.json'
 //     0: id,
 //     1: name,
 //     2: description,
-//     3: type,
+//     3: from [
+//         0: jewel,
+//         1: armor
+//     ],
+//     4: type,
 //     5: list [
 //         [
 //             0: level,
@@ -28,7 +32,7 @@ import Skills from 'datasets/skills.json'
 //     ]
 // ]
 const dataset = Skills.map((skillBundle) => {
-    return {
+    let skillResult = {
         id: skillBundle[0],
         name: skillBundle[1],
         description: skillBundle[2],
@@ -94,6 +98,93 @@ const dataset = Skills.map((skillBundle) => {
             }
         })
     }
+
+    skillResult.list = skillResult.list.map((skillItem) => {
+
+        // Reaction Attack
+        if (Helper.isEmpty(skillItem.reaction.attack.value)) {
+            skillItem.reaction.attack = null
+        }
+
+        // Reaction AttackMultiple
+        if (Helper.isEmpty(skillItem.reaction.attackMultiple.value)) {
+            skillItem.reaction.attackMultiple = null
+        }
+
+        // Reaction Defense
+        if (Helper.isEmpty(skillItem.reaction.defense.value)) {
+            skillItem.reaction.defense = null
+        }
+
+        // Reaction DefenseMultiple
+        if (Helper.isEmpty(skillItem.reaction.defenseMultiple.value)) {
+            skillItem.reaction.defenseMultiple = null
+        }
+
+        // Reaction CriticalRate
+        if (Helper.isEmpty(skillItem.reaction.criticalRate.value)) {
+            skillItem.reaction.criticalRate = null
+        }
+
+        // Reaction CriticalMultiple
+        if (Helper.isEmpty(skillItem.reaction.criticalMultiple.value)) {
+            skillItem.reaction.criticalMultiple = null
+        }
+
+        // Reaction ElementAttackCriticalMultiple
+        if (Helper.isEmpty(skillItem.reaction.elementAttackCriticalMultiple.value)) {
+            skillItem.reaction.elementAttackCriticalMultiple = null
+        }
+
+        // Reaction ElementStatusCriticalMultiple
+        if (Helper.isEmpty(skillItem.reaction.elementStatusCriticalMultiple.value)) {
+            skillItem.reaction.elementStatusCriticalMultiple = null
+        }
+
+        // Reaction Sharpness
+        if (Helper.isEmpty(skillItem.reaction.sharpness.value)) {
+            skillItem.reaction.sharpness = null
+        }
+
+        // Reaction Resistance
+        if (Helper.isEmpty(skillItem.reaction.resistance.type)
+            || Helper.isEmpty(skillItem.reaction.resistance.value)
+        ) {
+            skillItem.reaction.resistance = null
+        }
+
+        // Reaction ResistanceMultiple
+        if (Helper.isEmpty(skillItem.reaction.resistanceMultiple.type)
+            || Helper.isEmpty(skillItem.reaction.resistanceMultiple.value)
+        ) {
+            skillItem.reaction.resistanceMultiple = null
+        }
+
+        // Reaction ElementAttack
+        if (Helper.isEmpty(skillItem.reaction.elementAttack.type)
+            || Helper.isEmpty(skillItem.reaction.elementAttack.value)
+            || Helper.isEmpty(skillItem.reaction.elementAttack.multiple)
+        ) {
+            skillItem.reaction.elementAttack = null
+        }
+
+        // Reaction ElementStatus
+        if (Helper.isEmpty(skillItem.reaction.elementStatus.type)
+            || Helper.isEmpty(skillItem.reaction.elementStatus.value)
+            || Helper.isEmpty(skillItem.reaction.elementStatus.multiple)
+        ) {
+            skillItem.reaction.elementStatus = null
+        }
+
+        // Reaction SkillLevelUp
+        if (Helper.isEmpty(skillItem.reaction.skillLevelUp.value)) {
+            skillItem.reaction.skillLevelUp = null
+        }
+
+        return skillItem
+    })
+
+    return skillResult
 })
 
 class SkillDataset {

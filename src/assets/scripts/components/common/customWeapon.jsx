@@ -548,5 +548,8 @@ export default function CustomWeapon (props) {
                 ) : false}
             </div>
         )
-    }, [ stateMajorData ])
+    }, [
+        stateMajorData,
+        stateMinorData
+    ])
 }

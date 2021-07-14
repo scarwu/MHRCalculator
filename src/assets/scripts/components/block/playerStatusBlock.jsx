@@ -234,39 +234,43 @@ const generateStatus = (equipInfos, passiveSkills) => {
         }
 
         for (let reactionType in skillItem.list[skillLevel - 1].reaction) {
-            let data = skillItem.list[skillLevel - 1].reaction[reactionType]
+            let reactionData = skillItem.list[skillLevel - 1].reaction[reactionType]
+
+            if (Helper.isEmpty(reactionData)) {
+                continue
+            }
 
             switch (reactionType) {
             case 'attack':
             case 'defense':
-                status[reactionType] += data.value
+                status[reactionType] += reactionData.value
 
                 break
             case 'criticalRate':
-                status.critical.rate += data.value
+                status.critical.rate += reactionData.value
 
                 break
             case 'criticalMultiple':
-                status.critical.multiple.positive = data.value
+                status.critical.multiple.positive = reactionData.value
 
                 break
             case 'elementAttackCriticalMultiple':
                 if (null !== weaponType
                     && (status.elementCriticalMultiple.attack
-                        < Constant.elementCriticalMultiple.attack[weaponType][data.value])
+                        < Constant.elementCriticalMultiple.attack[weaponType][reactionData.value])
                 ) {
                     status.elementCriticalMultiple.attack
-                        = Constant.elementCriticalMultiple.attack[weaponType][data.value]
+                        = Constant.elementCriticalMultiple.attack[weaponType][reactionData.value]
                 }
 
                 break
             case 'elementStatusCriticalMultiple':
                 if (null !== weaponType
                     && (status.elementCriticalMultiple.status
-                        < Constant.elementCriticalMultiple.status[weaponType][data.value])
+                        < Constant.elementCriticalMultiple.status[weaponType][reactionData.value])
                 ) {
                     status.elementCriticalMultiple.status
-                        = Constant.elementCriticalMultiple.status[weaponType][data.value]
+                        = Constant.elementCriticalMultiple.status[weaponType][reactionData.value]
                 }
 
                 break
@@ -275,7 +279,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
                     break
                 }
 
-                status.sharpness.value += data.value
+                status.sharpness.value += reactionData.value
 
                 if (status.sharpness.value > status.sharpness.maxValue) {
                     status.sharpness.value = status.sharpness.maxValue
@@ -285,41 +289,41 @@ const generateStatus = (equipInfos, passiveSkills) => {
             case 'elementAttack':
                 if (Helper.isEmpty(status.element)
                     || Helper.isEmpty(status.element.attack)
-                    || status.element.attack.type !== data.type
+                    || status.element.attack.type !== reactionData.type
                 ) {
                     break
                 }
 
-                elementAttack = data
+                elementAttack = reactionData
 
                 break
             case 'elementStatus':
                 if (Helper.isEmpty(status.element)
                     || Helper.isEmpty(status.element.status)
-                    || status.element.status.type !== data.type
+                    || status.element.status.type !== reactionData.type
                 ) {
                     break
                 }
 
-                elementStatus = data
+                elementStatus = reactionData
 
                 break
             case 'resistance':
-                if ('all' === data.type) {
+                if ('all' === reactionData.type) {
                     Constant.resistanceTypes.forEach((elementType) => {
-                        status.resistance[elementType] += data.value
+                        status.resistance[elementType] += reactionData.value
                     })
                 } else {
-                    status.resistance[data.type] += data.value
+                    status.resistance[reactionData.type] += reactionData.value
                 }
 
                 break
             case 'resistanceMultiple':
-                resistanceMultiple = data
+                resistanceMultiple = reactionData
 
                 break
             case 'attackMultiple':
-                attackMultipleList.push(data.value)
+                attackMultipleList.push(reactionData.value)
 
                 break
             case 'defenseMultiple':
@@ -329,7 +333,7 @@ const generateStatus = (equipInfos, passiveSkills) => {
                     break
                 }
 
-                defenseMultipleList.push(data.value)
+                defenseMultipleList.push(reactionData.value)
 
                 break
             case 'skillLevelUp':

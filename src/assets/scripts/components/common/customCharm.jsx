@@ -358,5 +358,8 @@ export default function CustomCharm (props) {
                 ) : false}
             </div>
         )
-    }, [ stateMajorData ])
+    }, [
+        stateMajorData,
+        stateMinorData
+    ])
 }

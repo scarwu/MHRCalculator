@@ -15,6 +15,7 @@ const colors = require('ansi-colors')
 const webpack = require('webpack')
 const webpackStream = require('webpack-stream')
 const webpackConfig = require('./webpack.config.js')
+const sentryWebpackPlugin = require("@sentry/webpack-plugin")
 const postfix = (new Date()).getTime().toString()
 
 let ENVIRONMENT = 'development'
@@ -51,6 +52,13 @@ function compileWebpack(callback) {
                 'BUILD_TIME': postfix,
                 'NODE_ENV': JSON.stringify('production')
             }
+        }))
+        webpackConfig.plugins.push(new sentryWebpackPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: "scarstudio",
+            project: "mhrc",
+            release: postfix,
+            include: "src/boot/assets/scripts"
         }))
     } else {
         webpackConfig.plugins = webpackConfig.plugins || []
@@ -132,13 +140,6 @@ function releaseReplaceIndex() {
         .pipe(gulp.dest('src/boot'))
 }
 
-gulp.task(
-    'releaseUploadSourcemap',
-    $.shell.task([
-        `./node_modules/@sentry/cli/bin/sentry-cli releases -o scarstudio -p mhrc files ${postfix} upload-sourcemaps ./src/boot --ignore node_modules --rewrite`
-    ])
-)
-
 /**
  * Set Variables
  */
@@ -180,8 +181,7 @@ gulp.task('prepare', gulp.series(
 
 gulp.task('release', gulp.series(
     setEnv, cleanDocs,
-    'prepare',
-    gulp.parallel('releaseUploadSourcemap', releaseReplaceIndex),
+    'prepare', releaseReplaceIndex,
     releaseCopyBoot
 ))
 

@@ -154,6 +154,8 @@ export default function ArmorSelectorModal (props) {
     const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     const [stateTempData, updateTempData] = useState(null)
+    const [stateFilter, updateFilter] = useState({})
+
     const refModal = useRef()
     const refSearch = useRef()
 
@@ -181,6 +183,7 @@ export default function ArmorSelectorModal (props) {
         }
 
         let tempData = Helper.deepCopy(stateModalData)
+        let filter = {}
 
         // Set Id
         tempData.id = null
@@ -215,9 +218,7 @@ export default function ArmorSelectorModal (props) {
             }
         })
 
-        if (Helper.isEmpty(tempData.type) || 'armor' === tempData.type) {
-            tempData.type = Helper.isNotEmpty(armorItem) ? armorItem.type : tempData.typeList[0].key
-        }
+
 
         // Set Rare
         tempData.rareList = {}
@@ -233,13 +234,14 @@ export default function ArmorSelectorModal (props) {
             }
         })
 
-        if (Helper.isEmpty(tempData.rare)) {
-            tempData.rare = (Helper.isNotEmpty(armorItem)) ? armorItem.rare : tempData.rareList[0].key
-        }
-
-        updateTempData(tempData)
+        // Set Filter
+        filter.type = Helper.isNotEmpty(armorItem) ? armorItem.type : tempData.typeList[0].key
+        filter.rare = (Helper.isNotEmpty(armorItem)) ? armorItem.rare : tempData.rareList[0].key
 
         window.addEventListener('keydown', handleSearchFocus)
+
+        updateTempData(tempData)
+        updateFilter(filter)
     }, [
         stateModalData,
         statePlayerEquips,
@@ -255,6 +257,8 @@ export default function ArmorSelectorModal (props) {
         }
 
         States.setter.hideModal('armorSelector')
+
+        updateFilter({})
     }, [])
 
     const handleSearchFocus = useCallback((event) => {
@@ -270,28 +274,28 @@ export default function ArmorSelectorModal (props) {
     const handleSegmentInput = useCallback((event) => {
         let segment = event.target.value
 
-        updateTempData(Object.assign({}, stateTempData, {
+        updateFilter(Object.assign({}, stateFilter, {
             segment: (0 !== segment.length)
                 ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
         }))
-    }, [stateTempData])
+    }, [stateFilter])
 
     const handleTypeChange = useCallback((event) => {
         let type = event.target.value
 
-        updateTempData(Object.assign({}, stateTempData, {
+        updateFilter(Object.assign({}, stateFilter, {
             equipType: type,
             type: type
         }))
-    }, [stateTempData])
+    }, [stateFilter])
 
     const handleRareChange = useCallback((event) => {
         let rare = event.target.value
 
-        updateTempData(Object.assign({}, stateTempData, {
+        updateFilter(Object.assign({}, stateFilter, {
             rare: parseInt(rare, 10)
         }))
-    }, [stateTempData])
+    }, [stateFilter])
 
     const getContent = useMemo(() => {
         if (Helper.isEmpty(stateTempData)) {
@@ -299,11 +303,11 @@ export default function ArmorSelectorModal (props) {
         }
 
         return stateTempData.list.filter((item) => {
-            if (item.type !== stateTempData.type) {
+            if (item.type !== stateFilter.type) {
                 return false
             }
 
-            if (item.rare !== stateTempData.rare) {
+            if (item.rare !== stateFilter.rare) {
                 return false
             }
 
@@ -320,8 +324,8 @@ export default function ArmorSelectorModal (props) {
             })
 
             // Search Nameword
-            if (Helper.isNotEmpty(stateTempData.segment)
-                && -1 === text.toLowerCase().search(stateTempData.segment.toLowerCase())
+            if (Helper.isNotEmpty(stateFilter.segment)
+                && -1 === text.toLowerCase().search(stateFilter.segment.toLowerCase())
             ) {
                 return false
             }
@@ -332,7 +336,10 @@ export default function ArmorSelectorModal (props) {
         }).map((item) => {
             return renderArmorItem(item, stateTempData)
         })
-    }, [stateTempData])
+    }, [
+        stateTempData,
+        stateFilter
+    ])
 
     return Helper.isNotEmpty(stateTempData) ? (
         <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
@@ -343,13 +350,13 @@ export default function ArmorSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            bypassRef={refSearch} defaultValue={stateTempData.segment}
+                            bypassRef={refSearch} defaultValue={stateFilter.segment}
                             onChange={handleSegmentInput} />
                         <IconSelector
-                            iconName="filter" defaultValue={stateTempData.type}
+                            iconName="filter" defaultValue={stateFilter.type}
                             options={stateTempData.typeList} onChange={handleTypeChange} />
                         <IconSelector
-                            iconName="filter" defaultValue={stateTempData.rare}
+                            iconName="filter" defaultValue={stateFilter.rare}
                             options={stateTempData.rareList} onChange={handleRareChange} />
                         <IconButton
                             iconName="times" altName={_('close')}

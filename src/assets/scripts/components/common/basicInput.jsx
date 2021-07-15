@@ -27,12 +27,7 @@ export default function BasicInput (props) {
                     ref={bypassRef}
                     defaultValue={defaultValue}
                     placeholder={placeholder}
-                    onBlur={onChange}
-                    onKeyPress={(event) => {
-                        if (13 === event.charCode) {
-                            onChange(event)
-                        }
-                    }} />
+                    onChange={onChange} />
             </div>
         )
     }, [defaultValue, placeholder, onChange, bypassRef])

@@ -31,12 +31,7 @@ export default function IconInput (props) {
                         type={currentType}
                         defaultValue={defaultValue}
                         placeholder={placeholder}
-                        onBlur={onChange}
-                        onKeyPress={(event) => {
-                            if (13 === event.charCode) {
-                                onChange(event)
-                            }
-                        }} />
+                        onChange={onChange} />
                 </div>
             </div>
         )

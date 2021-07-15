@@ -210,7 +210,7 @@ export default function ArmorSelectorModal (props) {
 
         let armorItem = ArmorDataset.getItem(tempData.id)
 
-        // Set Type
+        // Set Type List
         tempData.typeList = Constant.armorTypes.map((type) => {
             return {
                 key: type,
@@ -218,9 +218,7 @@ export default function ArmorSelectorModal (props) {
             }
         })
 
-
-
-        // Set Rare
+        // Set Rare List
         tempData.rareList = {}
 
         tempData.list.forEach((armorItem) => {
@@ -283,11 +281,17 @@ export default function ArmorSelectorModal (props) {
     const handleTypeChange = useCallback((event) => {
         let type = event.target.value
 
+        updateTempData(Object.assign({}, stateTempData, {
+            equipType: type
+        }))
+
         updateFilter(Object.assign({}, stateFilter, {
-            equipType: type,
             type: type
         }))
-    }, [stateFilter])
+    }, [
+        stateTempData,
+        stateFilter
+    ])
 
     const handleRareChange = useCallback((event) => {
         let rare = event.target.value
@@ -345,9 +349,7 @@ export default function ArmorSelectorModal (props) {
         <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
-                    <span className="mhrc-title">{_('armorList')}</span>
-
-                    <div className="mhrc-icons_bundle">
+                    <div className="mhrc-icons_bundle-left">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
                             bypassRef={refSearch} defaultValue={stateFilter.segment}
@@ -358,6 +360,11 @@ export default function ArmorSelectorModal (props) {
                         <IconSelector
                             iconName="filter" defaultValue={stateFilter.rare}
                             options={stateTempData.rareList} onChange={handleRareChange} />
+                    </div>
+
+                    <span className="mhrc-title">{_('armorList')}</span>
+
+                    <div className="mhrc-icons_bundle-right">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => { States.setter.hideModal('armorSelector') }} />

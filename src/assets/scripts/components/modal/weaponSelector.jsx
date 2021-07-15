@@ -244,7 +244,7 @@ export default function WeaponSelectorModal (props) {
 
         let weaponItem = WeaponDataset.getItem(tempData.id)
 
-        // Set Type
+        // Set Type List
         tempData.typeList = Constant.weaponTypes.map((type) => {
             return {
                 key: type,
@@ -252,9 +252,7 @@ export default function WeaponSelectorModal (props) {
             }
         })
 
-
-
-        // Set Rare
+        // Set Rare List
         tempData.rareList = {}
 
         tempData.list.forEach((weaponItem) => {
@@ -391,9 +389,7 @@ export default function WeaponSelectorModal (props) {
         <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
-                    <span className="mhrc-title">{_('weaponList')}</span>
-
-                    <div className="mhrc-icons_bundle">
+                    <div className="mhrc-icons_bundle-left">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
                             bypassRef={refSearch} defaultValue={stateFilter.segment}
@@ -404,6 +400,11 @@ export default function WeaponSelectorModal (props) {
                         <IconSelector
                             iconName="filter" defaultValue={stateFilter.rare}
                             options={stateTempData.rareList} onChange={handleRareChange} />
+                    </div>
+
+                    <span className="mhrc-title">{_('weaponList')}</span>
+
+                    <div className="mhrc-icons_bundle-right">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {

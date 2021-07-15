@@ -254,13 +254,16 @@ export default function JewelSelectorModal (props) {
         <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
-                    <span className="mhrc-title">{_('jewelList')}</span>
-
-                    <div className="mhrc-icons_bundle">
+                    <div className="mhrc-icons_bundle-left">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
                             bypassRef={refSearch} defaultValue={stateFilter.segment}
                             onChange={handleSegmentInput} />
+                    </div>
+
+                    <span className="mhrc-title">{_('jewelList')}</span>
+
+                    <div className="mhrc-icons_bundle-right">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {

@@ -110,11 +110,18 @@ export default function App (props) {
     return (
         <div key={stateLang} id="mhrc-app" className="container-fluid">
             <div className="mhrc-header">
+                <div className="mhrc-icons_bundle-left">
+                    <IconSelector
+                        iconName="globe"
+                        defaultValue={stateLang} options={langList}
+                        onChange={handleLangChange} />
+                </div>
+
                 <a className="mhrc-title" href="./">
                     <h1>{_('title')}</h1>
                 </a>
 
-                <div className="mhrc-icons_bundle">
+                <div className="mhrc-icons_bundle-right">
                     <IconButton
                         iconName="link" altName={_('exportBundle')}
                         onClick={handlePlayerEquipsExport} />
@@ -124,10 +131,6 @@ export default function App (props) {
                     <IconButton
                         iconName="question" altName={_('readme')}
                         onClick={handleOpenReadme} />
-                    <IconSelector
-                        iconName="globe"
-                        defaultValue={stateLang} options={langList}
-                        onChange={handleLangChange} />
                 </div>
             </div>
 

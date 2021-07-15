@@ -33,10 +33,10 @@
         .mhrc-title
             +font-size(1.6)
 
-        .mhrc-icons_bundle
+        .mhrc-icons_bundle-left,
+        .mhrc-icons_bundle-right
             position: absolute
             top: 0
-            right: 10px
             padding-top: 10px
             height: 30px
 
@@ -46,7 +46,6 @@
             .mhrc-icon_selector,
             .mhrc-icon_button
                 vertical-align: top
-                margin-left: 2px
 
                 .mhrc-body
                     background-color: #999
@@ -54,6 +53,26 @@
                 &:hover
                     .mhrc-body
                         background-color: #333
+
+        .mhrc-icons_bundle-left
+            left: 10px
+
+            .mhrc-basic_input,
+            .mhrc-basic_selector,
+            .mhrc-icon_input,
+            .mhrc-icon_selector,
+            .mhrc-icon_button
+                margin-right: 2px
+
+        .mhrc-icons_bundle-right
+            right: 10px
+
+            .mhrc-basic_input,
+            .mhrc-basic_selector,
+            .mhrc-icon_input,
+            .mhrc-icon_selector,
+            .mhrc-icon_button
+                margin-left: 2px
 
     .mhrc-list
         position: absolute

@@ -98,7 +98,10 @@ export default function AlgorithmSettingModal (props) {
     const [stateAlgorithmParams, updateAlgorithmParams] = useState(States.getter.getAlgorithmParams())
 
     const [stateTempData, updateTempData] = useState(null)
+    const [stateFilter, updateFilter] = useState({})
+
     const refModal = useRef()
+    const refSearch = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -117,17 +120,21 @@ export default function AlgorithmSettingModal (props) {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
 
+            window.removeEventListener('keydown', handleSearchFocus)
+
             return
         }
 
         let tempData = Helper.deepCopy(stateModalData)
+        let filter = {}
 
-        // Set Mode
-        if (Helper.isEmpty(tempData.mode)) {
-            tempData.mode = 'all'
-        }
+        // Set filter
+        filter.mode = 'all'
+
+        window.addEventListener('keydown', handleSearchFocus)
 
         updateTempData(tempData)
+        updateFilter(filter)
     }, [stateModalData])
 
     /**
@@ -139,24 +146,36 @@ export default function AlgorithmSettingModal (props) {
         }
 
         States.setter.hideModal('algorithmSetting')
+
+        updateFilter({})
+    }, [])
+
+    const handleSearchFocus = useCallback((event) => {
+        if ('f' !== event.key || true !== event.ctrlKey) {
+            return
+        }
+
+        event.preventDefault()
+
+        refSearch.current.focus()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
         let segment = event.target.value
 
-        updateTempData(Object.assign({}, stateTempData, {
+        updateFilter(Object.assign({}, stateFilter, {
             segment: (0 !== segment.length)
                 ? segment.replace(/([.?*+^$[\]\\(){}|-])/g, '').trim() : null
         }))
-    }, [stateTempData])
+    }, [stateFilter])
 
     const handleModeChange = useCallback((event) => {
         let mode = event.target.value
 
-        updateTempData(Object.assign({}, stateTempData, {
+        updateFilter(Object.assign({}, stateFilter, {
             mode: mode
         }))
-    }, [stateTempData])
+    }, [stateFilter])
 
     /**
      * Render Functions
@@ -165,15 +184,19 @@ export default function AlgorithmSettingModal (props) {
         <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
-                    <strong>{_('algorithmSetting')}</strong>
-
-                    <div className="mhrc-icons_bundle">
+                    <div className="mhrc-icons_bundle-left">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
+                            bypassRef={refSearch} defaultValue={stateFilter.segment}
+                            onChange={handleSegmentInput} />
                         <IconSelector
-                            iconName="globe" defaultValue={stateTempData.mode}
+                            iconName="globe" defaultValue={stateFilter.mode}
                             options={getModeList()} onChange={handleModeChange} />
+                    </div>
+
+                    <strong>{_('algorithmSetting')}</strong>
+
+                    <div className="mhrc-icons_bundle-right">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {
@@ -222,7 +245,7 @@ export default function AlgorithmSettingModal (props) {
                             </div>
                         </div>
 
-                        {'all' === stateTempData.mode || 'armorFactor' === stateTempData.mode || 'byRequiredConditions' === stateTempData.mode ? (
+                        {'all' === stateFilter.mode || 'armorFactor' === stateFilter.mode || 'byRequiredConditions' === stateFilter.mode ? (
                             <div className="mhrc-item mhrc-item-2-step">
                                 <div className="col-12 mhrc-name">
                                     <span>{_('armorFactor')}</span>
@@ -250,7 +273,7 @@ export default function AlgorithmSettingModal (props) {
                             </div>
                         ) : false}
 
-                        {'all' === stateTempData.mode || 'jewelFactor' === stateTempData.mode || 'byRequiredConditions' === stateTempData.mode ? (
+                        {'all' === stateFilter.mode || 'jewelFactor' === stateFilter.mode || 'byRequiredConditions' === stateFilter.mode ? (
                             <div className="mhrc-item mhrc-item-2-step">
                                 <div className="col-12 mhrc-name">
                                     <span>{_('jewelFactor')}</span>
@@ -278,13 +301,13 @@ export default function AlgorithmSettingModal (props) {
                             </div>
                         ) : false}
 
-                        {'all' === stateTempData.mode || 'armorFactor' === stateTempData.mode || 'byRequiredConditions' === stateTempData.mode
-                            ? <ArmorFactors segment={stateTempData.segment}
-                                byRequiredConditions={'byRequiredConditions' === stateTempData.mode} />
+                        {'all' === stateFilter.mode || 'armorFactor' === stateFilter.mode || 'byRequiredConditions' === stateFilter.mode
+                            ? <ArmorFactors segment={stateFilter.segment}
+                                byRequiredConditions={'byRequiredConditions' === stateFilter.mode} />
                             : false}
-                        {'all' === stateTempData.mode || 'jewelFactor' === stateTempData.mode || 'byRequiredConditions' === stateTempData.mode
-                            ? <JewelFactors segment={stateTempData.segment}
-                                byRequiredConditions={'byRequiredConditions' === stateTempData.mode} />
+                        {'all' === stateFilter.mode || 'jewelFactor' === stateFilter.mode || 'byRequiredConditions' === stateFilter.mode
+                            ? <JewelFactors segment={stateFilter.segment}
+                                byRequiredConditions={'byRequiredConditions' === stateFilter.mode} />
                             : false}
                     </div>
                 </div>

@@ -25,16 +25,15 @@
             font-weight: bold
             +font-size(2.4)
 
-    .mhrc-icons_bundle
+    .mhrc-icons_bundle-left,
+    .mhrc-icons_bundle-right
         position: absolute
         top: 0
-        right: 10px
         padding-top: 20px
         height: $header-height
 
         .mhrc-icon_selector,
         .mhrc-icon_button
-            margin-left: 2px
             vertical-align: top
 
             .mhrc-body
@@ -43,6 +42,20 @@
             &:hover
                 .mhrc-body
                     background-color: #666
+
+    .mhrc-icons_bundle-left
+        left: 10px
+
+        .mhrc-icon_selector,
+        .mhrc-icon_button
+            margin-right: 2px
+
+    .mhrc-icons_bundle-right
+        right: 10px
+
+        .mhrc-icon_selector,
+        .mhrc-icon_button
+            margin-left: 2px
 
 .mhrc-container
     height: calc(100vh - (#{$header-height} + #{$footer-height}))

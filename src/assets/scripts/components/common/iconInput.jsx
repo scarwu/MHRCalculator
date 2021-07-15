@@ -7,13 +7,13 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-import React, { useMemo } from 'react'
+import React, { useMemo, forwardRef } from 'react'
 
 // Load Core
 import Helper from 'core/helper'
 
 export default function IconInput (props) {
-    const {type, iconName, defaultValue, placeholder, onChange} = props
+    const {type, iconName, defaultValue, placeholder, onChange, bypassRef} = props
 
     let currentType = (Helper.isEmpty(type) || '' === type) ? 'text' : type
 
@@ -27,6 +27,7 @@ export default function IconInput (props) {
                         <i className={`fa fa-${iconName}`}></i>
                     </div>
                     <input className="mhrc-input"
+                        ref={bypassRef}
                         type={currentType}
                         defaultValue={defaultValue}
                         placeholder={placeholder}
@@ -39,5 +40,5 @@ export default function IconInput (props) {
                 </div>
             </div>
         )
-    }, [iconName, defaultValue, placeholder, onChange])
+    }, [iconName, defaultValue, placeholder, onChange, bypassRef])
 }

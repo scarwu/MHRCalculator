@@ -43,8 +43,18 @@ const handleItemPickUp = (itemId, action, tempData) => {
  * Render Functions
  */
 const renderSetItem = (setItem, tempData) => {
+    let classNames = [
+        'mhrc-item'
+    ]
+
+    if (-1 === tempData.ids.indexOf(setItem.id)) {
+        classNames.push('mhrc-item-2-step')
+    } else {
+        classNames.push('mhrc-item-3-step')
+    }
+
     return (
-        <div key={setItem.id} className="mhrc-item mhrc-item-2-step">
+        <div key={setItem.id} className={classNames.join(' ')}>
             <div className="col-12 mhrc-name">
                 <span>{_(setItem.name)}</span>
 
@@ -52,13 +62,13 @@ const renderSetItem = (setItem, tempData) => {
                     {Helper.isNotEmpty(tempData.target) ? (
                         (-1 === tempData.ids.indexOf(setItem.id)) ? (
                             <IconButton
-                                iconName="plus" altName={_('add')}
+                                iconName="check" altName={_('select')}
                                 onClick={() => {
                                     handleItemPickUp(setItem.id, 'add', tempData)
                                 }} />
                         ) : (
                             <IconButton
-                                iconName="minus" altName={_('remove')}
+                                iconName="times" altName={_('remove')}
                                 onClick={() => {
                                     handleItemPickUp(setItem.id, 'remove', tempData)
                                 }} />
@@ -103,6 +113,7 @@ export default function SetSelectorModal (props) {
 
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
+    const refSearch = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -121,6 +132,8 @@ export default function SetSelectorModal (props) {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
 
+            window.removeEventListener('keydown', handleSearchFocus)
+
             return
         }
 
@@ -138,24 +151,13 @@ export default function SetSelectorModal (props) {
         }
 
         // Set List
-        let selectedList = []
-        let unselectedList = []
-
-        SetDataset.getList().forEach((setItem) => {
-            if (3 > setItem.items.length) {
-                return
-            }
-
-            if (-1 === tempData.ids.indexOf(setItem.id)) {
-                selectedList.push(setItem)
-            } else {
-                unselectedList.push(setItem)
-            }
+        tempData.list = SetDataset.getList().filter((setItem) => {
+            return 3 < setItem.items.length
         })
 
-        tempData.list = selectedList.concat(unselectedList)
-
         updateTempData(tempData)
+
+        window.addEventListener('keydown', handleSearchFocus)
     }, [
         stateModalData,
         stateRequiredConditions
@@ -170,6 +172,16 @@ export default function SetSelectorModal (props) {
         }
 
         States.setter.hideModal('setSelector')
+    }, [])
+
+    const handleSearchFocus = useCallback((event) => {
+        if ('f' !== event.key || true !== event.ctrlKey) {
+            return
+        }
+
+        event.preventDefault()
+
+        refSearch.current.focus()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -215,7 +227,8 @@ export default function SetSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
+                            bypassRef={refSearch} defaultValue={stateTempData.segment}
+                            onChange={handleSegmentInput} />
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {

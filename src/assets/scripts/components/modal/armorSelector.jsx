@@ -39,30 +39,46 @@ const handleItemPickUp = (itemId, tempData) => {
     if ('requiredConditions' === tempData.target) {
         States.setter.setRequiredConditionsEquip(tempData.equipType, itemId)
     }
-
-    States.setter.hideModal('armorSelector')
 }
 
 /**
  * Render Functions
  */
 const renderArmorItem = (armorItem, tempData) => {
+    let classNames = [
+        'mhrc-item'
+    ]
+
+    if (Helper.isEmpty(tempData.target) || armorItem.id !== tempData.id) {
+        classNames.push('mhrc-item-2-step')
+    } else {
+        classNames.push('mhrc-item-3-step')
+    }
+
     if (Helper.isEmpty(armorItem.maxDefense)) {
         armorItem.maxDefense = '?'
     }
 
     return (
-        <div key={armorItem.id} className="mhrc-item mhrc-item-2-step">
+        <div key={armorItem.id} className={classNames.join(' ')}>
             <div className="col-12 mhrc-name">
                 <span>{_(armorItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(Helper.isNotEmpty(tempData.target) && armorItem.id !== tempData.id) ? (
-                        <IconButton
-                            iconName="check" altName={_('select')}
-                            onClick={() => {
-                                handleItemPickUp(armorItem.id, tempData)
-                            }} />
+                    {Helper.isNotEmpty(tempData.target) ? (
+                        (armorItem.id !== tempData.id) ? (
+                            <IconButton
+                                iconName="check" altName={_('select')}
+                                onClick={() => {
+                                    handleItemPickUp(armorItem.id, tempData)
+                                }} />
+                        ) : (
+                            <IconButton
+                                iconName="times" altName={_('remove')}
+                                onClick={() => {
+                                    handleItemPickUp(null, tempData)
+                                }} />
+                        )
                     ) : false}
                 </div>
             </div>
@@ -139,6 +155,7 @@ export default function ArmorSelectorModal (props) {
 
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
+    const refSearch = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -157,6 +174,8 @@ export default function ArmorSelectorModal (props) {
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
+
+            window.removeEventListener('keydown', handleSearchFocus)
 
             return
         }
@@ -219,6 +238,8 @@ export default function ArmorSelectorModal (props) {
         }
 
         updateTempData(tempData)
+
+        window.addEventListener('keydown', handleSearchFocus)
     }, [
         stateModalData,
         statePlayerEquips,
@@ -234,6 +255,16 @@ export default function ArmorSelectorModal (props) {
         }
 
         States.setter.hideModal('armorSelector')
+    }, [])
+
+    const handleSearchFocus = useCallback((event) => {
+        if ('f' !== event.key || true !== event.ctrlKey) {
+            return
+        }
+
+        event.preventDefault()
+
+        refSearch.current.focus()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -312,7 +343,8 @@ export default function ArmorSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
+                            bypassRef={refSearch} defaultValue={stateTempData.segment}
+                            onChange={handleSegmentInput} />
                         <IconSelector
                             iconName="filter" defaultValue={stateTempData.type}
                             options={stateTempData.typeList} onChange={handleTypeChange} />

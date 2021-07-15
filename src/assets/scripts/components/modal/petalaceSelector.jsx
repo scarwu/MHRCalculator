@@ -30,26 +30,42 @@ const handleItemPickUp = (itemId, tempData) => {
     if ('playerEquips' === tempData.target) {
         States.setter.setPlayerEquip(tempData.equipType, itemId)
     }
-
-    States.setter.hideModal('petalaceSelector')
 }
 
 /**
  * Render Functions
  */
 const renderPetalaceItem = (petalaceItem, tempData) => {
+    let classNames = [
+        'mhrc-item'
+    ]
+
+    if (Helper.isEmpty(tempData.target) || petalaceItem.id !== tempData.id) {
+        classNames.push('mhrc-item-2-step')
+    } else {
+        classNames.push('mhrc-item-3-step')
+    }
+
     return (
-        <div key={petalaceItem.id} className="mhrc-item mhrc-item-2-step">
+        <div key={petalaceItem.id} className={classNames.join(' ')}>
             <div className="col-12 mhrc-name">
                 <span>{_(petalaceItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(Helper.isNotEmpty(tempData.target) && petalaceItem.id !== tempData.id) ? (
-                        <IconButton
-                            iconName="check" altName={_('select')}
-                            onClick={() => {
-                                handleItemPickUp(petalaceItem.id, tempData)
-                            }} />
+                    {Helper.isNotEmpty(tempData.target) ? (
+                        (petalaceItem.id !== tempData.id) ? (
+                            <IconButton
+                                iconName="check" altName={_('select')}
+                                onClick={() => {
+                                    handleItemPickUp(petalaceItem.id, tempData)
+                                }} />
+                        ) : (
+                            <IconButton
+                                iconName="times" altName={_('remove')}
+                                onClick={() => {
+                                    handleItemPickUp(null, tempData)
+                                }} />
+                        )
                     ) : false}
                 </div>
             </div>
@@ -117,6 +133,7 @@ export default function PetalaceSelectorModal (props) {
 
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
+    const refSearch = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -134,6 +151,8 @@ export default function PetalaceSelectorModal (props) {
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
+
+            window.removeEventListener('keydown', handleSearchFocus)
 
             return
         }
@@ -158,6 +177,8 @@ export default function PetalaceSelectorModal (props) {
         tempData.list = PetalaceDataset.getList()
 
         updateTempData(tempData)
+
+        window.addEventListener('keydown', handleSearchFocus)
     }, [
         stateModalData,
         statePlayerEquips
@@ -166,12 +187,22 @@ export default function PetalaceSelectorModal (props) {
     /**
      * Handle Functions
      */
-    const handleFastClose = useCallback((event) => {
+    const handleFastCloseModal = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
 
         States.setter.hideModal('petalaceSelector')
+    }, [])
+
+    const handleSearchFocus = useCallback((event) => {
+        if ('f' !== event.key || true !== event.ctrlKey) {
+            return
+        }
+
+        event.preventDefault()
+
+        refSearch.current.focus()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -209,7 +240,7 @@ export default function PetalaceSelectorModal (props) {
     }, [stateTempData])
 
     return Helper.isNotEmpty(stateTempData) ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_('petalaceList')}</span>
@@ -217,7 +248,8 @@ export default function PetalaceSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
+                            bypassRef={refSearch} defaultValue={stateTempData.segment}
+                            onChange={handleSegmentInput} />
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {

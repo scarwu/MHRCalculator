@@ -751,8 +751,10 @@ export default function PlayerStatusBlock (props) {
                             <span>{_('perPhysicalAttackEV')}</span>
                         </div>
                         <div className="col-3 mhrc-value">
-                            <BasicInput defaultValue={stateTuning.physicalAttack}
-                                bypassRef={refTuningPhysicalAttack} onChange={handleTuningChange} />
+                            <BasicInput
+                                bypassRef={refTuningPhysicalAttack}
+                                defaultValue={stateTuning.physicalAttack}
+                                onChange={handleTuningChange} />
                         </div>
                         <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perPhysicalAttackExpectedValue}</span>
@@ -761,8 +763,10 @@ export default function PlayerStatusBlock (props) {
                             <span>{_('perCriticalRateEV')}</span>
                         </div>
                         <div className="col-3 mhrc-value">
-                            <BasicInput defaultValue={stateTuning.physicalCriticalRate}
-                                bypassRef={refTuningPhysicalCriticalRate} onChange={handleTuningChange} />
+                            <BasicInput
+                                bypassRef={refTuningPhysicalCriticalRate}
+                                defaultValue={stateTuning.physicalCriticalRate}
+                                onChange={handleTuningChange} />
                         </div>
                         <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perPhysicalCriticalRateExpectedValue}</span>
@@ -771,8 +775,10 @@ export default function PlayerStatusBlock (props) {
                             <span>{_('perCriticalMultipleEV')}</span>
                         </div>
                         <div className="col-3 mhrc-value">
-                            <BasicInput defaultValue={stateTuning.physicalCriticalMultiple}
-                                bypassRef={refTuningPhysicalCriticalMultiple} onChange={handleTuningChange} />
+                            <BasicInput
+                                bypassRef={refTuningPhysicalCriticalMultiple}
+                                defaultValue={stateTuning.physicalCriticalMultiple}
+                                onChange={handleTuningChange} />
                         </div>
                         <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perPhysicalCriticalMultipleExpectedValue}</span>
@@ -781,8 +787,10 @@ export default function PlayerStatusBlock (props) {
                             <span>{_('perElementAttackEV')}</span>
                         </div>
                         <div className="col-3 mhrc-value">
-                            <BasicInput defaultValue={stateTuning.elementAttack}
-                                bypassRef={refTuningElementAttack} onChange={handleTuningChange} />
+                            <BasicInput
+                                bypassRef={refTuningElementAttack}
+                                defaultValue={stateTuning.elementAttack}
+                                onChange={handleTuningChange} />
                         </div>
                         <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perElementAttackExpectedValue}</span>

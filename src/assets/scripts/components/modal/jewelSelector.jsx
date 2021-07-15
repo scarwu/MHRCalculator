@@ -35,26 +35,42 @@ const handleItemPickUp = (itemId, tempData) => {
     if ('requiredConditions' === tempData.target) {
         States.setter.setRequiredConditionsEquipJewel(tempData.equipType, tempData.idIndex, itemId)
     }
-
-    States.setter.hideModal('jewelSelector')
 }
 
 /**
  * Render Functions
  */
 const renderJewelItem = (jewelItem, tempData) => {
+    let classNames = [
+        'mhrc-item'
+    ]
+
+    if (Helper.isEmpty(tempData.target) || jewelItem.id !== tempData.id) {
+        classNames.push('mhrc-item-2-step')
+    } else {
+        classNames.push('mhrc-item-3-step')
+    }
+
     return (
-        <div key={jewelItem.id} className="mhrc-item mhrc-item-2-step">
+        <div key={jewelItem.id} className={classNames.join(' ')}>
             <div className="col-12 mhrc-name">
                 <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(Helper.isNotEmpty(tempData.target) && jewelItem.id !== tempData.id) ? (
-                        <IconButton
-                            iconName="check" altName={_('select')}
-                            onClick={() => {
-                                handleItemPickUp(jewelItem.id, tempData)
-                            }} />
+                    {Helper.isNotEmpty(tempData.target) ? (
+                        (jewelItem.id !== tempData.id) ? (
+                            <IconButton
+                                iconName="check" altName={_('select')}
+                                onClick={() => {
+                                    handleItemPickUp(jewelItem.id, tempData)
+                                }} />
+                        ) : (
+                            <IconButton
+                                iconName="times" altName={_('remove')}
+                                onClick={() => {
+                                    handleItemPickUp(null, tempData)
+                                }} />
+                        )
                     ) : false}
                 </div>
             </div>
@@ -89,6 +105,7 @@ export default function JewelSelectorModal (props) {
 
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
+    const refSearch = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -107,6 +124,8 @@ export default function JewelSelectorModal (props) {
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
+
+            window.removeEventListener('keydown', handleSearchFocus)
 
             return
         }
@@ -153,6 +172,8 @@ export default function JewelSelectorModal (props) {
         }
 
         updateTempData(tempData)
+
+        window.addEventListener('keydown', handleSearchFocus)
     }, [
         stateModalData,
         statePlayerEquips,
@@ -162,12 +183,22 @@ export default function JewelSelectorModal (props) {
     /**
      * Handle Functions
      */
-    const handleFastClose = useCallback((event) => {
+    const handleFastCloseModal = useCallback((event) => {
         if (refModal.current !== event.target) {
             return
         }
 
         States.setter.hideModal('jewelSelector')
+    }, [])
+
+    const handleSearchFocus = useCallback((event) => {
+        if ('f' !== event.key || true !== event.ctrlKey) {
+            return
+        }
+
+        event.preventDefault()
+
+        refSearch.current.focus()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -213,7 +244,7 @@ export default function JewelSelectorModal (props) {
     }, [stateTempData])
 
     return Helper.isNotEmpty(stateTempData) ? (
-        <div className="mhrc-selector" ref={refModal} onClick={handleFastClose}>
+        <div className="mhrc-selector" ref={refModal} onClick={handleFastCloseModal}>
             <div className="mhrc-modal">
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_('jewelList')}</span>
@@ -221,7 +252,8 @@ export default function JewelSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
+                            bypassRef={refSearch} defaultValue={stateTempData.segment}
+                            onChange={handleSegmentInput} />
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {

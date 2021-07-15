@@ -41,14 +41,22 @@ const handleItemPickUp = (itemId, tempData) => {
     if ('requiredConditions' === tempData.target) {
         States.setter.setRequiredConditionsEquip(tempData.equipType, itemId)
     }
-
-    States.setter.hideModal('weaponSelector')
 }
 
 /**
  * Render Functions
  */
 const renderWeaponItem = (weaponItem, tempData) => {
+    let classNames = [
+        'mhrc-item'
+    ]
+
+    if (Helper.isEmpty(tempData.target) || weaponItem.id !== tempData.id) {
+        classNames.push('mhrc-item-2-step')
+    } else {
+        classNames.push('mhrc-item-3-step')
+    }
+
     if (Helper.isNotEmpty(weaponItem.element.attack)
         && Helper.isEmpty(weaponItem.element.attack.maxValue)
     ) {
@@ -62,17 +70,25 @@ const renderWeaponItem = (weaponItem, tempData) => {
     }
 
     return (
-        <div key={weaponItem.id} className="mhrc-item mhrc-item-2-step">
+        <div key={weaponItem.id} className={classNames.join(' ')}>
             <div className="col-12 mhrc-name">
                 <span>{_(weaponItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
-                    {(Helper.isNotEmpty(tempData.target) && weaponItem.id !== tempData.id) ? (
-                        <IconButton
-                            iconName="check" altName={_('select')}
-                            onClick={() => {
-                                handleItemPickUp(weaponItem.id, tempData)
-                            }} />
+                    {Helper.isNotEmpty(tempData.target) ? (
+                        (weaponItem.id !== tempData.id) ? (
+                            <IconButton
+                                iconName="check" altName={_('select')}
+                                onClick={() => {
+                                    handleItemPickUp(weaponItem.id, tempData)
+                                }} />
+                        ) : (
+                            <IconButton
+                                iconName="times" altName={_('remove')}
+                                onClick={() => {
+                                    handleItemPickUp(null, tempData)
+                                }} />
+                        )
                     ) : false}
                 </div>
             </div>
@@ -173,6 +189,7 @@ export default function WeaponSelectorModal (props) {
 
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
+    const refSearch = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -191,6 +208,8 @@ export default function WeaponSelectorModal (props) {
     useEffect(() => {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
+
+            window.removeEventListener('keydown', handleSearchFocus)
 
             return
         }
@@ -253,6 +272,8 @@ export default function WeaponSelectorModal (props) {
         }
 
         updateTempData(tempData)
+
+        window.addEventListener('keydown', handleSearchFocus)
     }, [
         stateModalData,
         statePlayerEquips,
@@ -268,6 +289,16 @@ export default function WeaponSelectorModal (props) {
         }
 
         States.setter.hideModal('weaponSelector')
+    }, [])
+
+    const handleSearchFocus = useCallback((event) => {
+        if ('f' !== event.key || true !== event.ctrlKey) {
+            return
+        }
+
+        event.preventDefault()
+
+        refSearch.current.focus()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -359,7 +390,8 @@ export default function WeaponSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
+                            bypassRef={refSearch} defaultValue={stateTempData.segment}
+                            onChange={handleSegmentInput} />
                         <IconSelector
                             iconName="filter" defaultValue={stateTempData.type}
                             options={stateTempData.typeList} onChange={handleTypeChange} />

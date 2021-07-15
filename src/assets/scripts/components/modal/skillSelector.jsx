@@ -42,8 +42,18 @@ const handleItemPickUp = (itemId, action, tempData) => {
  * Render Functions
  */
 const renderSkillItem = (skillItem, tempData) => {
+    let classNames = [
+        'mhrc-item'
+    ]
+
+    if (-1 === tempData.ids.indexOf(skillItem.id)) {
+        classNames.push('mhrc-item-2-step')
+    } else {
+        classNames.push('mhrc-item-3-step')
+    }
+
     return (
-        <div key={skillItem.id} className="mhrc-item mhrc-item-2-step">
+        <div key={skillItem.id} className={classNames.join(' ')}>
             <div className="col-12 mhrc-name">
                 <span>{_(skillItem.name)}</span>
 
@@ -93,6 +103,7 @@ export default function SkillSelectorModal (props) {
 
     const [stateTempData, updateTempData] = useState(null)
     const refModal = useRef()
+    const refSearch = useRef()
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
@@ -111,6 +122,8 @@ export default function SkillSelectorModal (props) {
         if (Helper.isEmpty(stateModalData)) {
             updateTempData(null)
 
+            window.removeEventListener('keydown', handleSearchFocus)
+
             return
         }
 
@@ -128,20 +141,11 @@ export default function SkillSelectorModal (props) {
         }
 
         // Set List
-        let selectedList = []
-        let unselectedList = []
-
-        SkillDataset.getList().forEach((skillItem) => {
-            if (-1 === tempData.ids.indexOf(skillItem.id)) {
-                selectedList.push(skillItem)
-            } else {
-                unselectedList.push(skillItem)
-            }
-        })
-
-        tempData.list = selectedList.concat(unselectedList)
+        tempData.list = SkillDataset.getList()
 
         updateTempData(tempData)
+
+        window.addEventListener('keydown', handleSearchFocus)
     }, [
         stateModalData,
         stateRequiredConditions
@@ -156,6 +160,16 @@ export default function SkillSelectorModal (props) {
         }
 
         States.setter.hideModal('skillSelector')
+    }, [])
+
+    const handleSearchFocus = useCallback((event) => {
+        if ('f' !== event.key || true !== event.ctrlKey) {
+            return
+        }
+
+        event.preventDefault()
+
+        refSearch.current.focus()
     }, [])
 
     const handleSegmentInput = useCallback((event) => {
@@ -205,7 +219,8 @@ export default function SkillSelectorModal (props) {
                     <div className="mhrc-icons_bundle">
                         <IconInput
                             iconName="search" placeholder={_('inputKeyword')}
-                            defaultValue={stateTempData.segment} onChange={handleSegmentInput} />
+                            bypassRef={refSearch} defaultValue={stateTempData.segment}
+                            onChange={handleSegmentInput} />
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {

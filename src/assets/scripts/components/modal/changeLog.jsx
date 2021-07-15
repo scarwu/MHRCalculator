@@ -96,7 +96,7 @@ export default function ChangeLogModal (props) {
                 <div className="mhrc-panel">
                     <span className="mhrc-title">{_('changeLog')}</span>
 
-                    <div className="mhrc-icons_bundle">
+                    <div className="mhrc-icons_bundle-right">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => { States.setter.hideModal('changeLog') }} />

@@ -92,7 +92,11 @@ export default function SetList (props) {
                 <div className="col-12 mhrc-name">
                     <span>{_('set')}</span>
                     <div className="mhrc-icons_bundle">
-                        <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
+                        {(0 === stateRequiredConditions.sets.length) ? (
+                            <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
+                        ) : (
+                            <IconButton iconName = "exchange" altName={ _('change') } onClick = { showModal } />
+                        )}
                     </div>
                 </div>
 

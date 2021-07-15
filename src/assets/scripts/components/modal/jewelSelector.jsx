@@ -141,19 +141,19 @@ export default function JewelSelectorModal (props) {
 
             if ('playerEquips' === tempData.target
                 && Helper.isNotEmpty(statePlayerEquips[equipType])
-                && Helper.isNotEmpty(statePlayerEquips[equipType].jeweldIds)
-                && Helper.isNotEmpty(statePlayerEquips[equipType].jeweldIds[idIndex])
+                && Helper.isNotEmpty(statePlayerEquips[equipType].jewelIds)
+                && Helper.isNotEmpty(statePlayerEquips[equipType].jewelIds[idIndex])
             ) {
-                tempData.id = statePlayerEquips[equipType].jeweldIds[idIndex]
+                tempData.id = statePlayerEquips[equipType].jewelIds[idIndex]
             }
 
             if ('requiredConditions' === tempData.target
                 && Helper.isNotEmpty(stateRequiredConditions.equips)
                 && Helper.isNotEmpty(stateRequiredConditions.equips[equipType])
-                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType].jeweldIds)
-                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType].jeweldIds[idIndex])
+                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType].jewelIds)
+                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType].jewelIds[idIndex])
             ) {
-                tempData.id = stateRequiredConditions.equips[equipType].jeweldIds[idIndex]
+                tempData.id = stateRequiredConditions.equips[equipType].jewelIds[idIndex]
             }
         }
 

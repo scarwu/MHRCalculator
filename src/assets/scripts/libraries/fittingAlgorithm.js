@@ -213,6 +213,12 @@ class FittingAlgorithm {
 
         // Sort Bundle List & Clean up
         return this.sortBundleList(bundleList, algorithmParams).map((bundle) => {
+            Object.keys(bundle.equipIdMapping).forEach((equipType) => {
+                if ('empty' === bundle.equipIdMapping[equipType]) {
+                    bundle.equipIdMapping[equipType] = null
+                }
+            })
+
             delete bundle.meta.completedSets
             delete bundle.meta.completedSkills
             delete bundle.meta.remainingSlotCountMapping
@@ -555,7 +561,7 @@ class FittingAlgorithm {
 
             traversalPercent = parseInt(precent * 100)
 
-            Helper.log('FA: Equips: Traversal Count:', traversalCount)
+            Helper.log(`FA: Equips: Traversal Count: ${traversalCount} / ${totalTraversalCount}`)
 
             let diffTime = parseInt(Math.floor(Date.now() / 1000), 10) - this.startTime
 
@@ -625,6 +631,8 @@ class FittingAlgorithm {
             equipTypeIndex = statusStack[stackIndex].equipTypeIndex
             equipItemIndex = statusStack[stackIndex].equipItemIndex
             candidateEquipItem = candidateEquipList[equipTypeIndex][equipItemIndex]
+
+            Helper.log(`FA: Equips: Stack Progress: ${equipTypeIndex} / ${equipItemIndex}`)
 
             // Add Candidate Equip to Bundle
             bundle = this.addCandidateEquipToBundle(bundle, candidateEquipItem)
@@ -1145,6 +1153,7 @@ class FittingAlgorithm {
     getEmptyCandidateEquipItem = (equipType) => {
         let candidateEquipItem = Helper.deepCopy(defaultCandidateEquipItem)
 
+        candidateEquipItem.id = 'empty'
         candidateEquipItem.type = equipType
 
         return candidateEquipItem

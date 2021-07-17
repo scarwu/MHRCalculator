@@ -390,10 +390,7 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
     const showModal = () => {
         States.setter.showModal(Misc.equipTypeToDatasetType(equipType) + 'Selector', {
             target: 'playerEquips',
-            equipType: equipType,
-
-            // Filter
-            type: equipType
+            equipType: equipType
         })
     }
 

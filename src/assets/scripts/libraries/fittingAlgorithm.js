@@ -801,7 +801,7 @@ class FittingAlgorithm {
         let slotIndex = null
         let slotSize = null
         let jewelIndex = null
-        let correspondJewel = null
+        let candidateJewelItem = null
 
         // Push Root Bundle
         statusStack.push({
@@ -869,7 +869,7 @@ class FittingAlgorithm {
             slotIndex = statusStack[stackIndex].slotIndex
             slotSize = slotSizeList[slotIndex]
             jewelIndex = statusStack[stackIndex].jewelIndex
-            correspondJewel = currentCandidateJewelMapping[slotSize][jewelIndex]
+            candidateJewelItem = currentCandidateJewelMapping[slotSize][jewelIndex]
 
             if (0 === bundle.meta.remainingSlotCountMapping.all) {
                 findPrevSkillAndNextJewel()
@@ -884,7 +884,7 @@ class FittingAlgorithm {
             }
 
             // Add Jewel To Bundle
-            bundle = this.addJewelToBundle(bundle, slotSize, correspondJewel, true)
+            bundle = this.addCandidateJewelToBundle(bundle, slotSize, candidateJewelItem, true)
 
             if (false === bundle) {
                 findNextJewel()
@@ -1162,17 +1162,17 @@ class FittingAlgorithm {
     /**
      * Add Jewel to Bundle
      */
-    addJewelToBundle = (bundle, slotSize, correspondJewel, hasJewelCountLimit = false) => {
+    addCandidateJewelToBundle = (bundle, slotSize, candidateJewelItem, hasJewelCountLimit = false) => {
 
         // Check Correspond Jewel
-        if (Helper.isEmpty(correspondJewel)) {
+        if (Helper.isEmpty(candidateJewelItem)) {
             return false
         }
 
         // Check Jewel Limit
         if (Helper.isNotEmpty(bundle.jewelMapping)
-            && Helper.isNotEmpty(bundle.jewelMapping[correspondJewel.id])
-            && correspondJewel.countLimit === bundle.jewelMapping[correspondJewel.id]
+            && Helper.isNotEmpty(bundle.jewelMapping[candidateJewelItem.id])
+            && candidateJewelItem.countLimit === bundle.jewelMapping[candidateJewelItem.id]
         ) {
             return false
         }
@@ -1181,7 +1181,7 @@ class FittingAlgorithm {
         let isSkip = false
         let jewelCount = bundle.meta.remainingSlotCountMapping[slotSize]
 
-        correspondJewel.skills.forEach((skillData) => {
+        candidateJewelItem.skills.forEach((skillData) => {
             if (true === isSkip) {
                 return
             }
@@ -1204,8 +1204,8 @@ class FittingAlgorithm {
             return false
         }
 
-        if (null !== correspondJewel.countLimit && jewelCount > correspondJewel.countLimit) {
-            jewelCount = correspondJewel.countLimit
+        if (null !== candidateJewelItem.countLimit && jewelCount > candidateJewelItem.countLimit) {
+            jewelCount = candidateJewelItem.countLimit
         }
 
         if (0 === jewelCount) {
@@ -1224,14 +1224,14 @@ class FittingAlgorithm {
             bundle.jewelMapping = {}
         }
 
-        if (Helper.isEmpty(bundle.jewelMapping[correspondJewel.id])) {
-            bundle.jewelMapping[correspondJewel.id] = 0
+        if (Helper.isEmpty(bundle.jewelMapping[candidateJewelItem.id])) {
+            bundle.jewelMapping[candidateJewelItem.id] = 0
         }
 
-        bundle.jewelMapping[correspondJewel.id] += jewelCount
+        bundle.jewelMapping[candidateJewelItem.id] += jewelCount
 
         // Increase Skill Level
-        correspondJewel.skills.forEach((skill) => {
+        candidateJewelItem.skills.forEach((skill) => {
             bundle.skillLevelMapping[skill.id] += jewelCount * skill.level
 
             if (this.skillMetaMapping[skill.id].level === bundle.skillLevelMapping[skill.id]) {
@@ -1244,8 +1244,8 @@ class FittingAlgorithm {
         bundle.meta.remainingSlotCountMapping.all -= jewelCount
 
         // Increase Expected Value & Level
-        let expectedValue = jewelCount * correspondJewel.expectedValue
-        let expectedLevel = jewelCount * correspondJewel.expectedLevel
+        let expectedValue = jewelCount * candidateJewelItem.expectedValue
+        let expectedLevel = jewelCount * candidateJewelItem.expectedLevel
 
         bundle.meta.skillExpectedValue += expectedValue
         bundle.meta.skillExpectedLevel += expectedLevel

@@ -45,7 +45,7 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
     }
 
     const removeItem = () => {
-        States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
+        States.setter.setRequiredConditionsEquipJewel(equipType, slotIndex, null)
     }
 
     return (
@@ -83,10 +83,7 @@ const renderEquipItem = (equipType, requiredEquipData) => {
     const showModal = () => {
         States.setter.showModal(Misc.equipTypeToDatasetType(equipType) + 'Selector', {
             target: 'requiredConditions',
-            equipType: equipType,
-
-            // Filter
-            type: equipType
+            equipType: equipType
         })
     }
 

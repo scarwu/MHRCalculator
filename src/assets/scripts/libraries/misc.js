@@ -7,9 +7,6 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-// Load Constant
-import Constant from 'constant'
-
 // Load Core
 import Helper from 'core/helper'
 

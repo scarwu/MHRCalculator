@@ -39,6 +39,11 @@ const handleItemPickUp = (itemId, tempData) => {
     if ('requiredConditions' === tempData.target) {
         States.setter.setRequiredConditionsEquip(tempData.equipType, itemId)
     }
+
+    States.setter.showModal('armorSelector', {
+        target: tempData.target,
+        equipType: tempData.equipType
+    })
 }
 
 /**
@@ -233,8 +238,16 @@ export default function ArmorSelectorModal (props) {
         })
 
         // Set Filter
-        filter.type = Helper.isNotEmpty(armorItem) ? armorItem.type : tempData.typeList[0].key
+        filter.type = Helper.isNotEmpty(armorItem) ? armorItem.type : null
         filter.rare = (Helper.isNotEmpty(armorItem)) ? armorItem.rare : tempData.rareList[0].key
+
+        if (Helper.isNotEmpty(stateModalData.equipType) && Helper.isEmpty(filter.type)) {
+            filter.type = stateModalData.equipType
+        }
+
+        if (Helper.isEmpty(filter.type)) {
+            filter.type = tempData.typeList[0].key
+        }
 
         window.addEventListener('keydown', handleSearchFocus)
 
@@ -281,9 +294,12 @@ export default function ArmorSelectorModal (props) {
     const handleTypeChange = useCallback((event) => {
         let type = event.target.value
 
-        updateTempData(Object.assign({}, stateTempData, {
-            equipType: type
-        }))
+        if (Helper.isNotEmpty(stateTempData.target)) {
+            States.setter.showModal('armorSelector', {
+                target: stateTempData.target,
+                equipType: type
+            })
+        }
 
         updateFilter(Object.assign({}, stateFilter, {
             type: type

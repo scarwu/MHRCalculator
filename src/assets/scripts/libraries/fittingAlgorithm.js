@@ -358,6 +358,13 @@ class FittingAlgorithm {
             if (Helper.isEmpty(requiredConditions.equips[equipType]) || Helper.isEmpty(requiredConditions.equips[equipType].id)) {
                 if ('weapon' !== equipType && 'charm' !== equipType) {
                     currentEquipTypes.push(equipType)
+
+                    // Set Default Value
+                    this.candidateEquipMapping[equipType] = []
+                    this.equipTypeMaxExpectedValue[equipType] = 0
+                    this.equipTypeMaxExpectedLevel[equipType] = 0
+                    this.equipTypeFutureExpectedValue[equipType] = 0
+                    this.equipTypeFutureExpectedLevel[equipType] = 0
                 }
 
                 continue
@@ -431,21 +438,9 @@ class FittingAlgorithm {
             }
 
             // Set Current Equip Mapping
-            if (Helper.isEmpty(this.candidateEquipMapping[equipType])) {
-                this.candidateEquipMapping[equipType] = []
-            }
-
             this.candidateEquipMapping[equipType].push(candidateEquipItem)
 
             // Set EquipMaxExpectedValue & EquipMaxExpectedLevel
-            if (Helper.isEmpty(this.equipTypeMaxExpectedValue[equipType])) {
-                this.equipTypeMaxExpectedValue[equipType] = 0
-            }
-
-            if (Helper.isEmpty(this.equipTypeMaxExpectedLevel[equipType])) {
-                this.equipTypeMaxExpectedLevel[equipType] = 0
-            }
-
             if (this.equipTypeMaxExpectedValue[equipType] < candidateEquipItem.totalExpectedValue) {
                 this.equipTypeMaxExpectedValue[equipType] = candidateEquipItem.totalExpectedValue
             }
@@ -462,9 +457,6 @@ class FittingAlgorithm {
 
         // Create Equip Future Expected Value & Expected Level
         currentEquipTypes.forEach((equipTypeA, equipTypeIndex) => {
-            this.equipTypeFutureExpectedValue[equipTypeA] = 0
-            this.equipTypeFutureExpectedLevel[equipTypeA] = 0
-
             currentEquipTypes.forEach((equipTypeB) => {
                 if (-1 !== currentEquipTypes.slice(0, equipTypeIndex + 1).indexOf(equipTypeB)) {
                     return
@@ -480,6 +472,8 @@ class FittingAlgorithm {
      * Create Bundle List with Equips
      */
     createBundleListWithEquips = (bundle, algorithmParams) => {
+        let traversalCount = 0
+        let traversalPercent = 0
         let totalTraversalCount = 1
 
         const candidateEquipTypes = Object.keys(this.candidateEquipMapping)
@@ -490,8 +484,6 @@ class FittingAlgorithm {
                 return candidateEquipItemB.totalExpectedValue - candidateEquipItemA.totalExpectedValue
             })
         })
-
-        console.log(candidateEquipList)
 
         let lastBundleMapping = {}
 
@@ -532,12 +524,6 @@ class FittingAlgorithm {
             }
         }
 
-        let traversalCount = 0
-        let traversalPercent = 0
-
-        let lastEquipTypeIndex = candidateEquipList.length - 1
-        let lastEquipItemIndex = candidateEquipList[lastEquipTypeIndex] - 1
-
         let stackIndex = 0
         let statusStack = []
         let equipTypeIndex = null
@@ -569,7 +555,7 @@ class FittingAlgorithm {
 
             traversalPercent = parseInt(precent * 100)
 
-            // Helper.log('FA: Skill Equips: Traversal Count:', traversalCount)
+            Helper.log('FA: Equips: Traversal Count:', traversalCount)
 
             let diffTime = parseInt(Math.floor(Date.now() / 1000), 10) - this.startTime
 
@@ -579,7 +565,7 @@ class FittingAlgorithm {
             })
         }
 
-        const findPrevTypeAndNextEquip = () => {
+        const findPrevEquipTypeAndNextEquipItem = () => {
             while (true) {
                 stackIndex--
                 statusStack.pop()
@@ -601,7 +587,7 @@ class FittingAlgorithm {
             }
         }
 
-        const findNextEquip = () => {
+        const findNextEquipItem = () => {
             equipTypeIndex = statusStack[stackIndex].equipTypeIndex
 
             if (Helper.isNotEmpty(candidateEquipList[equipTypeIndex][equipItemIndex + 1])) {
@@ -609,11 +595,11 @@ class FittingAlgorithm {
 
                 calculateTraversalCount()
             } else {
-                findPrevTypeAndNextEquip()
+                findPrevEquipTypeAndNextEquipItem()
             }
         }
 
-        const findNextType = () => {
+        const findNextEquipType = () => {
             equipTypeIndex = statusStack[stackIndex].equipTypeIndex
 
             if (Helper.isNotEmpty(candidateEquipList[equipTypeIndex + 1])) {
@@ -624,11 +610,12 @@ class FittingAlgorithm {
                     equipItemIndex: 0
                 })
             } else {
-                findNextEquip()
+                findNextEquipItem()
             }
         }
 
         // Helper.log('FA: CreateBundlesWithEquips: Root Bundle:', bundle)
+
         while (true) {
             if (0 === statusStack.length) {
                 break
@@ -644,13 +631,7 @@ class FittingAlgorithm {
 
             // If Add Candidate Equip Failed
             if (false === bundle) {
-
-                // Termination condition
-                if (lastEquipTypeIndex === equipTypeIndex && lastEquipItemIndex === equipItemIndex) {
-                    break
-                }
-
-                findNextEquip()
+                findNextEquipItem()
 
                 continue
             }
@@ -672,7 +653,7 @@ class FittingAlgorithm {
                         break
                     }
 
-                    findNextEquip()
+                    findNextEquipItem()
 
                     continue
                 }
@@ -697,25 +678,20 @@ class FittingAlgorithm {
                         }
                     }
 
-                    findNextEquip()
+                    findNextEquipItem()
 
                     continue
                 }
 
                 // Check Bundle Have a Future
                 if (false === this.isBundleHaveFuture(bundle, candidateEquipTypes[equipTypeIndex])) {
-                    findNextEquip()
+                    findNextEquipItem()
 
                     continue
                 }
             }
 
-            // Termination condition
-            if (lastEquipTypeIndex === equipTypeIndex && lastEquipItemIndex === equipItemIndex) {
-                break
-            }
-
-            findNextType()
+            findNextEquipType()
         }
 
         calculateTraversalCount()
@@ -812,9 +788,6 @@ class FittingAlgorithm {
             }
         }
 
-        let lastSlotIndex = slotSizeList.length - 1
-        let lastJewelIndex = currentCandidateJewelMapping[slotSizeList[lastSlotIndex]].length - 1
-
         let stackIndex = 0
         let statusStack = []
         let slotIndex = null
@@ -906,12 +879,6 @@ class FittingAlgorithm {
             bundle = this.addJewelToBundle(bundle, slotSize, correspondJewel, true)
 
             if (false === bundle) {
-
-                // Termination condition
-                if (lastSlotIndex === slotIndex && lastJewelIndex === jewelIndex) {
-                    break
-                }
-
                 findNextJewel()
 
                 continue
@@ -939,11 +906,6 @@ class FittingAlgorithm {
                 findNextJewel()
 
                 continue
-            }
-
-            // Termination condition
-            if (lastSlotIndex === slotIndex && lastJewelIndex === jewelIndex) {
-                break
             }
 
             findNextSlot()

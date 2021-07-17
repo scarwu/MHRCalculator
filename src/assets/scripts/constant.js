@@ -164,74 +164,6 @@ export const defaultAlgorithmParams = {
     }
 }
 
-export const defaultBundle = {
-    equipIdMapping: {
-        weapon: null,
-        helm: null,
-        chest: null,
-        arm: null,
-        waist: null,
-        leg: null,
-        petalace: null,
-        charm: null
-    },
-    skillLevelMapping: {},
-    setCountMapping: {},
-    slotCountMapping: {
-        1: 0,
-        2: 0,
-        3: 0
-    },
-    jewelPackages: [],
-    meta: {
-        equipCount: 0,
-        defense: 0,
-        resistance: {
-            fire: 0,
-            water: 0,
-            thunder: 0,
-            ice: 0,
-            dragon: 0
-        },
-        completedSkills: {},
-        completedSets: {},
-        remainingSlotCountMapping: {
-            1: 0,
-            2: 0,
-            3: 0,
-            all: 0
-        },
-        totalExpectedValue: 0,
-        totalExpectedLevel: 0,
-        skillExpectedValue: 0,
-        skillExpectedLevel: 0
-    }
-}
-
-export const defaultCandidateEquipItem = {
-    id: null,
-    type: null,
-    defense: 0,
-    resistance: {
-        fire: 0,
-        water: 0,
-        thunder: 0,
-        ice: 0,
-        dragon: 0
-    },
-    skillLevelMapping: {},
-    setId: null,
-    slotCountMapping: {
-        1: 0,
-        2: 0,
-        3: 0
-    },
-    totalExpectedValue: 0,
-    totalExpectedLevel: 0,
-    skillExpectedValue: 0,
-    skillExpectedLevel: 0
-}
-
 export const defaultCustomWeapon = {
     id: 'customWeapon',
     rare: 7,
@@ -399,8 +331,6 @@ export default {
     weaponMultiple,
     defaultLang,
     defaultAlgorithmParams,
-    defaultCandidateEquipItem,
-    defaultBundle,
     defaultCustomWeapon,
     defaultCustomCharm,
     defaultPlayerEquips,

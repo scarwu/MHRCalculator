@@ -350,21 +350,13 @@ export default function BundleList (props) {
                                 ) {
                                     isNotRequire = Helper.jsonHash({
                                         id: currentEquipData.id,
-                                        jewelIds: currentEquipData.jewelIds,
                                         custom: currentEquipData.custom
                                     }) !== Helper.jsonHash({
                                         id: requiredEquipData.id,
-                                        jewelIds: requiredEquipData.jewelIds,
                                         custom: requiredEquipData.custom
                                     })
                                 } else {
-                                    isNotRequire = Helper.jsonHash({
-                                        id: currentEquipData.id,
-                                        jewelIds: currentEquipData.jewelIds
-                                    }) !== Helper.jsonHash({
-                                        id: requiredEquipData.id,
-                                        jewelIds: requiredEquipData.jewelIds
-                                    })
+                                    isNotRequire = currentEquipData.id !== requiredEquipData.id
                                 }
 
                                 let equipItem = Misc.getEquipItem(currentEquipData.type, currentEquipData)
@@ -445,7 +437,9 @@ export default function BundleList (props) {
                         </div>
                     ) : false}
 
-                    {(0 !== additionalSets.length) ? (
+                    {(0 !== additionalSets.filter((setData) => {
+                        return 3 <= setData.count
+                    }).length) ? (
                         <div className="col-12 mhrc-content">
                             <div className="col-12 mhrc-name">
                                 <span>{_('additionalSets')}</span>

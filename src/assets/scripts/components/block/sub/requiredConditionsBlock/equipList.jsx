@@ -133,21 +133,6 @@ const renderEquipItem = (equipType, requiredEquipData) => {
                     <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
                 </div>
             </div>
-
-            {(Helper.isNotEmpty(equipItem.slots) && 0 !== equipItem.slots.length) ? (
-                <div className="col-12 mhrc-content">
-                    {equipItem.slots.map((slotData, slotIndex) => {
-                        return renderJewelOption(
-                            equipType,
-                            slotIndex,
-                            slotData.size,
-                            Helper.isNotEmpty(requiredEquipData.jewelIds[slotIndex])
-                                ? requiredEquipData.jewelIds[slotIndex] : null
-                        )
-                    })}
-                </div>
-            ) : false}
-
         </div>
     )
 }

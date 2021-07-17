@@ -151,7 +151,9 @@ class FittingAlgorithm {
         }
 
         this.candidateEquipMapping = {}
-        this.candidateJewelMapping = {}
+        this.candidateJewelMapping = {
+            1: [], 2: [], 3: []
+        }
 
         this.skillTotalExpectedValue = 0
         this.skillTotalExpectedLevel = 0
@@ -165,7 +167,7 @@ class FittingAlgorithm {
         // Init Condtions
         this.isInitFailed = false
 
-        this.generateMatadata(requiredConditions, algorithmParams)
+        this.initialize(requiredConditions, algorithmParams)
 
         if (this.isInitFailed) {
             Helper.log('FA: Init: Failed')
@@ -233,7 +235,7 @@ class FittingAlgorithm {
         })
     }
 
-    generateMatadata = (requiredConditions, algorithmParams) => {
+    initialize = (requiredConditions, algorithmParams) => {
         let armorList = Misc.getArmorListByRequiredConditions(requiredConditions)
         let jewelList = Misc.getJewelListByRequiredConditions(requiredConditions)
 
@@ -278,46 +280,13 @@ class FittingAlgorithm {
                 return
             }
 
-            // Create Infos
-            let expectedValue = 0
-            let expectedLevel = 0
+            let candidateJewelItem = this.getCandidateJewelItem(jewelItem, algorithmParams)
 
-            let jewelSkills = jewelItem.skills.map((skillData) => {
-                expectedValue += skillData.level * this.skillMetaMapping[skillData.id].jewelSize
-                expectedLevel += skillData.level
-
-                return {
-                    id: skillData.id,
-                    level: skillData.level
-                }
-            })
-
-            if (this.slotMetaMapping[jewelItem.size].expectedValue < expectedValue) {
-                this.slotMetaMapping[jewelItem.size].expectedValue = expectedValue
+            if (Helper.isEmpty(candidateJewelItem)) {
+                return
             }
 
-            if (this.slotMetaMapping[jewelItem.size].expectedLevel < expectedLevel) {
-                this.slotMetaMapping[jewelItem.size].expectedLevel = expectedLevel
-            }
-
-            if (Helper.isEmpty(this.candidateJewelMapping[jewelItem.size])) {
-                this.candidateJewelMapping[jewelItem.size] = []
-            }
-
-            let jewelCountLimit = null
-
-            if (-1 !== algorithmParams.usingFactor['jewel:id:' + jewelItem.id]) {
-                jewelCountLimit = algorithmParams.usingFactor['jewel:id:' + jewelItem.id]
-            }
-
-            this.candidateJewelMapping[jewelItem.size].push({
-                id: jewelItem.id,
-                size: jewelItem.size,
-                skills: jewelSkills,
-                countLimit: jewelCountLimit,
-                expectedValue: expectedValue,
-                expectedLevel: expectedLevel
-            })
+            this.candidateJewelMapping[jewelItem.size].push(candidateJewelItem)
         })
 
         Object.keys(this.slotMetaMapping).forEach((size) => {
@@ -359,6 +328,12 @@ class FittingAlgorithm {
         // Create First Bundle
         let bundle = Helper.deepCopy(defaultBundle)
         let currentEquipTypes = []
+
+        Object.keys(this.skillMetaMapping).forEach((skillId) => {
+            if (Helper.isEmpty(bundle.skillLevelMapping[skillId])) {
+                bundle.skillLevelMapping[skillId] = 0
+            }
+        })
 
         for (let equipType of ['weapon', 'helm', 'chest', 'arm', 'waist', 'leg', 'charm']) {
             if (Helper.isEmpty(requiredConditions.equips[equipType]) || Helper.isEmpty(requiredConditions.equips[equipType].id)) {
@@ -403,12 +378,6 @@ class FittingAlgorithm {
 
         // Reset Equip Count
         bundle.meta.equipCount = 0
-
-        Object.keys(this.skillMetaMapping).forEach((skillId) => {
-            if (Helper.isEmpty(bundle.skillLevelMapping[skillId])) {
-                bundle.skillLevelMapping[skillId] = 0
-            }
-        })
 
         this.firstBundle = bundle
 
@@ -709,6 +678,9 @@ class FittingAlgorithm {
         return Object.values(lastBundleMapping)
     }
 
+    /**
+     * Create Bundle with Jewels
+     */
     createBundleWithJewels = (bundle) => {
         if (this.isBundleSkillsCompleted(bundle)) {
             return bundle
@@ -1004,6 +976,69 @@ class FittingAlgorithm {
     }
 
     /**
+     * Get Candidate Equip Item
+     */
+     getCandidateEquipItem = (equipType, equipItem) => {
+        let candidateEquipItem = Helper.deepCopy(defaultCandidateEquipItem)
+
+        // Set Id, Type & Defense
+        candidateEquipItem.id = equipItem.id
+        candidateEquipItem.type = ('charm' !== equipType && 'weapon' !== equipType) ? equipItem.type : equipType
+        candidateEquipItem.defense = Helper.isNotEmpty(equipItem.defense) ? equipItem.defense : 0
+        candidateEquipItem.resistance = Helper.isNotEmpty(equipItem.resistance) ? equipItem.resistance : candidateEquipItem.resistance
+        candidateEquipItem.setId = equipItem.seriesId // SeriesId is SetId
+
+        if (Helper.isEmpty(equipItem.skills)) {
+            equipItem.skills = []
+        }
+
+        if (Helper.isEmpty(equipItem.slots)) {
+            equipItem.slots = []
+        }
+
+        equipItem.skills.forEach((skillData) => {
+
+            // Increase Skill Level
+            candidateEquipItem.skillLevelMapping[skillData.id] = skillData.level
+
+            if (Helper.isEmpty(this.skillMetaMapping[skillData.id])) {
+                return
+            }
+
+            // Increase Expected Value & Level
+            let expectedValue = skillData.level * this.skillMetaMapping[skillData.id].jewelSize
+            let expectedLevel = skillData.level
+
+            candidateEquipItem.totalExpectedValue += expectedValue
+            candidateEquipItem.totalExpectedLevel += expectedLevel
+            candidateEquipItem.skillExpectedValue += expectedValue
+            candidateEquipItem.skillExpectedLevel += expectedLevel
+        })
+
+        equipItem.slots.forEach((slotData) => {
+            candidateEquipItem.slotCountMapping[slotData.size] += 1
+
+            // Increase Expected Value & Level
+            candidateEquipItem.totalExpectedValue += this.slotMetaMapping[slotData.size].expectedValue
+            candidateEquipItem.totalExpectedLevel += this.slotMetaMapping[slotData.size].expectedLevel
+        })
+
+        return candidateEquipItem
+    }
+
+    /**
+     * Get Empty Candidate Equip Item
+     */
+    getEmptyCandidateEquipItem = (equipType) => {
+        let candidateEquipItem = Helper.deepCopy(defaultCandidateEquipItem)
+
+        candidateEquipItem.id = 'empty'
+        candidateEquipItem.type = equipType
+
+        return candidateEquipItem
+    }
+
+    /**
      * Add Candidate Equip To Bundle
      */
     addCandidateEquipToBundle = (bundle, candidateEquipItem) => {
@@ -1097,66 +1132,48 @@ class FittingAlgorithm {
     }
 
     /**
-     * Get Candidate Equip
+     * Get Candidate Jewel Item
      */
-    getCandidateEquipItem = (equipType, equipItem) => {
-        let candidateEquipItem = Helper.deepCopy(defaultCandidateEquipItem)
+    getCandidateJewelItem = (jewelItem, algorithmParams) => {
 
-        // Set Id, Type & Defense
-        candidateEquipItem.id = equipItem.id
-        candidateEquipItem.type = ('charm' !== equipType && 'weapon' !== equipType) ? equipItem.type : equipType
-        candidateEquipItem.defense = Helper.isNotEmpty(equipItem.defense) ? equipItem.defense : 0
-        candidateEquipItem.resistance = Helper.isNotEmpty(equipItem.resistance) ? equipItem.resistance : candidateEquipItem.resistance
-        candidateEquipItem.setId = equipItem.seriesId // SeriesId is SetId
+        // Create Infos
+        let expectedValue = 0
+        let expectedLevel = 0
 
-        if (Helper.isEmpty(equipItem.skills)) {
-            equipItem.skills = []
-        }
-
-        if (Helper.isEmpty(equipItem.slots)) {
-            equipItem.slots = []
-        }
-
-        equipItem.skills.forEach((skillData) => {
-
-            // Increase Skill Level
-            candidateEquipItem.skillLevelMapping[skillData.id] = skillData.level
-
-            if (Helper.isEmpty(this.skillMetaMapping[skillData.id])) {
-                return
+        let jewelSkills = jewelItem.skills.map((skillData) => {
+            if (Helper.isNotEmpty(this.skillMetaMapping[skillData.id])) {
+                expectedValue += skillData.level * this.skillMetaMapping[skillData.id].jewelSize
+                expectedLevel += skillData.level
             }
 
-            // Increase Expected Value & Level
-            let expectedValue = skillData.level * this.skillMetaMapping[skillData.id].jewelSize
-            let expectedLevel = skillData.level
-
-            candidateEquipItem.totalExpectedValue += expectedValue
-            candidateEquipItem.totalExpectedLevel += expectedLevel
-            candidateEquipItem.skillExpectedValue += expectedValue
-            candidateEquipItem.skillExpectedLevel += expectedLevel
+            return {
+                id: skillData.id,
+                level: skillData.level
+            }
         })
 
-        equipItem.slots.forEach((slotData) => {
-            candidateEquipItem.slotCountMapping[slotData.size] += 1
+        if (this.slotMetaMapping[jewelItem.size].expectedValue < expectedValue) {
+            this.slotMetaMapping[jewelItem.size].expectedValue = expectedValue
+        }
 
-            // Increase Expected Value & Level
-            candidateEquipItem.totalExpectedValue += this.slotMetaMapping[slotData.size].expectedValue
-            candidateEquipItem.totalExpectedLevel += this.slotMetaMapping[slotData.size].expectedLevel
-        })
+        if (this.slotMetaMapping[jewelItem.size].expectedLevel < expectedLevel) {
+            this.slotMetaMapping[jewelItem.size].expectedLevel = expectedLevel
+        }
 
-        return candidateEquipItem
-    }
+        let jewelCountLimit = null
 
-    /**
-     * Get Empty Candidate Equip
-     */
-    getEmptyCandidateEquipItem = (equipType) => {
-        let candidateEquipItem = Helper.deepCopy(defaultCandidateEquipItem)
+        if (-1 !== algorithmParams.usingFactor['jewel:id:' + jewelItem.id]) {
+            jewelCountLimit = algorithmParams.usingFactor['jewel:id:' + jewelItem.id]
+        }
 
-        candidateEquipItem.id = 'empty'
-        candidateEquipItem.type = equipType
-
-        return candidateEquipItem
+        return {
+            id: jewelItem.id,
+            size: jewelItem.size,
+            skills: jewelSkills,
+            countLimit: jewelCountLimit,
+            expectedValue: expectedValue,
+            expectedLevel: expectedLevel
+        }
     }
 
     /**
@@ -1231,11 +1248,15 @@ class FittingAlgorithm {
         bundle.jewelMapping[candidateJewelItem.id] += jewelCount
 
         // Increase Skill Level
-        candidateJewelItem.skills.forEach((skill) => {
-            bundle.skillLevelMapping[skill.id] += jewelCount * skill.level
+        candidateJewelItem.skills.forEach((skillData) => {
+            if (Helper.isEmpty(bundle.skillLevelMapping[skillData.id])) {
+                return
+            }
 
-            if (this.skillMetaMapping[skill.id].level === bundle.skillLevelMapping[skill.id]) {
-                bundle.meta.completedSkills[skill.id] = true
+            bundle.skillLevelMapping[skillData.id] += jewelCount * skillData.level
+
+            if (this.skillMetaMapping[skillData.id].level === bundle.skillLevelMapping[skillData.id]) {
+                bundle.meta.completedSkills[skillData.id] = true
             }
         })
 

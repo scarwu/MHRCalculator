@@ -31,10 +31,6 @@ const handleItemPickUp = (itemId, tempData) => {
     if ('playerEquips' === tempData.target) {
         States.setter.setPlayerEquipJewel(tempData.equipType, tempData.idIndex, itemId)
     }
-
-    if ('requiredConditions' === tempData.target) {
-        States.setter.setRequiredConditionsEquipJewel(tempData.equipType, tempData.idIndex, itemId)
-    }
 }
 
 /**
@@ -147,15 +143,6 @@ export default function JewelSelectorModal (props) {
                 && Helper.isNotEmpty(statePlayerEquips[equipType].jewelIds[idIndex])
             ) {
                 tempData.id = statePlayerEquips[equipType].jewelIds[idIndex]
-            }
-
-            if ('requiredConditions' === tempData.target
-                && Helper.isNotEmpty(stateRequiredConditions.equips)
-                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType])
-                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType].jewelIds)
-                && Helper.isNotEmpty(stateRequiredConditions.equips[equipType].jewelIds[idIndex])
-            ) {
-                tempData.id = stateRequiredConditions.equips[equipType].jewelIds[idIndex]
             }
         }
 

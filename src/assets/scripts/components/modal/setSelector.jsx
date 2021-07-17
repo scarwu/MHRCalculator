@@ -154,7 +154,7 @@ export default function SetSelectorModal (props) {
 
         // Set List
         tempData.list = SetDataset.getList().filter((setItem) => {
-            return 3 < setItem.items.length
+            return 3 <= setItem.items.length
         })
 
         window.addEventListener('keydown', handleSearchFocus)

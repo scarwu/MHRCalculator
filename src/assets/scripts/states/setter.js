@@ -125,17 +125,6 @@ export const setRequiredConditionsEquip = (equipType, equipId) => {
     })
 }
 
-export const setRequiredConditionsEquipJewel = (equipType, idIndex, jewelId) => {
-    store.dispatch({
-        type: 'SET_REQUIRED_CONDITIONS_EQUIP_JEWEL',
-        payload: {
-            equipType: equipType,
-            idIndex: idIndex,
-            jewelId: jewelId
-        }
-    })
-}
-
 export const setRequiredConditionsEquipCustomDataset = (equipType, customDataset) => {
     store.dispatch({
         type: 'SET_REQUIRED_CONDITIONS_EQUIP_CUSTOM',
@@ -298,7 +287,6 @@ export default {
     cleanRequiredConditions,
     replaceRequiredConditionsEquipData,
     setRequiredConditionsEquip,
-    setRequiredConditionsEquipJewel,
     setRequiredConditionsEquipCustomDataset,
     addRequiredConditionsSet,
     removeRequiredConditionsSet,

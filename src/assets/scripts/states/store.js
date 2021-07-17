@@ -258,13 +258,13 @@ export default createStore((state = initialState, action) => {
                 requiredConditions.equips[equipType] = Helper.deepCopy(Constant.defaultPlayerEquips[equipType])
                 requiredConditions.equips[equipType].id = equipData.id
 
-                if ('petalace' !== equipType) {
-                    requiredConditions.equips[equipType].jewelIds = equipData.jewelIds
-                }
+                // if ('petalace' !== equipType) {
+                //     requiredConditions.equips[equipType].jewelIds = equipData.jewelIds
+                // }
 
-                if ('weapon' === equipType) {
-                    requiredConditions.equips[equipType].enhanceIds = equipData.enhanceIds
-                }
+                // if ('weapon' === equipType) {
+                //     requiredConditions.equips[equipType].enhanceIds = equipData.enhanceIds
+                // }
 
                 if ('weapon' === equipType || 'charm' === equipType) {
                     requiredConditions.equips[equipType].custom = equipData.custom
@@ -287,24 +287,6 @@ export default createStore((state = initialState, action) => {
 
                 requiredConditions.equips[equipType] = Helper.deepCopy(Constant.defaultPlayerEquips[equipType])
                 requiredConditions.equips[equipType].id = equipId
-
-                return Object.assign({}, state, {
-                    requiredConditions: requiredConditions
-                })
-            })()
-
-        case 'SET_REQUIRED_CONDITIONS_EQUIP_JEWEL':
-            return (() => {
-                let requiredConditions = Helper.deepCopy(state.requiredConditions)
-                let equipType = action.payload.equipType
-                let idIndex = action.payload.idIndex
-                let jewelId = action.payload.jewelId
-
-                if (Helper.isEmpty(requiredConditions.equips[equipType])) {
-                    return state
-                }
-
-                requiredConditions.equips[equipType].jewelIds[idIndex] = jewelId
 
                 return Object.assign({}, state, {
                     requiredConditions: requiredConditions

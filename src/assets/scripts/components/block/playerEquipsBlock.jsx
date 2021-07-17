@@ -370,21 +370,13 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
     ) {
         isNotRequire = Helper.jsonHash({
             id: currentEquipData.id,
-            jewelIds: currentEquipData.jewelIds,
             custom: currentEquipData.custom
         }) !== Helper.jsonHash({
             id: requiredEquipData.id,
-            jewelIds: requiredEquipData.jewelIds,
             custom: requiredEquipData.custom
         })
     } else {
-        isNotRequire = Helper.jsonHash({
-            id: currentEquipData.id,
-            jewelIds: currentEquipData.jewelIds
-        }) !== Helper.jsonHash({
-            id: requiredEquipData.id,
-            jewelIds: requiredEquipData.jewelIds
-        })
+        isNotRequire = currentEquipData.id != requiredEquipData.id
     }
 
     const showModal = () => {

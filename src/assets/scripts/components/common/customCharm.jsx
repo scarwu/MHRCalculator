@@ -190,21 +190,13 @@ export default function CustomCharm (props) {
             ) {
                 isNotRequire = Helper.jsonHash({
                     id: stateMajorData.id,
-                    jewelIds: stateMajorData.jewelIds,
                     custom: stateMajorData.custom
                 }) !== Helper.jsonHash({
                     id: stateMinorData.id,
-                    jewelIds: stateMinorData.jewelIds,
                     custom: stateMinorData.custom
                 })
             } else {
-                isNotRequire = Helper.jsonHash({
-                    id: stateMajorData.id,
-                    jewelIds: stateMajorData.jewelIds
-                }) !== Helper.jsonHash({
-                    id: stateMinorData.id,
-                    jewelIds: stateMinorData.jewelIds
-                })
+                isNotRequire = stateMajorData.id !== stateMinorData.id
             }
         }
 
@@ -277,18 +269,21 @@ export default function CustomCharm (props) {
                                             handleRefreshCustomDataset(stateMajorData)
                                         }} />
                                 </div>
-                                <div className="col-6 mhrc-value">
-                                    {Helper.isNotEmpty(stateMajorData.custom.slots[slotIndex].size) ? (
-                                        renderJewelOption(
-                                            stateMajorData.target,
-                                            'charm',
-                                            slotIndex,
-                                            slotData.size,
-                                            Helper.isNotEmpty(stateMajorData.jewelIds[slotIndex])
-                                                ? stateMajorData.jewelIds[slotIndex] : null
-                                        )
-                                    ) : false}
-                                </div>
+
+                                {('playerEquips' === stateMajorData.target) ? (
+                                    <div className="col-6 mhrc-value">
+                                        {Helper.isNotEmpty(stateMajorData.custom.slots[slotIndex].size) ? (
+                                            renderJewelOption(
+                                                stateMajorData.target,
+                                                'charm',
+                                                slotIndex,
+                                                slotData.size,
+                                                Helper.isNotEmpty(stateMajorData.jewelIds[slotIndex])
+                                                    ? stateMajorData.jewelIds[slotIndex] : null
+                                            )
+                                        ) : false}
+                                    </div>
+                                ) : false}
                             </Fragment>
                         )
                     })}

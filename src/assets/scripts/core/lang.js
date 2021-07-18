@@ -55,7 +55,17 @@ function getExistLang (key) {
 export default (key) => {
     currentLang = Status.get('sys:lang')
 
-    return (Helper.isNotEmpty(langs[currentLang][key]))
-        ? langs[currentLang][key] : (Helper.isNotEmpty(langs[defaultLang][key])
-            ? langs[defaultLang][key] : getExistLang(key))
+    if (Helper.isNotEmpty(langs[currentLang]) && Helper.isNotEmpty(langs[currentLang][key])) {
+        return langs[currentLang][key]
+    }
+
+    if (Helper.isNotEmpty(langs[browserLnag]) && Helper.isNotEmpty(langs[browserLnag][key])) {
+        return langs[browserLnag][key]
+    }
+
+    if (Helper.isNotEmpty(langs[defaultLang]) && Helper.isNotEmpty(langs[defaultLang][key])) {
+        return langs[defaultLang][key]
+    }
+
+    return getExistLang(key)
 }

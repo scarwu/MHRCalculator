@@ -335,13 +335,15 @@ export default function ArmorSelectorModal (props) {
             let text = _(item.name)
             text += _(item.series)
 
-            item.skills.forEach((skillData) => {
-                let skillItem = SkillDataset.getItem(skillData.id)
+            if (Helper.isNotEmpty(item.skills)) {
+                item.skills.forEach((skillData) => {
+                    let skillItem = SkillDataset.getItem(skillData.id)
 
-                if (Helper.isNotEmpty(skillItem)) {
-                    text += _(skillItem.name)
-                }
-            })
+                    if (Helper.isNotEmpty(skillItem)) {
+                        text += _(skillItem.name)
+                    }
+                })
+            }
 
             // Search Nameword
             if (Helper.isNotEmpty(stateFilter.segment)

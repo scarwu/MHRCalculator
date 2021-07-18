@@ -196,7 +196,7 @@ export default function SkillSelectorModal (props) {
             let text = _(item.name)
 
             item.list.forEach((skillData) => {
-                text += _(skillData.name) + _(skillData.description)
+                text += _(skillData.name) + _(skillData.effect)
             })
 
             // Search Nameword

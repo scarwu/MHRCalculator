@@ -123,23 +123,6 @@ export const elementCriticalMultiple ={
     }
 }
 
-export const weaponMultiple = {
-    greatSword: 4.8,
-    longSword: 3.3,
-    swordAndShield: 1.4,
-    dualBlades: 1.4,
-    hammer: 5.2,
-    huntingHorn: 4.2,
-    lance: 2.3,
-    gunlance: 2.3,
-    switchAxe: 3.5,
-    chargeBlade: 3.6,
-    insectGlaive: 3.1,
-    lightBowgun: 1.3,
-    heavyBowgun: 1.5,
-    bow: 1.2
-}
-
 export const defaultLang = 'zhTW'
 
 export const defaultAlgorithmParams = {
@@ -328,7 +311,6 @@ export default {
     resistanceTypes,
     sharpnessMultiple,
     elementCriticalMultiple,
-    weaponMultiple,
     defaultLang,
     defaultAlgorithmParams,
     defaultCustomWeapon,

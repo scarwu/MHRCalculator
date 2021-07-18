@@ -349,8 +349,6 @@ const generateStatus = (equipInfos, passiveSkills) => {
         let weaponAttack = equipInfos.weapon.attack
         let weaponType = equipInfos.weapon.type
 
-        status.attack *= Constant.weaponMultiple[weaponType] // 武器倍率
-
         if (Helper.isEmpty(enableElement)
             && Helper.isNotEmpty(noneElementAttackMultiple)
         ) {
@@ -492,10 +490,9 @@ const getBasicBenefitAnalysis = (equipInfos, status, tuning) => {
     let expectedValue = 0
 
     if (Helper.isNotEmpty(equipInfos.weapon)) {
-        let weaponMultiple = Constant.weaponMultiple[equipInfos.weapon.type]
         let sharpnessMultiple = getSharpnessMultiple(status.sharpness)
 
-        physicalAttack = (status.attack / weaponMultiple)
+        physicalAttack = status.attack
 
         if (Helper.isNotEmpty(tuning.physicalAttack)) {
             physicalAttack += tuning.physicalAttack

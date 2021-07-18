@@ -609,9 +609,9 @@ export const runAction = () => {
             return Helper.isNotEmpty(slotData.size)
         })
 
-        weaponItem.enhance.list = weaponItem.enhance.list.filter((enhanceData) => {
-            return Helper.isNotEmpty(enhanceData.name)
-        })
+        // weaponItem.enhance.list = weaponItem.enhance.list.filter((enhanceData) => {
+        //     return Helper.isNotEmpty(enhanceData.name)
+        // })
 
         // Check Propeties Using as Unique Key
         if (Helper.isEmpty(weaponItem.name)
@@ -647,11 +647,11 @@ export const runAction = () => {
         }
 
         // Find Code Id
-        weaponItem.enhance.list = weaponItem.enhance.list.map((enhanceData) => {
-            enhanceData.name = createCode(`enhances:id:${enhanceData.name}`)
+        // weaponItem.enhance.list = weaponItem.enhance.list.map((enhanceData) => {
+        //     enhanceData.name = createCode(`enhances:id:${enhanceData.name}`)
 
-            return enhanceData
-        })
+        //     return enhanceData
+        // })
 
         // Create Dataset Mapping
         if (Helper.isEmpty(datasetMapping.weapons)) {
@@ -699,11 +699,11 @@ export const runAction = () => {
             }),
             [
                 weaponItem.enhance.amount,
-                weaponItem.enhance.list.map((enhanceData) => {
-                    return [
-                        enhanceData.name
-                    ]
-                })
+                // weaponItem.enhance.list.map((enhanceData) => {
+                //     return [
+                //         enhanceData.name
+                //     ]
+                // })
             ]
         ])
     })

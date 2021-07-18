@@ -58,11 +58,11 @@ const dataset = Weapons.map((weaponItem) => {
         }),
         enhance: {
             amount: weaponItem[11][0],
-            list: weaponItem[11][1].map((enhanceData) => {
-                return {
-                    name: enhanceData[0]
-                }
-            })
+            // list: weaponItem[11][1].map((enhanceData) => {
+            //     return {
+            //         name: enhanceData[0]
+            //     }
+            // })
         }
     }
 

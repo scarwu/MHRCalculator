@@ -254,7 +254,7 @@ export const defaultPlayerEquips = {
 export const defaultPlayerStatus = {
     health: 100,
     stamina: 100,
-    attack: 15, // 力量護符+6 力量之爪+9
+    attack: 0,
     critical: {
         rate: 0,
         multiple: {
@@ -271,7 +271,7 @@ export const defaultPlayerStatus = {
         attack: 1,
         status: 1
     },
-    defense: 31, // 守護護符+10 守護之爪+20
+    defense: 1,
     resistance: {
         fire: 0,
         water: 0,

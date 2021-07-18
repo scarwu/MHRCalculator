@@ -417,6 +417,19 @@ const generateStatus = (equipInfos, passiveSkills) => {
     status.attack = parseInt(Math.round(status.attack))
     status.defense = parseInt(Math.round(status.defense))
 
+    // Set Effect
+    status.sets.forEach((setData) => {
+        ['fire', 'water', 'thunder', 'ice', 'dragon'].forEach((type) => {
+            if (3 === setData.count) {
+                status.resistance[type] += 1
+            } else if (4 === setData.count) {
+                status.resistance[type] += 2
+            } else if (5 === setData.count) {
+                status.resistance[type] += 3
+            }
+        })
+    })
+
     // Resistance Multiple
     if (Helper.isNotEmpty(resistanceMultiple)) {
         if ('all' === resistanceMultiple.type) {

@@ -841,65 +841,6 @@ export default function PlayerStatusBlock (props) {
 
                 <div className="mhrc-item mhrc-item-3-step">
                     <div className="col-12 mhrc-name">
-                        <span>{_('inventory')}</span>
-                    </div>
-                    <div className="col-12 mhrc-content">
-                        <div className="col-6 mhrc-value">
-                            <span>{_('powerCharm')}</span>
-
-                            <div className="mhrc-icons_bundle">
-                                <IconButton
-                                    iconName={statePlayerStatus.usingItem['powerCharm'] ? 'circle' : 'circle-o'}
-                                    altName={statePlayerStatus.usingItem['powerCharm'] ? _('deactive') : _('active')}
-                                    onClick={() => {
-                                        States.setter.togglePlayerStatusUsingItem('powerCharm')
-                                    }} />
-                            </div>
-                        </div>
-
-                        <div className="col-6 mhrc-value">
-                            <span>{_('powerTalon')}</span>
-
-                            <div className="mhrc-icons_bundle">
-                                <IconButton
-                                    iconName={statePlayerStatus.usingItem['powerTalon'] ? 'circle' : 'circle-o'}
-                                    altName={statePlayerStatus.usingItem['powerTalon'] ? _('deactive') : _('active')}
-                                    onClick={() => {
-                                        States.setter.togglePlayerStatusUsingItem('powerTalon')
-                                    }} />
-                            </div>
-                        </div>
-
-                        <div className="col-6 mhrc-value">
-                            <span>{_('armorCharm')}</span>
-
-                            <div className="mhrc-icons_bundle">
-                                <IconButton
-                                    iconName={statePlayerStatus.usingItem['armorCharm'] ? 'circle' : 'circle-o'}
-                                    altName={statePlayerStatus.usingItem['armorCharm'] ? _('deactive') : _('active')}
-                                    onClick={() => {
-                                        States.setter.togglePlayerStatusUsingItem('armorCharm')
-                                    }} />
-                            </div>
-                        </div>
-
-                        <div className="col-6 mhrc-value">
-                            <span>{_('armorTalon')}</span>
-
-                            <div className="mhrc-icons_bundle">
-                                <IconButton
-                                    iconName={statePlayerStatus.usingItem['armorTalon'] ? 'circle' : 'circle-o'}
-                                    altName={statePlayerStatus.usingItem['armorTalon'] ? _('deactive') : _('active')}
-                                    onClick={() => {
-                                        States.setter.togglePlayerStatusUsingItem('armorTalon')
-                                    }} />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mhrc-item mhrc-item-3-step">
-                    <div className="col-12 mhrc-name">
                         <span>{_('property')}</span>
                     </div>
                     <div className="col-12 mhrc-content">
@@ -1018,6 +959,65 @@ export default function PlayerStatusBlock (props) {
                                 </Fragment>
                             )
                         })}
+                    </div>
+                </div>
+
+                <div className="mhrc-item mhrc-item-3-step">
+                    <div className="col-12 mhrc-name">
+                        <span>{_('inventory')}</span>
+                    </div>
+                    <div className="col-12 mhrc-content">
+                        <div className="col-6 mhrc-value">
+                            <span>{_('powerCharm')}</span>
+
+                            <div className="mhrc-icons_bundle">
+                                <IconButton
+                                    iconName={statePlayerStatus.usingItem['powerCharm'] ? 'circle' : 'circle-o'}
+                                    altName={statePlayerStatus.usingItem['powerCharm'] ? _('deactive') : _('active')}
+                                    onClick={() => {
+                                        States.setter.togglePlayerStatusUsingItem('powerCharm')
+                                    }} />
+                            </div>
+                        </div>
+
+                        <div className="col-6 mhrc-value">
+                            <span>{_('armorCharm')}</span>
+
+                            <div className="mhrc-icons_bundle">
+                                <IconButton
+                                    iconName={statePlayerStatus.usingItem['armorCharm'] ? 'circle' : 'circle-o'}
+                                    altName={statePlayerStatus.usingItem['armorCharm'] ? _('deactive') : _('active')}
+                                    onClick={() => {
+                                        States.setter.togglePlayerStatusUsingItem('armorCharm')
+                                    }} />
+                            </div>
+                        </div>
+
+                        <div className="col-6 mhrc-value">
+                            <span>{_('powerTalon')}</span>
+
+                            <div className="mhrc-icons_bundle">
+                                <IconButton
+                                    iconName={statePlayerStatus.usingItem['powerTalon'] ? 'circle' : 'circle-o'}
+                                    altName={statePlayerStatus.usingItem['powerTalon'] ? _('deactive') : _('active')}
+                                    onClick={() => {
+                                        States.setter.togglePlayerStatusUsingItem('powerTalon')
+                                    }} />
+                            </div>
+                        </div>
+
+                        <div className="col-6 mhrc-value">
+                            <span>{_('armorTalon')}</span>
+
+                            <div className="mhrc-icons_bundle">
+                                <IconButton
+                                    iconName={statePlayerStatus.usingItem['armorTalon'] ? 'circle' : 'circle-o'}
+                                    altName={statePlayerStatus.usingItem['armorTalon'] ? _('deactive') : _('active')}
+                                    onClick={() => {
+                                        States.setter.togglePlayerStatusUsingItem('armorTalon')
+                                    }} />
+                            </div>
+                        </div>
                     </div>
                 </div>
 

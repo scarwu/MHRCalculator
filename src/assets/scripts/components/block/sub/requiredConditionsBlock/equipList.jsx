@@ -79,7 +79,7 @@ const renderEquipItem = (equipType, requiredEquipData) => {
                         <IconButton
                             iconName="wrench" altName={_('customEquip')}
                             onClick={() => {
-                                States.setter.setRequiredConditionsEquip(equipType, 'custom')
+                                States.setter.setRequiredConditionsEquip(equipType, 'custom' + Helper.ucfirst(equipType))
                             }} />
                     ) : false}
                     {'charm' !== equipType ? (

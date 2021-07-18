@@ -169,5 +169,10 @@
     "attackIncrement":          "攻擊上升幅度",
     "attackObtain":             "攻擊獲取值",
     "defenseIncrement":         "防禦上升幅度",
-    "defenseObtain":            "防禦獲取值"
+    "defenseObtain":            "防禦獲取值",
+    "inventory":                "道具",
+    "powerCharm":               "力量護符",
+    "powerTalon":               "力量之爪",
+    "armorCharm":               "守護護符",
+    "armorTalon":               "守護之爪"
 }

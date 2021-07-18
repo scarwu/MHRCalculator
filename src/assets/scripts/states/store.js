@@ -31,6 +31,7 @@ const statusMapping = {
     dataStore: 'state:dataStore',
     requiredConditions: 'state:requiredConditions',
     playerEquips: 'state:playerEquips',
+    playerStatus: 'state:playerStatus',
     algorithmParams: 'state:algorithmParams',
     candidateBundles: 'state:candidateBundles'
 }
@@ -80,6 +81,7 @@ const initialState = {
     },
     requiredConditions: Status.get(statusMapping.requiredConditions) || Helper.deepCopy(Constant.defaultRequiredConditions),
     playerEquips: Status.get(statusMapping.playerEquips) || Helper.deepCopy(Constant.defaultPlayerEquips),
+    playerStatus: Status.get(statusMapping.playerStatus) || Helper.deepCopy(Constant.defaultPlayerStatus),
     algorithmParams: Status.get(statusMapping.algorithmParams) || Helper.deepCopy(Constant.defaultAlgorithmParams),
     candidateBundles: Status.get(statusMapping.candidateBundles) || {}
 }
@@ -145,6 +147,19 @@ export default createStore((state = initialState, action) => {
                 newState[target] = oldData
 
                 return Object.assign({}, state, newState)
+            })()
+
+        // Player Status
+        case 'TOGGLE_PLAYER_STATUS_USING_ITEM':
+            return (() => {
+                let playerStatus = Helper.deepCopy(state.playerStatus)
+                let flag = action.payload.flag
+
+                playerStatus.usingItem[flag] = !playerStatus.usingItem[flag]
+
+                return Object.assign({}, state, {
+                    playerStatus: playerStatus
+                })
             })()
 
         // Player Equips

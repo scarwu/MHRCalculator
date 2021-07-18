@@ -252,6 +252,15 @@ export const defaultPlayerEquips = {
 }
 
 export const defaultPlayerStatus = {
+    usingItem: {
+        'powerCharm': true, // 力量護符
+        'powerTalon': true, // 力量之爪
+        'armorCharm': true, // 守護護符
+        'armorTalon': true // 守護之爪
+    }
+}
+
+export const defaultStatus = {
     health: 100,
     stamina: 100,
     attack: 0,
@@ -317,6 +326,7 @@ export default {
     defaultCustomCharm,
     defaultPlayerEquips,
     defaultPlayerStatus,
+    defaultStatus,
     defaultBenefitAnalysis,
     defaultRequiredConditions
 }

@@ -169,5 +169,10 @@
     "attackIncrement":          null,
     "attackObtain":             null,
     "defenseIncrement":         null,
-    "defenseObtain":            null
+    "defenseObtain":            null,
+    "inventory":                null,
+    "powerCharm":               null,
+    "powerTalon":               null,
+    "armorCharm":               null,
+    "armorTalon":               null
 }

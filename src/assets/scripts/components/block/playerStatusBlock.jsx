@@ -102,8 +102,8 @@ const generatePassiveSkills = (equipInfos) => {
     return passiveSkills
 }
 
-const generateStatus = (equipInfos, passiveSkills) => {
-    let status = Helper.deepCopy(Constant.defaultPlayerStatus)
+const generateStatus = (equipInfos, passiveSkills, playerStatus) => {
+    let status = Helper.deepCopy(Constant.defaultStatus)
 
     equipInfos = Helper.deepCopy(equipInfos)
 
@@ -406,6 +406,24 @@ const generateStatus = (equipInfos, passiveSkills) => {
         status.element.status.value = parseInt(Math.round(status.element.status.value))
     }
 
+    // 道具加成
+    if (true === playerStatus.usingItem['powerCharm']) {
+        status.attack += 6 // 力量護符
+    }
+
+    if (true === playerStatus.usingItem['powerTalon']) {
+        status.attack += 9 // 力量之爪
+    }
+
+    if (true === playerStatus.usingItem['armorCharm']) {
+        status.defense += 12 // 守護護符
+    }
+
+    if (true === playerStatus.usingItem['armorTalon']) {
+        status.defense += 18 // 守護之爪
+    }
+
+    // 攻擊及防禦倍率
     attackMultipleList.forEach((multiple) => {
         status.attack *= multiple
     })
@@ -421,11 +439,11 @@ const generateStatus = (equipInfos, passiveSkills) => {
     status.sets.forEach((setData) => {
         ['fire', 'water', 'thunder', 'ice', 'dragon'].forEach((type) => {
             if (3 === setData.count) {
-                status.resistance[type] += 1
+                status.resistance[type] += 1 // 3 件
             } else if (4 === setData.count) {
-                status.resistance[type] += 2
+                status.resistance[type] += 2 // 4 件
             } else if (5 === setData.count) {
-                status.resistance[type] += 3
+                status.resistance[type] += 3 // 5 件
             }
         })
     })
@@ -601,9 +619,10 @@ export default function PlayerStatusBlock (props) {
     /**
      * Hooks
      */
+    const [statePlayerStatus, updatePlayerStatus] = useState(States.getter.getPlayerStatus())
     const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
     const [stateEquipInfos, updateEquipInfos] = useState({})
-    const [stateStatus, updateStatus] = useState(Helper.deepCopy(Constant.defaultPlayerStatus))
+    const [stateStatus, updateStatus] = useState(Helper.deepCopy(Constant.defaultStatus))
     const [stateBenefitAnalysis, updateBenefitAnalysis] = useState(Helper.deepCopy(Constant.defaultBenefitAnalysis))
     const [statePassiveSkills, updatePassiveSkills] = useState({})
     const [stateTuning, updateTuning] = useState({
@@ -621,18 +640,22 @@ export default function PlayerStatusBlock (props) {
     useEffect(() => {
         const equipInfos = generateEquipInfos(statePlayerEquips)
         const passiveSkills = generatePassiveSkills(equipInfos)
-        const status = generateStatus(equipInfos, passiveSkills)
+        const status = generateStatus(equipInfos, passiveSkills, statePlayerStatus)
         const benefitAnalysis = generateBenefitAnalysis(equipInfos, status, stateTuning)
 
         updateEquipInfos(equipInfos)
         updatePassiveSkills(passiveSkills)
         updateStatus(status)
         updateBenefitAnalysis(benefitAnalysis)
-    }, [statePlayerEquips])
+    }, [
+        statePlayerStatus,
+        statePlayerEquips
+    ])
 
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
+            updatePlayerStatus(States.getter.getPlayerStatus())
             updatePlayerEquips(States.getter.getPlayerEquips())
         })
 
@@ -651,12 +674,17 @@ export default function PlayerStatusBlock (props) {
 
         passiveSkills[skillId].isActive = !passiveSkills[skillId].isActive
 
-        const status = generateStatus(equipInfos, passiveSkills)
+        const status = generateStatus(equipInfos, passiveSkills, statePlayerStatus)
 
         updatePassiveSkills(passiveSkills)
         updateStatus(status)
         updateBenefitAnalysis(generateBenefitAnalysis(equipInfos, status, tuning))
-    }, [stateEquipInfos, statePassiveSkills, stateTuning])
+    }, [
+        statePlayerStatus,
+        stateEquipInfos,
+        statePassiveSkills,
+        stateTuning
+    ])
 
     const handleTuningChange = useCallback(() => {
         let tuningPhysicalAttack = parseInt(refTuningPhysicalAttack.current.value, 10)
@@ -680,7 +708,10 @@ export default function PlayerStatusBlock (props) {
 
         updateTuning(tuning)
         updateBenefitAnalysis(generateBenefitAnalysis(equipInfos, status, tuning))
-    }, [stateEquipInfos, stateStatus])
+    }, [
+        stateEquipInfos,
+        stateStatus
+    ])
 
     /**
      * Render Functions
@@ -804,6 +835,65 @@ export default function PlayerStatusBlock (props) {
                         </div>
                         <div className="col-3 mhrc-value">
                             <span>{benefitAnalysis.perElementAttackExpectedValue}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mhrc-item mhrc-item-3-step">
+                    <div className="col-12 mhrc-name">
+                        <span>{_('inventory')}</span>
+                    </div>
+                    <div className="col-12 mhrc-content">
+                        <div className="col-6 mhrc-value">
+                            <span>{_('powerCharm')}</span>
+
+                            <div className="mhrc-icons_bundle">
+                                <IconButton
+                                    iconName={statePlayerStatus.usingItem['powerCharm'] ? 'circle' : 'circle-o'}
+                                    altName={statePlayerStatus.usingItem['powerCharm'] ? _('deactive') : _('active')}
+                                    onClick={() => {
+                                        States.setter.togglePlayerStatusUsingItem('powerCharm')
+                                    }} />
+                            </div>
+                        </div>
+
+                        <div className="col-6 mhrc-value">
+                            <span>{_('powerTalon')}</span>
+
+                            <div className="mhrc-icons_bundle">
+                                <IconButton
+                                    iconName={statePlayerStatus.usingItem['powerTalon'] ? 'circle' : 'circle-o'}
+                                    altName={statePlayerStatus.usingItem['powerTalon'] ? _('deactive') : _('active')}
+                                    onClick={() => {
+                                        States.setter.togglePlayerStatusUsingItem('powerTalon')
+                                    }} />
+                            </div>
+                        </div>
+
+                        <div className="col-6 mhrc-value">
+                            <span>{_('armorCharm')}</span>
+
+                            <div className="mhrc-icons_bundle">
+                                <IconButton
+                                    iconName={statePlayerStatus.usingItem['armorCharm'] ? 'circle' : 'circle-o'}
+                                    altName={statePlayerStatus.usingItem['armorCharm'] ? _('deactive') : _('active')}
+                                    onClick={() => {
+                                        States.setter.togglePlayerStatusUsingItem('armorCharm')
+                                    }} />
+                            </div>
+                        </div>
+
+                        <div className="col-6 mhrc-value">
+                            <span>{_('armorTalon')}</span>
+
+                            <div className="mhrc-icons_bundle">
+                                <IconButton
+                                    iconName={statePlayerStatus.usingItem['armorTalon'] ? 'circle' : 'circle-o'}
+                                    altName={statePlayerStatus.usingItem['armorTalon'] ? _('deactive') : _('active')}
+                                    onClick={() => {
+                                        States.setter.togglePlayerStatusUsingItem('armorTalon')
+                                    }} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -968,7 +1058,7 @@ export default function PlayerStatusBlock (props) {
                                         <div className="mhrc-icons_bundle">
                                             {Helper.isNotEmpty(passiveSkills[data.id]) ? (
                                                 <IconButton
-                                                    iconName={passiveSkills[data.id].isActive ? 'eye' : 'eye-slash'}
+                                                    iconName={passiveSkills[data.id].isActive ? 'circle' : 'circle-o'}
                                                     altName={passiveSkills[data.id].isActive ? _('deactive') : _('active')}
                                                     onClick={() => {handlePassiveSkillToggle(data.id)}} />
                                             ) : false}

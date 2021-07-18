@@ -40,6 +40,16 @@ export const switchDataStore = (target, index) => {
     })
 }
 
+// Player Status
+export const togglePlayerStatusUsingItem = (flag) => {
+    store.dispatch({
+        type: 'TOGGLE_PLAYER_STATUS_USING_ITEM',
+        payload: {
+            flag: flag
+        }
+    })
+}
+
 // Player Equips
 export const cleanPlayerEquips = () => {
     store.dispatch({
@@ -276,6 +286,8 @@ export default {
     hideModal,
 
     switchDataStore,
+
+    togglePlayerStatusUsingItem,
 
     cleanPlayerEquips,
     replacePlayerEquips,

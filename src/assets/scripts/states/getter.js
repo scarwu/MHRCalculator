@@ -36,6 +36,10 @@ export const getDataStore = (target = null) => {
     return store.getState().dataStore[target]
 }
 
+export const getPlayerStatus = () => {
+    return store.getState().playerStatus
+}
+
 export const getPlayerEquips = (target = null) => {
     if (Helper.isEmpty(target)) {
         return store.getState().playerEquips
@@ -71,6 +75,7 @@ export const getCandidateBundles = () => {
 export default {
     getModalData,
     getDataStore,
+    getPlayerStatus,
     getPlayerEquips,
     getRequiredConditions,
     getAlgorithmParams,

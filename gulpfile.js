@@ -58,7 +58,7 @@ function compileWebpack(callback) {
             org: "scarstudio",
             project: "mhrc",
             release: postfix,
-            include: "src/boot/assets/scripts"
+            include: "src/boot"
         }))
     } else {
         webpackConfig.plugins = webpackConfig.plugins || []

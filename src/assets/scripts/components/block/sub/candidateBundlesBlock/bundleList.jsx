@@ -221,9 +221,17 @@ export default function BundleList (props) {
             })
 
             // Bundle Equips & Jewels
-            const bundleEquips = Object.keys(bundle.equipIdMapping).filter((equipType) => {
+            const bundleEquipList = Object.keys(bundle.equipIdMapping).filter((equipType) => {
                 return Helper.isNotEmpty(bundle.equipIdMapping[equipType])
             }).map((equipType) => {
+                if (Helper.isNotEmpty(bundleRequiredConditions.equips[equipType])
+                    && Helper.isNotEmpty(bundleRequiredConditions.equips[equipType].id)
+                ) {
+                    return Object.assign({}, bundleRequiredConditions.equips[equipType], {
+                        type: equipType
+                    })
+                }
+
                 return Object.assign({}, Constant.defaultPlayerEquips[equipType], {
                     id: bundle.equipIdMapping[equipType],
                     type: equipType
@@ -338,31 +346,26 @@ export default function BundleList (props) {
                             <span>{_('requiredEquips')}</span>
                         </div>
                         <div className="col-12 mhrc-content">
-                            {bundleEquips.map((currentEquipData) => {
-                                let requiredEquipData = stateRequiredConditions.equips[currentEquipData.type]
+                            {bundleEquipList.map((bundleEquipData) => {
+                                let requiredEquipData = stateRequiredConditions.equips[bundleEquipData.type]
 
                                 // Can Add to Required Contditions
-                                let isNotRequire = true
+                                let isNotRequire = false
 
-                                if (('weapon' === currentEquipData.type || 'charm' === currentEquipData.type)
-                                    && ('customWeapon' === currentEquipData.id || 'customCharm' === currentEquipData.id)
-                                    && ('customWeapon' === requiredEquipData.id || 'customCharm' === requiredEquipData.id)
-                                ) {
+                                if (Helper.isNotEmpty(bundleEquipData.id)) {
                                     isNotRequire = Helper.jsonHash({
-                                        id: currentEquipData.id,
-                                        custom: currentEquipData.custom
+                                        id: bundleEquipData.id,
+                                        custom: bundleEquipData.custom
                                     }) !== Helper.jsonHash({
                                         id: requiredEquipData.id,
                                         custom: requiredEquipData.custom
                                     })
-                                } else {
-                                    isNotRequire = currentEquipData.id !== requiredEquipData.id
                                 }
 
-                                let equipItem = Misc.getEquipItem(currentEquipData.type, currentEquipData)
+                                let equipItem = Misc.getEquipItem(bundleEquipData.type, bundleEquipData)
 
                                 return Helper.isNotEmpty(equipItem) ? (
-                                    <div key={currentEquipData.type} className="col-6 mhrc-value">
+                                    <div key={bundleEquipData.type} className="col-6 mhrc-value">
                                         <span>{_(equipItem.name)}</span>
 
                                         <div className="mhrc-icons_bundle">
@@ -370,7 +373,7 @@ export default function BundleList (props) {
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
                                                     onClick={() => {
-                                                        States.setter.replaceRequiredConditionsEquipData(currentEquipData.type, currentEquipData)
+                                                        States.setter.replaceRequiredConditionsEquipData(bundleEquipData.type, bundleEquipData)
                                                     }} />
                                             ) : false}
                                         </div>

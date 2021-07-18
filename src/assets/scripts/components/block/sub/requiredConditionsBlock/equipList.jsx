@@ -28,51 +28,6 @@ import States from 'states'
 /**
  * Render Functions
  */
-const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
-
-    // Get Jewel Item
-    let jewelItem = JewelDataset.getItem(jewelId)
-
-    const showModal = () => {
-        States.setter.showModal('jewelSelector', {
-            target: 'requiredConditions',
-            equipType: equipType,
-            idIndex: slotIndex,
-
-            // filter
-            size: slotSize
-        })
-    }
-
-    const removeItem = () => {
-        States.setter.setRequiredConditionsEquipJewel(equipType, slotIndex, null)
-    }
-
-    return (
-        <Fragment key={`${equipType}:${slotIndex}`}>
-            <div className="col-3 mhrc-name">
-                <span>{_('slot')}: {slotIndex + 1} [{slotSize}]</span>
-            </div>
-            <div className="col-9 mhrc-value">
-                {Helper.isNotEmpty(jewelItem) ? (
-                    <Fragment>
-                        <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
-
-                        <div className="mhrc-icons_bundle">
-                            <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
-                            <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
-                        </div>
-                    </Fragment>
-                ) : (
-                    <div className="mhrc-icons_bundle">
-                        <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
-                    </div>
-                )}
-            </div>
-        </Fragment>
-    )
-}
-
 const renderEquipItem = (equipType, requiredEquipData) => {
     if ('petalace' === equipType) {
         return false

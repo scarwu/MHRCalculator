@@ -98,15 +98,16 @@ export default function RequiredConditions (props) {
                                 let requiredEquipData = stateRequiredConditions.equips[currentEquipData.type]
 
                                 // Can Add to Required Contditions
-                                let isNotRequire = true
+                                let isNotRequire = false
 
-                                if (('weapon' === currentEquipData.type || 'charm' === currentEquipData.type)
-                                    && ('customWeapon' === currentEquipData.id || 'customCharm' === currentEquipData.id)
-                                    && ('customWeapon' === requiredEquipData.id || 'customCharm' === requiredEquipData.id)
-                                ) {
-                                    isNotRequire = Helper.jsonHash(currentEquipData.custom) !== Helper.jsonHash(requiredEquipData.custom)
-                                } else {
-                                    isNotRequire = currentEquipData.id !== requiredEquipData.id
+                                if (Helper.isNotEmpty(currentEquipData.id)) {
+                                    isNotRequire = Helper.jsonHash({
+                                        id: currentEquipData.id,
+                                        custom: currentEquipData.custom
+                                    }) !== Helper.jsonHash({
+                                        id: requiredEquipData.id,
+                                        custom: requiredEquipData.custom
+                                    })
                                 }
 
                                 let currentEquipItem = Misc.getEquipItem(currentEquipData.type, currentEquipData)
@@ -120,7 +121,7 @@ export default function RequiredConditions (props) {
                                                 <IconButton
                                                     iconName="arrow-left" altName={_('include')}
                                                     onClick={() => {
-                                                        States.setter.setRequiredConditionsEquip(currentEquipData.type, currentEquipData.id)
+                                                        States.setter.replaceRequiredConditionsEquipData(currentEquipData.type, currentEquipData)
                                                     }} />
                                             ) : false}
                                         </div>

@@ -362,12 +362,9 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
     let equipExtendItem = Misc.getEquipExtendItem(equipType, currentEquipData)
 
     // Can Add to Required Contditions
-    let isNotRequire = null
+    let isNotRequire = false
 
-    if (('weapon' === equipType || 'charm' === equipType)
-        && ('customWeapon' === currentEquipData.id || 'customCharm' === currentEquipData.id)
-        && ('customWeapon' === requiredEquipData.id || 'customCharm' === requiredEquipData.id)
-    ) {
+    if (Helper.isNotEmpty(currentEquipData.id)) {
         isNotRequire = Helper.jsonHash({
             id: currentEquipData.id,
             custom: currentEquipData.custom
@@ -375,8 +372,6 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
             id: requiredEquipData.id,
             custom: requiredEquipData.custom
         })
-    } else {
-        isNotRequire = currentEquipData.id != requiredEquipData.id
     }
 
     const showModal = () => {

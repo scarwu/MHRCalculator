@@ -151,10 +151,6 @@ const renderJewelOption = (target, equipType, slotIndex, slotSize, jewelId) => {
         if ('playerEquips' === target) {
             States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
         }
-
-        if ('requiredConditions' === target) {
-            States.setter.setRequiredConditionsEquipJewel(equipType, slotIndex, null)
-        }
     }
 
     return (
@@ -233,13 +229,10 @@ export default function CustomWeapon (props) {
             return false
         }
 
-        let isNotRequire = true
+        let isNotRequire = false
 
         if ('playerEquips' === stateMajorData.target) {
-            if (('weapon' === stateMajorData.type || 'charm' === stateMajorData.type)
-                && ('customWeapon' === stateMajorData.id || 'customCharm' === stateMajorData.id)
-                && ('customWeapon' === stateMinorData.id || 'customCharm' === stateMinorData.id)
-            ) {
+            if (Helper.isNotEmpty(stateMajorData.id)) {
                 isNotRequire = Helper.jsonHash({
                     id: stateMajorData.id,
                     custom: stateMajorData.custom
@@ -247,18 +240,13 @@ export default function CustomWeapon (props) {
                     id: stateMinorData.id,
                     custom: stateMinorData.custom
                 })
-            } else {
-                isNotRequire = stateMajorData.id !== stateMinorData.id
             }
         }
 
         const showModal = () => {
             States.setter.showModal('weaponSelector', {
                 target: stateMajorData.target,
-                equipType: 'weapon',
-
-                // Filter
-                type: 'weapon'
+                equipType: 'weapon'
             })
         }
 
@@ -489,10 +477,6 @@ export default function CustomWeapon (props) {
                                             // Clean Jewel
                                             if ('playerEquips' === stateMajorData.target) {
                                                 States.setter.setPlayerEquipJewel('weapon', slotIndex, null)
-                                            }
-
-                                            if ('requiredConditions' === stateMajorData.target) {
-                                                States.setter.setRequiredConditionsEquipJewel('weapon', slotIndex, null)
                                             }
 
                                             handleRefreshCustomDataset(stateMajorData)

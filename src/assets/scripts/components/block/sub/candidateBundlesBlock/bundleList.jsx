@@ -297,7 +297,7 @@ export default function BundleList (props) {
                     return false
                 }
 
-                if (0 === setData.count) {
+                if (3 > setData.count) {
                     return false
                 }
 
@@ -453,7 +453,7 @@ export default function BundleList (props) {
 
                                     return (
                                         <div key={setData.id} className="col-6 mhrc-value">
-                                            <span>{_(setItem.name)} x {setData.count} / {setItem.items.length}</span>
+                                            <span>{_(setItem.name)} x {setData.count}</span>
 
                                             {(-1 === requiredSetIds.indexOf(setItem.id)) ? (
                                                 <div className="mhrc-icons_bundle">

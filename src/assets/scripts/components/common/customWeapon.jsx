@@ -17,6 +17,7 @@ import Helper from 'core/helper'
 import Misc from 'libraries/misc'
 import JewelDataset from 'libraries/dataset/jewel'
 import SkillDataset from 'libraries/dataset/skill'
+import EnhanceDataset from 'libraries/dataset/enhance'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -131,6 +132,47 @@ const handleRefreshCustomDataset = (majorData) => {
 /**
  * Render Functions
  */
+ const renderEnhanceOption = (enhanceIndex, enhanceId) => {
+
+    // Get Enhance Item
+    let enhanceItem = EnhanceDataset.getItem(enhanceId)
+
+    const showModal = () => {
+        States.setter.showModal('enhanceSelector', {
+            target: 'playerEquips',
+            idIndex: enhanceIndex
+        })
+    }
+
+    const removeItem = () => {
+        States.setter.setPlayerEquipEnhance('weapon', enhanceIndex, null)
+    }
+
+    return (
+        <Fragment key={`weapon:${enhanceIndex}`}>
+            <div className="col-3 mhrc-name">
+                <span>{_('enhance')}: {enhanceIndex + 1}</span>
+            </div>
+            <div className="col-9 mhrc-value">
+                {Helper.isNotEmpty(enhanceItem) ? (
+                    <Fragment>
+                        <span>{_(enhanceItem.name)}</span>
+
+                        <div className="mhrc-icons_bundle">
+                            <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
+                            <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
+                        </div>
+                    </Fragment>
+                ) : (
+                    <div className="mhrc-icons_bundle">
+                        <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
+                    </div>
+                )}
+            </div>
+        </Fragment>
+    )
+}
+
 const renderJewelOption = (target, equipType, slotIndex, slotSize, jewelId) => {
 
     // Get Jewel Item
@@ -457,6 +499,18 @@ export default function CustomWeapon (props) {
                             </div>
                         </div>
                     </Fragment>
+                ) : false}
+
+                {('playerEquips' === stateMajorData.target) ? (
+                    <div className="col-12 mhrc-content">
+                        {[...Array(stateMajorData.custom.enhance.amount)].map((enhanceData, enhanceIndex) => {
+                            return renderEnhanceOption(
+                                enhanceIndex,
+                                Helper.isNotEmpty(stateMajorData.enhanceIds[enhanceIndex])
+                                    ? stateMajorData.enhanceIds[enhanceIndex] : null
+                            )
+                        })}
+                    </div>
                 ) : false}
 
                 <div className="col-12 mhrc-content">

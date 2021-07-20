@@ -7,7 +7,7 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
-let prefix = 'mhrc:2021:6'
+let prefix = 'mhrc:2021:7'
 let storage = window.localStorage
 
 export const get = (key) => {

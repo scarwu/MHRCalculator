@@ -97,7 +97,6 @@ export default function JewelSelectorModal (props) {
      */
     const [stateModalData, updateModalData] = useState(States.getter.getModalData('jewelSelector'))
     const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
-    const [stateRequiredConditions, updateRequiredConditions] = useState(States.getter.getRequiredConditions())
 
     const [stateTempData, updateTempData] = useState(null)
     const [stateFilter, updateFilter] = useState({})
@@ -110,7 +109,6 @@ export default function JewelSelectorModal (props) {
         const unsubscribe = States.store.subscribe(() => {
             updateModalData(States.getter.getModalData('jewelSelector'))
             updatePlayerEquips(States.getter.getPlayerEquips())
-            updateRequiredConditions(States.getter.getRequiredConditions())
         })
 
         return () => {
@@ -165,8 +163,7 @@ export default function JewelSelectorModal (props) {
         updateTempData(tempData)
     }, [
         stateModalData,
-        statePlayerEquips,
-        stateRequiredConditions
+        statePlayerEquips
     ])
 
     /**

@@ -20,8 +20,8 @@ import Helper from 'core/helper'
 // Load Libraries
 import Misc from 'libraries/misc'
 import JewelDataset from 'libraries/dataset/jewel'
-// import EnhanceDataset from 'libraries/dataset/enhance'
 import SkillDataset from 'libraries/dataset/skill'
+import EnhanceDataset from 'libraries/dataset/enhance'
 
 // Load Components
 import IconButton from 'components/common/iconButton'
@@ -47,95 +47,46 @@ const handleSwitchDataStore = (index) => {
 /**
  * Render Functions
  */
-// const renderEnhanceBlock = (equipExtendItem) => {
-//     let usedSize = 0
+ const renderEnhanceOption = (enhanceIndex, enhanceId) => {
 
-//     equipExtendItem.enhances.forEach((enhance) => {
-//         let enhanceInfo = EnhanceDataset.getItem(enhance.id)
+    // Get Enhance Item
+    let enhanceItem = EnhanceDataset.getItem(enhanceId)
 
-//         usedSize += enhanceInfo.list[enhance.level - 1].size
-//     })
+    const showModal = () => {
+        States.setter.showModal('enhanceSelector', {
+            target: 'playerEquips',
+            idIndex: enhanceIndex
+        })
+    }
 
-//     return (
-//         <div className="col-12 mhrc-content">
-//             <div className="col-3 mhrc-name">
-//                 <span>{_('enhanceFieldSize')}</span>
-//             </div>
-//             <div className="col-9 mhrc-value">
-//                 <span>{usedSize} / {equipExtendItem.enhanceSize}</span>
-//                 <div className="mhrc-icons_bundle">
-//                     {(usedSize < equipExtendItem.enhanceSize) ? (
-//                         <IconButton key={equipExtendItem.enhances.length} iconName="plus" altName={_('add')} onClick={() => {
-//                             States.setter.showModal('enhanceSelector', {
-//                                 equipType: equipExtendItem.type,
-//                                 equipRare: equipExtendItem.rare,
-//                                 enhanceIndex: equipExtendItem.enhances.length,
-//                                 enhanceIds: equipExtendItem.enhances.map((enhance) => {
-//                                     return enhance.id
-//                                 })
-//                             })
-//                         }} />
-//                     ) : false}
-//                 </div>
-//             </div>
+    const removeItem = () => {
+        States.setter.setPlayerEquipEnhance('weapon', enhanceIndex, null)
+    }
 
-//             {/* {equipExtendItem.enhances.map((enhance, index) => {
-//                 let enhanceInfo = EnhanceDataset.getItem(enhance.id)
+    return (
+        <Fragment key={`weapon:${enhanceIndex}`}>
+            <div className="col-3 mhrc-name">
+                <span>{_('enhance')}: {enhanceIndex + 1}</span>
+            </div>
+            <div className="col-9 mhrc-value">
+                {Helper.isNotEmpty(enhanceItem) ? (
+                    <Fragment>
+                        <span>{_(enhanceItem.name)}</span>
 
-//                 let currentLevel = enhance.level
-//                 let prevLevel = 1 <= (currentLevel - 1)
-//                     ? currentLevel - 1 : currentLevel
-//                 let nextLevel = (currentLevel + 1) <= enhanceInfo.list.length
-//                     ? currentLevel + 1 : currentLevel
-//                 let currentSize = enhanceInfo.list[currentLevel - 1].size
-//                 let prevSize = enhanceInfo.list[prevLevel - 1].size
-//                 let nextSize = enhanceInfo.list[nextLevel - 1].size
-
-//                 if ((usedSize + nextSize - currentSize) > equipExtendItem.enhanceSize) {
-//                     nextLevel = currentLevel
-//                 } else if (-1 === enhanceInfo.list[nextLevel - 1].allowRares.indexOf(equipExtendItem.rare)) {
-//                     nextLevel = currentLevel
-//                 }
-
-//                 return (
-//                     <Fragment key={`${equipExtendItem.type}:${index}`}>
-//                         <div className="col-3 mhrc-name">
-//                             <span>{_('enhance')}: {index + 1}</span>
-//                         </div>
-//                         <div className="col-9 mhrc-value">
-//                             <span>[{enhanceInfo.list[currentLevel - 1].size}] {_(enhanceInfo.name)} Lv.{currentLevel}</span>
-//                             <div className="mhrc-icons_bundle">
-//                                 <IconButton key={`prev:${prevLevel}`} iconName="minus-circle" altName={_('down')} onClick={() => {
-//                                     States.setter.setPlayerEquip({
-//                                         equipType: equipExtendItem.type,
-//                                         enhanceIndex: index,
-//                                         enhanceId: enhance.id,
-//                                         enhanceLevel: prevLevel
-//                                     })
-//                                 }} />
-//                                 <IconButton key={`next:${nextLevel}`} iconName="plus-circle" altName={_('up')} onClick={() => {
-//                                     States.setter.setPlayerEquip({
-//                                         equipType: equipExtendItem.type,
-//                                         enhanceIndex: index,
-//                                         enhanceId: enhance.id,
-//                                         enhanceLevel: nextLevel
-//                                     })
-//                                 }} />
-//                                 <IconButton iconName="times" altName={_('clean')} onClick={() => {
-//                                     States.setter.setPlayerEquip({
-//                                         equipType: equipExtendItem.type,
-//                                         enhanceIndex: index,
-//                                         enhanceId: null
-//                                     })
-//                                 }} />
-//                             </div>
-//                         </div>
-//                     </Fragment>
-//                 )
-//             })} */}
-//         </div>
-//     )
-// }
+                        <div className="mhrc-icons_bundle">
+                            <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
+                            <IconButton iconName="times" altName={_('clean')} onClick={removeItem} />
+                        </div>
+                    </Fragment>
+                ) : (
+                    <div className="mhrc-icons_bundle">
+                        <IconButton iconName="plus" altName={_('add')} onClick={showModal} />
+                    </div>
+                )}
+            </div>
+        </Fragment>
+    )
+}
 
 const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
 
@@ -433,9 +384,17 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
                 </div>
             </div>
 
-            {/* {(0 < equipExtendItem.enhanceSize) ? (
-                renderEnhanceBlock(equipExtendItem)
-            ) : false} */}
+            {('weapon' === Misc.equipTypeToDatasetType(equipType)) ? (
+                <div className="col-12 mhrc-content">
+                    {[...Array(equipExtendItem.enhance.amount)].map((enhanceData, enhanceIndex) => {
+                        return renderEnhanceOption(
+                            enhanceIndex,
+                            Helper.isNotEmpty(currentEquipData.enhanceIds[enhanceIndex])
+                                ? currentEquipData.enhanceIds[enhanceIndex] : null
+                        )
+                    })}
+                </div>
+            ) : false}
 
             {(Helper.isNotEmpty(equipExtendItem.slots) && 0 !== equipExtendItem.slots.length) ? (
                 <div className="col-12 mhrc-content">

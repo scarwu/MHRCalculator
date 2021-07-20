@@ -188,13 +188,19 @@ export const defaultCustomWeapon = {
         {
             size: null
         }
-    ]
+    ],
+    enhance: {
+        amount: 3
+    }
 }
 
 export const defaultCustomCharm = {
     id: 'customCharm',
     name: 'customCharm',
     slots: [
+        {
+            size: null
+        },
         {
             size: null
         },

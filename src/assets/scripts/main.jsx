@@ -8,8 +8,8 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import { HashRouter as Router, Route } from 'react-router-dom'
+import { createRoot } from 'react-dom/client'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
 
 // Load Config
@@ -30,8 +30,10 @@ if ('production' === Config.env) {
 }
 
 // Mounting
-ReactDOM.render((
-    <Router key="router">
-        <Route exact path="/:hash?" component={App} />
-    </Router>
-), document.getElementById('mhrc'))
+createRoot(document.getElementById('mhrc')).render(
+    <HashRouter key="router">
+        <Routes>
+            <Route exact path="/*" element={<App />} />
+        </Routes>
+    </HashRouter>
+)

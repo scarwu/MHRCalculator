@@ -8,6 +8,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useParams as useRouteParams } from 'react-router-dom'
 
 // Load Config & Constant
 import Config from 'config'
@@ -76,19 +77,21 @@ const handleOpenReadme = () => {
     window.open('https://scar.tw/article/2018/05/02/mhw-calculator-readme/','_blank')
 }
 
-export default function App (props) {
+export default function App () {
 
     /**
      * Hooks
      */
     const [stateLang, setLang] = useState(Status.get('sys:lang'))
 
+    let routeParams = useRouteParams()
+
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
 
         // Restore Equips from Url to State
-        if (Helper.isNotEmpty(props.match.params.hash)) {
-            let playerEquips = JSON.parse(Helper.base64Decode(props.match.params.hash))
+        if (Helper.isNotEmpty(routeParams['*']) && '' !== routeParams['*']) {
+            let playerEquips = JSON.parse(Helper.base64Decode(routeParams['*']))
 
             // TODO: need verify
 

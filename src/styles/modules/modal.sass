@@ -1,0 +1,105 @@
+// Main Module
+// @package     Monster Hunter Rise - Calculator
+// @author      Scar Wu
+// @copyright   Copyright (c) Scar Wu (https://scar.tw)
+// @link        https://github.com/scarwu/MHRCalculator
+
+// Load Specify Styles
+@import '@/styles/mixin'
+
+.mhrc-selector
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    z-index: 100
+    background-color: rgba(0, 0, 0, 0.5)
+
+    .mhrc-modal
+        position: absolute
+        top: $header-height
+        left: 0
+        right: 0
+        bottom: $footer-height
+        z-index: 200
+        background-color: #fff
+
+    .mhrc-panel
+        position: relative
+        height: $panel-height
+        line-height: $panel-height
+        text-align: center
+        background-color: #666
+        color: #fff
+
+        .mhrc-title
+            +font-size(1.6)
+
+        .mhrc-icons_bundle-left,
+        .mhrc-icons_bundle-right
+            position: absolute
+            top: 0
+            padding-top: 10px
+            height: 30px
+
+            .mhrc-basic_input,
+            .mhrc-basic_selector,
+            .mhrc-icon_input,
+            .mhrc-icon_selector,
+            .mhrc-icon_button
+                vertical-align: top
+
+                .mhrc-body
+                    background-color: #999
+
+                &:hover
+                    .mhrc-body
+                        background-color: #333
+
+        .mhrc-icons_bundle-left
+            left: 10px
+
+            .mhrc-basic_input,
+            .mhrc-basic_selector,
+            .mhrc-icon_input,
+            .mhrc-icon_selector,
+            .mhrc-icon_button
+                margin-right: 2px
+
+        .mhrc-icons_bundle-right
+            right: 10px
+
+            .mhrc-basic_input,
+            .mhrc-basic_selector,
+            .mhrc-icon_input,
+            .mhrc-icon_selector,
+            .mhrc-icon_button
+                margin-left: 2px
+
+    .mhrc-list
+        position: absolute
+        top: $panel-height
+        left: 0
+        right: 0
+        bottom: 0
+        padding: 5px 0 10px 0
+
+        .mhrc-article
+            padding: 0 5px
+
+        .mhrc-wrapper
+            column-count: 4
+            column-gap: 0
+
+        .mhrc-item
+            width: calc(100% - 10px)
+            height: 100%
+            overflow: auto
+
+    .mhrc-slim-modal
+        left: 25%
+        right: 25%
+
+        .mhrc-wrapper
+            column-count: 2

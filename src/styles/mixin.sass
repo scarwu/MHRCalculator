@@ -1,0 +1,53 @@
+// Mixin Component
+// @package     Monster Hunter Rise - Calculator
+// @author      Scar Wu
+// @copyright   Copyright (c) Scar Wu (https://scar.tw)
+// @link        https://github.com/scarwu/MHRCalculator
+
+// Mixins
+@mixin font-size($remSize)
+    $pxSize: $remSize * 10
+
+    font-size: #{$pxSize}px
+    font-size: #{$remSize}rem
+
+@mixin border-radius($radius)
+    // $radius: 4px
+    border-radius: $radius
+
+@mixin box-shadow($shadow)
+    // $shadow: 0 1px 3px rgba(0,0,0,.25)
+    box-shadow: $shadow
+
+@mixin opacity($setting)
+    // $setting: 100
+    opacity: $setting / 100
+    filter: alpha(opacity=$setting)
+
+@mixin hover-shadow
+    border: 1px solid #c4c4c4
+    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.3)
+
+@mixin linear-gradient($color1, $color2)
+    background: -webkit-linear-gradient($color1, $color2)
+    background: -o-linear-gradient($color1, $color2)
+    background: -moz-linear-gradient($color1, $color2)
+    background: linear-gradient($color1, $color2)
+
+@mixin linear-gradient-horizontal($color1, $color2, $color3)
+    background: -webkit-linear-gradient(left, $color1, $color2, $color3)
+    background: -o-linear-gradient(right, $color1, $color2, $color3)
+    background: -moz-linear-gradient(right, $color1, $color2, $color3)
+    background: linear-gradient(to right, $color1, $color2, $color3)
+
+@mixin wrap
+    display: block
+    overflow: visible
+    text-overflow: clip
+    white-space: normal
+
+@mixin nowrap
+    display: block
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap

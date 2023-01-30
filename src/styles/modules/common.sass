@@ -1,0 +1,322 @@
+// Main Module
+// @package     Monster Hunter Rise - Calculator
+// @author      Scar Wu
+// @copyright   Copyright (c) Scar Wu (https://scar.tw)
+// @link        https://github.com/scarwu/MHRCalculator
+
+// Load Specify Styles
+@import '@/styles/mixin'
+
+// Common Components
+.mhrc-basic_input,
+.mhrc-basic_selector
+    position: relative
+    display: inline-block
+    width: 100%
+    +font-size(1.2)
+
+    .mhrc-select,
+    .mhrc-input
+        -webkit-appearance: none
+        appearance: none
+        display: inline-block
+        vertical-align: top
+        margin: 0
+        padding: 0
+        border: none
+        height: 20px
+        line-height: 20px
+        background-color: #eee
+        +border-radius(3px)
+
+    .mhrc-input
+        padding: 0 4px
+
+    .mhrc-select
+        padding: 0 4px
+        padding-right: 20px
+
+.mhrc-icon_input,
+.mhrc-icon_selector,
+.mhrc-icon_switch,
+.mhrc-icon_button,
+.mhrc-icon_tab
+    transition-property: background-color
+    transition-duration: 0.1s
+
+    position: relative
+    display: inline-block
+    +font-size(1.2)
+
+    .mhrc-body
+        display: block
+        line-height: 20px
+        text-align: center
+        color: white
+        background-color: #ccc
+        +border-radius(3px)
+
+        .mhrc-icon
+            display: inline-block
+            vertical-align: top
+            width: 20px
+            height: 20px
+            color: white
+
+        .mhrc-select,
+        .mhrc-input
+            -webkit-appearance: none
+            -moz-appearance: none
+            display: inline-block
+            vertical-align: top
+            margin: 0
+            padding: 0
+            border: none
+            height: 20px
+            line-height: 20px
+            +border-radius(3px)
+
+        .mhrc-input
+            padding: 0 4px
+
+        .mhrc-select
+            padding: 0 4px
+            padding-right: 20px
+
+    .mhrc-label
+        +nowrap()
+        position: absolute
+        display: none
+        top: 0
+        right: 22px
+        z-index: 3000
+        padding: 0 5px
+        border: 1px solid #999
+        height: 20px
+        line-height: 18px
+        text-align: center
+        color: #333
+        background-color: white
+        pointer-events: none
+        +border-radius(3px)
+
+    &:hover
+        .mhrc-body
+            background-color: #666
+
+        .mhrc-label
+            display: block
+
+.mhrc-icon_tab
+    .mhrc-body
+        background-color: #999
+        +border-radius(3px 3px 0 0)
+
+        .mhrc-icon
+            height: 30px
+            padding-bottom: 10px
+
+    .is-active
+        background-color: #fff !important
+
+        .mhrc-icon
+            color: #999
+
+        &:hover
+            background-color: #fff
+
+.mhrc-basic_selector,
+.mhrc-icon_selector
+    position: relative
+
+    .mhrc-arrow-icon
+        position: absolute
+        top: 0
+        right: 0
+        height: 20px
+        width: 20px
+        text-align: center
+        line-height: 20px
+        color: black
+        pointer-events: none
+
+.mhrc-sharpness_bar
+    position: relative
+    border: 1px solid black
+    width: 100%
+    height: 100%
+    background-color: black
+    +font-size(0)
+
+    .mhrc-steps
+        position: absolute
+        top: 0
+        left: 0
+        right: 0
+        bottom: 0
+
+        .mhrc-step
+            float: left
+            display: block
+            height: 100%
+
+            &:nth-child(1)
+                background-color: red
+
+            &:nth-child(2)
+                background-color: orange
+
+            &:nth-child(3)
+                background-color: yellow
+
+            &:nth-child(4)
+                background-color: green
+
+            &:nth-child(5)
+                background-color: blue
+
+            &:nth-child(6)
+                background-color: white
+
+            &:nth-child(7)
+                background-color: purple
+
+    .mhrc-mask
+        position: absolute
+        top: 0
+        right: 0
+        height: 100%
+        background-color: black
+
+.mhrc-list
+    overflow-y: scroll
+    overflow-x: hidden
+
+    &::-webkit-scrollbar
+        width: 0
+        height: 0
+
+    // &::-webkit-scrollbar-thumb
+    //     background: rgba(0, 0, 0, 0.1)
+
+.mhrc-item
+    margin: 0 5px 10px 5px
+    padding: 0 2.5px 5px 2.5px
+    border: 1px solid #999
+    +border-radius(5px)
+
+    @for $i from 1 through 12
+        .col-#{$i}
+            flex-basis: calc(100% / 12 * #{$i} - 5px)
+            max-width: calc(100% / 12 * #{$i} - 5px)
+
+    .mhrc-name,
+    .mhrc-content,
+    .mhrc-value
+        overflow: hidden
+
+    .mhrc-content,
+    .mhrc-value
+        border: 1px solid #999
+        +border-radius(5px)
+
+    .mhrc-name
+        +nowrap()
+        margin: 5px 2.5px 0 2.5px
+        padding: 4px 0 5px 0
+        height: 30px
+
+        > .mhrc-basic_input
+            width: initial
+            vertical-align: top
+
+            .mhrc-input
+                background-color: #ddd
+
+    .mhrc-content
+        display: flex
+        flex-wrap: wrap
+        margin: 5px 2.5px 0 2.5px
+        padding: 0 2.5px 5px 2.5px
+
+    .mhrc-value
+        margin: 5px 2.5px 0 2.5px
+        padding: 4px 5px 5px 5px
+        min-height: 32px
+        +nowrap()
+
+        > .mhrc-basic_input,
+        > .mhrc-basic_selector
+            margin-top: 1px
+            vertical-align: top
+
+            .mhrc-select,
+            .mhrc-input
+                width: 100%
+
+    .mhrc-icons_bundle
+        margin-top: 1px
+        height: 20px
+        float: right
+
+        .mhrc-basic_input,
+        .mhrc-basic_selector,
+        .mhrc-icon_input,
+        .mhrc-icon_selector,
+        .mhrc-icon_button
+            margin-left: 2px
+            vertical-align: top
+
+    .mhrc-sharpness
+        .mhrc-sharpness_bar
+            height: 11px
+
+        .mhrc-sharpness_bar:nth-child(2)
+            margin-top: -1px
+
+    .mhrc-description
+        +wrap()
+
+        ul
+            margin: 0
+
+    .mhrc-input-ev
+        .mhrc-basic_input
+            margin-left: 2px
+            margin-right: 2px
+
+            .mhrc-input
+                width: 50px
+                background-color: #eee !important
+
+.mhrc-item-2-step
+    background-color: #eee
+
+    .mhrc-content
+        background-color: #fff
+
+    .mhrc-value
+        background-color: #fff
+
+.mhrc-item-3-step
+    background-color: #ccc
+
+    > .mhrc-name
+        .mhrc-icons_bundle
+            .mhrc-icon_selector,
+            .mhrc-icon_button
+                .mhrc-body
+                    background-color: #999
+
+                &:hover
+                    .mhrc-body
+                        background-color: #666
+
+    .mhrc-content
+        background-color: #eee
+
+        .mhrc-content
+            background-color: #fff
+
+    .mhrc-value
+        background-color: #fff

@@ -1,7 +1,8 @@
 .DS_Store
 .sass-cache
 src/boot
-src/assets/scripts/langs/*/dataset.json
-src/assets/scripts/datasets
+src/scripts/langs/*/dataset.json
+src/scripts/datasets
+src/fonts
 src/tools/temp
 node_modules

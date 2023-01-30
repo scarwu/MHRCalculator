@@ -1,0 +1,32 @@
+// Website Style
+// @package     Monster Hunter Rise - Calculator
+// @author      Scar Wu
+// @copyright   Copyright (c) Scar Wu (https://scar.tw)
+// @link        https://github.com/scarwu/MHRCalculator
+
+$fa-font-path: "fonts/vendor"
+$grid-gutter-width: 0
+
+@import "../../node_modules/bootstrap/scss/bootstrap"
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome"
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/solid"
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/regular"
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/brands"
+
+// Load Specify Styles
+@import '@/styles/global'
+
+// Module & Option Style
+#mhrc
+    position: relative
+    height: 100vh
+    +font-size(1.4)
+
+    // Variables
+    $header-height: 60px
+    $footer-height: 50px
+    $panel-height: 40px
+
+    @import "@/styles/modules/common"
+    @import "@/styles/modules/app"
+    @import "@/styles/modules/modal"

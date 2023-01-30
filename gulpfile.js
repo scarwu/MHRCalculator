@@ -28,20 +28,6 @@ function handleCompileError(event) {
     log.error(colors.red(event.message), 'error.')
 }
 
-function compileSass() {
-    return gulp.src('src/assets/styles/main.{sass,scss}')
-        .pipe($.sass({
-            outputStyle: ('production' === ENVIRONMENT) ? 'compressed' : 'expanded'
-        }).on('error', handleCompileError))
-        .pipe($.replace('../fonts/', '../../assets/fonts/vendor/'))
-        .pipe($.autoprefixer())
-        .pipe($.rename(function (path) {
-            path.basename = path.basename.split('.')[0]
-            path.extname = '.min.css'
-        }))
-        .pipe(gulp.dest('src/boot/assets/styles'))
-}
-
 function compileWebpack(callback) {
     if ('production' === ENVIRONMENT) {
         webpackConfig.mode = ENVIRONMENT
@@ -75,9 +61,9 @@ function compileWebpack(callback) {
         webpackConfig.watch = true
     }
 
-    let result = gulp.src([ 'src/assets/scripts/main.jsx', 'src/assets/scripts/worker.js' ])
+    let result = gulp.src([ 'src/scripts/main.jsx', 'src/scripts/worker.js' ])
         .pipe(webpackStream(webpackConfig, webpack).on('error', handleCompileError))
-        .pipe(gulp.dest('src/boot/assets/scripts'))
+        .pipe(gulp.dest('src/boot/scripts'))
 
     if (WEBPACK_NEED_WATCH) {
         callback()
@@ -95,18 +81,18 @@ function copyStatic() {
 }
 
 function copyAssetsFonts() {
-    return gulp.src('src/assets/fonts/*')
-        .pipe(gulp.dest('src/boot/assets/fonts'))
+    return gulp.src('src/fonts/*')
+        .pipe(gulp.dest('src/boot/fonts'))
 }
 
 function copyAssetsImages() {
-    return gulp.src('src/assets/images/**/*')
-        .pipe(gulp.dest('src/boot/assets/images'))
+    return gulp.src('src/images/**/*')
+        .pipe(gulp.dest('src/boot/images'))
 }
 
 function copyVendorFonts() {
-    return gulp.src('node_modules/font-awesome/fonts/*.{otf,eot,svg,ttf,woff,woff2}')
-        .pipe(gulp.dest('src/boot/assets/fonts/vendor'))
+    return gulp.src('node_modules/@fortawesome/fontawesome-free/webfonts/*.{otf,eot,svg,ttf,woff,woff2}')
+        .pipe(gulp.dest('src/fonts/vendor'))
 }
 
 /**
@@ -117,9 +103,8 @@ function watch() {
     // Watch Files
     gulp.watch('src/boot/**/*').on('change', $.livereload.changed)
     gulp.watch('src/static/**/*', copyStatic)
-    gulp.watch('src/assets/fonts/*', copyAssetsFonts)
-    gulp.watch('src/assets/images/**/*', copyAssetsImages)
-    gulp.watch('src/assets/styles/**/*.{sass,scss}', compileSass)
+    gulp.watch('src/fonts/*', copyAssetsFonts)
+    gulp.watch('src/images/**/*', copyAssetsImages)
 
     // Start LiveReload
     $.livereload.listen({
@@ -178,7 +163,7 @@ function cleanDocs() {
 gulp.task('prepare', gulp.series(
     cleanBoot,
     gulp.parallel(copyStatic, copyAssetsFonts, copyAssetsImages, copyVendorFonts),
-    gulp.parallel(compileSass, compileWebpack)
+    compileWebpack
 ))
 
 gulp.task('release', gulp.series(

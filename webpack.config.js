@@ -9,27 +9,65 @@
 
 const path = require('path')
 const marked = require('marked')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CompressionPlugin = require('compression-webpack-plugin')
+const BrotliPlugin = require('brotli-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
-    mode: 'development',
+    mode: process.env.NODE_ENV,
     devtool: 'source-map',
     entry: {
-        main: './src/assets/scripts/main.jsx',
-        worker: './src/assets/scripts/worker.js'
+        main: './src/scripts/main.jsx',
+        worker: './src/scripts/worker.js'
     },
     output: {
-        filename: '[name].min.js'
+        filename: (process.env.NODE_ENV === 'production') ? 'scripts/[name].[chunkhash].js' : 'scripts/[name].js',
+        chunkFilename: 'scripts/[name].[chunkhash].js',
+        globalObject: 'self'
     },
     resolve: {
         modules: [
-            path.resolve('./src/assets/scripts'),
+            path.resolve('./src/scripts'),
             'node_modules'
         ],
         extensions: [
             '.js',
             '.jsx'
-        ]
+        ],
+        alias: {
+            '@': path.resolve('./src')
+        }
     },
+    optimization: ((process.env.NODE_ENV !== 'production') ? {
+        moduleIds: 'named',
+        removeAvailableModules: false,
+        removeEmptyChunks: false,
+        splitChunks: false
+    } : {
+        moduleIds: 'deterministic',
+        // splitChunks: {
+        //     chunks: 'all',
+        //     name: 'vendor'
+        // },
+        // runtimeChunk: {
+        //     name: 'manifest'
+        // },
+        minimizer: [
+            new CssMinimizerPlugin({
+                parallel: true,
+                minify: CssMinimizerPlugin.esbuildMinify
+            }),
+            new TerserPlugin({
+                minify: TerserPlugin.swcMinify,
+                extractComments: false,
+                terserOptions: {
+                    ecma: 5
+                }
+            })
+        ]
+    }),
     module: {
         rules: [
             {
@@ -62,7 +100,8 @@ module.exports = {
                             '@babel/plugin-syntax-dynamic-import',
                             '@babel/plugin-syntax-import-meta',
                             ['@babel/plugin-proposal-class-properties', { 'loose': false }],
-                            '@babel/plugin-proposal-json-strings'
+                            '@babel/plugin-proposal-json-strings',
+                            'babel-plugin-react-scoped-css'
                         ],
                         presets: [
                             ['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }],
@@ -70,6 +109,36 @@ module.exports = {
                         ]
                     }
                 }
+            },
+            {
+                test: /\.(sc|c|sa)ss$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: (process.env.NODE_ENV !== 'production'),
+                        },
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            sourceMap: (process.env.NODE_ENV !== 'production')
+                        }
+                    },
+                    {
+                        loader: 'scoped-css-loader'
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: (process.env.NODE_ENV !== 'production'),
+                            sassOptions: {
+                                // indentedSyntax: true
+                            }
+                        }
+                    }
+                ]
             },
             {
                 test: /\.md$/,
@@ -87,5 +156,30 @@ module.exports = {
                 ]
             }
         ]
-    }
+    },
+    plugins: [
+        // new webpack.optimize.ModuleConcatenationPlugin(),
+        new MiniCssExtractPlugin((process.env.NODE_ENV === 'production') ? {
+            filename: 'styles/[name].[chunkhash].css'
+        } : {
+            filename: 'styles/[name].css'
+        }),
+        ...((process.env.NODE_ENV !== 'production') ? [
+            // new webpack.HotModuleReplacementPlugin()
+        ] : [
+            new CompressionPlugin({
+                filename: '[path][base].gz[query]',
+                algorithm: 'gzip',
+                test: /\.js$|\.css$|\.html$|\.svg$/,
+                threshold: 10240,
+                minRatio: 0.7
+            }),
+            new BrotliPlugin({
+                asset: '[path].br[query]',
+                test: /\.js$|\.css$|\.html$|\.svg$/,
+                threshold: 10240,
+                minRatio: 0.7
+            })
+        ])
+    ]
 }

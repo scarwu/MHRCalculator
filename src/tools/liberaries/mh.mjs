@@ -203,6 +203,8 @@ export const normalizeText = (text) => {
         .replace(/(│|├|└)*/g, '').replace(/(┃|┣|┗|　)*/g, '')
 
         .replace(/Ⅰ/g, 'I').replace(/Ⅱ/g, 'II').replace(/Ⅲ/g, 'III').replace(/Ⅳ/g, 'IV').replace(/Ⅴ/g, 'V')
+        .replace(/Ⅵ/g, 'VI').replace(/Ⅶ/g, 'VII').replace(/Ⅷ/g, 'VIII').replace(/Ⅸ/g, 'IX').replace(/Ⅹ/g, 'X')
+        .replace(/Ⅺ/g, 'XI').replace(/Ⅻ/g, 'XII')
 
         .replace(/Ａ/g, 'A').replace(/Ｂ/g, 'B').replace(/Ｃ/g, 'C').replace(/Ｄ/g, 'D').replace(/Ｅ/g, 'E')
         .replace(/Ｆ/g, 'F').replace(/Ｇ/g, 'G').replace(/Ｈ/g, 'H').replace(/Ｉ/g, 'I').replace(/Ｊ/g, 'J')
@@ -280,7 +282,7 @@ export const weaponTypeList = [
 ]
 
 export const rareList = [
-    'rare1', 'rare2', 'rare3', 'rare4', 'rare5', 'rare6', 'rare7'
+    'rare1', 'rare2', 'rare3', 'rare4', 'rare5', 'rare6', 'rare7', 'rare8', 'rare9', 'rare10'
 ]
 
 export const sizeList = [

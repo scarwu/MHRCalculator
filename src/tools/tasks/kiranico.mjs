@@ -54,7 +54,10 @@ const urls = {
         rare4: 'data/armors?scope=rarity&value=3',
         rare5: 'data/armors?scope=rarity&value=4',
         rare6: 'data/armors?scope=rarity&value=5',
-        rare7: 'data/armors?scope=rarity&value=6'
+        rare7: 'data/armors?scope=rarity&value=6',
+        rare8: 'data/armors?scope=rarity&value=7',
+        rare9: 'data/armors?scope=rarity&value=8',
+        rare10: 'data/armors?scope=rarity&value=9'
     },
     // charms: null,
     // petalaces: null,

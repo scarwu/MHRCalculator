@@ -23,8 +23,8 @@ const tempConvertRoot = 'temp/convert'
 
 const fileRoot = '../files'
 
-const assetsDatasetRoot = '../assets/scripts/datasets'
-const assetsLangRoot = '../assets/scripts/langs'
+const datasetRoot = '../scripts/datasets'
+const langRoot = '../scripts/langs'
 
 const codeLength = 3
 const codeChars = [
@@ -710,12 +710,12 @@ export const runAction = () => {
 
     // Save Datasets
     Object.keys(datasetMapping).forEach((target) => {
-        Helper.saveJSON(`${assetsDatasetRoot}/${target}.json`, datasetMapping[target])
+        Helper.saveJSON(`${datasetRoot}/${target}.json`, datasetMapping[target])
     })
 
     // Save Dataset Langs
     Object.keys(datasetLangMapping).forEach((lang) => {
-        Helper.saveJSON(`${assetsLangRoot}/${lang}/dataset.json`, datasetLangMapping[lang])
+        Helper.saveJSON(`${langRoot}/${lang}/dataset.json`, datasetLangMapping[lang])
     })
 
     // Save Unique Id Mapping

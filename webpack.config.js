@@ -23,8 +23,7 @@ module.exports = {
         worker: './src/scripts/worker.js'
     },
     output: {
-        filename: (process.env.NODE_ENV === 'production') ? 'scripts/[name].[chunkhash].js' : 'scripts/[name].js',
-        chunkFilename: 'scripts/[name].[chunkhash].js',
+        filename: 'scripts/[name].min.js',
         globalObject: 'self'
     },
     resolve: {
@@ -41,19 +40,12 @@ module.exports = {
         }
     },
     optimization: ((process.env.NODE_ENV !== 'production') ? {
-        moduleIds: 'named',
+        moduleIds: 'deterministic',
         removeAvailableModules: false,
         removeEmptyChunks: false,
         splitChunks: false
     } : {
         moduleIds: 'deterministic',
-        // splitChunks: {
-        //     chunks: 'all',
-        //     name: 'vendor'
-        // },
-        // runtimeChunk: {
-        //     name: 'manifest'
-        // },
         minimizer: [
             new CssMinimizerPlugin({
                 parallel: true,
@@ -158,15 +150,10 @@ module.exports = {
         ]
     },
     plugins: [
-        // new webpack.optimize.ModuleConcatenationPlugin(),
-        new MiniCssExtractPlugin((process.env.NODE_ENV === 'production') ? {
-            filename: 'styles/[name].[chunkhash].css'
-        } : {
-            filename: 'styles/[name].css'
+        new MiniCssExtractPlugin({
+            filename: 'styles/[name].min.css'
         }),
-        ...((process.env.NODE_ENV !== 'production') ? [
-            // new webpack.HotModuleReplacementPlugin()
-        ] : [
+        ...((process.env.NODE_ENV === 'production') ? [
             new CompressionPlugin({
                 filename: '[path][base].gz[query]',
                 algorithm: 'gzip',
@@ -180,6 +167,6 @@ module.exports = {
                 threshold: 10240,
                 minRatio: 0.7
             })
-        ])
+        ] : [])
     ]
 }

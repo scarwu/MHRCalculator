@@ -29,31 +29,23 @@ function handleCompileError(event) {
 }
 
 function compileWebpack(callback) {
+    webpackConfig.mode = ENVIRONMENT
+    webpackConfig.plugins = webpackConfig.plugins || []
+    webpackConfig.plugins.push(new webpack.DefinePlugin({
+        'process.env': {
+            'ENV': JSON.stringify(ENVIRONMENT),
+            'BUILD_TIME': postfix,
+            'NODE_ENV': JSON.stringify(ENVIRONMENT)
+        }
+    }))
+
     if ('production' === ENVIRONMENT) {
-        webpackConfig.mode = ENVIRONMENT
-        webpackConfig.plugins = webpackConfig.plugins || []
-        webpackConfig.plugins.push(new webpack.DefinePlugin({
-            'process.env': {
-                'ENV': "'production'",
-                'BUILD_TIME': postfix,
-                'NODE_ENV': JSON.stringify('production')
-            }
-        }))
         webpackConfig.plugins.push(new sentryWebpackPlugin({
             authToken: process.env.SENTRY_AUTH_TOKEN,
             org: "scarstudio",
             project: "mhrc",
             release: postfix,
             include: "src/boot"
-        }))
-    } else {
-        webpackConfig.plugins = webpackConfig.plugins || []
-        webpackConfig.plugins.push(new webpack.DefinePlugin({
-            'process.env': {
-                'ENV': "'development'",
-                'BUILD_TIME': postfix,
-                'NODE_ENV': JSON.stringify('development')
-            }
         }))
     }
 
@@ -63,7 +55,7 @@ function compileWebpack(callback) {
 
     let result = gulp.src([ 'src/scripts/main.jsx', 'src/scripts/worker.js' ])
         .pipe(webpackStream(webpackConfig, webpack).on('error', handleCompileError))
-        .pipe(gulp.dest('src/boot/scripts'))
+        .pipe(gulp.dest('src/boot'))
 
     if (WEBPACK_NEED_WATCH) {
         callback()
@@ -80,16 +72,6 @@ function copyStatic() {
         .pipe(gulp.dest('src/boot'))
 }
 
-function copyAssetsFonts() {
-    return gulp.src('src/fonts/*')
-        .pipe(gulp.dest('src/boot/fonts'))
-}
-
-function copyAssetsImages() {
-    return gulp.src('src/images/**/*')
-        .pipe(gulp.dest('src/boot/images'))
-}
-
 function copyVendorFonts() {
     return gulp.src('node_modules/@fortawesome/fontawesome-free/webfonts/*.{otf,eot,svg,ttf,woff,woff2}')
         .pipe(gulp.dest('src/fonts/vendor'))
@@ -103,8 +85,6 @@ function watch() {
     // Watch Files
     gulp.watch('src/boot/**/*').on('change', $.livereload.changed)
     gulp.watch('src/static/**/*', copyStatic)
-    gulp.watch('src/fonts/*', copyAssetsFonts)
-    gulp.watch('src/images/**/*', copyAssetsImages)
 
     // Start LiveReload
     $.livereload.listen({
@@ -162,7 +142,7 @@ function cleanDocs() {
  */
 gulp.task('prepare', gulp.series(
     cleanBoot,
-    gulp.parallel(copyStatic, copyAssetsFonts, copyAssetsImages, copyVendorFonts),
+    gulp.parallel(copyStatic, copyVendorFonts),
     compileWebpack
 ))
 

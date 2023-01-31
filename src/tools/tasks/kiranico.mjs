@@ -100,8 +100,8 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             return
         }
 
-        for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
-            let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
 
             // Get Data
             let name = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
@@ -304,8 +304,8 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 return
             }
 
-            for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
-                let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+            for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+                let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
 
                 // Set Lang Mapping
                 let uniqueKey = rowNode.find('td').eq(1).find('a').attr('href').split('/').pop()
@@ -322,9 +322,6 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 }
 
 export const fetchArmorsAction = async (targetArmorRare = null) => {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
     for (let armorRare of Object.keys(urls.armors)) {
         if (Helper.isNotEmpty(targetArmorRare) && targetArmorRare !== armorRare) {
             continue
@@ -336,125 +333,13 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
         let langKeyMapping = {}
 
         // Fetch List Page
-        fetchPageUrl = getFullUrl('zhTW', urls.armors[armorRare])
-        fetchPageName = `armors:${armorRare}`
-
-        console.log(fetchPageUrl, fetchPageName)
-
-        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-        if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
-
-            return
-        }
-
-        for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
-            let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
-
-            // Get Data
-            let name = normalizeText(rowNode.find('td').eq(2).find('a').text().trim())
-
-            // Fetch Detail Page
-            fetchPageUrl = rowNode.find('td').eq(2).find('a').attr('href')
-            fetchPageName = `armors:${armorRare}:${name}`
+        for (let lang of ['zhTW', 'jaJP', 'enUS']) {
+            let fetchPageUrl = getFullUrl(lang, urls.armors[armorRare])
+            let fetchPageName = `armors:${armorRare}`
 
             console.log(fetchPageUrl, fetchPageName)
 
-            let armorDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-            if (Helper.isEmpty(armorDom)) {
-                console.log(fetchPageUrl, fetchPageName, 'Err')
-
-                return
-            }
-
-            let series = normalizeText(armorDom('dl.grid dd').eq(2).text().trim())
-
-            mappingKey = `${series}:${name}`
-
-            // Set Lang Mapping
-            let uniqueKey = fetchPageUrl.split('/').pop()
-            langKeyMapping[uniqueKey] = mappingKey
-
-            if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
-            }
-
-            mapping[mappingKey].series = {
-                zhTW: null,
-                jaJP: null,
-                enUS: null
-            }
-            mapping[mappingKey].name = {
-                zhTW: name,
-                jaJP: null,
-                enUS: null
-            }
-            mapping[mappingKey].gender = null
-
-            let rare = armorDom('dl.grid dd').eq(5).text().trim()
-            let minDefense = armorDom('dl.grid dd').eq(11).text().trim()
-            let resistanceFire = armorDom('dl.grid dd').eq(12).text().trim()
-            let resistanceWater = armorDom('dl.grid dd').eq(13).text().trim()
-            let resistanceIce = armorDom('dl.grid dd').eq(14).text().trim()
-            let resistanceThunder = armorDom('dl.grid dd').eq(15).text().trim()
-            let resistanceDragon = armorDom('dl.grid dd').eq(16).text().trim()
-            let type = guessArmorType(name)
-
-            mapping[mappingKey].type = type // special fix
-            mapping[mappingKey].rare = parseFloat(rare) + 1 // special fix
-            mapping[mappingKey].minDefense = parseFloat(minDefense)
-            mapping[mappingKey].resistance.fire = parseFloat(resistanceFire)
-            mapping[mappingKey].resistance.water = parseFloat(resistanceWater)
-            mapping[mappingKey].resistance.thunder = parseFloat(resistanceThunder)
-            mapping[mappingKey].resistance.ice = parseFloat(resistanceIce)
-            mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
-
-            // Slots
-            JSON.parse(armorDom('dl.grid dd').eq(19).text()).forEach((slotCount, index) => {
-                if (0 === slotCount) {
-                    return
-                }
-
-                let size = index + 1
-
-                for (let count = 0; count < slotCount; count++) {
-                    mapping[mappingKey].slots.push({
-                        size: size
-                    })
-                }
-            })
-
-            // Skills
-            armorDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
-                let skillName = normalizeText(armorDom(node).find('td').eq(0).find('a').text())
-
-                mapping[mappingKey].skills.push({
-                    name: skillName,
-                    level: null
-                })
-            })
-
-            if (0 < mapping[mappingKey].skills.length) {
-                let skillMapping = {}
-
-                mapping[mappingKey].skills.forEach((skillItem) => {
-                    skillMapping[skillItem.name] = skillItem
-                })
-
-                mapping[mappingKey].skills = Object.values(skillMapping)
-            }
-        }
-
-        // Get Other Lang
-        for (let lang of ['jaJP', 'enUS']) {
-            fetchPageUrl = getFullUrl(lang, urls.armors[armorRare])
-            fetchPageName = `armors:${armorRare}:${lang}`
-
-            console.log(fetchPageUrl, fetchPageName)
-
-            listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+            let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
             if (Helper.isEmpty(listDom)) {
                 console.log(fetchPageUrl, fetchPageName, 'Err')
@@ -462,16 +347,144 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                 return
             }
 
-            for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
-                let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+            for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+                let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
 
-                // Set Lang Mapping
+                // Get Data
+                let name = normalizeText(rowNode.find('td').eq(2).find('a').text().trim())
+
+                // Fetch Detail Page
+                fetchPageUrl = rowNode.find('td').eq(2).find('a').attr('href')
+                fetchPageName = `armors:${armorRare}:${name}`
+
+                console.log(fetchPageUrl, fetchPageName)
+
+                let armorDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+                if (Helper.isEmpty(armorDom)) {
+                    console.log(fetchPageUrl, fetchPageName, 'Err')
+
+                    return
+                }
+
+                let description = armorDom('.mb-9.space-y-1 > p').eq(1).text()
+
                 let uniqueKey = rowNode.find('td').eq(2).find('a').attr('href').split('/').pop()
+
+                if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
+                    langKeyMapping[uniqueKey] = name
+                }
+
                 let mappingKey = langKeyMapping[uniqueKey]
 
-                mapping[mappingKey].name[lang] = normalizeText(rowNode.find('td').eq(2).find('a').text().trim())
+                if (Helper.isEmpty(mapping[mappingKey])) {
+                    mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
+                    mapping[mappingKey].series = {}
+                    mapping[mappingKey].name = {}
+                    mapping[mappingKey].description = {}
+                    mapping[mappingKey].gender = null
+
+                    let type = guessArmorType(name)
+                    let rare = armorRare.replace('rare', '')
+                    let minDefense = rowNode.find('td').eq(4).find('div').eq(0).text().trim()
+                    let resistanceFire = rowNode.find('td').eq(4).find('div').eq(1).text().trim()
+                    let resistanceWater = rowNode.find('td').eq(4).find('div').eq(2).text().trim()
+                    let resistanceIce = rowNode.find('td').eq(5).find('div').eq(0).text().trim()
+                    let resistanceThunder = rowNode.find('td').eq(5).find('div').eq(1).text().trim()
+                    let resistanceDragon = rowNode.find('td').eq(5).find('div').eq(2).text().trim()
+
+                    mapping[mappingKey].type = type
+                    mapping[mappingKey].rare = parseFloat(rare)
+                    mapping[mappingKey].minDefense = parseFloat(minDefense)
+                    mapping[mappingKey].resistance.fire = parseFloat(resistanceFire)
+                    mapping[mappingKey].resistance.water = parseFloat(resistanceWater)
+                    mapping[mappingKey].resistance.ice = parseFloat(resistanceIce)
+                    mapping[mappingKey].resistance.thunder = parseFloat(resistanceThunder)
+                    mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
+
+                    // Slots
+                    rowNode.find('td').eq(3).find('img').each((index, node) => {
+                        switch(listDom(node).attr('src')) {
+                        case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco1.png':
+                            mapping[mappingKey].slots.push({
+                                size: 1
+                            })
+
+                            break
+                        case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco2.png':
+                            mapping[mappingKey].slots.push({
+                                size: 2
+                            })
+
+                            break
+                        case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco3.png':
+                            mapping[mappingKey].slots.push({
+                                size: 3
+                            })
+
+                            break
+                        case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco4.png':
+                            mapping[mappingKey].slots.push({
+                                size: 4
+                            })
+
+                            break
+                        }
+                    })
+
+                    // Skills
+                    rowNode.find('td').eq(6).find('div').each((index, node) => {
+                        console.log(listDom(node).text())
+                        let skillName = normalizeText(listDom(node).find('a').text())
+                        let skillLevel = normalizeText(listDom(node).text()).match(/^(?:.*)(?:Lv|Ｌｖ)(.*)$/)[1].trim()
+
+                        mapping[mappingKey].skills.push({
+                            name: skillName,
+                            level: parseFloat(skillLevel)
+                        })
+                    })
+
+                    if (0 < mapping[mappingKey].skills.length) {
+                        let skillMapping = {}
+
+                        mapping[mappingKey].skills.forEach((skillItem) => {
+                            skillMapping[skillItem.name] = skillItem
+                        })
+
+                        mapping[mappingKey].skills = Object.values(skillMapping)
+                    }
+                }
+
+                mapping[mappingKey].name[lang] = name
+                mapping[mappingKey].description[lang] = description
             }
         }
+
+        // // Get Other Lang
+        // for (let lang of ['jaJP', 'enUS']) {
+        //     fetchPageUrl = getFullUrl(lang, urls.armors[armorRare])
+        //     fetchPageName = `armors:${armorRare}:${lang}`
+
+        //     console.log(fetchPageUrl, fetchPageName)
+
+        //     listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+        //     if (Helper.isEmpty(listDom)) {
+        //         console.log(fetchPageUrl, fetchPageName, 'Err')
+
+        //         return
+        //     }
+
+        //     for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+        //         let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+
+        //         // Set Lang Mapping
+        //         let uniqueKey = rowNode.find('td').eq(2).find('a').attr('href').split('/').pop()
+        //         let mappingKey = langKeyMapping[uniqueKey]
+
+        //         mapping[mappingKey].name[lang] = normalizeText(rowNode.find('td').eq(2).find('a').text().trim())
+        //     }
+        // }
 
         let list = autoExtendListQuantity(Object.values(mapping))
 
@@ -729,8 +742,9 @@ export const infoAction = () => {
         weapons: {},
         armors: {},
         decorations: {},
-        rampageSkills: {},
-        skills: {}
+        skills: {},
+        rampageDecorations: {},
+        rampageSkills: {}
     }
 
     result.weapons.all = null
@@ -817,8 +831,8 @@ export const infoAction = () => {
         }
     }
 
-    // RampageSkills & Skills
-    for (let target of ['rampageSkills', 'skills']) {
+    // Skills, RampageDecorations & RampageSkills
+    for (let target of ['skills', 'rampageDecorations', 'rampageSkills']) {
         let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {

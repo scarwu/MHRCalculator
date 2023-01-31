@@ -60,6 +60,7 @@ export const defaultWeaponItem = {
 export const defaultArmorItem = {
     series: null,
     name: null,
+    description: null,
     rare: null,
     type: null,
     gender: null,
@@ -131,8 +132,7 @@ export const defaultRampageDecorationItem = {
     size: null,
     skill: null
     // {
-    //     name: null,
-    //     level: null
+    //     name: null
     // }
 }
 

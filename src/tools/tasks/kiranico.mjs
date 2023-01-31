@@ -478,63 +478,13 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
 }
 
 export const fetchJewelsAction = async () => {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
     let mapping = {}
-    let mappingKey = null
-
     let langKeyMapping = {}
 
     // Fetch List Page
-    fetchPageUrl = getFullUrl('zhTW', urls.jewels)
-    fetchPageName = 'jewels'
-
-    console.log(fetchPageUrl, fetchPageName)
-
-    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-    if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
-
-        return
-    }
-
-    for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
-        let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
-
-        // Get Data
-        let name = normalizeText(rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(\d+)】$/)[1])
-        let size = rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(\d+)】$/)[2]
-        let skillName = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
-
-        mappingKey = name
-
-        if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultJewelItem)
-        }
-
-        // Set Lang Mapping
-        let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
-        langKeyMapping[uniqueKey] = mappingKey
-
-        mapping[mappingKey].name = {
-            zhTW: name,
-            jaJP: null,
-            enUS: null
-        }
-        mapping[mappingKey].rare = null
-        mapping[mappingKey].size = parseFloat(size)
-        mapping[mappingKey].skills.push({
-            name: skillName,
-            level: 1
-        })
-    }
-
-    // Get Other Lang
-    for (let lang of ['jaJP', 'enUS']) {
-        fetchPageUrl = getFullUrl(lang, urls.jewels)
-        fetchPageName = `jewels:${lang}`
+    for (let lang of ['zhTW', 'jaJP', 'enUS']) {
+        let fetchPageUrl = getFullUrl(lang, urls.jewels)
+        let fetchPageName = 'jewels'
 
         console.log(fetchPageUrl, fetchPageName)
 
@@ -546,17 +496,42 @@ export const fetchJewelsAction = async () => {
             return
         }
 
-        for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
-            let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+
+            let matches = ('enUS' === lang)
+                ? normalizeText(rowNode.find('td').eq(0).text().trim()).match(/^(.*?)(\d+)$/)
+                : normalizeText(rowNode.find('td').eq(0).text().trim()).match(/^(.*?)【(\d+)】$/)
+
+            if (null === matches) {
+                continue
+            }
 
             // Get Data
-            let name = ('enUS' === lang)
-                ? normalizeText(rowNode.find('td').eq(0).text().trim().match(/^(.*?)( \d+)$/)[1])
-                : normalizeText(rowNode.find('td').eq(0).text().trim().match(/^(.*?)【(.+)】$/)[1])
+            let name = normalizeText(matches[1].trim())
+            let size = matches[2].trim()
 
-            // Set Lang Mapping
+            let skillName = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
+            let skillLevel = normalizeText(rowNode.find('td').eq(1).text().trim()).match(/^(?:.*)(?:Lv|Ｌｖ)(.*)$/)[1].trim()
+
             let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+
+            if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
+                langKeyMapping[uniqueKey] = name
+            }
+
             let mappingKey = langKeyMapping[uniqueKey]
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultJewelItem)
+                mapping[mappingKey].name = {}
+                mapping[mappingKey].rare = null
+                mapping[mappingKey].size = parseFloat(size)
+                mapping[mappingKey].skills.push({
+                    name: skillName,
+                    level: parseFloat(skillLevel)
+                })
+            }
 
             mapping[mappingKey].name[lang] = name
         }
@@ -566,61 +541,13 @@ export const fetchJewelsAction = async () => {
 }
 
 export const fetchEnhancesAction = async () => {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
     let mapping = {}
-    let mappingKey = null
-
     let langKeyMapping = {}
 
     // Fetch List Page
-    fetchPageUrl = getFullUrl('zhTW', urls.enhances)
-    fetchPageName = 'enhances'
-
-    console.log(fetchPageUrl, fetchPageName)
-
-    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-    if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
-
-        return
-    }
-
-    for (let rowIndex = 0; rowIndex < listDom('ul.relative li.bg-white').length; rowIndex++) {
-        let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
-
-        // Get Data
-        let name = normalizeText(rowNode.find('a p').eq(0).text().trim())
-        let description = normalizeText(rowNode.find('a p').eq(1).text().trim())
-
-        mappingKey = name
-
-        if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultEnhanceItem)
-        }
-
-        // Set Lang Mapping
-        let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
-        langKeyMapping[uniqueKey] = mappingKey
-
-        mapping[mappingKey].name = {
-            zhTW: name,
-            jaJP: null,
-            enUS: null
-        }
-        mapping[mappingKey].description = {
-            zhTW: description,
-            jaJP: null,
-            enUS: null
-        }
-    }
-
-    // Get Other Lang
-    for (let lang of ['jaJP', 'enUS']) {
-        fetchPageUrl = getFullUrl(lang, urls.enhances)
-        fetchPageName = `enhances:${lang}`
+    for (let lang of ['zhTW', 'jaJP', 'enUS']) {
+        let fetchPageUrl = getFullUrl(lang, urls.enhances)
+        let fetchPageName = 'enhances'
 
         console.log(fetchPageUrl, fetchPageName)
 
@@ -632,16 +559,29 @@ export const fetchEnhancesAction = async () => {
             return
         }
 
-        for (let rowIndex = 0; rowIndex < listDom('ul.relative li.bg-white').length; rowIndex++) {
-            let rowNode = listDom('ul.relative li.bg-white').eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
 
             // Get Data
-            let name = normalizeText(rowNode.find('a p').eq(0).text().trim())
-            let description = normalizeText(rowNode.find('a p').eq(1).text().trim())
+            let name = normalizeText(rowNode.find('td').eq(0).text().trim())
+            let description = normalizeText(rowNode.find('td').eq(1).text().trim())
+
+            let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+
+            if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
+                langKeyMapping[uniqueKey] = name
+            }
+
+            let mappingKey = langKeyMapping[uniqueKey]
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultEnhanceItem)
+                mapping[mappingKey].name = {}
+                mapping[mappingKey].description = {}
+            }
 
             // Set Lang Mapping
-            let uniqueKey = rowNode.find('a').attr('href').split('/').pop()
-            let mappingKey = langKeyMapping[uniqueKey]
+            langKeyMapping[uniqueKey] = mappingKey
 
             mapping[mappingKey].name[lang] = name
             mapping[mappingKey].description[lang] = description
@@ -652,78 +592,13 @@ export const fetchEnhancesAction = async () => {
 }
 
 export const fetchSkillsAction = async () => {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
     let mapping = {}
-    let mappingKey = null
-
     let langKeyMapping = {}
 
     // Fetch List Page
-    fetchPageUrl = getFullUrl('zhTW', urls.skills)
-    fetchPageName = 'skills'
-
-    console.log(fetchPageUrl, fetchPageName)
-
-    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-    if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
-
-        return
-    }
-
-    for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
-        let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
-
-        // Get Data
-        let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
-        let description = null
-
-        rowNode.find('td').eq(2).find('div').each((index, node) => {
-            if (0 === index) {
-                description = normalizeText(listDom(node).text())
-
-                return
-            }
-
-            let level = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[1]
-            let effect = normalizeText(listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[2])
-
-            mappingKey = `${name}:${level}`
-
-            if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultSkillItem)
-            }
-
-            // Set Lang Mapping
-            let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
-            langKeyMapping[`${uniqueKey}:${level}`] = mappingKey
-
-            mapping[mappingKey].name = {
-                zhTW: name,
-                jaJP: null,
-                enUS: null
-            }
-            mapping[mappingKey].description = {
-                zhTW: description,
-                jaJP: null,
-                enUS: null
-            }
-            mapping[mappingKey].level = parseFloat(level)
-            mapping[mappingKey].effect = {
-                zhTW: effect,
-                jaJP: null,
-                enUS: null
-            }
-        })
-    }
-
-    // Get Other Lang
-    for (let lang of ['jaJP', 'enUS']) {
-        fetchPageUrl = getFullUrl(lang, urls.skills)
-        fetchPageName = `skills:${lang}`
+    for (let lang of ['zhTW', 'jaJP', 'enUS']) {
+        let fetchPageUrl = getFullUrl(lang, urls.skills)
+        let fetchPageName = 'skills'
 
         console.log(fetchPageUrl, fetchPageName)
 
@@ -735,25 +610,44 @@ export const fetchSkillsAction = async () => {
             return
         }
 
-        for (let rowIndex = 0; rowIndex < listDom('table.min-w-full tbody.bg-white tr.bg-white').length; rowIndex++) {
-            let rowNode = listDom('table.min-w-full tbody.bg-white tr.bg-white').eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
 
             // Get Data
             let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
             let description = null
 
-            rowNode.find('td').eq(2).find('div').each((index, node) => {
+            rowNode.find('td').eq(1).find('p').each((index, node) => {
                 if (0 === index) {
                     description = normalizeText(listDom(node).text())
 
                     return
                 }
 
-                let level = listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[1]
-                let effect = normalizeText(listDom(node).text().trim().match(/^(\d+)\: (.*)$/)[2])
+                let matches = listDom(node).text().trim().match(/^(?:Lv|Ｌｖ)( ?\d+)(.*)$/)
+
+                if (null === matches) {
+                    return
+                }
+
+                let level = matches[1].trim()
+                let effect = normalizeText(matches[2].trim())
 
                 let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+
+                if (Helper.isEmpty(langKeyMapping[`${uniqueKey}:${level}`])) {
+                    langKeyMapping[`${uniqueKey}:${level}`] = `${name}:${level}`
+                }
+
                 let mappingKey = langKeyMapping[`${uniqueKey}:${level}`]
+
+                if (Helper.isEmpty(mapping[mappingKey])) {
+                    mapping[mappingKey] = Helper.deepCopy(defaultSkillItem)
+                    mapping[mappingKey].name = {}
+                    mapping[mappingKey].description = {}
+                    mapping[mappingKey].level = parseFloat(level)
+                    mapping[mappingKey].effect = {}
+                }
 
                 mapping[mappingKey].name[lang] = name
                 mapping[mappingKey].description[lang] = description

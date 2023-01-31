@@ -13,8 +13,9 @@ import {
     defaultArmorItem,
     // defaultPetalaceItem,
     defaultDecorationItem,
-    defaultRampageSkillItem,
     defaultSkillItem,
+    defaultRampageDecorationItem,
+    defaultRampageSkillItem,
     autoExtendListQuantity,
     normalizeText,
     guessArmorType,
@@ -62,8 +63,9 @@ const urls = {
     // charms: null,
     // petalaces: null,
     decorations: 'data/decorations',
+    skills: 'data/skills',
+    rampageDecorations: 'data/rampage-decorations',
     rampageSkills: 'data/rampage-skills',
-    skills: 'data/skills'
 }
 
 const getFullUrl = (lang, url) => {
@@ -540,57 +542,6 @@ export const fetchDecorationsAction = async () => {
     Helper.saveJSONAsCSV(`${tempRoot}/decorations.csv`, Object.values(mapping))
 }
 
-export const fetchRampageSkillsAction = async () => {
-    let mapping = {}
-    let langKeyMapping = {}
-
-    // Fetch List Page
-    for (let lang of ['zhTW', 'jaJP', 'enUS']) {
-        let fetchPageUrl = getFullUrl(lang, urls.rampageSkills)
-        let fetchPageName = 'rampageSkills'
-
-        console.log(fetchPageUrl, fetchPageName)
-
-        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-        if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
-
-            return
-        }
-
-        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
-
-            // Get Data
-            let name = normalizeText(rowNode.find('td').eq(0).text().trim())
-            let description = normalizeText(rowNode.find('td').eq(1).text().trim())
-
-            let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
-
-            if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
-                langKeyMapping[uniqueKey] = name
-            }
-
-            let mappingKey = langKeyMapping[uniqueKey]
-
-            if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultRampageSkillItem)
-                mapping[mappingKey].name = {}
-                mapping[mappingKey].description = {}
-            }
-
-            // Set Lang Mapping
-            langKeyMapping[uniqueKey] = mappingKey
-
-            mapping[mappingKey].name[lang] = name
-            mapping[mappingKey].description[lang] = description
-        }
-    }
-
-    Helper.saveJSONAsCSV(`${tempRoot}/rampageSkills.csv`, Object.values(mapping))
-}
-
 export const fetchSkillsAction = async () => {
     let mapping = {}
     let langKeyMapping = {}
@@ -657,6 +608,118 @@ export const fetchSkillsAction = async () => {
     }
 
     Helper.saveJSONAsCSV(`${tempRoot}/skills.csv`, Object.values(mapping))
+}
+
+export const fetchRampageDecorationsAction = async () => {
+    let mapping = {}
+    let langKeyMapping = {}
+
+    // Fetch List Page
+    for (let lang of ['zhTW', 'jaJP', 'enUS']) {
+        let fetchPageUrl = getFullUrl(lang, urls.rampageDecorations)
+        let fetchPageName = 'rampageDecorations'
+
+        console.log(fetchPageUrl, fetchPageName)
+
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
+
+            return
+        }
+
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+
+            let matches = ('enUS' === lang)
+                ? normalizeText(rowNode.find('td').eq(0).text().trim()).match(/^(.*?)(\d+)$/)
+                : normalizeText(rowNode.find('td').eq(0).text().trim()).match(/^(.*?)【(\d+)】$/)
+
+            if (null === matches) {
+                continue
+            }
+
+            // Get Data
+            let name = normalizeText(matches[1].trim())
+            let size = matches[2].trim()
+
+            let skillName = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
+
+            let uniqueKey = rowNode.find('td').eq(1).find('a').attr('href').split('/').pop()
+
+            if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
+                langKeyMapping[uniqueKey] = name
+            }
+
+            let mappingKey = langKeyMapping[uniqueKey]
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultRampageDecorationItem)
+                mapping[mappingKey].name = {}
+                mapping[mappingKey].rare = null
+                mapping[mappingKey].size = parseFloat(size)
+                mapping[mappingKey].skill = {
+                    name: skillName
+                }
+            }
+
+            mapping[mappingKey].name[lang] = name
+        }
+    }
+
+    Helper.saveJSONAsCSV(`${tempRoot}/rampageDecorations.csv`, Object.values(mapping))
+}
+
+export const fetchRampageSkillsAction = async () => {
+    let mapping = {}
+    let langKeyMapping = {}
+
+    // Fetch List Page
+    for (let lang of ['zhTW', 'jaJP', 'enUS']) {
+        let fetchPageUrl = getFullUrl(lang, urls.rampageSkills)
+        let fetchPageName = 'rampageSkills'
+
+        console.log(fetchPageUrl, fetchPageName)
+
+        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+        if (Helper.isEmpty(listDom)) {
+            console.log(fetchPageUrl, fetchPageName, 'Err')
+
+            return
+        }
+
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+
+            // Get Data
+            let name = normalizeText(rowNode.find('td').eq(0).text().trim())
+            let description = normalizeText(rowNode.find('td').eq(1).text().trim())
+
+            let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+
+            if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
+                langKeyMapping[uniqueKey] = name
+            }
+
+            let mappingKey = langKeyMapping[uniqueKey]
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultRampageSkillItem)
+                mapping[mappingKey].name = {}
+                mapping[mappingKey].description = {}
+            }
+
+            // Set Lang Mapping
+            langKeyMapping[uniqueKey] = mappingKey
+
+            mapping[mappingKey].name[lang] = name
+            mapping[mappingKey].description[lang] = description
+        }
+    }
+
+    Helper.saveJSONAsCSV(`${tempRoot}/rampageSkills.csv`, Object.values(mapping))
 }
 
 export const infoAction = () => {
@@ -772,8 +835,9 @@ export const fetchAllAction = () => {
         fetchWeaponsAction(),
         fetchArmorsAction(),
         fetchDecorationsAction(),
-        fetchRampageSkillsAction(),
-        fetchSkillsAction()
+        fetchSkillsAction(),
+        fetchRampageDecorationsAction(),
+        fetchRampageSkillsAction()
     ]).then(() => {
         infoAction()
     })
@@ -784,7 +848,8 @@ export default {
     fetchWeaponsAction,
     fetchArmorsAction,
     fetchDecorationsAction,
-    fetchRampageSkillsAction,
     fetchSkillsAction,
+    fetchRampageDecorationsAction,
+    fetchRampageSkillsAction,
     infoAction
 }

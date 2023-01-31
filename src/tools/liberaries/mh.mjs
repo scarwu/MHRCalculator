@@ -118,6 +118,13 @@ export const defaultDecorationItem = {
     ]
 }
 
+export const defaultSkillItem = {
+    name: null,
+    description: null,
+    level: null,
+    effect: null
+}
+
 export const defaultRampageDecorationItem = {
     name: null,
     rare: null,
@@ -127,13 +134,6 @@ export const defaultRampageDecorationItem = {
     //     name: null,
     //     level: null
     // }
-}
-
-export const defaultSkillItem = {
-    name: null,
-    description: null,
-    level: null,
-    effect: null
 }
 
 export const defaultRampageSkillItem = {

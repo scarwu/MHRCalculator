@@ -14,8 +14,8 @@ import {
     defaultWeaponItem,
     defaultArmorItem,
     defaultPetalaceItem,
-    defaultJewelItem,
-    defaultEnhanceItem,
+    defaultDecorationItem,
+    defaultRampageSkillItem,
     defaultSkillItem,
     autoExtendListQuantity,
     weaponTypeList,
@@ -194,7 +194,7 @@ const specialReplaceSkillPropertyName = (text) => {
     return text
 }
 
-const specialReplaceEnhancePropertyName = (text, itemName = null) => {
+const specialReplaceRampageSkillPropertyName = (text, itemName = null) => {
     let replacementList = [
 
         // kiranico
@@ -470,10 +470,10 @@ export const runAction = () => {
         return idNameMapping[translateIdMapping[translateId]]
     }
 
-    const getPropertyEnhanceTranslateName = (name) => {
-        name = specialReplaceEnhancePropertyName(name)
+    const getPropertyRampageSkillTranslateName = (name) => {
+        name = specialReplaceRampageSkillPropertyName(name)
 
-        let translateId = `enhances:name:${md5(name)}`
+        let translateId = `rampageSkills:name:${md5(name)}`
 
         if (Helper.isEmpty(translateIdMapping[translateId])) {
             return null
@@ -497,7 +497,7 @@ export const runAction = () => {
             item = mergeElementValue(target, itemId, item, crawlerMapping)
             item = mergeSharpnessValue(target, itemId, item, crawlerMapping)
             item = mergeSlotsValue(target, itemId, item, crawlerMapping)
-            item = mergeEnhanceValue(target, itemId, item, crawlerMapping)
+            item = mergeRampageSkillValue(target, itemId, item, crawlerMapping)
 
             return Helper.deepCopy(item)
         case 'armors':
@@ -509,8 +509,8 @@ export const runAction = () => {
             item = mergeSkillsValue(target, itemId, item, crawlerMapping)
 
             return Helper.deepCopy(item)
-        case 'jewels':
-            item = Helper.deepCopy(defaultJewelItem)
+        case 'decorations':
+            item = Helper.deepCopy(defaultDecorationItem)
             item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'size'])
             item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name'])
             item = mergeSkillsValue(target, itemId, item, crawlerMapping)
@@ -523,8 +523,8 @@ export const runAction = () => {
             item = mergeIncrementAndObtainValue(target, itemId, item, crawlerMapping, ['name'])
 
             return Helper.deepCopy(item)
-        case 'enhances':
-            item = Helper.deepCopy(defaultEnhanceItem)
+        case 'rampageSkills':
+            item = Helper.deepCopy(defaultRampageSkillItem)
             item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name', 'description'])
 
             return Helper.deepCopy(item)
@@ -1199,34 +1199,34 @@ export const runAction = () => {
         return item
     }
 
-    const mergeEnhanceValue = (target, itemId, item, crawlerMapping) => {
+    const mergeRampageSkillValue = (target, itemId, item, crawlerMapping) => {
         let voteMapping = null
         let valueMapping = null
 
-        // For Enhance Amount
+        // For RampageSkill Amount
         voteMapping = {}
         valueMapping = {}
 
         for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
-            if (Helper.isEmpty(crawlerItem.enhance.amount)) {
+            if (Helper.isEmpty(crawlerItem.rampageSkill.amount)) {
                 continue
             }
 
             // Set Default Value
-            if (Helper.isEmpty(item.enhance.amount)) {
-                item.enhance.amount = crawlerItem.enhance.amount
+            if (Helper.isEmpty(item.rampageSkill.amount)) {
+                item.rampageSkill.amount = crawlerItem.rampageSkill.amount
             }
 
             // Set Count & Value
-            if (Helper.isEmpty(voteMapping[crawlerItem.enhance.amount])) {
-                voteMapping[crawlerItem.enhance.amount] = {
+            if (Helper.isEmpty(voteMapping[crawlerItem.rampageSkill.amount])) {
+                voteMapping[crawlerItem.rampageSkill.amount] = {
                     count: 0,
-                    value: crawlerItem.enhance.amount
+                    value: crawlerItem.rampageSkill.amount
                 }
             }
 
-            voteMapping[crawlerItem.enhance.amount].count++
-            valueMapping[crawlerName] = crawlerItem.enhance.amount
+            voteMapping[crawlerItem.rampageSkill.amount].count++
+            valueMapping[crawlerName] = crawlerItem.rampageSkill.amount
         }
 
         // Need Copy
@@ -1238,17 +1238,17 @@ export const runAction = () => {
             for (let voteItem of Object.values(voteMapping)) {
                 if (maxCount < voteItem.count) {
                     maxCount = voteItem.count
-                    item.enhance.amount = voteItem.value
+                    item.rampageSkill.amount = voteItem.value
                 }
             }
 
             // Record DuplicationValueMapping
             if (Object.keys(voteMapping).length > 1) {
-                if (Helper.isEmpty(duplicateValueMapping.enhanceAmount)) {
-                    duplicateValueMapping.enhanceAmount = []
+                if (Helper.isEmpty(duplicateValueMapping.rampageSkillAmount)) {
+                    duplicateValueMapping.rampageSkillAmount = []
                 }
 
-                duplicateValueMapping.enhanceAmount.push({
+                duplicateValueMapping.rampageSkillAmount.push({
                     target: target,
                     name: idNameMapping[itemId],
                     rare: item.rare,
@@ -1257,48 +1257,48 @@ export const runAction = () => {
             }
         }
 
-        // For Enhance List
+        // For RampageSkill List
         voteMapping = {}
         valueMapping = {}
 
-        // Generate Enhance Mapping
+        // Generate RampageSkill Mapping
         for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
-            if (Helper.isEmpty(crawlerItem.enhance.list)) {
+            if (Helper.isEmpty(crawlerItem.rampageSkill.list)) {
                 continue
             }
 
-            let enhanceList = []
+            let rampageSkillList = []
 
-            crawlerItem.enhance.list.forEach((enhanceItem) => {
-                if (Helper.isEmpty(enhanceItem.name)) {
+            crawlerItem.rampageSkill.list.forEach((rampageSkillItem) => {
+                if (Helper.isEmpty(rampageSkillItem.name)) {
                     return
                 }
 
-                let enhanceName = getPropertyEnhanceTranslateName(enhanceItem.name)
+                let rampageSkillName = getPropertyRampageSkillTranslateName(rampageSkillItem.name)
 
                 // Record untrackMergeMapping
-                if (Helper.isEmpty(enhanceName)) {
-                    if (Helper.isEmpty(untrackMergeMapping.enhanceList)) {
-                        untrackMergeMapping.enhanceList = []
+                if (Helper.isEmpty(rampageSkillName)) {
+                    if (Helper.isEmpty(untrackMergeMapping.rampageSkillList)) {
+                        untrackMergeMapping.rampageSkillList = []
                     }
 
-                    untrackMergeMapping.enhanceList.push({
+                    untrackMergeMapping.rampageSkillList.push({
                         target: target,
                         name: idNameMapping[itemId],
                         crawlerName: crawlerName,
                         orignalName: crawlerItem.name,
-                        enhanceName: enhanceItem.name
+                        rampageSkillName: rampageSkillItem.name
                     })
 
                     return
                 }
 
-                enhanceList.push(enhanceName)
+                rampageSkillList.push(rampageSkillName)
             })
 
-            enhanceList.sort()
+            rampageSkillList.sort()
 
-            let value = JSON.stringify(enhanceList)
+            let value = JSON.stringify(rampageSkillList)
 
             // Set Count & Value
             if (Helper.isEmpty(voteMapping[value])) {
@@ -1309,7 +1309,7 @@ export const runAction = () => {
             }
 
             voteMapping[value].count++
-            valueMapping[crawlerName] = enhanceList.join(',')
+            valueMapping[crawlerName] = rampageSkillList.join(',')
         }
 
         // Need Copy
@@ -1322,49 +1322,49 @@ export const runAction = () => {
                 if (maxCount < voteItem.count) {
                     maxCount = voteItem.count
 
-                    item.enhance.list = {}
+                    item.rampageSkill.list = {}
 
-                    JSON.parse(voteItem.value).forEach((enhanceName) => {
-                        item.enhance.list[enhanceName] = null
+                    JSON.parse(voteItem.value).forEach((rampageSkillName) => {
+                        item.rampageSkill.list[rampageSkillName] = null
                     })
                 }
             }
 
             // Filling
             for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
-                if (Helper.isEmpty(crawlerItem.enhance.list)) {
+                if (Helper.isEmpty(crawlerItem.rampageSkill.list)) {
                     continue
                 }
 
-                crawlerItem.enhance.list.forEach((enhanceItem) => {
-                    if (Helper.isEmpty(enhanceItem.name)) {
+                crawlerItem.rampageSkill.list.forEach((rampageSkillItem) => {
+                    if (Helper.isEmpty(rampageSkillItem.name)) {
                         return
                     }
 
-                    let enhanceName = getPropertyEnhanceTranslateName(enhanceItem.name)
+                    let rampageSkillName = getPropertyRampageSkillTranslateName(rampageSkillItem.name)
 
                     // Just Skipped
-                    if (Helper.isEmpty(enhanceName)) {
+                    if (Helper.isEmpty(rampageSkillName)) {
                         return
                     }
 
-                    enhanceItem.name = enhanceName
+                    rampageSkillItem.name = rampageSkillName
 
-                    if (Helper.isEmpty(item.enhance.list[enhanceItem.name])) {
-                        item.enhance.list[enhanceItem.name] = enhanceItem
+                    if (Helper.isEmpty(item.rampageSkill.list[rampageSkillItem.name])) {
+                        item.rampageSkill.list[rampageSkillItem.name] = rampageSkillItem
                     }
                 })
             }
 
-            item.enhance.list = Object.values(item.enhance.list)
+            item.rampageSkill.list = Object.values(item.rampageSkill.list)
 
             // Record DuplicationValueMapping
             if (Object.keys(voteMapping).length > 1) {
-                if (Helper.isEmpty(duplicateValueMapping.enhanceList)) {
-                    duplicateValueMapping.enhanceList = []
+                if (Helper.isEmpty(duplicateValueMapping.rampageSkillList)) {
+                    duplicateValueMapping.rampageSkillList = []
                 }
 
-                duplicateValueMapping.enhanceList.push({
+                duplicateValueMapping.rampageSkillList.push({
                     target: target,
                     name: idNameMapping[itemId],
                     rare: item.rare,
@@ -1428,14 +1428,14 @@ export const infoAction = () => {
         weapons: {},
         armors: {},
         petalaces: {},
-        jewels: {},
-        enhances: {},
+        decorations: {},
+        rampageSkills: {},
         skills: {}
     }
 
     result.weapons.all = {}
     result.armors.all = {}
-    result.jewels.all = {}
+    result.decorations.all = {}
 
     for (let weaponType of weaponTypeList) {
         result.weapons[weaponType] = {}
@@ -1451,7 +1451,7 @@ export const infoAction = () => {
     }
 
     for (let size of sizeList) {
-        result.jewels[size] = {}
+        result.decorations[size] = {}
     }
 
     // Load All Crawler Data
@@ -1567,21 +1567,21 @@ export const infoAction = () => {
                 continue
             }
 
-            if ('jewels' === target) {
-                let jewelList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/jewels.csv`)
+            if ('decorations' === target) {
+                let decorationList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/decorations.csv`)
 
-                if (Helper.isNotEmpty(jewelList)) {
-                    result.jewels.all[crawler] = jewelList.length
+                if (Helper.isNotEmpty(decorationList)) {
+                    result.decorations.all[crawler] = decorationList.length
 
-                    for (let item of jewelList) {
+                    for (let item of decorationList) {
                         if (Helper.isNotEmpty(item.size)) {
                             let size = `size${item.size}`
 
-                            if (Helper.isEmpty(result.jewels[size][crawler])) {
-                                result.jewels[size][crawler] = 0
+                            if (Helper.isEmpty(result.decorations[size][crawler])) {
+                                result.decorations[size][crawler] = 0
                             }
 
-                            result.jewels[size][crawler] += 1
+                            result.decorations[size][crawler] += 1
                         }
                     }
                 }

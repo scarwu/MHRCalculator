@@ -12,8 +12,8 @@ import {
     defaultWeaponItem,
     defaultArmorItem,
     defaultPetalaceItem,
-    defaultJewelItem,
-    defaultEnhanceItem,
+    defaultDecorationItem,
+    defaultRampageSkillItem,
     defaultSkillItem,
     autoExtendListQuantity,
     normalizeText,
@@ -45,8 +45,8 @@ const urls = {
     armors: 'https://mhr.gameqb.net/3748/',
     // charms: null,
     petalaces: 'https://mhr.gameqb.net/%e7%b5%90%e8%8a%b1%e7%92%b0/',
-    jewels: 'https://mhr.gameqb.net/1839/',
-    // enhances: null,
+    decorations: 'https://mhr.gameqb.net/1839/',
+    // rampageSkills: null,
     skills: 'https://mhr.gameqb.net/1830/'
 }
 
@@ -61,8 +61,8 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 
         let mapping = {}
         let mappingKey = null
-        let enhanceMapping = {}
-        let enhanceMappingKey = null
+        let rampageSkillMapping = {}
+        let rampageSkillMappingKey = null
 
         // Fetch List Page
         fetchPageUrl = urls.weapons[weaponType]
@@ -277,38 +277,38 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         continue
                     }
 
-                    // Enhance
-                    for (let enhanceIndex = 0; enhanceIndex < rowNode.find('td').eq(3).find('a').length; enhanceIndex++) {
-                        let enhanceNode = rowNode.find('td').eq(3).find('a').eq(enhanceIndex)
+                    // RampageSkill
+                    for (let rampageSkillIndex = 0; rampageSkillIndex < rowNode.find('td').eq(3).find('a').length; rampageSkillIndex++) {
+                        let rampageSkillNode = rowNode.find('td').eq(3).find('a').eq(rampageSkillIndex)
 
-                        let enhanceName = normalizeText(enhanceNode.text())
+                        let rampageSkillName = normalizeText(rampageSkillNode.text())
 
-                        mapping[mappingKey].enhance.list.push({
-                            name: enhanceName
+                        mapping[mappingKey].rampageSkill.list.push({
+                            name: rampageSkillName
                         })
 
                         if (Helper.isEmpty(targetWeaponType)) {
-                            enhanceMappingKey = enhanceName
+                            rampageSkillMappingKey = rampageSkillName
 
-                            if (Helper.isEmpty(enhanceMapping[enhanceMappingKey])) {
-                                enhanceMapping[enhanceMappingKey] = Helper.deepCopy(defaultEnhanceItem)
+                            if (Helper.isEmpty(rampageSkillMapping[rampageSkillMappingKey])) {
+                                rampageSkillMapping[rampageSkillMappingKey] = Helper.deepCopy(defaultRampageSkillItem)
                             }
 
-                            enhanceMapping[enhanceMappingKey].name = {
-                                zhTW: enhanceName
+                            rampageSkillMapping[rampageSkillMappingKey].name = {
+                                zhTW: rampageSkillName
                             }
 
-                            // Fetch Enhance Page
-                            fetchPageUrl = enhanceNode.attr('href')
-                            fetchPageName = `enhances:${enhanceName}`
+                            // Fetch RampageSkill Page
+                            fetchPageUrl = rampageSkillNode.attr('href')
+                            fetchPageName = `rampageSkills:${rampageSkillName}`
 
                             if (Helper.isNotEmpty(fetchPageUrl)) {
                                 console.log(fetchPageUrl, fetchPageName)
 
-                                let enhanceDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+                                let rampageSkillDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-                                if (Helper.isNotEmpty(enhanceDom)) {
-                                    enhanceMapping[enhanceMappingKey].description = normalizeText(enhanceDom('p').eq(0).text())
+                                if (Helper.isNotEmpty(rampageSkillDom)) {
+                                    rampageSkillMapping[rampageSkillMappingKey].description = normalizeText(rampageSkillDom('p').eq(0).text())
                                 } else {
                                     console.log(fetchPageUrl, fetchPageName, 'Err')
                                 }
@@ -429,9 +429,9 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
         Helper.saveJSONAsCSV(`${tempRoot}/weapons/${weaponType}.csv`, list)
 
         if (Helper.isEmpty(targetWeaponType)) {
-            let enhanceList = autoExtendListQuantity(Object.values(enhanceMapping))
+            let rampageSkillList = autoExtendListQuantity(Object.values(rampageSkillMapping))
 
-            Helper.saveJSONAsCSV(`${tempRoot}/enhances.csv`, enhanceList)
+            Helper.saveJSONAsCSV(`${tempRoot}/rampageSkills.csv`, rampageSkillList)
         }
     }
 }
@@ -691,7 +691,7 @@ export const fetchPetalacesAction = async () => {
     Helper.saveJSONAsCSV(`${tempRoot}/petalaces.csv`, Object.values(mapping))
 }
 
-export const fetchJewelsAction = async () => {
+export const fetchDecorationsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -699,8 +699,8 @@ export const fetchJewelsAction = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    fetchPageUrl = urls.jewels
-    fetchPageName = 'jewels'
+    fetchPageUrl = urls.decorations
+    fetchPageName = 'decorations'
 
     console.log(fetchPageUrl, fetchPageName)
 
@@ -723,7 +723,7 @@ export const fetchJewelsAction = async () => {
         let hasDetailPage = false
 
         fetchPageUrl = itemNode.attr('href')
-        fetchPageName = `jewels:${itemNode.text().trim()}`
+        fetchPageName = `decorations:${itemNode.text().trim()}`
 
         if (Helper.isNotEmpty(fetchPageUrl)) {
             console.log(fetchPageUrl, fetchPageName)
@@ -754,7 +754,7 @@ export const fetchJewelsAction = async () => {
         mappingKey = name
 
         if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultJewelItem)
+            mapping[mappingKey] = Helper.deepCopy(defaultDecorationItem)
         }
 
         mapping[mappingKey].name = {
@@ -768,7 +768,7 @@ export const fetchJewelsAction = async () => {
         })
     }
 
-    Helper.saveJSONAsCSV(`${tempRoot}/jewels.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${tempRoot}/decorations.csv`, Object.values(mapping))
 }
 
 export const fetchSkillsAction = async () => {
@@ -848,14 +848,14 @@ export const infoAction = () => {
         weapons: {},
         armors: {},
         petalaces: {},
-        jewels: {},
-        enhances: {},
+        decorations: {},
+        rampageSkills: {},
         skills: {}
     }
 
     result.weapons.all = null
     result.armors.all = null
-    result.jewels.all = null
+    result.decorations.all = null
 
     for (let weaponType of weaponTypeList) {
         result.weapons[weaponType] = {}
@@ -871,7 +871,7 @@ export const infoAction = () => {
     }
 
     for (let size of sizeList) {
-        result.jewels[size] = null
+        result.decorations[size] = null
     }
 
     // Weapons
@@ -923,27 +923,27 @@ export const infoAction = () => {
         }
     }
 
-    // Jewels
-    let jewelList = Helper.loadCSVAsJSON(`${tempRoot}/jewels.csv`)
+    // Decorations
+    let decorationList = Helper.loadCSVAsJSON(`${tempRoot}/decorations.csv`)
 
-    if (Helper.isNotEmpty(jewelList)) {
-        result.jewels.all = jewelList.length
+    if (Helper.isNotEmpty(decorationList)) {
+        result.decorations.all = decorationList.length
 
-        for (let item of jewelList) {
+        for (let item of decorationList) {
             if (Helper.isNotEmpty(item.size)) {
                 let size = `size${item.size}`
 
-                if (Helper.isEmpty(result.jewels[size])) {
-                    result.jewels[size] = 0
+                if (Helper.isEmpty(result.decorations[size])) {
+                    result.decorations[size] = 0
                 }
 
-                result.jewels[size] += 1
+                result.decorations[size] += 1
             }
         }
     }
 
-    // Petalaces, Enhances & Skills
-    for (let target of ['petalaces', 'enhances', 'skills']) {
+    // Petalaces, RampageSkills & Skills
+    for (let target of ['petalaces', 'rampageSkills', 'skills']) {
         let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {
@@ -960,7 +960,7 @@ export const fetchAllAction = () => {
         fetchWeaponsAction(),
         fetchArmorsAction(),
         fetchPetalacesAction(),
-        fetchJewelsAction(),
+        fetchDecorationsAction(),
         fetchSkillsAction()
     ]).then(() => {
         infoAction()
@@ -972,7 +972,7 @@ export default {
     fetchWeaponsAction,
     fetchArmorsAction,
     fetchPetalacesAction,
-    fetchJewelsAction,
+    fetchDecorationsAction,
     fetchSkillsAction,
     infoAction
 }

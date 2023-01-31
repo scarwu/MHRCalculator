@@ -12,8 +12,8 @@ import {
     defaultWeaponItem,
     defaultArmorItem,
     // defaultPetalaceItem,
-    defaultJewelItem,
-    defaultEnhanceItem,
+    defaultDecorationItem,
+    defaultRampageSkillItem,
     defaultSkillItem,
     autoExtendListQuantity,
     normalizeText,
@@ -45,8 +45,8 @@ const urls = {
     armors: 'https://monsterhunterrise.wiki.fextralife.com/Armor',
     // charms: 'https://monsterhunterrise.wiki.fextralife.com/Talismans',
     // petalaces: 'https://monsterhunterrise.wiki.fextralife.com/Petalace',
-    jewels: 'https://monsterhunterrise.wiki.fextralife.com/Decorations',
-    enhances: 'https://monsterhunterrise.wiki.fextralife.com/Ramp-Up+Skills',
+    decorations: 'https://monsterhunterrise.wiki.fextralife.com/Decorations',
+    rampageSkills: 'https://monsterhunterrise.wiki.fextralife.com/Ramp-Up+Skills',
     skills: 'https://monsterhunterrise.wiki.fextralife.com/Skills'
 }
 
@@ -189,7 +189,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             let sharpnessIndex = null
             let criticalRateIndex = null
             let elementIndex = null
-            let enhanceIndex = null
+            let rampageSkillIndex = null
 
             switch (weaponType) {
             case 'greatSword':
@@ -202,7 +202,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 sharpnessIndex = 5
                 criticalRateIndex = 6
                 elementIndex = 7
-                enhanceIndex = 8
+                rampageSkillIndex = 8
 
                 break
             case 'huntingHorn':
@@ -211,7 +211,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 sharpnessIndex = 5
                 criticalRateIndex = 6
                 elementIndex = 7
-                enhanceIndex = 9
+                rampageSkillIndex = 9
 
                 break
             case 'gunlance':
@@ -219,7 +219,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 sharpnessIndex = 5
                 criticalRateIndex = 6
                 elementIndex = 7
-                enhanceIndex = 10
+                rampageSkillIndex = 10
 
                 break
             case 'chargeBlade':
@@ -228,14 +228,14 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 sharpnessIndex = 5
                 criticalRateIndex = 6
                 elementIndex = 7
-                enhanceIndex = 9
+                rampageSkillIndex = 9
 
                 break
             case 'bow':
                 attackIndex = 4
                 criticalRateIndex = 5
                 elementIndex = 6
-                enhanceIndex = 12
+                rampageSkillIndex = 12
 
                 break
             case 'heavyBowgun':
@@ -243,7 +243,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 attackIndex = 4
                 criticalRateIndex = 5
                 elementIndex = null
-                enhanceIndex = 12
+                rampageSkillIndex = 12
 
                 break
             }
@@ -252,7 +252,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 attackIndex = 3
                 criticalRateIndex = 5
                 elementIndex = 6
-                enhanceIndex = 7
+                rampageSkillIndex = 7
             }
 
             let attack = weaponNode.eq(attackIndex).find('td').eq(1).text().trim()
@@ -386,15 +386,15 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 })
             }
 
-            // Enhance
-            let enhanceLimit = weaponNode.eq(enhanceIndex).find('td').eq(1).text().trim()
+            // RampageSkill
+            let rampageSkillLimit = weaponNode.eq(rampageSkillIndex).find('td').eq(1).text().trim()
 
-            mapping[mappingKey].enhance.amount = ('??' !== enhanceLimit && '--' !== enhanceLimit && '' !== enhanceLimit)
-                ? parseFloat(enhanceLimit) : null
+            mapping[mappingKey].rampageSkill.amount = ('??' !== rampageSkillLimit && '--' !== rampageSkillLimit && '' !== rampageSkillLimit)
+                ? parseFloat(rampageSkillLimit) : null
 
-            let enhanceText = weaponNode.eq(enhanceIndex + 1).find('td').eq(1).html()
+            let rampageSkillText = weaponNode.eq(rampageSkillIndex + 1).find('td').eq(1).html()
 
-            if (-1 !== enhanceText.indexOf('<br>')
+            if (-1 !== rampageSkillText.indexOf('<br>')
                 && 'Plegis Needle I' !== name // Special Exception
                 && 'Bolt Chamber II' !== name // Special Exception
                 && 'Royal Bloom II' !== name // Special Exception
@@ -403,28 +403,28 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 && 'Wind Thief Crossbow III' !== name // Special Exception
                 && 'Gale Crossbow' !== name // Special Exception
             ) {
-                let enhanceSegments = enhanceText.split('<br>')
+                let rampageSkillSegments = rampageSkillText.split('<br>')
 
-                enhanceSegments.forEach((node) => {
+                rampageSkillSegments.forEach((node) => {
                     let name = normalizeText(weaponDom('<span>' + node + '</span>').text().trim())
 
                     if ('' === name) {
                         return
                     }
 
-                    mapping[mappingKey].enhance.list.push({
+                    mapping[mappingKey].rampageSkill.list.push({
                         name: name
                     })
                 })
             } else {
-                weaponNode.eq(enhanceIndex + 1).find('td').eq(1).find('a').each((index, node) => {
+                weaponNode.eq(rampageSkillIndex + 1).find('td').eq(1).find('a').each((index, node) => {
                     let name = normalizeText(weaponDom(node).text().trim())
 
                     if ('' === name) {
                         return
                     }
 
-                    mapping[mappingKey].enhance.list.push({
+                    mapping[mappingKey].rampageSkill.list.push({
                         name: name
                     })
                 })
@@ -598,7 +598,7 @@ export const fetchArmorsAction = async () => {
     Helper.saveJSONAsCSV(`${tempRoot}/armors.csv`, list)
 }
 
-export const fetchJewelsAction = async () => {
+export const fetchDecorationsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -606,8 +606,8 @@ export const fetchJewelsAction = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    fetchPageUrl = urls.jewels
-    fetchPageName = 'jewels'
+    fetchPageUrl = urls.decorations
+    fetchPageName = 'decorations'
 
     console.log(fetchPageUrl, fetchPageName)
 
@@ -631,7 +631,7 @@ export const fetchJewelsAction = async () => {
         mappingKey = name
 
         if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultJewelItem)
+            mapping[mappingKey] = Helper.deepCopy(defaultDecorationItem)
         }
 
         mapping[mappingKey].name = {
@@ -645,10 +645,10 @@ export const fetchJewelsAction = async () => {
         })
     }
 
-    Helper.saveJSONAsCSV(`${tempRoot}/jewels.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${tempRoot}/decorations.csv`, Object.values(mapping))
 }
 
-export const fetchEnhancesAction = async () => {
+export const fetchRampageSkillsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -656,8 +656,8 @@ export const fetchEnhancesAction = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    fetchPageUrl = urls.enhances
-    fetchPageName = 'enhances'
+    fetchPageUrl = urls.rampageSkills
+    fetchPageName = 'rampageSkills'
 
     console.log(fetchPageUrl, fetchPageName)
 
@@ -679,7 +679,7 @@ export const fetchEnhancesAction = async () => {
         mappingKey = name
 
         if (Helper.isEmpty(mapping[mappingKey])) {
-            mapping[mappingKey] = Helper.deepCopy(defaultEnhanceItem)
+            mapping[mappingKey] = Helper.deepCopy(defaultRampageSkillItem)
         }
 
         mapping[mappingKey].name = {
@@ -690,7 +690,7 @@ export const fetchEnhancesAction = async () => {
         }
     }
 
-    Helper.saveJSONAsCSV(`${tempRoot}/enhances.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${tempRoot}/rampageSkills.csv`, Object.values(mapping))
 }
 
 export const fetchSkillsAction = async () => {
@@ -758,14 +758,14 @@ export const infoAction = () => {
     let result = {
         weapons: {},
         armors: {},
-        jewels: {},
-        enhances: {},
+        decorations: {},
+        rampageSkills: {},
         skills: {}
     }
 
     result.weapons.all = null
     result.armors.all = null
-    result.jewels.all = null
+    result.decorations.all = null
 
     for (let weaponType of weaponTypeList) {
         result.weapons[weaponType] = {}
@@ -781,7 +781,7 @@ export const infoAction = () => {
     }
 
     for (let size of sizeList) {
-        result.jewels[size] = null
+        result.decorations[size] = null
     }
 
     // Weapons
@@ -833,27 +833,27 @@ export const infoAction = () => {
         }
     }
 
-    // Jewels
-    let jewelList = Helper.loadCSVAsJSON(`${tempRoot}/jewels.csv`)
+    // Decorations
+    let decorationList = Helper.loadCSVAsJSON(`${tempRoot}/decorations.csv`)
 
-    if (Helper.isNotEmpty(jewelList)) {
-        result.jewels.all = jewelList.length
+    if (Helper.isNotEmpty(decorationList)) {
+        result.decorations.all = decorationList.length
 
-        for (let item of jewelList) {
+        for (let item of decorationList) {
             if (Helper.isNotEmpty(item.size)) {
                 let size = `size${item.size}`
 
-                if (Helper.isEmpty(result.jewels[size])) {
-                    result.jewels[size] = 0
+                if (Helper.isEmpty(result.decorations[size])) {
+                    result.decorations[size] = 0
                 }
 
-                result.jewels[size] += 1
+                result.decorations[size] += 1
             }
         }
     }
 
-    // Enhances & Skills
-    for (let target of ['enhances', 'skills']) {
+    // RampageSkills & Skills
+    for (let target of ['rampageSkills', 'skills']) {
         let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {
@@ -869,8 +869,8 @@ export const fetchAllAction = () => {
     Promise.all([
         fetchWeaponsAction(),
         fetchArmorsAction(),
-        fetchJewelsAction(),
-        fetchEnhancesAction(),
+        fetchDecorationsAction(),
+        fetchRampageSkillsAction(),
         fetchSkillsAction()
     ]).then(() => {
         infoAction()
@@ -881,8 +881,8 @@ export default {
     fetchAllAction,
     fetchWeaponsAction,
     fetchArmorsAction,
-    fetchJewelsAction,
-    fetchEnhancesAction,
+    fetchDecorationsAction,
+    fetchRampageSkillsAction,
     fetchSkillsAction,
     infoAction
 }

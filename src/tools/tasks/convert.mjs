@@ -191,7 +191,7 @@ export const runAction = () => {
             skillBundle.name,
             skillBundle.description,
             [
-                skillBundle.from.jewel,
+                skillBundle.from.decoration,
                 skillBundle.from.armor,
                 skillBundle.from.charm
             ],
@@ -255,32 +255,32 @@ export const runAction = () => {
         ])
     })
 
-    // Handle Enhances
-    console.log('handle:enhances')
+    // Handle RampageSkills
+    console.log('handle:rampageSkills')
 
-    rawDataMapping.enhances.forEach((enhanceItem) => {
+    rawDataMapping.rampageSkills.forEach((enhanceItem) => {
 
         // Check Propeties Using as Unique Key
         if (Helper.isEmpty(enhanceItem.name)
             || Helper.isEmpty(enhanceItem.name.zhTW)
         ) {
-            if (Helper.isEmpty(incompleteDataMapping.enhances)) {
-                incompleteDataMapping.enhances = []
+            if (Helper.isEmpty(incompleteDataMapping.rampageSkills)) {
+                incompleteDataMapping.rampageSkills = []
             }
 
-            incompleteDataMapping.enhances.push(enhanceItem)
+            incompleteDataMapping.rampageSkills.push(enhanceItem)
 
             return
         }
 
         // Get Id Code
-        let idCode = createCode(`enhances:id:${enhanceItem.name.zhTW}`)
+        let idCode = createCode(`rampageSkills:id:${enhanceItem.name.zhTW}`)
 
         enhanceItem.id = idCode
 
         // Get Translate Code & Create Dataset Lang Mapping
         for (let property of ['name', 'description']) {
-            let translateCode = createCode(`enhances:translate:${property}:${idCode}`)
+            let translateCode = createCode(`rampageSkills:translate:${property}:${idCode}`)
 
             Object.keys(enhanceItem[property]).forEach((lang) => {
                 if (Helper.isEmpty(datasetLangMapping[lang])) {
@@ -294,11 +294,11 @@ export const runAction = () => {
         }
 
         // Create Dataset Mapping
-        if (Helper.isEmpty(datasetMapping.enhances)) {
-            datasetMapping.enhances = []
+        if (Helper.isEmpty(datasetMapping.rampageSkills)) {
+            datasetMapping.rampageSkills = []
         }
 
-        datasetMapping.enhances.push([
+        datasetMapping.rampageSkills.push([
             enhanceItem.id,
             enhanceItem.name,
             enhanceItem.description,
@@ -370,65 +370,65 @@ export const runAction = () => {
         ])
     })
 
-    // Handle Jewels
-    console.log('handle:jewels')
+    // Handle Decorations
+    console.log('handle:decorations')
 
-    rawDataMapping.jewels.forEach((jewelItem) => {
+    rawDataMapping.decorations.forEach((decorationItem) => {
 
         // Filter Empty Items
-        jewelItem.skills = jewelItem.skills.filter((skillData) => {
+        decorationItem.skills = decorationItem.skills.filter((skillData) => {
             return Helper.isNotEmpty(skillData.name)
         })
 
         // Check Propeties Using as Unique Key
-        if (Helper.isEmpty(jewelItem.name)
-            || Helper.isEmpty(jewelItem.name.zhTW)
+        if (Helper.isEmpty(decorationItem.name)
+            || Helper.isEmpty(decorationItem.name.zhTW)
         ) {
-            if (Helper.isEmpty(incompleteDataMapping.jewels)) {
-                incompleteDataMapping.jewels = []
+            if (Helper.isEmpty(incompleteDataMapping.decorations)) {
+                incompleteDataMapping.decorations = []
             }
 
-            incompleteDataMapping.jewels.push(jewelItem)
+            incompleteDataMapping.decorations.push(decorationItem)
 
             return
         }
 
         // Get Id Code
-        let idCode = createCode(`jewels:id:${jewelItem.name.zhTW}`)
+        let idCode = createCode(`decorations:id:${decorationItem.name.zhTW}`)
 
-        jewelItem.id = idCode
+        decorationItem.id = idCode
 
         // Get Translate Code & Create Dataset Lang Mapping
-        let translateCode = createCode(`jewels:translate:name:${idCode}`)
+        let translateCode = createCode(`decorations:translate:name:${idCode}`)
 
-        Object.keys(jewelItem.name).forEach((lang) => {
+        Object.keys(decorationItem.name).forEach((lang) => {
             if (Helper.isEmpty(datasetLangMapping[lang])) {
                 datasetLangMapping[lang] = {}
             }
 
-            datasetLangMapping[lang][translateCode] = jewelItem.name[lang]
+            datasetLangMapping[lang][translateCode] = decorationItem.name[lang]
         })
 
-        jewelItem.name = translateCode
+        decorationItem.name = translateCode
 
         // Filter Empty
-        jewelItem.skills = jewelItem.skills.map((skillData) => {
+        decorationItem.skills = decorationItem.skills.map((skillData) => {
             skillData.name = createCode(`skills:id:${skillData.name}`)
 
             return skillData
         })
 
         // Create Dataset Mapping
-        if (Helper.isEmpty(datasetMapping.jewels)) {
-            datasetMapping.jewels = []
+        if (Helper.isEmpty(datasetMapping.decorations)) {
+            datasetMapping.decorations = []
         }
 
-        datasetMapping.jewels.push([
-            jewelItem.id,
-            jewelItem.name,
-            jewelItem.rare,
-            jewelItem.size,
-            jewelItem.skills.map((skillData) => {
+        datasetMapping.decorations.push([
+            decorationItem.id,
+            decorationItem.name,
+            decorationItem.rare,
+            decorationItem.size,
+            decorationItem.skills.map((skillData) => {
                 return [
                     skillData.name,
                     skillData.level
@@ -648,7 +648,7 @@ export const runAction = () => {
 
         // Find Code Id
         // weaponItem.enhance.list = weaponItem.enhance.list.map((enhanceData) => {
-        //     enhanceData.name = createCode(`enhances:id:${enhanceData.name}`)
+        //     enhanceData.name = createCode(`rampageSkills:id:${enhanceData.name}`)
 
         //     return enhanceData
         // })
@@ -734,15 +734,15 @@ export const runAction = () => {
 export const findSkillSourceAction = () => {
 
     let skillList = Helper.loadCSVAsJSON(`${fileRoot}/skills.csv`)
-    let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewels.csv`)
+    let decorationList = Helper.loadCSVAsJSON(`${fileRoot}/decorations.csv`)
     let armorList = Helper.loadCSVAsJSON(`${fileRoot}/armors.csv`)
 
-    let jewelSkillMapping = {}
+    let decorationSkillMapping = {}
     let armorSkillMapping = {}
 
-    jewelList.forEach((jewelItem) => {
-        jewelItem.skills.forEach((skillData) => {
-            jewelSkillMapping[skillData.name] = true
+    decorationList.forEach((decorationItem) => {
+        decorationItem.skills.forEach((skillData) => {
+            decorationSkillMapping[skillData.name] = true
         })
     })
 
@@ -753,7 +753,7 @@ export const findSkillSourceAction = () => {
     })
 
     skillList = skillList.map((skillItem) => {
-        skillItem.from.jewel = Helper.isNotEmpty(jewelSkillMapping[skillItem.name.zhTW])
+        skillItem.from.decoration = Helper.isNotEmpty(decorationSkillMapping[skillItem.name.zhTW])
         skillItem.from.armor = Helper.isNotEmpty(armorSkillMapping[skillItem.name.zhTW])
 
         return skillItem
@@ -769,14 +769,14 @@ export const infoAction = () => {
         weapons: {},
         armors: {},
         petalaces: {},
-        jewels: {},
-        enhances: {},
+        decorations: {},
+        rampageSkills: {},
         skills: {}
     }
 
     result.weapons.all = {}
     result.armors.all = {}
-    result.jewels.all = {}
+    result.decorations.all = {}
 
     for (let weaponType of weaponTypeList) {
         result.weapons[weaponType] = {}
@@ -792,7 +792,7 @@ export const infoAction = () => {
     }
 
     for (let size of sizeList) {
-        result.jewels[size] = {}
+        result.decorations[size] = {}
     }
 
     console.log(`count:final`)
@@ -856,21 +856,21 @@ export const infoAction = () => {
             continue
         }
 
-        if ('jewels' === target) {
-            let jewelList = Helper.loadCSVAsJSON(`${fileRoot}/jewels.csv`)
+        if ('decorations' === target) {
+            let decorationList = Helper.loadCSVAsJSON(`${fileRoot}/decorations.csv`)
 
-            if (Helper.isNotEmpty(jewelList)) {
-                result.jewels.all.final = jewelList.length
+            if (Helper.isNotEmpty(decorationList)) {
+                result.decorations.all.final = decorationList.length
 
-                for (let item of jewelList) {
+                for (let item of decorationList) {
                     if (Helper.isNotEmpty(item.size)) {
                         let size = `size${item.size}`
 
-                        if (Helper.isEmpty(result.jewels[size].final)) {
-                            result.jewels[size].final = 0
+                        if (Helper.isEmpty(result.decorations[size].final)) {
+                            result.decorations[size].final = 0
                         }
 
-                        result.jewels[size].final += 1
+                        result.decorations[size].final += 1
                     }
                 }
             }
@@ -1002,21 +1002,21 @@ export const infoAction = () => {
                 continue
             }
 
-            if ('jewels' === target) {
-                let jewelList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/jewels.csv`)
+            if ('decorations' === target) {
+                let decorationList = Helper.loadCSVAsJSON(`${tempCrawlerRoot}/${crawler}/decorations.csv`)
 
-                if (Helper.isNotEmpty(jewelList)) {
-                    result.jewels.all[crawler] = jewelList.length
+                if (Helper.isNotEmpty(decorationList)) {
+                    result.decorations.all[crawler] = decorationList.length
 
-                    for (let item of jewelList) {
+                    for (let item of decorationList) {
                         if (Helper.isNotEmpty(item.size)) {
                             let size = `size${item.size}`
 
-                            if (Helper.isEmpty(result.jewels[size][crawler])) {
-                                result.jewels[size][crawler] = 0
+                            if (Helper.isEmpty(result.decorations[size][crawler])) {
+                                result.decorations[size][crawler] = 0
                             }
 
-                            result.jewels[size][crawler] += 1
+                            result.decorations[size][crawler] += 1
                         }
                     }
                 }

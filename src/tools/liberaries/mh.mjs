@@ -47,7 +47,7 @@ export const defaultWeaponItem = {
         //     size: null
         // }
     ],
-    enhance: {
+    rampageSkill: {
         amount: null,
         list: [
             // {
@@ -85,18 +85,6 @@ export const defaultArmorItem = {
     ]
 }
 
-export const defaultJewelItem = {
-    name: null,
-    rare: null,
-    size: null,
-    skills: [
-        // {
-        //     name: null,
-        //     level: null
-        // }
-    ]
-}
-
 export const defaultPetalaceItem = {
     name: null,
     rare: null,
@@ -118,9 +106,27 @@ export const defaultPetalaceItem = {
     }
 }
 
-export const defaultEnhanceItem = {
+export const defaultDecorationItem = {
     name: null,
-    description: null
+    rare: null,
+    size: null,
+    skills: [
+        // {
+        //     name: null,
+        //     level: null
+        // }
+    ]
+}
+
+export const defaultRampageDecorationItem = {
+    name: null,
+    rare: null,
+    size: null,
+    skill: null
+    // {
+    //     name: null,
+    //     level: null
+    // }
 }
 
 export const defaultSkillItem = {
@@ -130,10 +136,15 @@ export const defaultSkillItem = {
     effect: null
 }
 
+export const defaultRampageSkillItem = {
+    name: null,
+    description: null
+}
+
 export const autoExtendListQuantity = (list) => {
     let slotCount = 0
     let skillCount = 0
-    let enhanceCount = 0
+    let rampageSkillCount = 0
 
     list.forEach((row) => {
         if (Helper.isNotEmpty(row.slots)
@@ -148,10 +159,10 @@ export const autoExtendListQuantity = (list) => {
             skillCount = row.skills.length
         }
 
-        if (Helper.isNotEmpty(row.enhance) && Helper.isNotEmpty(row.enhance.list)
-            && enhanceCount < row.enhance.list.length
+        if (Helper.isNotEmpty(row.rampageSkill) && Helper.isNotEmpty(row.rampageSkill.list)
+            && rampageSkillCount < row.rampageSkill.list.length
         ) {
-            enhanceCount = row.enhance.list.length
+            rampageSkillCount = row.rampageSkill.list.length
         }
     })
 
@@ -181,13 +192,13 @@ export const autoExtendListQuantity = (list) => {
             }
         }
 
-        if (Helper.isNotEmpty(row.enhance) && Helper.isNotEmpty(row.enhance.list)) {
-            for (let index = 0; index < enhanceCount; index++) {
-                if (Helper.isNotEmpty(row.enhance.list[index])) {
+        if (Helper.isNotEmpty(row.rampageSkill) && Helper.isNotEmpty(row.rampageSkill.list)) {
+            for (let index = 0; index < rampageSkillCount; index++) {
+                if (Helper.isNotEmpty(row.rampageSkill.list[index])) {
                     continue
                 }
 
-                row.enhance.list[index] = {
+                row.rampageSkill.list[index] = {
                     name: null
                 }
             }
@@ -297,8 +308,8 @@ export const targetList = [
     'weapons',
     'armors',
     'petalaces',
-    'jewels',
-    'enhances',
+    'decorations',
+    'rampageSkills',
     'skills'
 ]
 

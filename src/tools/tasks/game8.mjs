@@ -12,8 +12,8 @@ import {
     defaultWeaponItem,
     defaultArmorItem,
     // defaultPetalaceItem,
-    defaultJewelItem,
-    defaultEnhanceItem,
+    defaultDecorationItem,
+    defaultRampageSkillItem,
     defaultSkillItem,
     autoExtendListQuantity,
     normalizeText,
@@ -44,8 +44,8 @@ const urls = {
     armors: 'https://game8.jp/mhrise/363845',
     // charms: null,
     // petalaces: 'https://game8.jp/mhrise/364037',
-    jewels: 'https://game8.jp/mhrise/363846',
-    enhances: 'https://game8.jp/mhrise/382391',
+    decorations: 'https://game8.jp/mhrise/363846',
+    rampageSkills: 'https://game8.jp/mhrise/382391',
     skills: 'https://game8.jp/mhrise/363848'
 }
 
@@ -248,15 +248,15 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         }
                     })
 
-                    // Enhances
-                    let enhanceRowIndex = 4
+                    // RampageSkills
+                    let rampageSkillRowIndex = 4
 
                     if ('lightBowgun' === weaponType || 'heavyBowgun' === weaponType) {
-                        enhanceRowIndex = 7
+                        rampageSkillRowIndex = 7
                     }
 
-                    subNode.find('tbody tr').eq(enhanceRowIndex).find('a').each((index, node) => {
-                        mapping[mappingKey].enhance.list.push({
+                    subNode.find('tbody tr').eq(rampageSkillRowIndex).find('a').each((index, node) => {
+                        mapping[mappingKey].rampageSkill.list.push({
                             name: normalizeText(weaponDom(node).text())
                         })
                     })
@@ -535,7 +535,7 @@ export const fetchArmorsAction = async () => {
     Helper.saveJSONAsCSV(`${tempRoot}/armors.csv`, list)
 }
 
-export const fetchJewelsAction = async () => {
+export const fetchDecorationsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -543,8 +543,8 @@ export const fetchJewelsAction = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    fetchPageUrl = urls.jewels
-    fetchPageName = 'jewels'
+    fetchPageUrl = urls.decorations
+    fetchPageName = 'decorations'
 
     console.log(fetchPageUrl, fetchPageName)
 
@@ -566,26 +566,26 @@ export const fetchJewelsAction = async () => {
 
             // Fetch Detail Page
             fetchPageUrl = rowNode.find('td').eq(0).find('a').attr('href')
-            fetchPageName = `jewels:${name}`
+            fetchPageName = `decorations:${name}`
 
             console.log(fetchPageUrl, fetchPageName)
 
-            let jewelDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+            let decorationDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
-            if (Helper.isEmpty(jewelDom)) {
+            if (Helper.isEmpty(decorationDom)) {
                 console.log(fetchPageUrl, fetchPageName, 'Err')
 
                 return
             }
 
             // Get Data
-            let rare = jewelDom(`#hm_1 + table tbody tr`).eq(1).find('td').eq(0).text().trim()
-            let size = jewelDom(`#hm_1 + table tbody tr`).eq(1).find('td').eq(1).text().trim()
+            let rare = decorationDom(`#hm_1 + table tbody tr`).eq(1).find('td').eq(0).text().trim()
+            let size = decorationDom(`#hm_1 + table tbody tr`).eq(1).find('td').eq(1).text().trim()
 
             mappingKey = name
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultJewelItem)
+                mapping[mappingKey] = Helper.deepCopy(defaultDecorationItem)
             }
 
             mapping[mappingKey].name = {
@@ -600,10 +600,10 @@ export const fetchJewelsAction = async () => {
         }
     }
 
-    Helper.saveJSONAsCSV(`${tempRoot}/jewels.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${tempRoot}/decorations.csv`, Object.values(mapping))
 }
 
-export const fetchEnhancesAction = async () => {
+export const fetchRampageSkillsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
 
@@ -611,8 +611,8 @@ export const fetchEnhancesAction = async () => {
     let mappingKey = null
 
     // Fetch List Page
-    fetchPageUrl = urls.enhances
-    fetchPageName = 'enhances'
+    fetchPageUrl = urls.rampageSkills
+    fetchPageName = 'rampageSkills'
 
     console.log(fetchPageUrl, fetchPageName)
 
@@ -635,7 +635,7 @@ export const fetchEnhancesAction = async () => {
             mappingKey = name
 
             if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultEnhanceItem)
+                mapping[mappingKey] = Helper.deepCopy(defaultRampageSkillItem)
             }
 
             mapping[mappingKey].name = {
@@ -647,7 +647,7 @@ export const fetchEnhancesAction = async () => {
         }
     }
 
-    Helper.saveJSONAsCSV(`${tempRoot}/enhances.csv`, Object.values(mapping))
+    Helper.saveJSONAsCSV(`${tempRoot}/rampageSkills.csv`, Object.values(mapping))
 }
 
 export const fetchSkillsAction = async () => {
@@ -729,14 +729,14 @@ export const infoAction = () => {
     let result = {
         weapons: {},
         armors: {},
-        jewels: {},
-        enhances: {},
+        decorations: {},
+        rampageSkills: {},
         skills: {}
     }
 
     result.weapons.all = null
     result.armors.all = null
-    result.jewels.all = null
+    result.decorations.all = null
 
     for (let weaponType of weaponTypeList) {
         result.weapons[weaponType] = {}
@@ -752,7 +752,7 @@ export const infoAction = () => {
     }
 
     for (let size of sizeList) {
-        result.jewels[size] = null
+        result.decorations[size] = null
     }
 
     // Weapons
@@ -804,27 +804,27 @@ export const infoAction = () => {
         }
     }
 
-    // Jewels
-    let jewelList = Helper.loadCSVAsJSON(`${tempRoot}/jewels.csv`)
+    // Decorations
+    let decorationList = Helper.loadCSVAsJSON(`${tempRoot}/decorations.csv`)
 
-    if (Helper.isNotEmpty(jewelList)) {
-        result.jewels.all = jewelList.length
+    if (Helper.isNotEmpty(decorationList)) {
+        result.decorations.all = decorationList.length
 
-        for (let item of jewelList) {
+        for (let item of decorationList) {
             if (Helper.isNotEmpty(item.size)) {
                 let size = `size${item.size}`
 
-                if (Helper.isEmpty(result.jewels[size])) {
-                    result.jewels[size] = 0
+                if (Helper.isEmpty(result.decorations[size])) {
+                    result.decorations[size] = 0
                 }
 
-                result.jewels[size] += 1
+                result.decorations[size] += 1
             }
         }
     }
 
-    // Enhances & Skills
-    for (let target of ['enhances', 'skills']) {
+    // RampageSkills & Skills
+    for (let target of ['rampageSkills', 'skills']) {
         let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {
@@ -840,8 +840,8 @@ export const fetchAllAction = () => {
     Promise.all([
         fetchWeaponsAction(),
         fetchArmorsAction(),
-        fetchJewelsAction(),
-        fetchEnhancesAction(),
+        fetchDecorationsAction(),
+        fetchRampageSkillsAction(),
         fetchSkillsAction()
     ]).then(() => {
         infoAction()
@@ -852,8 +852,8 @@ export default {
     fetchAllAction,
     fetchWeaponsAction,
     fetchArmorsAction,
-    fetchJewelsAction,
-    fetchEnhancesAction,
+    fetchDecorationsAction,
+    fetchRampageSkillsAction,
     fetchSkillsAction,
     infoAction
 }

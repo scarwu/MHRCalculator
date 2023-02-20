@@ -35,11 +35,12 @@ import ChangeLogModal from '@/scripts/components/modal/changeLog'
 import AlgorithmSettingModal from '@/scripts/components/modal/algorithmSetting'
 import WeaponSelectorModal from '@/scripts/components/modal/weaponSelector'
 import ArmorSelectorModal from '@/scripts/components/modal/armorSelector'
-import SetSelectorModal from '@/scripts/components/modal/setSelector'
 import PetalaceSelectorModal from '@/scripts/components/modal/petalaceSelector'
-import DecorationSelectorModal from '@/scripts/components/modal/decorationSelector'
-import RampageSkillSelectorModal from '@/scripts/components/modal/rampageSkillSelector'
+import SetSelectorModal from '@/scripts/components/modal/setSelector'
 import SkillSelectorModal from '@/scripts/components/modal/skillSelector'
+import DecorationSelectorModal from '@/scripts/components/modal/decorationSelector'
+import RampageDecorationSelectorModal from '@/scripts/components/modal/rampageDecorationSelector'
+import RampageSkillSelectorModal from '@/scripts/components/modal/rampageSkillSelector'
 
 if ('production' === Config.env) {
     if (Config.buildTime !== Status.get('sys:buildTime')) {
@@ -164,11 +165,12 @@ export default function App () {
             <AlgorithmSettingModal />
             <WeaponSelectorModal />
             <ArmorSelectorModal />
+            <PetalaceSelectorModal />
             <SetSelectorModal />
             <DecorationSelectorModal />
-            <PetalaceSelectorModal />
-            <RampageSkillSelectorModal />
             <SkillSelectorModal />
+            <RampageDecorationSelectorModal />
+            <RampageSkillSelectorModal />
         </div>
     )
 }

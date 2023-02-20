@@ -21,6 +21,7 @@ import Helper from '@/scripts/core/helper'
 import Misc from '@/scripts/libraries/misc'
 import DecorationDataset from '@/scripts/libraries/dataset/decoration'
 import SkillDataset from '@/scripts/libraries/dataset/skill'
+import RampageDecorationDataset from '@/scripts/libraries/dataset/rampageDecoration'
 import RampageSkillDataset from '@/scripts/libraries/dataset/rampageSkill'
 
 // Load Components

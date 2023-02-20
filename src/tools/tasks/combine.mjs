@@ -15,8 +15,9 @@ import {
     defaultArmorItem,
     defaultPetalaceItem,
     defaultDecorationItem,
-    defaultRampageSkillItem,
     defaultSkillItem,
+    defaultRampageDecorationItem,
+    defaultRampageSkillItem,
     autoExtendListQuantity,
     weaponTypeList,
     rareList,
@@ -493,26 +494,20 @@ export const runAction = () => {
         case 'weapons':
             item = Helper.deepCopy(defaultWeaponItem)
             item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'type', 'attack', 'criticalRate', 'defense'])
-            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['series', 'name'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['series', 'name', 'description'])
             item = mergeElementValue(target, itemId, item, crawlerMapping)
             item = mergeSharpnessValue(target, itemId, item, crawlerMapping)
             item = mergeSlotsValue(target, itemId, item, crawlerMapping)
+            item = mergeRampageSlotValue(target, itemId, item, crawlerMapping)
             item = mergeRampageSkillValue(target, itemId, item, crawlerMapping)
 
             return Helper.deepCopy(item)
         case 'armors':
             item = Helper.deepCopy(defaultArmorItem)
             item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'type', 'gender', 'minDefense', 'maxDefense'])
-            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['series', 'name'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['series', 'name', 'description'])
             item = mergeResistenceValue(target, itemId, item, crawlerMapping)
             item = mergeSlotsValue(target, itemId, item, crawlerMapping)
-            item = mergeSkillsValue(target, itemId, item, crawlerMapping)
-
-            return Helper.deepCopy(item)
-        case 'decorations':
-            item = Helper.deepCopy(defaultDecorationItem)
-            item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'size'])
-            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name'])
             item = mergeSkillsValue(target, itemId, item, crawlerMapping)
 
             return Helper.deepCopy(item)
@@ -523,15 +518,29 @@ export const runAction = () => {
             item = mergeIncrementAndObtainValue(target, itemId, item, crawlerMapping, ['name'])
 
             return Helper.deepCopy(item)
-        case 'rampageSkills':
-            item = Helper.deepCopy(defaultRampageSkillItem)
-            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name', 'description'])
+        case 'decorations':
+            item = Helper.deepCopy(defaultDecorationItem)
+            item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'size'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name'])
+            item = mergeSkillsValue(target, itemId, item, crawlerMapping)
 
             return Helper.deepCopy(item)
         case 'skills':
             item = Helper.deepCopy(defaultSkillItem)
             item = mergeNormalValue(target, itemId, item, crawlerMapping, ['level'])
             item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name', 'description', 'effect'])
+
+            return Helper.deepCopy(item)
+        case 'rampageDecorations':
+            item = Helper.deepCopy(defaultRampageDecorationItem)
+            item = mergeNormalValue(target, itemId, item, crawlerMapping, ['rare', 'size'])
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name'])
+            item = mergeSkillsValue(target, itemId, item, crawlerMapping)
+
+            return Helper.deepCopy(item)
+        case 'rampageSkills':
+            item = Helper.deepCopy(defaultRampageSkillItem)
+            item = mergeTranslateValue(target, itemId, item, crawlerMapping, ['name', 'description'])
 
             return Helper.deepCopy(item)
         default:
@@ -1199,6 +1208,70 @@ export const runAction = () => {
         return item
     }
 
+    const mergeRampageSlotValue = (target, itemId, item, crawlerMapping) => {
+        let voteMapping = null
+        let valueMapping = null
+
+        // For RampageSlot Size
+        voteMapping = {}
+        valueMapping = {}
+
+        for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
+            if (Helper.isEmpty(crawlerItem.rampageSlot)
+                || Helper.isEmpty(crawlerItem.rampageSlot.size)
+            ) {
+                continue
+            }
+
+            // Set Default Value
+            if (Helper.isEmpty(item.rampageSlot.size)) {
+                item.rampageSlot.size = crawlerItem.rampageSlot.size
+            }
+
+            // Set Count & Value
+            if (Helper.isEmpty(voteMapping[crawlerItem.rampageSlot.size])) {
+                voteMapping[crawlerItem.rampageSlot.size] = {
+                    count: 0,
+                    value: crawlerItem.rampageSlot.size
+                }
+            }
+
+            voteMapping[crawlerItem.rampageSlot.size].count++
+            valueMapping[crawlerName] = crawlerItem.rampageSlot.size
+        }
+
+        // Need Copy
+        if (0 !== Object.keys(voteMapping).length) {
+
+            // Assign Final Value by Max Count
+            let maxCount = 0
+
+            for (let voteItem of Object.values(voteMapping)) {
+                if (maxCount < voteItem.count) {
+                    maxCount = voteItem.count
+                    item.rampageSlot.size = voteItem.value
+                }
+            }
+
+            // Record DuplicationValueMapping
+            if (Object.keys(voteMapping).length > 1) {
+                if (Helper.isEmpty(duplicateValueMapping.rampageSlotSize)) {
+                    duplicateValueMapping.rampageSlotSize = []
+                }
+
+                duplicateValueMapping.rampageSlotSize.push({
+                    target: target,
+                    name: idNameMapping[itemId],
+                    rare: item.rare,
+                    valueMapping: valueMapping
+                })
+            }
+        }
+
+        return item
+    }
+
+
     const mergeRampageSkillValue = (target, itemId, item, crawlerMapping) => {
         let voteMapping = null
         let valueMapping = null
@@ -1208,7 +1281,9 @@ export const runAction = () => {
         valueMapping = {}
 
         for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
-            if (Helper.isEmpty(crawlerItem.rampageSkill.amount)) {
+            if (Helper.isEmpty(crawlerItem.rampageSkill)
+                || Helper.isEmpty(crawlerItem.rampageSkill.amount)
+            ) {
                 continue
             }
 
@@ -1263,7 +1338,9 @@ export const runAction = () => {
 
         // Generate RampageSkill Mapping
         for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
-            if (Helper.isEmpty(crawlerItem.rampageSkill.list)) {
+            if (Helper.isEmpty(crawlerItem.rampageSkill)
+                || Helper.isEmpty(crawlerItem.rampageSkill.list)
+            ) {
                 continue
             }
 
@@ -1332,7 +1409,9 @@ export const runAction = () => {
 
             // Filling
             for (let [crawlerName, crawlerItem] of Object.entries(crawlerMapping)) {
-                if (Helper.isEmpty(crawlerItem.rampageSkill.list)) {
+                if (Helper.isEmpty(crawlerItem.rampageSkill)
+                    || Helper.isEmpty(crawlerItem.rampageSkill.list)
+                ) {
                     continue
                 }
 
@@ -1429,8 +1508,9 @@ export const infoAction = () => {
         armors: {},
         petalaces: {},
         decorations: {},
-        rampageSkills: {},
-        skills: {}
+        skills: {},
+        rampageDecorations: {},
+        rampageSkills: {}
     }
 
     result.weapons.all = {}

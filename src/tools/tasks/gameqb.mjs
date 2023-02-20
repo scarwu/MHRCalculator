@@ -847,31 +847,33 @@ export const infoAction = () => {
     let result = {
         weapons: {},
         armors: {},
-        petalaces: {},
         decorations: {},
-        rampageSkills: {},
-        skills: {}
+        skills: {},
+        rampageDecorations: {},
+        rampageSkills: {}
     }
 
-    result.weapons.all = null
-    result.armors.all = null
-    result.decorations.all = null
+    result.weapons.all = 0
+    result.armors.all = 0
+    result.decorations.all = 0
+    result.rampageDecorations.all = 0
 
     for (let weaponType of weaponTypeList) {
         result.weapons[weaponType] = {}
-        result.weapons[weaponType].all = null
+        result.weapons[weaponType].all = 0
 
         for (let rare of rareList) {
-            result.weapons[weaponType][rare] = null
+            result.weapons[weaponType][rare] = 0
         }
     }
 
     for (let rare of rareList) {
-        result.armors[rare] = null
+        result.armors[rare] = 0
     }
 
     for (let size of sizeList) {
-        result.decorations[size] = null
+        result.decorations[size] = 0
+        result.rampageDecorations[size] = 0
     }
 
     // Weapons
@@ -879,26 +881,12 @@ export const infoAction = () => {
         let weaponList = Helper.loadCSVAsJSON(`${tempRoot}/weapons/${weaponType}.csv`)
 
         if (Helper.isNotEmpty(weaponList)) {
-            if (Helper.isEmpty(result.weapons.all)) {
-                result.weapons.all = 0
-            }
-
-            if (Helper.isEmpty(result.weapons[weaponType].all)) {
-                result.weapons[weaponType].all = 0
-            }
-
             result.weapons.all += weaponList.length
             result.weapons[weaponType].all += weaponList.length
 
             for (let item of weaponList) {
                 if (Helper.isNotEmpty(item.rare)) {
-                    let rare = `rare${item.rare}`
-
-                    if (Helper.isEmpty(result.weapons[weaponType][rare])) {
-                        result.weapons[weaponType][rare] = 0
-                    }
-
-                    result.weapons[weaponType][rare] += 1
+                    result.weapons[weaponType][`rare${item.rare}`] += 1
                 }
             }
         }
@@ -912,13 +900,7 @@ export const infoAction = () => {
 
         for (let item of armorList) {
             if (Helper.isNotEmpty(item.rare)) {
-                let rare = `rare${item.rare}`
-
-                if (Helper.isEmpty(result.armors[rare])) {
-                    result.armors[rare] = 0
-                }
-
-                result.armors[rare] += 1
+                result.armors[`rare${item.rare}`] += 1
             }
         }
     }
@@ -931,13 +913,7 @@ export const infoAction = () => {
 
         for (let item of decorationList) {
             if (Helper.isNotEmpty(item.size)) {
-                let size = `size${item.size}`
-
-                if (Helper.isEmpty(result.decorations[size])) {
-                    result.decorations[size] = 0
-                }
-
-                result.decorations[size] += 1
+                result.decorations[`size${item.size}`] += 1
             }
         }
     }

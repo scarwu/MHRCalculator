@@ -48,10 +48,9 @@ export const defaultWeaponItem = {
         //     size: null
         // }
     ],
-    rampageSlot: null,
-    // {
-    //     size: null
-    // }
+    rampageSlot: {
+        size: null
+    },
     rampageSkill: {
         amount: null,
         list: [
@@ -302,7 +301,7 @@ export const rareList = [
 ]
 
 export const sizeList = [
-    'size1', 'size2', 'size3'
+    'size1', 'size2', 'size3', 'size4'
 ]
 
 export const crawlerList = [

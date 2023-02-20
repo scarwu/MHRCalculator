@@ -56,9 +56,12 @@ const dataset = Weapons.map((weaponItem) => {
                 size: slotData[0]
             }
         }),
+        rampageSlot: {
+            size: weaponItem[11][0]
+        },
         rampageSkill: {
-            amount: weaponItem[11][0],
-            // list: weaponItem[11][1].map((rampageSkillData) => {
+            amount: weaponItem[12][0],
+            // list: weaponItem[12][1].map((rampageSkillData) => {
             //     return {
             //         name: rampageSkillData[0]
             //     }

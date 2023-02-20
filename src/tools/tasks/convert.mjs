@@ -258,39 +258,39 @@ export const runAction = () => {
     // Handle RampageSkills
     console.log('handle:rampageSkills')
 
-    rawDataMapping.rampageSkills.forEach((enhanceItem) => {
+    rawDataMapping.rampageSkills.forEach((rampageSkillItem) => {
 
         // Check Propeties Using as Unique Key
-        if (Helper.isEmpty(enhanceItem.name)
-            || Helper.isEmpty(enhanceItem.name.zhTW)
+        if (Helper.isEmpty(rampageSkillItem.name)
+            || Helper.isEmpty(rampageSkillItem.name.zhTW)
         ) {
             if (Helper.isEmpty(incompleteDataMapping.rampageSkills)) {
                 incompleteDataMapping.rampageSkills = []
             }
 
-            incompleteDataMapping.rampageSkills.push(enhanceItem)
+            incompleteDataMapping.rampageSkills.push(rampageSkillItem)
 
             return
         }
 
         // Get Id Code
-        let idCode = createCode(`rampageSkills:id:${enhanceItem.name.zhTW}`)
+        let idCode = createCode(`rampageSkills:id:${rampageSkillItem.name.zhTW}`)
 
-        enhanceItem.id = idCode
+        rampageSkillItem.id = idCode
 
         // Get Translate Code & Create Dataset Lang Mapping
         for (let property of ['name', 'description']) {
             let translateCode = createCode(`rampageSkills:translate:${property}:${idCode}`)
 
-            Object.keys(enhanceItem[property]).forEach((lang) => {
+            Object.keys(rampageSkillItem[property]).forEach((lang) => {
                 if (Helper.isEmpty(datasetLangMapping[lang])) {
                     datasetLangMapping[lang] = {}
                 }
 
-                datasetLangMapping[lang][translateCode] = enhanceItem[property][lang]
+                datasetLangMapping[lang][translateCode] = rampageSkillItem[property][lang]
             })
 
-            enhanceItem[property] = translateCode
+            rampageSkillItem[property] = translateCode
         }
 
         // Create Dataset Mapping
@@ -299,10 +299,10 @@ export const runAction = () => {
         }
 
         datasetMapping.rampageSkills.push([
-            enhanceItem.id,
-            enhanceItem.name,
-            enhanceItem.description,
-            null // enhanceItem.reaction
+            rampageSkillItem.id,
+            rampageSkillItem.name,
+            rampageSkillItem.description,
+            null // rampageSkillItem.reaction
         ])
     })
 
@@ -609,8 +609,8 @@ export const runAction = () => {
             return Helper.isNotEmpty(slotData.size)
         })
 
-        // weaponItem.enhance.list = weaponItem.enhance.list.filter((enhanceData) => {
-        //     return Helper.isNotEmpty(enhanceData.name)
+        // weaponItem.rampageSkill.list = weaponItem.rampageSkill.list.filter((rampageSkillData) => {
+        //     return Helper.isNotEmpty(rampageSkillData.name)
         // })
 
         // Check Propeties Using as Unique Key
@@ -647,10 +647,10 @@ export const runAction = () => {
         }
 
         // Find Code Id
-        // weaponItem.enhance.list = weaponItem.enhance.list.map((enhanceData) => {
-        //     enhanceData.name = createCode(`rampageSkills:id:${enhanceData.name}`)
+        // weaponItem.rampageSkill.list = weaponItem.rampageSkill.list.map((rampageSkillData) => {
+        //     rampageSkillData.name = createCode(`rampageSkills:id:${rampageSkillData.name}`)
 
-        //     return enhanceData
+        //     return rampageSkillData
         // })
 
         // Create Dataset Mapping
@@ -698,10 +698,13 @@ export const runAction = () => {
                 ]
             }),
             [
-                weaponItem.enhance.amount,
-                // weaponItem.enhance.list.map((enhanceData) => {
+                weaponItem.rampageSlot.size
+            ],
+            [
+                weaponItem.rampageSkill.amount,
+                // weaponItem.rampageSkill.list.map((rampageSkillData) => {
                 //     return [
-                //         enhanceData.name
+                //         rampageSkillData.name
                 //     ]
                 // })
             ]
@@ -770,8 +773,9 @@ export const infoAction = () => {
         armors: {},
         petalaces: {},
         decorations: {},
-        rampageSkills: {},
-        skills: {}
+        skills: {},
+        rampageDecorations: {},
+        rampageSkills: {}
     }
 
     result.weapons.all = {}

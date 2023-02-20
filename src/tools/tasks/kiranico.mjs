@@ -73,21 +73,14 @@ const getFullUrl = (lang, url) => {
 }
 
 export const fetchWeaponsAction = async (targetWeaponType = null) => {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
-    for (let weaponType of Object.keys(urls.weapons)) {
-        if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
-            continue
-        }
-
+    const runner = async (weaponType) => {
         let mapping = {}
         let langKeyMapping = {}
 
         // Fetch List Page
         for (let lang of ['zhTW', 'jaJP', 'enUS']) {
-            fetchPageUrl = getFullUrl(lang, urls.weapons[weaponType])
-            fetchPageName = `weapons:${weaponType}`
+            let fetchPageUrl = getFullUrl(lang, urls.weapons[weaponType])
+            let fetchPageName = `weapons:${weaponType}`
 
             console.log(fetchPageUrl, fetchPageName)
 
@@ -99,13 +92,13 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 return
             }
 
-            for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-                let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+            for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('> tbody > tr').length; rowIndex++) {
+                let rowNode = listDom('[x-data=categoryFilter]').find('> tbody > tr').eq(rowIndex)
 
                 // Get Data
-                let name = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
+                let name = normalizeText(rowNode.find('> td').eq(1).find('a').text().trim())
 
-                let uniqueKey = rowNode.find('td').eq(1).find('a').attr('href').split('/').pop()
+                let uniqueKey = rowNode.find('> td').eq(1).find('a').attr('href').split('/').pop()
 
                 if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
                     langKeyMapping[uniqueKey] = `${weaponType}:${name}`
@@ -133,7 +126,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     mapping[mappingKey].type = weaponType
 
                     // Decoration Slots
-                    let slotNode = rowNode.find('td').eq(2).find('span').eq(0).find('img')
+                    let slotNode = rowNode.find('> td').eq(2).find('span').eq(0).find('img')
 
                     if (0 !== slotNode.length) {
                         slotNode.each((index, node) => {
@@ -158,7 +151,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     }
 
                     // Rampage Decoration Slots
-                    let rampageSlotNode = rowNode.find('td').eq(2).find('span').eq(1).find('img')
+                    let rampageSlotNode = rowNode.find('> td').eq(2).find('span').eq(1).find('img')
 
                     if (0 !== rampageSlotNode.length) {
                         rampageSlotNode.each((index, node) => {
@@ -185,9 +178,9 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     // Element
                     if ('heavyBowgun' !== weaponType
                         && 'lightBowgun' !== weaponType
-                        && 0 !== rowNode.find('td').eq(4).find('img').length
+                        && 0 !== rowNode.find('> td').eq(4).find('img').length
                     ) {
-                        rowNode.find('td').eq(4).find('span').each((index, node) => {
+                        rowNode.find('> td').eq(4).find('span').each((index, node) => {
                             switch (listDom(node).find('img').attr('src')) {
                             case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType1.png':
                                 mapping[mappingKey].element.attack.type = 'fire'
@@ -238,13 +231,13 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         })
                     }
 
-                    let rare = rowNode.find('td').eq(7).text().trim().replace('Rare', '')
-                    let attack = rowNode.find('td').eq(3).text().trim()
+                    let rare = rowNode.find('> td').eq(7).text().trim().replace('Rare', '')
+                    let attack = rowNode.find('> td').eq(3).text().trim()
 
                     mapping[mappingKey].rare = parseFloat(rare)
                     mapping[mappingKey].attack = parseFloat(attack)
 
-                    rowNode.find('td').eq(4).find('div').each((index, node) => {
+                    rowNode.find('> td').eq(4).find('div').each((index, node) => {
                         let text = listDom(node).eq(0).text()
 
                         if (-1 !== text.indexOf('會心率')) {
@@ -277,7 +270,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         ]
 
                         // minimum sharpness
-                        rowNode.find('td').eq(5).find('svg').eq(0).find('rect').each((index, node) => {
+                        rowNode.find('> td').eq(5).find('svg').eq(0).find('rect').each((index, node) => {
                             let value = parseFloat(listDom(node).attr('width')) * 5
 
                             if (0 === value) {
@@ -292,7 +285,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         })
 
                         // maximum sharpness
-                        rowNode.find('td').eq(5).find('svg').eq(1).find('rect').each((index, node) => {
+                        rowNode.find('> td').eq(5).find('svg').eq(1).find('rect').each((index, node) => {
                             let value = parseFloat(listDom(node).attr('width')) * 5
 
                             if (0 === value) {
@@ -310,7 +303,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 }
 
                 // Fetch Detail Page
-                fetchPageUrl = rowNode.find('td').eq(1).find('a').attr('href')
+                fetchPageUrl = rowNode.find('> td').eq(1).find('a').attr('href')
                 fetchPageName = `weapons:${weaponType}:${name}`
 
                 console.log(fetchPageUrl, fetchPageName)
@@ -323,19 +316,19 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     return
                 }
 
-                if ('zhTW' === lang) {
-
-                    // RampageSkills
-                    weaponDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
-                        let rampageSkillName = normalizeText(weaponDom(node).find('td').eq(1).find('a').text())
-
-                        mapping[mappingKey].rampageSkill.list.push({
-                            name: rampageSkillName
-                        })
-                    })
-                }
-
                 let description = weaponDom('.mb-9.space-y-1 > p').eq(1).text()
+
+                // if ('zhTW' === lang) {
+
+                //     // RampageSkills
+                //     weaponDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
+                //         let rampageSkillName = normalizeText(weaponDom(node).find('td').eq(1).find('a').text())
+
+                //         mapping[mappingKey].rampageSkill.list.push({
+                //             name: rampageSkillName
+                //         })
+                //     })
+                // }
 
                 mapping[mappingKey].name[lang] = name
                 mapping[mappingKey].description[lang] = description
@@ -346,14 +339,24 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 
         Helper.saveJSONAsCSV(`${tempRoot}/weapons/${weaponType}.csv`, list)
     }
-}
 
-export const fetchArmorsAction = async (targetArmorRare = null) => {
-    for (let armorRare of Object.keys(urls.armors)) {
-        if (Helper.isNotEmpty(targetArmorRare) && targetArmorRare !== armorRare) {
+    let tasks = []
+
+    for (let weaponType of Object.keys(urls.weapons)) {
+        if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
             continue
         }
 
+        tasks.push(runner(weaponType))
+    }
+
+    return Promise.all(tasks).then(() => {
+        // pass
+    })
+}
+
+export const fetchArmorsAction = async (targetArmorRare = null) => {
+    const runner = async (armorRare) => {
         let mapping = {}
         let langKeyMapping = {}
 
@@ -372,29 +375,13 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                 return
             }
 
-            for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-                let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+            for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('> tbody > tr').length; rowIndex++) {
+                let rowNode = listDom('[x-data=categoryFilter]').find('> tbody > tr').eq(rowIndex)
 
                 // Get Data
-                let name = normalizeText(rowNode.find('td').eq(2).find('a').text().trim())
+                let name = normalizeText(rowNode.find('> td').eq(2).find('a').text().trim())
 
-                // Fetch Detail Page
-                fetchPageUrl = rowNode.find('td').eq(2).find('a').attr('href')
-                fetchPageName = `armors:${armorRare}:${name}`
-
-                console.log(fetchPageUrl, fetchPageName)
-
-                let armorDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-                if (Helper.isEmpty(armorDom)) {
-                    console.log(fetchPageUrl, fetchPageName, 'Err')
-
-                    return
-                }
-
-                let description = armorDom('.mb-9.space-y-1 > p').eq(1).text()
-
-                let uniqueKey = rowNode.find('td').eq(2).find('a').attr('href').split('/').pop()
+                let uniqueKey = rowNode.find('> td').eq(2).find('a').attr('href').split('/').pop()
 
                 if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
                     langKeyMapping[uniqueKey] = name
@@ -411,12 +398,12 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
 
                     let type = guessArmorType(name)
                     let rare = armorRare.replace('rare', '')
-                    let minDefense = rowNode.find('td').eq(4).find('div').eq(0).text().trim()
-                    let resistanceFire = rowNode.find('td').eq(4).find('div').eq(1).text().trim()
-                    let resistanceWater = rowNode.find('td').eq(4).find('div').eq(2).text().trim()
-                    let resistanceIce = rowNode.find('td').eq(5).find('div').eq(0).text().trim()
-                    let resistanceThunder = rowNode.find('td').eq(5).find('div').eq(1).text().trim()
-                    let resistanceDragon = rowNode.find('td').eq(5).find('div').eq(2).text().trim()
+                    let minDefense = rowNode.find('> td').eq(4).find('div').eq(0).text().trim()
+                    let resistanceFire = rowNode.find('> td').eq(4).find('div').eq(1).text().trim()
+                    let resistanceWater = rowNode.find('> td').eq(4).find('div').eq(2).text().trim()
+                    let resistanceIce = rowNode.find('> td').eq(5).find('div').eq(0).text().trim()
+                    let resistanceThunder = rowNode.find('> td').eq(5).find('div').eq(1).text().trim()
+                    let resistanceDragon = rowNode.find('> td').eq(5).find('div').eq(2).text().trim()
 
                     mapping[mappingKey].type = type
                     mapping[mappingKey].rare = parseFloat(rare)
@@ -428,7 +415,7 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                     mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
 
                     // Slots
-                    rowNode.find('td').eq(3).find('img').each((index, node) => {
+                    rowNode.find('> td').eq(3).find('img').each((index, node) => {
                         switch(listDom(node).attr('src')) {
                         case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco1.png':
                             mapping[mappingKey].slots.push({
@@ -458,7 +445,7 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                     })
 
                     // Skills
-                    rowNode.find('td').eq(6).find('div').each((index, node) => {
+                    rowNode.find('> td').eq(6).find('div').each((index, node) => {
                         let skillName = normalizeText(listDom(node).find('a').text())
                         let skillLevel = normalizeText(listDom(node).text()).match(/^(?:.*)(?:Lv|Ｌｖ)(.*)$/)[1].trim()
 
@@ -479,6 +466,22 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                     }
                 }
 
+                // Fetch Detail Page
+                fetchPageUrl = rowNode.find('> td').eq(2).find('a').attr('href')
+                fetchPageName = `armors:${armorRare}:${name}`
+
+                console.log(fetchPageUrl, fetchPageName)
+
+                let armorDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+                if (Helper.isEmpty(armorDom)) {
+                    console.log(fetchPageUrl, fetchPageName, 'Err')
+
+                    return
+                }
+
+                let description = armorDom('.mb-9.space-y-1 > p').eq(1).text()
+
                 mapping[mappingKey].name[lang] = name
                 mapping[mappingKey].description[lang] = description
             }
@@ -488,6 +491,20 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
 
         Helper.saveJSONAsCSV(`${tempRoot}/armors/${armorRare}.csv`, list)
     }
+
+    let tasks = []
+
+    for (let armorRare of Object.keys(urls.armors)) {
+        if (Helper.isNotEmpty(targetArmorRare) && targetArmorRare !== armorRare) {
+            continue
+        }
+
+        tasks.push(runner(armorRare))
+    }
+
+    return Promise.all(tasks).then(() => {
+        // pass
+    })
 }
 
 export const fetchDecorationsAction = async () => {
@@ -509,12 +526,12 @@ export const fetchDecorationsAction = async () => {
             return
         }
 
-        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('> tbody > tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('> tbody > tr').eq(rowIndex)
 
             let matches = ('enUS' === lang)
-                ? normalizeText(rowNode.find('td').eq(0).text().trim()).match(/^(.*?)(\d+)$/)
-                : normalizeText(rowNode.find('td').eq(0).text().trim()).match(/^(.*?)【(\d+)】$/)
+                ? normalizeText(rowNode.find('> td').eq(0).text().trim()).match(/^(.*?)(\d+)$/)
+                : normalizeText(rowNode.find('> td').eq(0).text().trim()).match(/^(.*?)【(\d+)】$/)
 
             if (null === matches) {
                 continue
@@ -524,10 +541,10 @@ export const fetchDecorationsAction = async () => {
             let name = normalizeText(matches[1].trim())
             let size = matches[2].trim()
 
-            let skillName = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
-            let skillLevel = normalizeText(rowNode.find('td').eq(1).text().trim()).match(/^(?:.*)(?:Lv|Ｌｖ)(.*)$/)[1].trim()
+            let skillName = normalizeText(rowNode.find('> td').eq(1).find('a').text().trim())
+            let skillLevel = normalizeText(rowNode.find('> td').eq(1).text().trim()).match(/^(?:.*)(?:Lv|Ｌｖ)(.*)$/)[1].trim()
 
-            let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+            let uniqueKey = rowNode.find('> td').eq(0).find('a').attr('href').split('/').pop()
 
             if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
                 langKeyMapping[uniqueKey] = name
@@ -572,14 +589,14 @@ export const fetchSkillsAction = async () => {
             return
         }
 
-        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('> tbody > tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('> tbody > tr').eq(rowIndex)
 
             // Get Data
-            let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
+            let name = normalizeText(rowNode.find('> td').eq(0).find('a').text().trim())
             let description = null
 
-            rowNode.find('td').eq(1).find('p').each((index, node) => {
+            rowNode.find('> td').eq(1).find('p').each((index, node) => {
                 if (0 === index) {
                     description = normalizeText(listDom(node).text())
 
@@ -595,7 +612,7 @@ export const fetchSkillsAction = async () => {
                 let level = matches[1].trim()
                 let effect = normalizeText(matches[2].trim())
 
-                let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+                let uniqueKey = rowNode.find('> td').eq(0).find('a').attr('href').split('/').pop()
 
                 if (Helper.isEmpty(langKeyMapping[`${uniqueKey}:${level}`])) {
                     langKeyMapping[`${uniqueKey}:${level}`] = `${name}:${level}`
@@ -640,12 +657,12 @@ export const fetchRampageDecorationsAction = async () => {
             return
         }
 
-        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('> tbody > tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('> tbody > tr').eq(rowIndex)
 
             let matches = ('enUS' === lang)
-                ? normalizeText(rowNode.find('td').eq(0).text().trim()).match(/^(.*?)(\d+)$/)
-                : normalizeText(rowNode.find('td').eq(0).text().trim()).match(/^(.*?)【(\d+)】$/)
+                ? normalizeText(rowNode.find('> td').eq(0).text().trim()).match(/^(.*?)(\d+)$/)
+                : normalizeText(rowNode.find('> td').eq(0).text().trim()).match(/^(.*?)【(\d+)】$/)
 
             if (null === matches) {
                 continue
@@ -655,9 +672,9 @@ export const fetchRampageDecorationsAction = async () => {
             let name = normalizeText(matches[1].trim())
             let size = matches[2].trim()
 
-            let skillName = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
+            let skillName = normalizeText(rowNode.find('> td').eq(1).find('a').text().trim())
 
-            let uniqueKey = rowNode.find('td').eq(1).find('a').attr('href').split('/').pop()
+            let uniqueKey = rowNode.find('> td').eq(1).find('a').attr('href').split('/').pop()
 
             if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
                 langKeyMapping[uniqueKey] = name
@@ -701,14 +718,14 @@ export const fetchRampageSkillsAction = async () => {
             return
         }
 
-        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
+        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('> tbody > tr').length; rowIndex++) {
+            let rowNode = listDom('[x-data=categoryFilter]').find('> tbody > tr').eq(rowIndex)
 
             // Get Data
-            let name = normalizeText(rowNode.find('td').eq(0).text().trim())
-            let description = normalizeText(rowNode.find('td').eq(1).text().trim())
+            let name = normalizeText(rowNode.find('> td').eq(0).text().trim())
+            let description = normalizeText(rowNode.find('> td').eq(1).text().trim())
 
-            let uniqueKey = rowNode.find('td').eq(0).find('a').attr('href').split('/').pop()
+            let uniqueKey = rowNode.find('> td').eq(0).find('a').attr('href').split('/').pop()
 
             if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
                 langKeyMapping[uniqueKey] = name
@@ -742,25 +759,27 @@ export const infoAction = () => {
         rampageSkills: {}
     }
 
-    result.weapons.all = null
-    result.armors.all = null
-    result.decorations.all = null
+    result.weapons.all = 0
+    result.armors.all = 0
+    result.decorations.all = 0
+    result.rampageDecorations.all = 0
 
     for (let weaponType of weaponTypeList) {
         result.weapons[weaponType] = {}
-        result.weapons[weaponType].all = null
+        result.weapons[weaponType].all = 0
 
         for (let rare of rareList) {
-            result.weapons[weaponType][rare] = null
+            result.weapons[weaponType][rare] = 0
         }
     }
 
     for (let rare of rareList) {
-        result.armors[rare] = null
+        result.armors[rare] = 0
     }
 
     for (let size of sizeList) {
-        result.decorations[size] = null
+        result.decorations[size] = 0
+        result.rampageDecorations[size] = 0
     }
 
     // Weapons
@@ -768,26 +787,12 @@ export const infoAction = () => {
         let weaponList = Helper.loadCSVAsJSON(`${tempRoot}/weapons/${weaponType}.csv`)
 
         if (Helper.isNotEmpty(weaponList)) {
-            if (Helper.isEmpty(result.weapons.all)) {
-                result.weapons.all = 0
-            }
-
-            if (Helper.isEmpty(result.weapons[weaponType].all)) {
-                result.weapons[weaponType].all = 0
-            }
-
             result.weapons.all += weaponList.length
             result.weapons[weaponType].all += weaponList.length
 
             for (let item of weaponList) {
                 if (Helper.isNotEmpty(item.rare)) {
-                    let rare = `rare${item.rare}`
-
-                    if (Helper.isEmpty(result.weapons[weaponType][rare])) {
-                        result.weapons[weaponType][rare] = 0
-                    }
-
-                    result.weapons[weaponType][rare] += 1
+                    result.weapons[weaponType][`rare${item.rare}`] += 1
                 }
             }
         }
@@ -798,36 +803,28 @@ export const infoAction = () => {
         let armorList = Helper.loadCSVAsJSON(`${tempRoot}/armors/${rare}.csv`)
 
         if (Helper.isNotEmpty(armorList)) {
-            if (Helper.isEmpty(result.armors.all)) {
-                result.armors.all = 0
-            }
-
             result.armors.all += armorList.length
             result.armors[rare] = armorList.length
         }
     }
 
-    // Decorations
-    let decorationList = Helper.loadCSVAsJSON(`${tempRoot}/decorations.csv`)
+    // Decorations & RampageDecorations
+    for (let target of ['decorations', 'rampageDecorations']) {
+        let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
-    if (Helper.isNotEmpty(decorationList)) {
-        result.decorations.all = decorationList.length
+        if (Helper.isNotEmpty(targetList)) {
+            result[target].all = targetList.length
 
-        for (let item of decorationList) {
-            if (Helper.isNotEmpty(item.size)) {
-                let size = `size${item.size}`
-
-                if (Helper.isEmpty(result.decorations[size])) {
-                    result.decorations[size] = 0
+            for (let item of targetList) {
+                if (Helper.isNotEmpty(item.size)) {
+                    result[target][`size${item.size}`] += 1
                 }
-
-                result.decorations[size] += 1
             }
         }
     }
 
-    // Skills, RampageDecorations & RampageSkills
-    for (let target of ['skills', 'rampageDecorations', 'rampageSkills']) {
+    // Skills & RampageSkills
+    for (let target of ['skills', 'rampageSkills']) {
         let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {

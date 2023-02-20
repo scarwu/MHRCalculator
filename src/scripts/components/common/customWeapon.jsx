@@ -15,9 +15,9 @@ import Helper from '@/scripts/core/helper'
 
 // Load Custom Libraries
 import Misc from '@/scripts/libraries/misc'
-import JewelDataset from '@/scripts/libraries/dataset/jewel'
+import DecorationDataset from '@/scripts/libraries/dataset/decoration'
 import SkillDataset from '@/scripts/libraries/dataset/skill'
-import EnhanceDataset from '@/scripts/libraries/dataset/enhance'
+import RampageSkillDataset from '@/scripts/libraries/dataset/rampageSkill'
 
 // Load Components
 import IconButton from '@/scripts/components/common/iconButton'
@@ -132,31 +132,31 @@ const handleRefreshCustomDataset = (majorData) => {
 /**
  * Render Functions
  */
- const renderEnhanceOption = (enhanceIndex, enhanceId) => {
+ const renderRampageSkillOption = (rampageSkillIndex, rampageSkillId) => {
 
-    // Get Enhance Item
-    let enhanceItem = EnhanceDataset.getItem(enhanceId)
+    // Get RampageSkill Item
+    let rampageSkillItem = RampageSkillDataset.getItem(rampageSkillId)
 
     const showModal = () => {
-        States.setter.showModal('enhanceSelector', {
+        States.setter.showModal('rampageSkillSelector', {
             target: 'playerEquips',
-            idIndex: enhanceIndex
+            idIndex: rampageSkillIndex
         })
     }
 
     const removeItem = () => {
-        States.setter.setPlayerEquipEnhance('weapon', enhanceIndex, null)
+        States.setter.setPlayerEquipRampageSkill('weapon', rampageSkillIndex, null)
     }
 
     return (
-        <Fragment key={`weapon:${enhanceIndex}`}>
+        <Fragment key={`weapon:${rampageSkillIndex}`}>
             <div className="col-3 mhrc-name">
-                <span>{_('enhance')}: {enhanceIndex + 1}</span>
+                <span>{_('rampageSkill')}: {rampageSkillIndex + 1}</span>
             </div>
             <div className="col-9 mhrc-value">
-                {Helper.isNotEmpty(enhanceItem) ? (
+                {Helper.isNotEmpty(rampageSkillItem) ? (
                     <Fragment>
-                        <span>{_(enhanceItem.name)}</span>
+                        <span>{_(rampageSkillItem.name)}</span>
 
                         <div className="mhrc-icons_bundle">
                             <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
@@ -173,13 +173,13 @@ const handleRefreshCustomDataset = (majorData) => {
     )
 }
 
-const renderJewelOption = (target, equipType, slotIndex, slotSize, jewelId) => {
+const renderDecorationOption = (target, equipType, slotIndex, slotSize, decorationId) => {
 
-    // Get Jewel Item
-    let jewelItem = JewelDataset.getItem(jewelId)
+    // Get Decoration Item
+    let decorationItem = DecorationDataset.getItem(decorationId)
 
     const showModal = () => {
-        States.setter.showModal('jewelSelector', {
+        States.setter.showModal('decorationSelector', {
             target: target,
             equipType: equipType,
             idIndex: slotIndex,
@@ -191,15 +191,15 @@ const renderJewelOption = (target, equipType, slotIndex, slotSize, jewelId) => {
 
     const removeItem = () => {
         if ('playerEquips' === target) {
-            States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
+            States.setter.setPlayerEquipDecoration(equipType, slotIndex, null)
         }
     }
 
     return (
         <Fragment key={`${equipType}:${slotIndex}`}>
-            {Helper.isNotEmpty(jewelItem) ? (
+            {Helper.isNotEmpty(decorationItem) ? (
                 <Fragment>
-                    <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
+                    <span>[{decorationItem.size}] {_(decorationItem.name)}</span>
 
                     <div className="mhrc-icons_bundle">
                         <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
@@ -503,11 +503,11 @@ export default function CustomWeapon (props) {
 
                 {('playerEquips' === stateMajorData.target) ? (
                     <div className="col-12 mhrc-content">
-                        {[...Array(stateMajorData.custom.enhance.amount)].map((enhanceData, enhanceIndex) => {
-                            return renderEnhanceOption(
-                                enhanceIndex,
-                                Helper.isNotEmpty(stateMajorData.enhanceIds[enhanceIndex])
-                                    ? stateMajorData.enhanceIds[enhanceIndex] : null
+                        {[...Array(stateMajorData.custom.rampageSkill.amount)].map((rampageSkillData, rampageSkillIndex) => {
+                            return renderRampageSkillOption(
+                                rampageSkillIndex,
+                                Helper.isNotEmpty(stateMajorData.rampageSkillIds[rampageSkillIndex])
+                                    ? stateMajorData.rampageSkillIds[rampageSkillIndex] : null
                             )
                         })}
                     </div>
@@ -528,9 +528,9 @@ export default function CustomWeapon (props) {
                                             stateMajorData.custom.slots[slotIndex].size = ('none' !== event.target.value)
                                                 ? parseInt(event.target.value, 10) : null
 
-                                            // Clean Jewel
+                                            // Clean Decoration
                                             if ('playerEquips' === stateMajorData.target) {
-                                                States.setter.setPlayerEquipJewel('weapon', slotIndex, null)
+                                                States.setter.setPlayerEquipDecoration('weapon', slotIndex, null)
                                             }
 
                                             handleRefreshCustomDataset(stateMajorData)
@@ -540,13 +540,13 @@ export default function CustomWeapon (props) {
                                 {('playerEquips' === stateMajorData.target) ? (
                                     <div className="col-6 mhrc-value">
                                         {Helper.isNotEmpty(stateMajorData.custom.slots[slotIndex].size) ? (
-                                            renderJewelOption(
+                                            renderDecorationOption(
                                                 stateMajorData.target,
                                                 'weapon',
                                                 slotIndex,
                                                 slotData.size,
-                                                Helper.isNotEmpty(stateMajorData.jewelIds[slotIndex])
-                                                    ? stateMajorData.jewelIds[slotIndex] : null
+                                                Helper.isNotEmpty(stateMajorData.decorationIds[slotIndex])
+                                                    ? stateMajorData.decorationIds[slotIndex] : null
                                             )
                                         ) : false}
                                     </div>

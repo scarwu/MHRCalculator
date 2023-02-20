@@ -37,8 +37,8 @@ import WeaponSelectorModal from '@/scripts/components/modal/weaponSelector'
 import ArmorSelectorModal from '@/scripts/components/modal/armorSelector'
 import SetSelectorModal from '@/scripts/components/modal/setSelector'
 import PetalaceSelectorModal from '@/scripts/components/modal/petalaceSelector'
-import JewelSelectorModal from '@/scripts/components/modal/jewelSelector'
-import EnhanceSelectorModal from '@/scripts/components/modal/enhanceSelector'
+import DecorationSelectorModal from '@/scripts/components/modal/decorationSelector'
+import RampageSkillSelectorModal from '@/scripts/components/modal/rampageSkillSelector'
 import SkillSelectorModal from '@/scripts/components/modal/skillSelector'
 
 if ('production' === Config.env) {
@@ -165,9 +165,9 @@ export default function App () {
             <WeaponSelectorModal />
             <ArmorSelectorModal />
             <SetSelectorModal />
-            <JewelSelectorModal />
+            <DecorationSelectorModal />
             <PetalaceSelectorModal />
-            <EnhanceSelectorModal />
+            <RampageSkillSelectorModal />
             <SkillSelectorModal />
         </div>
     )

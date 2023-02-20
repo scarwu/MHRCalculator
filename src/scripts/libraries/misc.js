@@ -15,8 +15,8 @@ import WeaponDataset from '@/scripts/libraries/dataset/weapon'
 import ArmorDataset from '@/scripts/libraries/dataset/armor'
 import SetDataset from '@/scripts/libraries/dataset/set'
 import PetalaceDataset from '@/scripts/libraries/dataset/petalace'
-import JewelDataset from '@/scripts/libraries/dataset/jewel'
-import EnhanceDataset from '@/scripts/libraries/dataset/enhance'
+import DecorationDataset from '@/scripts/libraries/dataset/decoration'
+import RampageSkillDataset from '@/scripts/libraries/dataset/rampageSkill'
 import SkillDataset from '@/scripts/libraries/dataset/skill'
 
 export const verifyCustomWeaponItem = (customDataset) => {
@@ -90,8 +90,8 @@ export const getWeaponExtendItem = (equipData) => {
 
     // Set Extends
     weaponItem.extends = {
-        jewelIds: Helper.deepCopy(equipData.jewelIds),
-        enhanceIds: Helper.deepCopy(equipData.enhanceIds)
+        decorationIds: Helper.deepCopy(equipData.decorationIds),
+        rampageSkillIds: Helper.deepCopy(equipData.rampageSkillIds)
     }
 
     // Handle Skills
@@ -105,14 +105,14 @@ export const getWeaponExtendItem = (equipData) => {
         })
     }
 
-    weaponItem.extends.jewelIds.forEach((jewelId) => {
-        let jewelItem = JewelDataset.getItem(jewelId)
+    weaponItem.extends.decorationIds.forEach((decorationId) => {
+        let decorationItem = DecorationDataset.getItem(decorationId)
 
-        if (Helper.isEmpty(jewelItem)) {
+        if (Helper.isEmpty(decorationItem)) {
             return
         }
 
-        jewelItem.skills.forEach((skillData) => {
+        decorationItem.skills.forEach((skillData) => {
             let skillItem = SkillDataset.getItem(skillData.id)
 
             if (Helper.isEmpty(skillItem)) {
@@ -156,7 +156,7 @@ export const getArmorExtendItem = (equipData) => {
 
     // Set Extends
     armorItem.extends = {
-        jewelIds: Helper.deepCopy(equipData.jewelIds)
+        decorationIds: Helper.deepCopy(equipData.decorationIds)
     }
 
     // Handle Skills
@@ -170,14 +170,14 @@ export const getArmorExtendItem = (equipData) => {
         })
     }
 
-    armorItem.extends.jewelIds.forEach((jewelId) => {
-        let jewelItem = JewelDataset.getItem(jewelId)
+    armorItem.extends.decorationIds.forEach((decorationId) => {
+        let decorationItem = DecorationDataset.getItem(decorationId)
 
-        if (Helper.isEmpty(jewelItem)) {
+        if (Helper.isEmpty(decorationItem)) {
             return
         }
 
-        jewelItem.skills.forEach((skillData) => {
+        decorationItem.skills.forEach((skillData) => {
             let skillItem = SkillDataset.getItem(skillData.id)
 
             if (Helper.isEmpty(skillItem)) {
@@ -225,7 +225,7 @@ export const getCharmExtendItem = (equipData) => {
 
     // Set Extends
     charmItem.extends = {
-        jewelIds: Helper.deepCopy(equipData.jewelIds)
+        decorationIds: Helper.deepCopy(equipData.decorationIds)
     }
 
     // Handle Skills
@@ -239,14 +239,14 @@ export const getCharmExtendItem = (equipData) => {
         })
     }
 
-    charmItem.extends.jewelIds.forEach((jewelId) => {
-        let jewelItem = JewelDataset.getItem(jewelId)
+    charmItem.extends.decorationIds.forEach((decorationId) => {
+        let decorationItem = DecorationDataset.getItem(decorationId)
 
-        if (Helper.isEmpty(jewelItem)) {
+        if (Helper.isEmpty(decorationItem)) {
             return
         }
 
-        jewelItem.skills.forEach((skillData) => {
+        decorationItem.skills.forEach((skillData) => {
             let skillItem = SkillDataset.getItem(skillData.id)
 
             if (Helper.isEmpty(skillItem)) {
@@ -438,8 +438,8 @@ export const getArmorListByRequiredConditions = (requiredConditions) => {
     return Object.values(armorMapping)
 }
 
-export const getJewelListByRequiredConditions = (requiredConditions) => {
-    let jewelMapping = {}
+export const getDecorationListByRequiredConditions = (requiredConditions) => {
+    let decorationMapping = {}
     let skillLevelMapping = {}
 
     const skillIds = requiredConditions.skills.map((skillData) => {
@@ -448,13 +448,13 @@ export const getJewelListByRequiredConditions = (requiredConditions) => {
         return skillData.id
     })
 
-    // Find Jewels By Skill Ids
+    // Find Decorations By Skill Ids
     let isConsistent = true
 
-    JewelDataset.hasSkills(skillIds, isConsistent).getList().forEach((jewelItem) => {
+    DecorationDataset.hasSkills(skillIds, isConsistent).getList().forEach((decorationItem) => {
         let isSkip = false
 
-        jewelItem.skills.forEach((skillData) => {
+        decorationItem.skills.forEach((skillData) => {
             if (true === isSkip) {
                 return
             }
@@ -470,12 +470,12 @@ export const getJewelListByRequiredConditions = (requiredConditions) => {
             return
         }
 
-        if (Helper.isEmpty(jewelMapping[jewelItem.id])) {
-            jewelMapping[jewelItem.id] = jewelItem
+        if (Helper.isEmpty(decorationMapping[decorationItem.id])) {
+            decorationMapping[decorationItem.id] = decorationItem
         }
     })
 
-    return Object.values(jewelMapping)
+    return Object.values(decorationMapping)
 }
 
 export default {
@@ -484,5 +484,5 @@ export default {
     equipTypeToDatasetType,
 
     getArmorListByRequiredConditions,
-    getJewelListByRequiredConditions
+    getDecorationListByRequiredConditions
 }

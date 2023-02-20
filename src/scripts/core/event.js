@@ -7,10 +7,13 @@
  * @link        https://github.com/scarwu/MHRCalculator
  */
 
+// Load Core
+import Helper from 'core/helper'
+
 let eventList = {}
 
 export const on = (name, key, callback) => {
-    if (undefined === eventList[name]) {
+    if (Helper.isEmpty(eventList[name])) {
         eventList[name] = {}
     }
 
@@ -18,7 +21,7 @@ export const on = (name, key, callback) => {
 }
 
 export const off = (name, key) => {
-    if (undefined === eventList[name]) {
+    if (Helper.isEmpty(eventList[name])) {
         return false
     }
 
@@ -26,7 +29,7 @@ export const off = (name, key) => {
 }
 
 export const trigger = (name, arg) => {
-    if (undefined === eventList[name]) {
+    if (Helper.isEmpty(eventList[name])) {
         return false
     }
 

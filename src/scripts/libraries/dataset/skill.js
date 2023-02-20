@@ -18,7 +18,7 @@ import Skills from '@/scripts/datasets/skills.json'
 //     1: name,
 //     2: description,
 //     3: from [
-//         0: jewel,
+//         0: decoration,
 //         1: armor
 //     ],
 //     4: type,
@@ -37,7 +37,7 @@ const dataset = Skills.map((skillBundle) => {
         name: skillBundle[1],
         description: skillBundle[2],
         from: {
-            jewel: skillBundle[3][0],
+            decoration: skillBundle[3][0],
             armor: skillBundle[3][1],
             charm: skillBundle[3][2]
         },

@@ -120,9 +120,9 @@ export default function CandidateBundlesBlock (props) {
                 States.setter.replaceCandidateBundles(payload.candidateBundles)
 
                 // workers[tabIndex].terminate()
-                // workers[tabIndex] = undefined
+                // workers[tabIndex] = null
 
-                stateTasks[tabIndex] = undefined
+                stateTasks[tabIndex] = null
 
                 updateTasks(Helper.deepCopy(stateTasks))
 
@@ -212,9 +212,9 @@ export default function CandidateBundlesBlock (props) {
         let tabIndex = stateDataStore.candidateBundles.index
 
         workers[tabIndex].terminate()
-        workers[tabIndex] = undefined
+        workers[tabIndex] = null
 
-        stateTasks[tabIndex] = undefined
+        stateTasks[tabIndex] = null
 
         updateTasks(Helper.deepCopy(stateTasks))
     }, [stateTasks, stateDataStore])

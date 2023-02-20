@@ -21,7 +21,7 @@ import BasicSelector from '@/scripts/components/common/basicSelector'
 import BasicInput from '@/scripts/components/common/basicInput'
 
 import ArmorFactors from '@/scripts/components/modal/sub/algorithmSetting/armorFactors'
-import JewelFactors from '@/scripts/components/modal/sub/algorithmSetting/jewelFactors'
+import DecorationFactors from '@/scripts/components/modal/sub/algorithmSetting/decorationFactors'
 
 // Load States
 import States from '@/scripts/states'
@@ -53,16 +53,16 @@ const getModeList = () => {
     return [
         { key: 'all',                   value: _('all') },
         { key: 'armorFactor',           value: _('armorFactor') },
-        { key: 'jewelFactor',           value: _('jewelFactor') },
+        { key: 'decorationFactor',           value: _('decorationFactor') },
         { key: 'byRequiredConditions',  value: _('byRequiredConditions') }
     ]
 }
 
 // const armorRareList = [ 5, 6, 7, 8, 9, 10, 11, 12 ]
-// const jewelSizeList = [ 1, 2, 3, 4 ]
+// const decorationSizeList = [ 1, 2, 3, 4 ]
 
 const armorRareList = [ 1, 2, 3, 4, 5, 6, 7 ]
-const jewelSizeList = [ 1, 2, 3 ]
+const decorationSizeList = [ 1, 2, 3 ]
 
 /**
  * Handler Functions
@@ -273,25 +273,25 @@ export default function AlgorithmSettingModal (props) {
                             </div>
                         ) : false}
 
-                        {'all' === stateFilter.mode || 'jewelFactor' === stateFilter.mode || 'byRequiredConditions' === stateFilter.mode ? (
+                        {'all' === stateFilter.mode || 'decorationFactor' === stateFilter.mode || 'byRequiredConditions' === stateFilter.mode ? (
                             <div className="mhrc-item mhrc-item-2-step">
                                 <div className="col-12 mhrc-name">
-                                    <span>{_('jewelFactor')}</span>
+                                    <span>{_('decorationFactor')}</span>
                                 </div>
                                 <div className="col-12 mhrc-content">
-                                    {jewelSizeList.map((size) => {
+                                    {decorationSizeList.map((size) => {
                                         return (
                                             <div key={size} className="col-6 mhrc-value">
                                                 <span>{_('size') + `: ${size}`}</span>
                                                 <div className="mhrc-icons_bundle">
-                                                    {stateAlgorithmParams.usingFactor['jewel:size:' + size] ? (
+                                                    {stateAlgorithmParams.usingFactor['decoration:size:' + size] ? (
                                                         <IconButton
                                                             iconName="star" altName={_('exclude')}
-                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('jewel:size:' + size, false)}} />
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('decoration:size:' + size, false)}} />
                                                     ) : (
                                                         <IconButton
                                                             iconName="star-o" altName={_('include')}
-                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('jewel:size:' + size, true)}} />
+                                                            onClick={() => {States.setter.setAlgorithmParamsUsingFactor('decoration:size:' + size, true)}} />
                                                     )}
                                                 </div>
                                             </div>
@@ -305,8 +305,8 @@ export default function AlgorithmSettingModal (props) {
                             ? <ArmorFactors segment={stateFilter.segment}
                                 byRequiredConditions={'byRequiredConditions' === stateFilter.mode} />
                             : false}
-                        {'all' === stateFilter.mode || 'jewelFactor' === stateFilter.mode || 'byRequiredConditions' === stateFilter.mode
-                            ? <JewelFactors segment={stateFilter.segment}
+                        {'all' === stateFilter.mode || 'decorationFactor' === stateFilter.mode || 'byRequiredConditions' === stateFilter.mode
+                            ? <DecorationFactors segment={stateFilter.segment}
                                 byRequiredConditions={'byRequiredConditions' === stateFilter.mode} />
                             : false}
                     </div>

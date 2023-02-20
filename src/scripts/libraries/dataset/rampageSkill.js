@@ -1,5 +1,5 @@
 /**
- * Dataset Enhance
+ * Dataset RampageSkill
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -11,7 +11,7 @@
 import Helper from '@/scripts/core/helper'
 
 // Load Dataset
-import Enhances from '@/scripts/datasets/enhances.json'
+import RampageSkills from '@/scripts/datasets/rampageSkills.json'
 
 // [
 //     0: id,
@@ -19,65 +19,65 @@ import Enhances from '@/scripts/datasets/enhances.json'
 //     2: description,
 //     3: reaction { ... }
 // ]
-const dataset = Enhances.map((enhanceItem) => {
+const dataset = RampageSkills.map((rampageSkillItem) => {
     return {
-        id: enhanceItem[0],
-        name: enhanceItem[1],
-        description: enhanceItem[2],
+        id: rampageSkillItem[0],
+        name: rampageSkillItem[1],
+        description: rampageSkillItem[2],
         // reaction: {
         //     attack: {
-        //         value: enhanceItem[3][0][0]
+        //         value: rampageSkillItem[3][0][0]
         //     },
         //     attackMultiple: {
-        //         value: enhanceItem[3][1][0]
+        //         value: rampageSkillItem[3][1][0]
         //     },
         //     defense: {
-        //         value: enhanceItem[3][2][0]
+        //         value: rampageSkillItem[3][2][0]
         //     },
         //     defenseMultiple: {
-        //         value: enhanceItem[3][3][0]
+        //         value: rampageSkillItem[3][3][0]
         //     },
         //     criticalRate: {
-        //         value: enhanceItem[3][4][0]
+        //         value: rampageSkillItem[3][4][0]
         //     },
         //     criticalMultiple: {
-        //         value: enhanceItem[3][5][0]
+        //         value: rampageSkillItem[3][5][0]
         //     },
         //     elementAttackCriticalMultiple: {
-        //         value: enhanceItem[3][6][0]
+        //         value: rampageSkillItem[3][6][0]
         //     },
         //     elementStatusCriticalMultiple: {
-        //         value: enhanceItem[3][7][0]
+        //         value: rampageSkillItem[3][7][0]
         //     },
         //     sharpness: {
-        //         value: enhanceItem[3][8][0]
+        //         value: rampageSkillItem[3][8][0]
         //     },
         //     resistance: {
-        //         type: enhanceItem[3][9][0],
-        //         value: enhanceItem[3][9][1]
+        //         type: rampageSkillItem[3][9][0],
+        //         value: rampageSkillItem[3][9][1]
         //     },
         //     resistanceMultiple: {
-        //         type: enhanceItem[3][10][0],
-        //         value: enhanceItem[3][10][1]
+        //         type: rampageSkillItem[3][10][0],
+        //         value: rampageSkillItem[3][10][1]
         //     },
         //     elementAttack: {
-        //         type: enhanceItem[3][11][0],
-        //         value: enhanceItem[3][11][1],
-        //         multiple: enhanceItem[3][11][2]
+        //         type: rampageSkillItem[3][11][0],
+        //         value: rampageSkillItem[3][11][1],
+        //         multiple: rampageSkillItem[3][11][2]
         //     },
         //     elementStatus: {
-        //         type: enhanceItem[3][12][0],
-        //         value: enhanceItem[3][12][1],
-        //         multiple: enhanceItem[3][12][2]
+        //         type: rampageSkillItem[3][12][0],
+        //         value: rampageSkillItem[3][12][1],
+        //         multiple: rampageSkillItem[3][12][2]
         //     },
         //     skillLevelUp: {
-        //         value: enhanceItem[3][13][0]
+        //         value: rampageSkillItem[3][13][0]
         //     }
         // }
     }
 })
 
-class EnhanceDataset {
+class RampageSkillDataset {
 
     constructor (list) {
         this.mapping = {}
@@ -103,4 +103,4 @@ class EnhanceDataset {
     }
 }
 
-export default new EnhanceDataset(dataset)
+export default new RampageSkillDataset(dataset)

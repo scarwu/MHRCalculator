@@ -64,7 +64,7 @@ const generateEquipInfos = (equips) => {
     //     }
 
     //     WeaponDataset.setItem('customWeapon', (true === isCompleted)
-    //         ? Helper.deepCopy(customWeapon) : undefined)
+    //         ? Helper.deepCopy(customWeapon) : null)
     // }
 
     Object.keys(equips).forEach((equipType) => {

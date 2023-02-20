@@ -22,8 +22,8 @@ import WeaponDataset from '@/scripts/libraries/dataset/weapon'
 import ArmorDataset from '@/scripts/libraries/dataset/armor'
 import SetDataset from '@/scripts/libraries/dataset/set'
 import PetalaceDataset from '@/scripts/libraries/dataset/petalace'
-import JewelDataset from '@/scripts/libraries/dataset/jewel'
-import EnhanceDataset from '@/scripts/libraries/dataset/enhance'
+import DecorationDataset from '@/scripts/libraries/dataset/decoration'
+import RampageSkillDataset from '@/scripts/libraries/dataset/rampageSkill'
 import SkillDataset from '@/scripts/libraries/dataset/skill'
 
 const statusMapping = {
@@ -195,36 +195,36 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
-        case 'SET_PLAYER_EQUIP_JEWEL':
+        case 'SET_PLAYER_EQUIP_DECORATION':
             return (() => {
                 let playerEquips = Helper.deepCopy(state.playerEquips)
                 let equipType = action.payload.equipType
                 let idIndex = action.payload.idIndex
-                let jewelId = action.payload.jewelId
+                let decorationId = action.payload.decorationId
 
                 if (Helper.isEmpty(playerEquips[equipType])) {
                     return state
                 }
 
-                playerEquips[equipType].jewelIds[idIndex] = jewelId
+                playerEquips[equipType].decorationIds[idIndex] = decorationId
 
                 return Object.assign({}, state, {
                     playerEquips: playerEquips
                 })
             })()
 
-        case 'SET_PLAYER_EQUIP_ENHANCE':
+        case 'SET_PLAYER_EQUIP_RAMPAGE_SKILL':
             return (() => {
                 let playerEquips = Helper.deepCopy(state.playerEquips)
                 let equipType = action.payload.equipType
                 let idIndex = action.payload.idIndex
-                let enhanceId = action.payload.enhanceId
+                let rampageSkillId = action.payload.rampageSkillId
 
                 if (Helper.isEmpty(playerEquips[equipType])) {
                     return state
                 }
 
-                playerEquips[equipType].enhanceIds[idIndex] = enhanceId
+                playerEquips[equipType].rampageSkillIds[idIndex] = rampageSkillId
 
                 return Object.assign({}, state, {
                     playerEquips: playerEquips
@@ -274,11 +274,11 @@ export default createStore((state = initialState, action) => {
                 requiredConditions.equips[equipType].id = equipData.id
 
                 // if ('petalace' !== equipType) {
-                //     requiredConditions.equips[equipType].jewelIds = equipData.jewelIds
+                //     requiredConditions.equips[equipType].decorationIds = equipData.decorationIds
                 // }
 
                 // if ('weapon' === equipType) {
-                //     requiredConditions.equips[equipType].enhanceIds = equipData.enhanceIds
+                //     requiredConditions.equips[equipType].rampageSkillIds = equipData.rampageSkillIds
                 // }
 
                 if ('weapon' === equipType || 'charm' === equipType) {

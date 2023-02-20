@@ -15,7 +15,7 @@ import Helper from '@/scripts/core/helper'
 
 // Load Libraries
 import Misc from '@/scripts/libraries/misc'
-import JewelDataset from '@/scripts/libraries/dataset/jewel'
+import DecorationDataset from '@/scripts/libraries/dataset/decoration'
 import SkillDataset from '@/scripts/libraries/dataset/skill'
 
 // Load Components
@@ -79,13 +79,13 @@ const handleRefreshCustomDataset = (majorData) => {
 /**
  * Render Functions
  */
-const renderJewelOption = (target, equipType, slotIndex, slotSize, jewelId) => {
+const renderDecorationOption = (target, equipType, slotIndex, slotSize, decorationId) => {
 
-    // Get Jewel Item
-    let jewelItem = JewelDataset.getItem(jewelId)
+    // Get Decoration Item
+    let decorationItem = DecorationDataset.getItem(decorationId)
 
     const showModal = () => {
-        States.setter.showModal('jewelSelector', {
+        States.setter.showModal('decorationSelector', {
             target: target,
             equipType: equipType,
             idIndex: slotIndex,
@@ -97,15 +97,15 @@ const renderJewelOption = (target, equipType, slotIndex, slotSize, jewelId) => {
 
     const removeItem = () => {
         if ('playerEquips' === target) {
-            States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
+            States.setter.setPlayerEquipDecoration(equipType, slotIndex, null)
         }
     }
 
     return (
         <Fragment key={`${equipType}:${slotIndex}`}>
-            {Helper.isNotEmpty(jewelItem) ? (
+            {Helper.isNotEmpty(decorationItem) ? (
                 <Fragment>
-                    <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
+                    <span>[{decorationItem.size}] {_(decorationItem.name)}</span>
 
                     <div className="mhrc-icons_bundle">
                         <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
@@ -248,9 +248,9 @@ export default function CustomCharm (props) {
                                             stateMajorData.custom.slots[slotIndex].size = ('none' !== event.target.value)
                                                 ? parseInt(event.target.value, 10) : null
 
-                                            // Clean Jewel
+                                            // Clean Decoration
                                             if ('playerEquips' === stateMajorData.target) {
-                                                States.setter.setPlayerEquipJewel('charm', slotIndex, null)
+                                                States.setter.setPlayerEquipDecoration('charm', slotIndex, null)
                                             }
 
                                             handleRefreshCustomDataset(stateMajorData)
@@ -260,13 +260,13 @@ export default function CustomCharm (props) {
                                 {('playerEquips' === stateMajorData.target) ? (
                                     <div className="col-6 mhrc-value">
                                         {Helper.isNotEmpty(stateMajorData.custom.slots[slotIndex].size) ? (
-                                            renderJewelOption(
+                                            renderDecorationOption(
                                                 stateMajorData.target,
                                                 'charm',
                                                 slotIndex,
                                                 slotData.size,
-                                                Helper.isNotEmpty(stateMajorData.jewelIds[slotIndex])
-                                                    ? stateMajorData.jewelIds[slotIndex] : null
+                                                Helper.isNotEmpty(stateMajorData.decorationIds[slotIndex])
+                                                    ? stateMajorData.decorationIds[slotIndex] : null
                                             )
                                         ) : false}
                                     </div>

@@ -140,10 +140,11 @@ export const defaultAlgorithmParams = {
         'armor:rare:2': false,
         'armor:rare:1': false,
 
-        // Jewel Size
-        'jewel:size:3': true,
-        'jewel:size:2': true,
-        'jewel:size:1': true
+        // Decoration Size
+        'decoration:size:4': true,
+        'decoration:size:3': true,
+        'decoration:size:2': true,
+        'decoration:size:1': true
     }
 }
 
@@ -189,7 +190,7 @@ export const defaultCustomWeapon = {
             size: null
         }
     ],
-    enhance: {
+    rampageSkill: {
         amount: 3
     }
 }
@@ -223,36 +224,36 @@ export const defaultCustomCharm = {
 export const defaultPlayerEquips = {
     weapon: {
         id: null,
-        jewelIds: [],
-        enhanceIds: [],
+        decorationIds: [],
+        rampageSkillIds: [],
         custom: defaultCustomWeapon
     },
     helm: {
         id: null,
-        jewelIds: []
+        decorationIds: []
     },
     chest: {
         id: null,
-        jewelIds: []
+        decorationIds: []
     },
     arm: {
         id: null,
-        jewelIds: []
+        decorationIds: []
     },
     waist: {
         id: null,
-        jewelIds: []
+        decorationIds: []
     },
     leg: {
         id: null,
-        jewelIds: []
+        decorationIds: []
     },
     petalace: {
         id: null
     },
     charm: {
         id: null,
-        jewelIds: [],
+        decorationIds: [],
         custom: defaultCustomCharm
     }
 }

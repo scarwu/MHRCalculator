@@ -1,5 +1,5 @@
 /**
- * Dataset Jewel
+ * Dataset Decoration
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -11,7 +11,7 @@
 import Helper from '@/scripts/core/helper'
 
 // Load Dataset
-import Jewels from '@/scripts/datasets/jewels.json'
+import Decorations from '@/scripts/datasets/decorations.json'
 
 // [
 //     0: id,
@@ -26,13 +26,13 @@ import Jewels from '@/scripts/datasets/jewels.json'
 //         [ ... ]
 //     ]
 // ]
-const dataset = Jewels.map((jewelItem) => {
+const dataset = Decorations.map((decorationItem) => {
     return {
-        id: jewelItem[0],
-        name: jewelItem[1],
-        rare: jewelItem[2],
-        size: jewelItem[3],
-        skills: jewelItem[4].map((skillData) => {
+        id: decorationItem[0],
+        name: decorationItem[1],
+        rare: decorationItem[2],
+        size: decorationItem[3],
+        skills: decorationItem[4].map((skillData) => {
             return {
                 id: skillData[0],
                 level: skillData[1]
@@ -41,7 +41,7 @@ const dataset = Jewels.map((jewelItem) => {
     }
 })
 
-class JewelDataset {
+class DecorationDataset {
 
     constructor (list) {
         this.mapping = {}
@@ -185,4 +185,4 @@ class JewelDataset {
     }
 }
 
-export default new JewelDataset(dataset)
+export default new DecorationDataset(dataset)

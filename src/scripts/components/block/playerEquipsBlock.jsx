@@ -19,9 +19,9 @@ import Helper from '@/scripts/core/helper'
 
 // Load Libraries
 import Misc from '@/scripts/libraries/misc'
-import JewelDataset from '@/scripts/libraries/dataset/jewel'
+import DecorationDataset from '@/scripts/libraries/dataset/decoration'
 import SkillDataset from '@/scripts/libraries/dataset/skill'
-import EnhanceDataset from '@/scripts/libraries/dataset/enhance'
+import RampageSkillDataset from '@/scripts/libraries/dataset/rampageSkill'
 
 // Load Components
 import IconButton from '@/scripts/components/common/iconButton'
@@ -47,31 +47,31 @@ const handleSwitchDataStore = (index) => {
 /**
  * Render Functions
  */
- const renderEnhanceOption = (enhanceIndex, enhanceId) => {
+ const renderRampageSkillOption = (rampageSkillIndex, rampageSkillId) => {
 
-    // Get Enhance Item
-    let enhanceItem = EnhanceDataset.getItem(enhanceId)
+    // Get RampageSkill Item
+    let rampageSkillItem = RampageSkillDataset.getItem(rampageSkillId)
 
     const showModal = () => {
-        States.setter.showModal('enhanceSelector', {
+        States.setter.showModal('rampageSkillSelector', {
             target: 'playerEquips',
-            idIndex: enhanceIndex
+            idIndex: rampageSkillIndex
         })
     }
 
     const removeItem = () => {
-        States.setter.setPlayerEquipEnhance('weapon', enhanceIndex, null)
+        States.setter.setPlayerEquipRampageSkill('weapon', rampageSkillIndex, null)
     }
 
     return (
-        <Fragment key={`weapon:${enhanceIndex}`}>
+        <Fragment key={`weapon:${rampageSkillIndex}`}>
             <div className="col-3 mhrc-name">
-                <span>{_('enhance')}: {enhanceIndex + 1}</span>
+                <span>{_('rampageSkill')}: {rampageSkillIndex + 1}</span>
             </div>
             <div className="col-9 mhrc-value">
-                {Helper.isNotEmpty(enhanceItem) ? (
+                {Helper.isNotEmpty(rampageSkillItem) ? (
                     <Fragment>
-                        <span>{_(enhanceItem.name)}</span>
+                        <span>{_(rampageSkillItem.name)}</span>
 
                         <div className="mhrc-icons_bundle">
                             <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
@@ -88,13 +88,13 @@ const handleSwitchDataStore = (index) => {
     )
 }
 
-const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
+const renderDecorationOption = (equipType, slotIndex, slotSize, decorationId) => {
 
-    // Get Jewel Item
-    let jewelItem = JewelDataset.getItem(jewelId)
+    // Get Decoration Item
+    let decorationItem = DecorationDataset.getItem(decorationId)
 
     const showModal = () => {
-        States.setter.showModal('jewelSelector', {
+        States.setter.showModal('decorationSelector', {
             target: 'playerEquips',
             equipType: equipType,
             idIndex: slotIndex,
@@ -105,7 +105,7 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
     }
 
     const removeItem = () => {
-        States.setter.setPlayerEquipJewel(equipType, slotIndex, null)
+        States.setter.setPlayerEquipDecoration(equipType, slotIndex, null)
     }
 
     return (
@@ -114,9 +114,9 @@ const renderJewelOption = (equipType, slotIndex, slotSize, jewelId) => {
                 <span>{_('slot')}: {slotIndex + 1} [{slotSize}]</span>
             </div>
             <div className="col-9 mhrc-value">
-                {Helper.isNotEmpty(jewelItem) ? (
+                {Helper.isNotEmpty(decorationItem) ? (
                     <Fragment>
-                        <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
+                        <span>[{decorationItem.size}] {_(decorationItem.name)}</span>
 
                         <div className="mhrc-icons_bundle">
                             <IconButton iconName="exchange" altName={_('change')} onClick={showModal} />
@@ -386,11 +386,11 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
 
             {('weapon' === Misc.equipTypeToDatasetType(equipType)) ? (
                 <div className="col-12 mhrc-content">
-                    {[...Array(equipExtendItem.enhance.amount)].map((enhanceData, enhanceIndex) => {
-                        return renderEnhanceOption(
-                            enhanceIndex,
-                            Helper.isNotEmpty(currentEquipData.enhanceIds[enhanceIndex])
-                                ? currentEquipData.enhanceIds[enhanceIndex] : null
+                    {[...Array(equipExtendItem.rampageSkill.amount)].map((rampageSkillData, rampageSkillIndex) => {
+                        return renderRampageSkillOption(
+                            rampageSkillIndex,
+                            Helper.isNotEmpty(currentEquipData.rampageSkillIds[rampageSkillIndex])
+                                ? currentEquipData.rampageSkillIds[rampageSkillIndex] : null
                         )
                     })}
                 </div>
@@ -399,12 +399,12 @@ const renderEquipPartBlock = (equipType, currentEquipData, requiredEquipData) =>
             {(Helper.isNotEmpty(equipExtendItem.slots) && 0 !== equipExtendItem.slots.length) ? (
                 <div className="col-12 mhrc-content">
                     {equipExtendItem.slots.map((slotData, slotIndex) => {
-                        return renderJewelOption(
+                        return renderDecorationOption(
                             equipType,
                             slotIndex,
                             slotData.size,
-                            Helper.isNotEmpty(currentEquipData.jewelIds[slotIndex])
-                                ? currentEquipData.jewelIds[slotIndex] : null
+                            Helper.isNotEmpty(currentEquipData.decorationIds[slotIndex])
+                                ? currentEquipData.decorationIds[slotIndex] : null
                         )
                     })}
                 </div>

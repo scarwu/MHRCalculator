@@ -76,24 +76,24 @@ export const setPlayerEquip = (equipType, equipId) => {
     })
 }
 
-export const setPlayerEquipJewel = (equipType, idIndex, jewelId) => {
+export const setPlayerEquipDecoration = (equipType, idIndex, decorationId) => {
     store.dispatch({
-        type: 'SET_PLAYER_EQUIP_JEWEL',
+        type: 'SET_PLAYER_EQUIP_DECORATION',
         payload: {
             equipType: equipType,
             idIndex: idIndex,
-            jewelId: jewelId
+            decorationId: decorationId
         }
     })
 }
 
-export const setPlayerEquipEnhance = (equipType, idIndex, enhanceId) => {
+export const setPlayerEquipRampageSkill = (equipType, idIndex, rampageSkillId) => {
     store.dispatch({
-        type: 'SET_PLAYER_EQUIP_ENHANCE',
+        type: 'SET_PLAYER_EQUIP_RAMPAGE_SKILL',
         payload: {
             equipType: equipType,
             idIndex: idIndex,
-            enhanceId: enhanceId
+            rampageSkillId: rampageSkillId
         }
     })
 }
@@ -292,8 +292,8 @@ export default {
     cleanPlayerEquips,
     replacePlayerEquips,
     setPlayerEquip,
-    setPlayerEquipJewel,
-    setPlayerEquipEnhance,
+    setPlayerEquipDecoration,
+    setPlayerEquipRampageSkill,
     setPlayerEquipCustomDataset,
 
     cleanRequiredConditions,

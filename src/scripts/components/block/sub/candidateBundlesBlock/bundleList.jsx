@@ -20,7 +20,7 @@ import Helper from '@/scripts/core/helper'
 import Misc from '@/scripts/libraries/misc'
 import WeaponDataset from '@/scripts/libraries/dataset/weapon'
 import ArmorDataset from '@/scripts/libraries/dataset/armor'
-import JewelDataset from '@/scripts/libraries/dataset/jewel'
+import DecorationDataset from '@/scripts/libraries/dataset/decoration'
 import SkillDataset from '@/scripts/libraries/dataset/skill'
 import SetDataset from '@/scripts/libraries/dataset/set'
 
@@ -78,35 +78,35 @@ const handleBundlePickUp = (bundle, requiredConditions) => {
         }
     })
 
-    // Select Jewel Package Index
-    let jewelPackageIndex = Helper.isNotEmpty(bundle.jewelPackageIndex)
-        ? bundle.jewelPackageIndex : 0
+    // Select Decoration Package Index
+    let decorationPackageIndex = Helper.isNotEmpty(bundle.decorationPackageIndex)
+        ? bundle.decorationPackageIndex : 0
 
-    if (Helper.isNotEmpty(bundle.jewelPackages[jewelPackageIndex])) {
-        Object.keys(bundle.jewelPackages[jewelPackageIndex]).sort((jewelIdA, jewelIdB) => {
-            let jewelItemA = JewelDataset.getItem(jewelIdA)
-            let jewelItemB = JewelDataset.getItem(jewelIdB)
+    if (Helper.isNotEmpty(bundle.decorationPackages[decorationPackageIndex])) {
+        Object.keys(bundle.decorationPackages[decorationPackageIndex]).sort((decorationIdA, decorationIdB) => {
+            let decorationItemA = DecorationDataset.getItem(decorationIdA)
+            let decorationItemB = DecorationDataset.getItem(decorationIdB)
 
-            if (Helper.isEmpty(jewelItemA) || Helper.isEmpty(jewelItemB)) {
+            if (Helper.isEmpty(decorationItemA) || Helper.isEmpty(decorationItemB)) {
                 return 0
             }
 
-            return jewelItemA.size - jewelItemB.size
-        }).forEach((jewelId) => {
-            let jewelItem = JewelDataset.getItem(jewelId)
+            return decorationItemA.size - decorationItemB.size
+        }).forEach((decorationId) => {
+            let decorationItem = DecorationDataset.getItem(decorationId)
 
-            if (Helper.isEmpty(jewelItem)) {
+            if (Helper.isEmpty(decorationItem)) {
                 return
             }
 
-            let currentSize = jewelItem.size
+            let currentSize = decorationItem.size
 
-            let jewelCount = bundle.jewelPackages[jewelPackageIndex][jewelId]
+            let decorationCount = bundle.decorationPackages[decorationPackageIndex][decorationId]
             let slotMeta = null
 
-            let jewelIndex = 0
+            let decorationIndex = 0
 
-            while (jewelIndex < jewelCount) {
+            while (decorationIndex < decorationCount) {
                 if (0 === slotMetaMap[currentSize].length) {
                     currentSize++
 
@@ -115,9 +115,9 @@ const handleBundlePickUp = (bundle, requiredConditions) => {
 
                 slotMeta = slotMetaMap[currentSize].shift()
 
-                playerEquips[slotMeta.type].jewelIds[slotMeta.index] = jewelId
+                playerEquips[slotMeta.type].decorationIds[slotMeta.index] = decorationId
 
-                jewelIndex++
+                decorationIndex++
             }
         })
     }
@@ -148,10 +148,10 @@ export default function BundleList (props) {
     /**
      * Handle Functions
      */
-    const handleJewelPackageChange = useCallback((bundleIndex, packageIndex) => {
+    const handleDecorationPackageChange = useCallback((bundleIndex, packageIndex) => {
         let computedResult = Helper.deepCopy(stateCandidateBundles)
 
-        computedResult.list[bundleIndex].jewelPackageIndex = packageIndex
+        computedResult.list[bundleIndex].decorationPackageIndex = packageIndex
 
         States.setter.saveCandidateBundles(computedResult)
     }, [stateCandidateBundles])
@@ -203,9 +203,9 @@ export default function BundleList (props) {
         })
 
         return bundleList.map((bundle, bundleIndex) => {
-            const jewelPackageCount = bundle.jewelPackages.length
-            const jewelPackageIndex = Helper.isNotEmpty(bundle.jewelPackageIndex)
-                ? bundle.jewelPackageIndex : 0
+            const decorationPackageCount = bundle.decorationPackages.length
+            const decorationPackageIndex = Helper.isNotEmpty(bundle.decorationPackageIndex)
+                ? bundle.decorationPackageIndex : 0
 
             // Remaining Slot Count Mapping
             let remainingSlotCountMapping = {
@@ -220,7 +220,7 @@ export default function BundleList (props) {
                 remainingSlotCountMapping[slotSize] += bundle.slotCountMapping[slotSize]
             })
 
-            // Bundle Equips & Jewels
+            // Bundle Equips & Decorations
             const bundleEquipList = Object.keys(bundle.equipIdMapping).filter((equipType) => {
                 return Helper.isNotEmpty(bundle.equipIdMapping[equipType])
             }).map((equipType) => {
@@ -238,41 +238,41 @@ export default function BundleList (props) {
                 })
             })
 
-            let bundleJewels = []
+            let bundleDecorations = []
 
-            if (Helper.isNotEmpty(bundle.jewelPackages[jewelPackageIndex])) {
-                bundleJewels = Object.keys(bundle.jewelPackages[jewelPackageIndex]).map((jewelId) => {
-                    let jewelItem = JewelDataset.getItem(jewelId)
-                    let jewelCount = bundle.jewelPackages[jewelPackageIndex][jewelId]
+            if (Helper.isNotEmpty(bundle.decorationPackages[decorationPackageIndex])) {
+                bundleDecorations = Object.keys(bundle.decorationPackages[decorationPackageIndex]).map((decorationId) => {
+                    let decorationItem = DecorationDataset.getItem(decorationId)
+                    let decorationCount = bundle.decorationPackages[decorationPackageIndex][decorationId]
 
-                    for (let slotSize = jewelItem.size; slotSize <= 4; slotSize++) {
+                    for (let slotSize = decorationItem.size; slotSize <= 4; slotSize++) {
                         if (0 === remainingSlotCountMapping[slotSize]) {
                             continue
                         }
 
-                        if (remainingSlotCountMapping[slotSize] < jewelCount) {
-                            jewelCount -= remainingSlotCountMapping[slotSize]
+                        if (remainingSlotCountMapping[slotSize] < decorationCount) {
+                            decorationCount -= remainingSlotCountMapping[slotSize]
                             remainingSlotCountMapping.all -= remainingSlotCountMapping[slotSize]
                             remainingSlotCountMapping[slotSize] = 0
 
                             continue
                         }
 
-                        remainingSlotCountMapping.all -= jewelCount
-                        remainingSlotCountMapping[slotSize] -= jewelCount
+                        remainingSlotCountMapping.all -= decorationCount
+                        remainingSlotCountMapping[slotSize] -= decorationCount
 
                         break
                     }
 
                     return {
-                        id: jewelId,
-                        count: bundle.jewelPackages[jewelPackageIndex][jewelId]
+                        id: decorationId,
+                        count: bundle.decorationPackages[decorationPackageIndex][decorationId]
                     }
-                }).sort((jewelA, jewelB) => {
-                    let jewelItemA = JewelDataset.getItem(jewelA.id)
-                    let jewelItemB = JewelDataset.getItem(jewelB.id)
+                }).sort((decorationA, decorationB) => {
+                    let decorationItemA = DecorationDataset.getItem(decorationA.id)
+                    let decorationItemB = DecorationDataset.getItem(decorationB.id)
 
-                    return jewelItemA.size < jewelItemB.size ? 1 : -1
+                    return decorationItemA.size < decorationItemB.size ? 1 : -1
                 })
             }
 
@@ -383,33 +383,33 @@ export default function BundleList (props) {
                         </div>
                     </div>
 
-                    {(0 !== bundleJewels.length) ? (
-                        <div key={bundleIndex + '_' + jewelPackageIndex} className="col-12 mhrc-content">
+                    {(0 !== bundleDecorations.length) ? (
+                        <div key={bundleIndex + '_' + decorationPackageIndex} className="col-12 mhrc-content">
                             <div className="col-12 mhrc-name">
-                                <span>{_('requiredJewels')}</span>
-                                {1 < jewelPackageCount ? (
+                                <span>{_('requiredDecorations')}</span>
+                                {1 < decorationPackageCount ? (
                                     <div className="mhrc-icons_bundle">
                                         <IconSwitch
-                                            defaultValue={jewelPackageIndex}
-                                            options={bundle.jewelPackages.map((jewelMapping, packageIndex) => {
+                                            defaultValue={decorationPackageIndex}
+                                            options={bundle.decorationPackages.map((decorationMapping, packageIndex) => {
                                                 return {
                                                     key: packageIndex,
-                                                    value: `${packageIndex + 1} / ${jewelPackageCount}`
+                                                    value: `${packageIndex + 1} / ${decorationPackageCount}`
                                                 }
                                             })}
                                             onChange={(packageIndex) => {
-                                                handleJewelPackageChange(bundleIndex, parseInt(packageIndex), 10)
+                                                handleDecorationPackageChange(bundleIndex, parseInt(packageIndex), 10)
                                             }} />
                                     </div>
                                 ) : false}
                             </div>
                             <div className="col-12 mhrc-content">
-                                {bundleJewels.map((jewel) => {
-                                    let jewelItem = JewelDataset.getItem(jewel.id)
+                                {bundleDecorations.map((decoration) => {
+                                    let decorationItem = DecorationDataset.getItem(decoration.id)
 
-                                    return (Helper.isNotEmpty(jewelItem)) ? (
-                                        <div key={jewel.id} className="col-6 mhrc-value">
-                                            <span>{`[${jewelItem.size}] ${_(jewelItem.name)} x ${jewel.count}`}</span>
+                                    return (Helper.isNotEmpty(decorationItem)) ? (
+                                        <div key={decoration.id} className="col-6 mhrc-value">
+                                            <span>{`[${decorationItem.size}] ${_(decorationItem.name)} x ${decoration.count}`}</span>
                                         </div>
                                     ) : false
                                 })}

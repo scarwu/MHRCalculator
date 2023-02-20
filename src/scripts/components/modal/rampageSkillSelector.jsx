@@ -1,5 +1,5 @@
 /**
- * Jewel Selector Modal
+ * RampageSkill Selector Modal
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -14,8 +14,7 @@ import _ from '@/scripts/core/lang'
 import Helper from '@/scripts/core/helper'
 
 // Load Libraries
-import JewelDataset from '@/scripts/libraries/dataset/jewel'
-import SkillDataset from '@/scripts/libraries/dataset/skill'
+import RampageSkillDataset from '@/scripts/libraries/dataset/rampageSkill'
 
 // Load Components
 import IconButton from '@/scripts/components/common/iconButton'
@@ -29,36 +28,36 @@ import States from '@/scripts/states'
  */
 const handleItemPickUp = (itemId, tempData) => {
     if ('playerEquips' === tempData.target) {
-        States.setter.setPlayerEquipJewel(tempData.equipType, tempData.idIndex, itemId)
+        States.setter.setPlayerEquipRampageSkill('weapon', tempData.idIndex, itemId)
     }
 }
 
 /**
  * Render Functions
  */
-const renderJewelItem = (jewelItem, tempData) => {
+const renderRampageSkillItem = (rampageSkillItem, tempData) => {
     let classNames = [
         'mhrc-item'
     ]
 
-    if (Helper.isEmpty(tempData.target) || jewelItem.id !== tempData.id) {
+    if (Helper.isEmpty(tempData.target) || rampageSkillItem.id !== tempData.id) {
         classNames.push('mhrc-item-2-step')
     } else {
         classNames.push('mhrc-item-3-step')
     }
 
     return (
-        <div key={jewelItem.id} className={classNames.join(' ')}>
+        <div key={rampageSkillItem.id} className={classNames.join(' ')}>
             <div className="col-12 mhrc-name">
-                <span>[{jewelItem.size}] {_(jewelItem.name)}</span>
+                <span>{_(rampageSkillItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
                     {Helper.isNotEmpty(tempData.target) ? (
-                        (jewelItem.id !== tempData.id) ? (
+                        (rampageSkillItem.id !== tempData.id) ? (
                             <IconButton
                                 iconName="check" altName={_('select')}
                                 onClick={() => {
-                                    handleItemPickUp(jewelItem.id, tempData)
+                                    handleItemPickUp(rampageSkillItem.id, tempData)
                                 }} />
                         ) : (
                             <IconButton
@@ -70,32 +69,19 @@ const renderJewelItem = (jewelItem, tempData) => {
                     ) : false}
                 </div>
             </div>
-            <div className="col-12 mhrc-content">
-                {jewelItem.skills.map((skillData, index) => {
-                    let skillItem = SkillDataset.getItem(skillData.id)
-
-                    return Helper.isNotEmpty(skillItem) ? (
-                        <Fragment key={index}>
-                            <div className="col-12 mhrc-name">
-                                <span>{_(skillItem.name)} Lv.{skillData.level}</span>
-                            </div>
-                            <div className="col-12 mhrc-value mhrc-description">
-                                <span>{_(skillItem.list[skillData.level - 1].effect)}</span>
-                            </div>
-                        </Fragment>
-                    ) : false
-                })}
+            <div className="col-12 mhrc-value mhrc-description">
+                <span>{_(rampageSkillItem.description)}</span>
             </div>
         </div>
     )
 }
 
-export default function JewelSelectorModal (props) {
+export default function RampageSkillSelectorModal (props) {
 
     /**
      * Hooks
      */
-    const [stateModalData, updateModalData] = useState(States.getter.getModalData('jewelSelector'))
+    const [stateModalData, updateModalData] = useState(States.getter.getModalData('rampageSkillSelector'))
     const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
 
     const [stateTempData, updateTempData] = useState(null)
@@ -107,7 +93,7 @@ export default function JewelSelectorModal (props) {
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
-            updateModalData(States.getter.getModalData('jewelSelector'))
+            updateModalData(States.getter.getModalData('rampageSkillSelector'))
             updatePlayerEquips(States.getter.getPlayerEquips())
         })
 
@@ -136,27 +122,16 @@ export default function JewelSelectorModal (props) {
             let idIndex = tempData.idIndex
 
             if ('playerEquips' === tempData.target
-                && Helper.isNotEmpty(statePlayerEquips[equipType])
-                && Helper.isNotEmpty(statePlayerEquips[equipType].jewelIds)
-                && Helper.isNotEmpty(statePlayerEquips[equipType].jewelIds[idIndex])
+                && Helper.isNotEmpty(statePlayerEquips.weapon)
+                && Helper.isNotEmpty(statePlayerEquips.weapon.rampageSkillIds)
+                && Helper.isNotEmpty(statePlayerEquips.weapon.rampageSkillIds[idIndex])
             ) {
-                tempData.id = statePlayerEquips[equipType].jewelIds[idIndex]
+                tempData.id = statePlayerEquips.weapon.rampageSkillIds[idIndex]
             }
-        }
-
-        // Set Size
-        if (Helper.isEmpty(tempData.size)) {
-            tempData.size = 3
         }
 
         // Set List
-        tempData.list = []
-
-        for (let size = tempData.size; size >= 1; size--) {
-            for (let rare = 9; rare >= 1; rare--) {
-                tempData.list = tempData.list.concat(JewelDataset.rareIs(rare).sizeIs(size).getList())
-            }
-        }
+        tempData.list = RampageSkillDataset.getList()
 
         window.addEventListener('keydown', handleSearchFocus)
 
@@ -174,7 +149,7 @@ export default function JewelSelectorModal (props) {
             return
         }
 
-        States.setter.hideModal('jewelSelector')
+        States.setter.hideModal('rampageSkillSelector')
 
         updateFilter({})
     }, [])
@@ -208,14 +183,6 @@ export default function JewelSelectorModal (props) {
             // Create Text
             let text = _(item.name)
 
-            item.skills.forEach((skillData) => {
-                let skillItem = SkillDataset.getItem(skillData.id)
-
-                if (Helper.isNotEmpty(skillItem)) {
-                    text += _(skillItem.name)
-                }
-            })
-
             // Search Nameword
             if (Helper.isNotEmpty(stateFilter.segment)
                 && -1 === text.toLowerCase().search(stateFilter.segment.toLowerCase())
@@ -227,7 +194,7 @@ export default function JewelSelectorModal (props) {
         }).sort((itemA, itemB) => {
             return _(itemA.id) > _(itemB.id) ? 1 : -1
         }).map((item) => {
-            return renderJewelItem(item, stateTempData)
+            return renderRampageSkillItem(item, stateTempData)
         })
     }, [
         stateTempData,
@@ -245,13 +212,13 @@ export default function JewelSelectorModal (props) {
                             onChange={handleSegmentInput} />
                     </div>
 
-                    <span className="mhrc-title">{_('jewelList')}</span>
+                    <span className="mhrc-title">{_('rampageSkillList')}</span>
 
                     <div className="mhrc-icons_bundle-right">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {
-                                States.setter.hideModal('jewelSelector')
+                                States.setter.hideModal('rampageSkillSelector')
                             }} />
                     </div>
                 </div>

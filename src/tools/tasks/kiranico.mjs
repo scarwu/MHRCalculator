@@ -434,7 +434,6 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
 
                     // Skills
                     rowNode.find('td').eq(6).find('div').each((index, node) => {
-                        console.log(listDom(node).text())
                         let skillName = normalizeText(listDom(node).find('a').text())
                         let skillLevel = normalizeText(listDom(node).text()).match(/^(?:.*)(?:Lv|Ｌｖ)(.*)$/)[1].trim()
 

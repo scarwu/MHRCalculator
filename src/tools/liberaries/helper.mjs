@@ -15,15 +15,15 @@ import * as http from 'http'
 import * as https from 'https'
 import * as cheerio from 'cheerio'
 
-function isEmpty(variable) {
+export const isEmpty = (variable) => {
     return (undefined === variable || null === variable)
 }
 
-function isNotEmpty(variable) {
+export const isNotEmpty = (variable) => {
     return (undefined !== variable && null !== variable)
 }
 
-function isObject(value) {
+export const isObject = (value) => {
     if (true === isEmpty(value)) {
         return false
     }
@@ -31,7 +31,7 @@ function isObject(value) {
     return 'object' === typeof value && false === Array.isArray(value)
 }
 
-function isArray(value) {
+export const isArray = (value) => {
     if (true === isEmpty(value)) {
         return false
     }
@@ -39,7 +39,7 @@ function isArray(value) {
     return 'object' === typeof value && true === Array.isArray(value)
 }
 
-function isFunction(value) {
+export const isFunction = (value) => {
     if (true === isEmpty(value)) {
         return false
     }
@@ -47,7 +47,7 @@ function isFunction(value) {
     return 'function' === typeof value
 }
 
-function isString(value) {
+export const isString = (value) => {
     if (true === isEmpty(value)) {
         return false
     }
@@ -55,7 +55,7 @@ function isString(value) {
     return 'string' === typeof value
 }
 
-function isNumber(value) {
+export const isNumber = (value) => {
     if (true === isEmpty(value)) {
         return false
     }
@@ -63,7 +63,7 @@ function isNumber(value) {
     return 'number' === typeof value
 }
 
-function isBoolean(value) {
+export const isBoolean = (value) => {
     if (true === isEmpty(value)) {
         return false
     }
@@ -71,7 +71,7 @@ function isBoolean(value) {
     return 'boolean' === typeof value
 }
 
-function checkType(value) {
+export const checkType = (value) => {
     if (true === isEmpty(value)) {
         return null
     }
@@ -101,11 +101,11 @@ function checkType(value) {
     }
 }
 
-function deepCopy(data) {
+export const deepCopy = (data) => {
     return JSON.parse(JSON.stringify(data))
 }
 
-function jsonHash(data) {
+export const jsonHash = (data) => {
     return md5(JSON.stringify(data))
 }
 
@@ -123,7 +123,7 @@ const userAgentList = [
     'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.13'
 ]
 
-function fetchHtml(url) {
+export const fetchHtml = (url) => {
     if (isEmpty(url)) {
         return null
     }
@@ -192,7 +192,7 @@ function fetchHtml(url) {
     })
 }
 
-async function fetchHtmlAsDom(url) {
+export const fetchHtmlAsDom = async (url) => {
     let html = await fetchHtml(url)
 
     if (null === html) {
@@ -202,7 +202,7 @@ async function fetchHtmlAsDom(url) {
     return cheerio.load(html)
 }
 
-function loadJSON(subPath) {
+export const loadJSON = (subPath) => {
     let filePath = `${global.root}/${subPath}`
 
     if (false === fs.existsSync(filePath)) {
@@ -212,7 +212,7 @@ function loadJSON(subPath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'))
 }
 
-function saveJSON(subPath, data) {
+export const saveJSON = (subPath, data) => {
     let filePath = `${global.root}/${subPath}`
 
     if (false === fs.existsSync(path.dirname(filePath))) {
@@ -226,7 +226,7 @@ function saveJSON(subPath, data) {
     return true
 }
 
-function loadCSV(subPath) {
+export const loadCSV = (subPath) => {
     let filePath = `${global.root}/${subPath}`
 
     if (false === fs.existsSync(filePath)) {
@@ -260,7 +260,7 @@ function loadCSV(subPath) {
     })
 }
 
-function saveCSV(subPath, data) {
+export const saveCSV = (subPath, data) => {
     let filePath = `${global.root}/${subPath}`
 
     if (false === fs.existsSync(path.dirname(filePath))) {
@@ -278,7 +278,7 @@ function saveCSV(subPath, data) {
     return true
 }
 
-function loadCSVAsJSON(subPath) {
+export const loadCSVAsJSON = (subPath) => {
     const recursive = (segments, value, lastType, mapping) => {
         segments = deepCopy(segments)
 
@@ -393,7 +393,7 @@ function loadCSVAsJSON(subPath) {
     })
 }
 
-function saveJSONAsCSV(subPath, data) {
+export const saveJSONAsCSV = (subPath, data) => {
     const recursive = (key, value, allKeys, keyTypeMapping, keyDataMapping) => {
         if (true === isFunction(value)) {
             throw 'is not allowed type'
@@ -500,7 +500,7 @@ function saveJSONAsCSV(subPath, data) {
     return true
 }
 
-function cleanFolder(subPath) {
+export const cleanFolder = (subPath) => {
     let filePath = `${global.root}/${subPath}`
 
     if (true === fs.existsSync(path.dirname(filePath))) {

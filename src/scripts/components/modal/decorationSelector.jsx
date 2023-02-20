@@ -1,5 +1,5 @@
 /**
- * Enhance Selector Modal
+ * Decoration Selector Modal
  *
  * @package     Monster Hunter Rise - Calculator
  * @author      Scar Wu
@@ -14,7 +14,8 @@ import _ from '@/scripts/core/lang'
 import Helper from '@/scripts/core/helper'
 
 // Load Libraries
-import EnhanceDataset from '@/scripts/libraries/dataset/enhance'
+import DecorationDataset from '@/scripts/libraries/dataset/decoration'
+import SkillDataset from '@/scripts/libraries/dataset/skill'
 
 // Load Components
 import IconButton from '@/scripts/components/common/iconButton'
@@ -28,36 +29,36 @@ import States from '@/scripts/states'
  */
 const handleItemPickUp = (itemId, tempData) => {
     if ('playerEquips' === tempData.target) {
-        States.setter.setPlayerEquipEnhance('weapon', tempData.idIndex, itemId)
+        States.setter.setPlayerEquipDecoration(tempData.equipType, tempData.idIndex, itemId)
     }
 }
 
 /**
  * Render Functions
  */
-const renderEnhanceItem = (enhanceItem, tempData) => {
+const renderDecorationItem = (decorationItem, tempData) => {
     let classNames = [
         'mhrc-item'
     ]
 
-    if (Helper.isEmpty(tempData.target) || enhanceItem.id !== tempData.id) {
+    if (Helper.isEmpty(tempData.target) || decorationItem.id !== tempData.id) {
         classNames.push('mhrc-item-2-step')
     } else {
         classNames.push('mhrc-item-3-step')
     }
 
     return (
-        <div key={enhanceItem.id} className={classNames.join(' ')}>
+        <div key={decorationItem.id} className={classNames.join(' ')}>
             <div className="col-12 mhrc-name">
-                <span>{_(enhanceItem.name)}</span>
+                <span>[{decorationItem.size}] {_(decorationItem.name)}</span>
 
                 <div className="mhrc-icons_bundle">
                     {Helper.isNotEmpty(tempData.target) ? (
-                        (enhanceItem.id !== tempData.id) ? (
+                        (decorationItem.id !== tempData.id) ? (
                             <IconButton
                                 iconName="check" altName={_('select')}
                                 onClick={() => {
-                                    handleItemPickUp(enhanceItem.id, tempData)
+                                    handleItemPickUp(decorationItem.id, tempData)
                                 }} />
                         ) : (
                             <IconButton
@@ -69,19 +70,32 @@ const renderEnhanceItem = (enhanceItem, tempData) => {
                     ) : false}
                 </div>
             </div>
-            <div className="col-12 mhrc-value mhrc-description">
-                <span>{_(enhanceItem.description)}</span>
+            <div className="col-12 mhrc-content">
+                {decorationItem.skills.map((skillData, index) => {
+                    let skillItem = SkillDataset.getItem(skillData.id)
+
+                    return Helper.isNotEmpty(skillItem) ? (
+                        <Fragment key={index}>
+                            <div className="col-12 mhrc-name">
+                                <span>{_(skillItem.name)} Lv.{skillData.level}</span>
+                            </div>
+                            <div className="col-12 mhrc-value mhrc-description">
+                                <span>{_(skillItem.list[skillData.level - 1].effect)}</span>
+                            </div>
+                        </Fragment>
+                    ) : false
+                })}
             </div>
         </div>
     )
 }
 
-export default function EnhanceSelectorModal (props) {
+export default function DecorationSelectorModal (props) {
 
     /**
      * Hooks
      */
-    const [stateModalData, updateModalData] = useState(States.getter.getModalData('enhanceSelector'))
+    const [stateModalData, updateModalData] = useState(States.getter.getModalData('decorationSelector'))
     const [statePlayerEquips, updatePlayerEquips] = useState(States.getter.getPlayerEquips())
 
     const [stateTempData, updateTempData] = useState(null)
@@ -93,7 +107,7 @@ export default function EnhanceSelectorModal (props) {
     // Like Did Mount & Will Unmount Cycle
     useEffect(() => {
         const unsubscribe = States.store.subscribe(() => {
-            updateModalData(States.getter.getModalData('enhanceSelector'))
+            updateModalData(States.getter.getModalData('decorationSelector'))
             updatePlayerEquips(States.getter.getPlayerEquips())
         })
 
@@ -122,16 +136,27 @@ export default function EnhanceSelectorModal (props) {
             let idIndex = tempData.idIndex
 
             if ('playerEquips' === tempData.target
-                && Helper.isNotEmpty(statePlayerEquips.weapon)
-                && Helper.isNotEmpty(statePlayerEquips.weapon.enhanceIds)
-                && Helper.isNotEmpty(statePlayerEquips.weapon.enhanceIds[idIndex])
+                && Helper.isNotEmpty(statePlayerEquips[equipType])
+                && Helper.isNotEmpty(statePlayerEquips[equipType].decorationIds)
+                && Helper.isNotEmpty(statePlayerEquips[equipType].decorationIds[idIndex])
             ) {
-                tempData.id = statePlayerEquips.weapon.enhanceIds[idIndex]
+                tempData.id = statePlayerEquips[equipType].decorationIds[idIndex]
             }
         }
 
+        // Set Size
+        if (Helper.isEmpty(tempData.size)) {
+            tempData.size = 3
+        }
+
         // Set List
-        tempData.list = EnhanceDataset.getList()
+        tempData.list = []
+
+        for (let size = tempData.size; size >= 1; size--) {
+            for (let rare = 9; rare >= 1; rare--) {
+                tempData.list = tempData.list.concat(DecorationDataset.rareIs(rare).sizeIs(size).getList())
+            }
+        }
 
         window.addEventListener('keydown', handleSearchFocus)
 
@@ -149,7 +174,7 @@ export default function EnhanceSelectorModal (props) {
             return
         }
 
-        States.setter.hideModal('enhanceSelector')
+        States.setter.hideModal('decorationSelector')
 
         updateFilter({})
     }, [])
@@ -183,6 +208,14 @@ export default function EnhanceSelectorModal (props) {
             // Create Text
             let text = _(item.name)
 
+            item.skills.forEach((skillData) => {
+                let skillItem = SkillDataset.getItem(skillData.id)
+
+                if (Helper.isNotEmpty(skillItem)) {
+                    text += _(skillItem.name)
+                }
+            })
+
             // Search Nameword
             if (Helper.isNotEmpty(stateFilter.segment)
                 && -1 === text.toLowerCase().search(stateFilter.segment.toLowerCase())
@@ -194,7 +227,7 @@ export default function EnhanceSelectorModal (props) {
         }).sort((itemA, itemB) => {
             return _(itemA.id) > _(itemB.id) ? 1 : -1
         }).map((item) => {
-            return renderEnhanceItem(item, stateTempData)
+            return renderDecorationItem(item, stateTempData)
         })
     }, [
         stateTempData,
@@ -212,13 +245,13 @@ export default function EnhanceSelectorModal (props) {
                             onChange={handleSegmentInput} />
                     </div>
 
-                    <span className="mhrc-title">{_('enhanceList')}</span>
+                    <span className="mhrc-title">{_('decorationList')}</span>
 
                     <div className="mhrc-icons_bundle-right">
                         <IconButton
                             iconName="times" altName={_('close')}
                             onClick={() => {
-                                States.setter.hideModal('enhanceSelector')
+                                States.setter.hideModal('decorationSelector')
                             }} />
                     </div>
                 </div>

@@ -56,11 +56,11 @@ const dataset = Weapons.map((weaponItem) => {
                 size: slotData[0]
             }
         }),
-        enhance: {
+        rampageSkill: {
             amount: weaponItem[11][0],
-            // list: weaponItem[11][1].map((enhanceData) => {
+            // list: weaponItem[11][1].map((rampageSkillData) => {
             //     return {
-            //         name: enhanceData[0]
+            //         name: rampageSkillData[0]
             //     }
             // })
         }

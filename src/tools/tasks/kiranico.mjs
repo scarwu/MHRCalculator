@@ -82,221 +82,16 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
         }
 
         let mapping = {}
-        let mappingKey = null
-
         let langKeyMapping = {}
 
         // Fetch List Page
-        fetchPageUrl = getFullUrl('zhTW', urls.weapons[weaponType])
-        fetchPageName = `weapons:${weaponType}`
-
-        console.log(fetchPageUrl, fetchPageName)
-
-        let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-        if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
-
-            return
-        }
-
-        for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-            let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
-
-            // Get Data
-            let name = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
-
-            mappingKey = `${weaponType}:${name}`
-
-            if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultWeaponItem)
-            }
-
-            mapping[mappingKey].series = {
-                zhTW: null,
-                jaJP: null,
-                enUS: null
-            }
-            mapping[mappingKey].name = {
-                zhTW: name,
-                jaJP: null,
-                enUS: null
-            }
-            mapping[mappingKey].type = weaponType
-
-            // Slots
-            let slotNode = rowNode.find('td').eq(1).find('img')
-
-            if (0 !== slotNode.length) {
-                slotNode.each((index, node) => {
-                    if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco3.png' === listDom(node).attr('src')) {
-                        mapping[mappingKey].slots.push({
-                            size: 3
-                        })
-                    } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco2.png' === listDom(node).attr('src')) {
-                        mapping[mappingKey].slots.push({
-                            size: 2
-                        })
-                    } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco1.png' === listDom(node).attr('src')) {
-                        mapping[mappingKey].slots.push({
-                            size: 1
-                        })
-                    }
-                })
-            }
-
-            // Element
-            if ('heavyBowgun' !== weaponType
-                && 'lightBowgun' !== weaponType
-                && 0 !== rowNode.find('td').eq(4).find('img').length
-            ) {
-                rowNode.find('td').eq(4).find('img').each((index, node) => {
-                    switch (listDom(node).attr('src')) {
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType1.png':
-                        mapping[mappingKey].element.attack.type = 'fire'
-                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType2.png':
-                        mapping[mappingKey].element.attack.type = 'water'
-                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType3.png':
-                        mapping[mappingKey].element.attack.type = 'thunder'
-                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType4.png':
-                        mapping[mappingKey].element.attack.type = 'ice'
-                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType5.png':
-                        mapping[mappingKey].element.attack.type = 'dragon'
-                        mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType6.png':
-                        mapping[mappingKey].element.status.type = 'poison'
-                        mapping[mappingKey].element.status.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType7.png':
-                        mapping[mappingKey].element.status.type = 'sleep'
-                        mapping[mappingKey].element.status.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType8.png':
-                        mapping[mappingKey].element.status.type = 'paralysis'
-                        mapping[mappingKey].element.status.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType9.png':
-                        mapping[mappingKey].element.status.type = 'blast'
-                        mapping[mappingKey].element.status.minValue = parseFloat(listDom(node)[0].next.data.trim())
-
-                        break
-                    }
-                })
-            }
-
-            // Sharpness
-            if ('bow' !== weaponType
-                && 'heavyBowgun' !== weaponType
-                && 'lightBowgun' !== weaponType
-            ) {
-                let sharpnessList = [
-                    'red',
-                    'orange',
-                    'yellow',
-                    'green',
-                    'blue',
-                    'white',
-                    'purple'
-                ]
-
-
-                // minimum sharpness
-                rowNode.find('td').eq(5).find('div.flex div.flex').eq(0).find('div').each((index, node) => {
-                    let value = parseFloat(listDom(node).css('width').replace('px', '')) * 5
-
-                    if (0 === value) {
-                        return
-                    }
-
-                    if (Helper.isEmpty(mapping[mappingKey].sharpness.minValue)) {
-                        mapping[mappingKey].sharpness.minValue = 0
-                    }
-
-                    mapping[mappingKey].sharpness.minValue += value
-                })
-
-                // maximum sharpness
-                rowNode.find('td').eq(5).find('div.flex div.flex').eq(1).find('div').each((index, node) => {
-                    let value = parseFloat(listDom(node).css('width').replace('px', '')) * 5
-
-                    if (0 === value) {
-                        return
-                    }
-
-                    if (Helper.isEmpty(mapping[mappingKey].sharpness.maxValue)) {
-                        mapping[mappingKey].sharpness.maxValue = 0
-                    }
-
-                    mapping[mappingKey].sharpness.maxValue += value
-                    mapping[mappingKey].sharpness.steps[sharpnessList[index]] = value
-                })
-            }
-
-            // Fetch Detail Page
-            fetchPageUrl = rowNode.find('td').eq(1).find('a').attr('href')
-            fetchPageName = `weapons:${weaponType}:${name}`
-
-            console.log(fetchPageUrl, fetchPageName)
-
-            let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-            if (Helper.isEmpty(weaponDom)) {
-                console.log(fetchPageUrl, fetchPageName, 'Err')
-
-                return
-            }
-
-            // Set Lang Mapping
-            let uniqueKey = fetchPageUrl.split('/').pop()
-            langKeyMapping[uniqueKey] = mappingKey
-
-            let rare = weaponDom('dl.grid dd').eq(2).text().trim()
-            let attack = weaponDom('dl.grid dd').eq(6).text().trim()
-            let criticalRate = weaponDom('dl.grid dd').eq(7).text().trim()
-            let defense = weaponDom('dl.grid dd').eq(8).text().trim()
-
-            mapping[mappingKey].rare = parseFloat(rare) + 1 // special fix
-            mapping[mappingKey].attack = parseFloat(attack)
-            mapping[mappingKey].criticalRate = (0 !== parseFloat(criticalRate))
-                ? parseFloat(criticalRate) : null
-            mapping[mappingKey].defense = (0 !== parseFloat(defense))
-                ? parseFloat(defense) : null
-
-            // RampageSkills
-            weaponDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
-                let rampageSkillName = normalizeText(weaponDom(node).find('td').eq(1).find('a').text())
-
-                mapping[mappingKey].rampageSkill.list.push({
-                    name: rampageSkillName
-                })
-            })
-        }
-
-        // Get Other Lang
-        for (let lang of ['jaJP', 'enUS']) {
+        for (let lang of ['zhTW', 'jaJP', 'enUS']) {
             fetchPageUrl = getFullUrl(lang, urls.weapons[weaponType])
-            fetchPageName = `weapons:${weaponType}:${lang}`
+            fetchPageName = `weapons:${weaponType}`
 
             console.log(fetchPageUrl, fetchPageName)
 
-            listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+            let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
             if (Helper.isEmpty(listDom)) {
                 console.log(fetchPageUrl, fetchPageName, 'Err')
@@ -307,11 +102,243 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
                 let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
 
-                // Set Lang Mapping
+                // Get Data
+                let name = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
+
                 let uniqueKey = rowNode.find('td').eq(1).find('a').attr('href').split('/').pop()
+
+                if (Helper.isEmpty(langKeyMapping[uniqueKey])) {
+                    langKeyMapping[uniqueKey] = `${weaponType}:${name}`
+                }
+
                 let mappingKey = langKeyMapping[uniqueKey]
 
-                mapping[mappingKey].name[lang] = normalizeText(rowNode.find('td').eq(1).find('a').text().trim())
+                if (Helper.isEmpty(mapping[mappingKey])) {
+                    mapping[mappingKey] = Helper.deepCopy(defaultWeaponItem)
+                    mapping[mappingKey].series = {
+                        zhTW: null,
+                        jaJP: null,
+                        enUS: null
+                    }
+                    mapping[mappingKey].name = {
+                        zhTW: null,
+                        jaJP: null,
+                        enUS: null
+                    }
+                    mapping[mappingKey].description = {
+                        zhTW: null,
+                        jaJP: null,
+                        enUS: null
+                    }
+                    mapping[mappingKey].type = weaponType
+
+                    // Decoration Slots
+                    let slotNode = rowNode.find('td').eq(2).find('span').eq(0).find('img')
+
+                    if (0 !== slotNode.length) {
+                        slotNode.each((index, node) => {
+                            if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco4.png' === listDom(node).attr('src')) {
+                                mapping[mappingKey].slots.push({
+                                    size: 4
+                                })
+                            } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco3.png' === listDom(node).attr('src')) {
+                                mapping[mappingKey].slots.push({
+                                    size: 3
+                                })
+                            } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco2.png' === listDom(node).attr('src')) {
+                                mapping[mappingKey].slots.push({
+                                    size: 2
+                                })
+                            } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco1.png' === listDom(node).attr('src')) {
+                                mapping[mappingKey].slots.push({
+                                    size: 1
+                                })
+                            }
+                        })
+                    }
+
+                    // Rampage Decoration Slots
+                    let rampageSlotNode = rowNode.find('td').eq(2).find('span').eq(1).find('img')
+
+                    if (0 !== rampageSlotNode.length) {
+                        rampageSlotNode.each((index, node) => {
+                            if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco4.png' === listDom(node).attr('src')) {
+                                mapping[mappingKey].rampageSlot = {
+                                    size: 4
+                                }
+                            } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco3.png' === listDom(node).attr('src')) {
+                                mapping[mappingKey].rampageSlot = {
+                                    size: 3
+                                }
+                            } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco2.png' === listDom(node).attr('src')) {
+                                mapping[mappingKey].rampageSlot = {
+                                    size: 2
+                                }
+                            } else if ('https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/deco1.png' === listDom(node).attr('src')) {
+                                mapping[mappingKey].rampageSlot = {
+                                    size: 1
+                                }
+                            }
+                        })
+                    }
+
+                    // Element
+                    if ('heavyBowgun' !== weaponType
+                        && 'lightBowgun' !== weaponType
+                        && 0 !== rowNode.find('td').eq(4).find('img').length
+                    ) {
+                        rowNode.find('td').eq(4).find('span').each((index, node) => {
+                            switch (listDom(node).find('img').attr('src')) {
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType1.png':
+                                mapping[mappingKey].element.attack.type = 'fire'
+                                mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType2.png':
+                                mapping[mappingKey].element.attack.type = 'water'
+                                mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType3.png':
+                                mapping[mappingKey].element.attack.type = 'thunder'
+                                mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType4.png':
+                                mapping[mappingKey].element.attack.type = 'ice'
+                                mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType5.png':
+                                mapping[mappingKey].element.attack.type = 'dragon'
+                                mapping[mappingKey].element.attack.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType6.png':
+                                mapping[mappingKey].element.status.type = 'poison'
+                                mapping[mappingKey].element.status.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType7.png':
+                                mapping[mappingKey].element.status.type = 'sleep'
+                                mapping[mappingKey].element.status.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType8.png':
+                                mapping[mappingKey].element.status.type = 'paralysis'
+                                mapping[mappingKey].element.status.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            case 'https://cdn.kiranico.net/file/kiranico/mhrise-web/images/ui/ElementType9.png':
+                                mapping[mappingKey].element.status.type = 'blast'
+                                mapping[mappingKey].element.status.minValue = parseFloat(listDom(node).text().trim())
+
+                                break
+                            }
+                        })
+                    }
+
+                    let rare = rowNode.find('td').eq(7).text().trim().replace('Rare', '')
+                    let attack = rowNode.find('td').eq(3).text().trim()
+
+                    mapping[mappingKey].rare = parseFloat(rare)
+                    mapping[mappingKey].attack = parseFloat(attack)
+
+                    rowNode.find('td').eq(4).find('div').each((index, node) => {
+                        let text = listDom(node).eq(0).text()
+
+                        if (-1 !== text.indexOf('會心率')) {
+                            let criticalRate = text.replace('會心率', '').replace('+', '').replace('%', '').trim()
+
+                            mapping[mappingKey].criticalRate = (0 !== parseFloat(criticalRate))
+                                ? parseFloat(criticalRate) : null
+
+                        } else if (-1 !== text.indexOf('防禦力加成')) {
+                            let defense = text.replace('防禦力加成', '').replace('+', '').trim()
+
+                            mapping[mappingKey].defense = (0 !== parseFloat(defense))
+                                ? parseFloat(defense) : null
+                        }
+                    })
+
+                    // Sharpness
+                    if ('bow' !== weaponType
+                        && 'heavyBowgun' !== weaponType
+                        && 'lightBowgun' !== weaponType
+                    ) {
+                        let sharpnessList = [
+                            'red',
+                            'orange',
+                            'yellow',
+                            'green',
+                            'blue',
+                            'white',
+                            'purple'
+                        ]
+
+                        // minimum sharpness
+                        rowNode.find('td').eq(5).find('svg').eq(0).find('rect').each((index, node) => {
+                            let value = parseFloat(listDom(node).attr('width')) * 5
+
+                            if (0 === value) {
+                                return
+                            }
+
+                            if (Helper.isEmpty(mapping[mappingKey].sharpness.minValue)) {
+                                mapping[mappingKey].sharpness.minValue = 0
+                            }
+
+                            mapping[mappingKey].sharpness.minValue += value
+                        })
+
+                        // maximum sharpness
+                        rowNode.find('td').eq(5).find('svg').eq(1).find('rect').each((index, node) => {
+                            let value = parseFloat(listDom(node).attr('width')) * 5
+
+                            if (0 === value) {
+                                return
+                            }
+
+                            if (Helper.isEmpty(mapping[mappingKey].sharpness.maxValue)) {
+                                mapping[mappingKey].sharpness.maxValue = 0
+                            }
+
+                            mapping[mappingKey].sharpness.maxValue += value
+                            mapping[mappingKey].sharpness.steps[sharpnessList[index]] = value
+                        })
+                    }
+                }
+
+                // Fetch Detail Page
+                fetchPageUrl = rowNode.find('td').eq(1).find('a').attr('href')
+                fetchPageName = `weapons:${weaponType}:${name}`
+
+                console.log(fetchPageUrl, fetchPageName)
+
+                let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+                if (Helper.isEmpty(weaponDom)) {
+                    console.log(fetchPageUrl, fetchPageName, 'Err')
+
+                    return
+                }
+
+                if ('zhTW' === lang) {
+
+                    // RampageSkills
+                    weaponDom('table.min-w-full tbody.bg-white').eq(0).find('tr.bg-white').each((index, node) => {
+                        let rampageSkillName = normalizeText(weaponDom(node).find('td').eq(1).find('a').text())
+
+                        mapping[mappingKey].rampageSkill.list.push({
+                            name: rampageSkillName
+                        })
+                    })
+                }
+
+                let description = weaponDom('.mb-9.space-y-1 > p').eq(1).text()
+
+                mapping[mappingKey].name[lang] = name
+                mapping[mappingKey].description[lang] = description
             }
         }
 
@@ -328,8 +355,6 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
         }
 
         let mapping = {}
-        let mappingKey = null
-
         let langKeyMapping = {}
 
         // Fetch List Page
@@ -458,32 +483,6 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                 mapping[mappingKey].description[lang] = description
             }
         }
-
-        // // Get Other Lang
-        // for (let lang of ['jaJP', 'enUS']) {
-        //     fetchPageUrl = getFullUrl(lang, urls.armors[armorRare])
-        //     fetchPageName = `armors:${armorRare}:${lang}`
-
-        //     console.log(fetchPageUrl, fetchPageName)
-
-        //     listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-        //     if (Helper.isEmpty(listDom)) {
-        //         console.log(fetchPageUrl, fetchPageName, 'Err')
-
-        //         return
-        //     }
-
-        //     for (let rowIndex = 0; rowIndex < listDom('[x-data=categoryFilter]').find('tbody tr').length; rowIndex++) {
-        //         let rowNode = listDom('[x-data=categoryFilter]').find('tbody tr').eq(rowIndex)
-
-        //         // Set Lang Mapping
-        //         let uniqueKey = rowNode.find('td').eq(2).find('a').attr('href').split('/').pop()
-        //         let mappingKey = langKeyMapping[uniqueKey]
-
-        //         mapping[mappingKey].name[lang] = normalizeText(rowNode.find('td').eq(2).find('a').text().trim())
-        //     }
-        // }
 
         let list = autoExtendListQuantity(Object.values(mapping))
 
@@ -722,9 +721,6 @@ export const fetchRampageSkillsAction = async () => {
                 mapping[mappingKey].name = {}
                 mapping[mappingKey].description = {}
             }
-
-            // Set Lang Mapping
-            langKeyMapping[uniqueKey] = mappingKey
 
             mapping[mappingKey].name[lang] = name
             mapping[mappingKey].description[lang] = description

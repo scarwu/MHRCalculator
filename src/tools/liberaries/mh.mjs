@@ -12,6 +12,7 @@ import Helper from './helper.mjs'
 export const defaultWeaponItem = {
     series: null,
     name: null,
+    description: null,
     rare: null,
     type: null,
     attack: null,
@@ -47,6 +48,10 @@ export const defaultWeaponItem = {
         //     size: null
         // }
     ],
+    rampageSlot: null,
+    // {
+    //     size: null
+    // }
     rampageSkill: {
         amount: null,
         list: [

@@ -697,9 +697,9 @@ export const runAction = () => {
                     slotData.size
                 ]
             }),
-            [
-                weaponItem.rampageSlot.size
-            ],
+            // [
+            //     weaponItem.rampageSlot.size
+            // ],
             [
                 weaponItem.rampageSkill.amount,
                 // weaponItem.rampageSkill.list.map((rampageSkillData) => {

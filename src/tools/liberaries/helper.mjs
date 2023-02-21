@@ -504,7 +504,7 @@ export const cleanFolder = (subPath) => {
     let filePath = `${global.root}/${subPath}`
 
     if (true === fs.existsSync(path.dirname(filePath))) {
-        fs.rmdirSync(filePath, {
+        fs.rmSync(filePath, {
             recursive: true
         })
     }

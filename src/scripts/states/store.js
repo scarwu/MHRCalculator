@@ -213,6 +213,23 @@ export default createStore((state = initialState, action) => {
                 })
             })()
 
+        case 'SET_PLAYER_EQUIP_RAMPAGE_DECORATION':
+            return (() => {
+                let playerEquips = Helper.deepCopy(state.playerEquips)
+                let equipType = action.payload.equipType
+                let rampageDecorationId = action.payload.rampageDecorationId
+
+                if (Helper.isEmpty(playerEquips[equipType])) {
+                    return state
+                }
+
+                playerEquips[equipType].rampageDecorationId = rampageDecorationId
+
+                return Object.assign({}, state, {
+                    playerEquips: playerEquips
+                })
+            })()
+
         case 'SET_PLAYER_EQUIP_RAMPAGE_SKILL':
             return (() => {
                 let playerEquips = Helper.deepCopy(state.playerEquips)

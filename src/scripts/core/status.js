@@ -14,11 +14,8 @@ let prefix = 'mhrc:2023:1'
 let storage = window.localStorage
 
 export const get = (key) => {
-    if (Helper.isEmpty(storage[`${prefix}:${key}`])) {
-        return null
-    }
-
-    let dataSet = storage[`${prefix}:${key}`]
+    let dataSet = (Helper.isNotEmpty(storage[`${prefix}:${key}`]))
+        ? storage[`${prefix}:${key}`] : null
 
     try {
         dataSet = JSON.parse(dataSet)
@@ -30,36 +27,15 @@ export const get = (key) => {
 }
 
 export const set = (key, value) => {
-    let dataSet = (Helper.isNotEmpty(storage[`${prefix}:${key}`]))
-        ? storage[`${prefix}:${key}`] : null
-
-    try {
-        dataSet = JSON.parse(dataSet)
-    } catch (error) {
-        dataSet = null
-    }
-
     if (Helper.isNotEmpty(value)) {
-        dataSet = value
+        storage[`${prefix}:${key}`] = JSON.stringify(value)
+    } else {
+        delete storage[`${prefix}:${key}`]
     }
-
-    storage[`${prefix}:${key}`] = JSON.stringify(dataSet)
 }
 
 export const has = (key) => {
-    if (Helper.isEmpty(storage[`${prefix}:${key}`])) {
-        return null
-    }
-
-    let dataSet = storage[`${prefix}:${key}`]
-
-    try {
-        dataSet = JSON.parse(dataSet)
-    } catch (error) {
-        dataSet = null
-    }
-
-    return Helper.isNotEmpty(dataSet)
+    return Helper.isNotEmpty(get(key))
 }
 
 export const reset = () => {

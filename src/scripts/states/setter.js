@@ -87,6 +87,16 @@ export const setPlayerEquipDecoration = (equipType, idIndex, decorationId) => {
     })
 }
 
+export const setPlayerEquipRampageDecoration = (equipType, rampageDecorationId) => {
+    store.dispatch({
+        type: 'SET_PLAYER_EQUIP_RAMPAGE_DECORATION',
+        payload: {
+            equipType: equipType,
+            rampageDecorationId: rampageDecorationId
+        }
+    })
+}
+
 export const setPlayerEquipRampageSkill = (equipType, idIndex, rampageSkillId) => {
     store.dispatch({
         type: 'SET_PLAYER_EQUIP_RAMPAGE_SKILL',
@@ -293,6 +303,7 @@ export default {
     replacePlayerEquips,
     setPlayerEquip,
     setPlayerEquipDecoration,
+    setPlayerEquipRampageDecoration,
     setPlayerEquipRampageSkill,
     setPlayerEquipCustomDataset,
 

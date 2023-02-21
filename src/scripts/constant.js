@@ -225,6 +225,7 @@ export const defaultPlayerEquips = {
     weapon: {
         id: null,
         decorationIds: [],
+        rampageDecorationId: null,
         rampageSkillIds: [],
         custom: defaultCustomWeapon
     },

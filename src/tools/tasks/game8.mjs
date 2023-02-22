@@ -13,8 +13,9 @@ import {
     defaultArmorItem,
     // defaultPetalaceItem,
     defaultDecorationItem,
-    defaultRampageSkillItem,
     defaultSkillItem,
+    defaultRampageDecorationItem,
+    defaultRampageSkillItem,
     autoExtendListQuantity,
     normalizeText,
     weaponTypeList,
@@ -50,27 +51,20 @@ const urls = {
 }
 
 export const fetchWeaponsAction = async (targetWeaponType = null) => {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
-    for (let weaponType of Object.keys(urls.weapons)) {
-        if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
-            continue
-        }
-
+    const runner = async (weaponType) => {
         let mapping = {}
         let mappingKey = null
 
         // Fetch List Page
-        fetchPageUrl = urls.weapons[weaponType]
-        fetchPageName = `weapons:${weaponType}`
+        let fetchPageUrl = urls.weapons[weaponType]
+        let fetchPageName = `weapons:${weaponType}`
 
         console.log(fetchPageUrl, fetchPageName)
 
         let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
         if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
+            console.trace(fetchPageUrl, fetchPageName, 'Err')
 
             return
         }
@@ -112,9 +106,20 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
                 if (Helper.isEmpty(weaponDom)) {
-                    console.log(fetchPageUrl, fetchPageName, 'Err')
+                    console.trace(fetchPageUrl, fetchPageName, 'Err')
 
-                    return
+                    mappingKey = name
+
+                    if (Helper.isEmpty(mapping[mappingKey])) {
+                        mapping[mappingKey] = Helper.deepCopy(defaultWeaponItem)
+                    }
+
+                    mapping[mappingKey].name = {
+                        jaJP: name
+                    }
+                    mapping[mappingKey].type = weaponType
+
+                    continue
                 }
 
                 let series = normalizeText(weaponDom('h3#hm_1').text().replace('の性能まとめ', ''))
@@ -141,7 +146,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                     let rare = subNode.find('tbody tr').eq(1).find('td').eq(0).text()
                     let attack = subNode.find('tbody tr').eq(1).find('td').eq(1).text()
                     let criticalRate = subNode.find('tbody tr').eq(1).find('td').eq(2).text()
-                    let element = subNode.find('tbody tr').eq(3).find('td').eq(0).text()
+                    let element = subNode.find('tbody tr').eq(3).find('td').eq(0).text().replace('\n', '')
                     let defense = subNode.find('tbody tr').eq(3).find('td').eq(2).text()
 
                     // Element
@@ -174,6 +179,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                                 })
                             }
                         }
+
 
                         elements.forEach((element) => {
                             switch (element.type) {
@@ -233,7 +239,11 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 
                     // Slot
                     subNode.find('tbody tr').eq(3).find('td').eq(1).text().split('').forEach((slotSize) => {
-                        if ('③' === slotSize) {
+                        if ('④' === slotSize) {
+                            mapping[mappingKey].slots.push({
+                                size: 4
+                            })
+                        } else if ('③' === slotSize) {
                             mapping[mappingKey].slots.push({
                                 size: 3
                             })
@@ -248,18 +258,43 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                         }
                     })
 
-                    // RampageSkills
-                    let rampageSkillRowIndex = 4
+                    // RampageSkills & RampageDecoration
+                    for (let trIndex = 4; trIndex < subNode.find('tbody tr').length; trIndex++) {
+                        let text = subNode.find('tbody tr').eq(trIndex).find('th').eq(0).text().trim()
 
-                    if ('lightBowgun' === weaponType || 'heavyBowgun' === weaponType) {
-                        rampageSkillRowIndex = 7
+                        switch (text) {
+                        case '百竜スキル':
+                            subNode.find('tbody tr').eq(trIndex).find('td').eq(0).find('a').each((index, node) => {
+                                mapping[mappingKey].rampageSkill.list.push({
+                                    name: normalizeText(weaponDom(node).text())
+                                })
+                            })
+
+                            break
+                        case '百竜スロット':
+                            let slotSize = subNode.find('tbody tr').eq(trIndex).find('td').eq(0).text()
+
+                            if ('④' === slotSize) {
+                                mapping[mappingKey].rampageSlot = {
+                                    size: 4
+                                }
+                            } else if ('③' === slotSize) {
+                                mapping[mappingKey].rampageSlot = {
+                                    size: 3
+                                }
+                            } else if ('②' === slotSize) {
+                                mapping[mappingKey].rampageSlot = {
+                                    size: 2
+                                }
+                            } else if ('①' === slotSize) {
+                                mapping[mappingKey].rampageSlot = {
+                                    size: 1
+                                }
+                            }
+
+                            break
+                        }
                     }
-
-                    subNode.find('tbody tr').eq(rampageSkillRowIndex).find('a').each((index, node) => {
-                        mapping[mappingKey].rampageSkill.list.push({
-                            name: normalizeText(weaponDom(node).text())
-                        })
-                    })
 
                     mapping[mappingKey].series = {
                         jaJP: series
@@ -286,6 +321,20 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
 
         Helper.saveJSONAsCSV(`${tempRoot}/weapons/${weaponType}.csv`, list)
     }
+
+    let tasks = []
+
+    for (let weaponType of Object.keys(urls.weapons)) {
+        if (Helper.isNotEmpty(targetWeaponType) && targetWeaponType !== weaponType) {
+            continue
+        }
+
+        tasks.push(runner(weaponType))
+    }
+
+    return Promise.all(tasks).then(() => {
+        // pass
+    })
 }
 
 export const fetchArmorsAction = async () => {
@@ -304,7 +353,7 @@ export const fetchArmorsAction = async () => {
     let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
     if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
+        console.trace(fetchPageUrl, fetchPageName, 'Err')
 
         return
     }
@@ -326,7 +375,7 @@ export const fetchArmorsAction = async () => {
         return text
     }
 
-    for (let tableIndex = 1; tableIndex <= 2; tableIndex++) {
+    for (let tableIndex = 1; tableIndex <= 3; tableIndex++) {
         for (let rowIndex = 0; rowIndex < listDom(`#hm_${tableIndex} + table tbody td`).length; rowIndex++) {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody td`).eq(rowIndex)
 
@@ -357,172 +406,194 @@ export const fetchArmorsAction = async () => {
                 let armorDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
                 if (Helper.isEmpty(armorDom)) {
-                    console.log(fetchPageUrl, fetchPageName, 'Err')
+                    console.trace(fetchPageUrl, fetchPageName, 'Err')
 
                     return
                 }
 
-                for (let h3Index = 0; h3Index < armorDom('h3.a-header--3').length; h3Index++) {
-                    let header = armorDom('h3.a-header--3').eq(h3Index).text().trim()
-                    let hmId = armorDom('h3.a-header--3').eq(h3Index).attr('id')
+                if (0 < armorDom('h3.a-header--3').length) {
+                    for (let h3Index = 0; h3Index < armorDom('h3.a-header--3').length; h3Index++) {
+                        let header = armorDom('h3.a-header--3').eq(h3Index).text().trim()
+                        let hmId = armorDom('h3.a-header--3').eq(h3Index).attr('id')
 
-                    if ('スキル・スロット' === header) {
-                        for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length; armorIndex++) {
-                            let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
+                        if ('スキル・スロット' === header) {
+                            for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length; armorIndex++) {
+                                let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
 
-                            // Get Data
-                            let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).text().trim()))
+                                // Get Data
+                                let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).text().trim()))
 
-                            if (2 === seriesList.length) {
-                                name = name.split('/')[seriesIndex]
-                            }
-
-                            mappingKey = `${series}:${name}`
-
-                            if (Helper.isEmpty(mapping[mappingKey])) {
-                                mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
-                            }
-
-                            mapping[mappingKey].series = {
-                                jaJP: series
-                            }
-                            mapping[mappingKey].name = {
-                                jaJP: name
-                            }
-                            mapping[mappingKey].gender = gender
-
-                            armorNode.find('td').eq(1).find('a').each((index, node) => {
-                                let skillName = normalizeText(armorDom(node).text())
-                                let skillLevel = armorDom(node)[0].next.data.replace('Lv.', '')
-
-                                mapping[mappingKey].skills.push({
-                                    name: skillName,
-                                    level: parseFloat(skillLevel)
-                                })
-                            })
-
-                            // Slots
-                            armorNode.find('td').eq(2).text().trim().split('').forEach((slotSize) => {
-                                if ('③' === slotSize) {
-                                    mapping[mappingKey].slots.push({
-                                        size: 3
-                                    })
-                                } else if ('②' === slotSize) {
-                                    mapping[mappingKey].slots.push({
-                                        size: 2
-                                    })
-                                } else if ('①' === slotSize) {
-                                    mapping[mappingKey].slots.push({
-                                        size: 1
-                                    })
+                                if (2 === seriesList.length) {
+                                    name = name.split('/')[seriesIndex]
                                 }
-                            })
+
+                                mappingKey = `${series}:${name}`
+
+                                if (Helper.isEmpty(mapping[mappingKey])) {
+                                    mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
+                                }
+
+                                mapping[mappingKey].series = {
+                                    jaJP: series
+                                }
+                                mapping[mappingKey].name = {
+                                    jaJP: name
+                                }
+                                mapping[mappingKey].gender = gender
+
+                                armorNode.find('td').eq(1).find('a').each((index, node) => {
+                                    let skillName = normalizeText(armorDom(node).text())
+                                    let skillLevel = armorDom(node)[0].next.data.replace('Lv.', '')
+
+                                    mapping[mappingKey].skills.push({
+                                        name: skillName,
+                                        level: parseFloat(skillLevel)
+                                    })
+                                })
+
+                                // Slots
+                                armorNode.find('td').eq(2).text().trim().split('').forEach((slotSize) => {
+                                    if ('③' === slotSize) {
+                                        mapping[mappingKey].slots.push({
+                                            size: 3
+                                        })
+                                    } else if ('②' === slotSize) {
+                                        mapping[mappingKey].slots.push({
+                                            size: 2
+                                        })
+                                    } else if ('①' === slotSize) {
+                                        mapping[mappingKey].slots.push({
+                                            size: 1
+                                        })
+                                    }
+                                })
+                            }
+                        }
+
+                        if ('防御力' === header) {
+                            for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length - 1; armorIndex++) {
+                                let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
+
+                                // Get Data
+                                let type = armorNode.find('td').eq(0).find('.align').text().trim()
+                                let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
+                                let minDefense = armorNode.find('td').eq(1).text().trim()
+                                let maxDefense = (3 === armorNode.find('td').length)
+                                    ? armorNode.find('td').eq(2).text().trim() : null
+
+                                if (2 === seriesList.length) {
+                                    name = name.split('/')[seriesIndex]
+                                }
+
+                                switch (type) {
+                                case '頭':
+                                    type = 'helm'
+
+                                    break
+                                case '胴':
+                                    type = 'chest'
+
+                                    break
+                                case '腕':
+                                    type = 'arm'
+
+                                    break
+                                case '腰':
+                                    type = 'waist'
+
+                                    break
+                                case '脚':
+                                    type = 'leg'
+
+                                    break
+                                }
+
+                                mappingKey = `${series}:${name}`
+
+                                if (Helper.isEmpty(mapping[mappingKey])) {
+                                    mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
+                                }
+
+                                mapping[mappingKey].type = type
+                                mapping[mappingKey].minDefense = parseFloat(minDefense)
+                                mapping[mappingKey].maxDefense = Helper.isNotEmpty(maxDefense)
+                                    ? parseFloat(maxDefense) : null
+                            }
+                        }
+
+                        if ('属性耐性' === header) {
+                            for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length - 1; armorIndex++) {
+                                let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
+
+                                // Get Data
+                                let type = armorNode.find('td').eq(0).find('.align').text().trim()
+                                let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
+                                let resistanceFire = armorNode.find('td').eq(1).text().trim()
+                                let resistanceWater = armorNode.find('td').eq(2).text().trim()
+                                let resistanceThunder = armorNode.find('td').eq(3).text().trim()
+                                let resistanceIce = armorNode.find('td').eq(4).text().trim()
+                                let resistanceDragon = armorNode.find('td').eq(5).text().trim()
+
+                                if (2 === seriesList.length) {
+                                    name = name.split('/')[seriesIndex]
+                                }
+
+                                switch (type) {
+                                case '頭':
+                                    type = 'helm'
+
+                                    break
+                                case '胴':
+                                    type = 'chest'
+
+                                    break
+                                case '腕':
+                                    type = 'arm'
+
+                                    break
+                                case '腰':
+                                    type = 'waist'
+
+                                    break
+                                case '脚':
+                                    type = 'leg'
+
+                                    break
+                                }
+
+                                mappingKey = `${series}:${name}`
+
+                                if (Helper.isEmpty(mapping[mappingKey])) {
+                                    mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
+                                }
+
+                                mapping[mappingKey].type = type
+                                mapping[mappingKey].resistance.fire = parseFloat(resistanceFire)
+                                mapping[mappingKey].resistance.water = parseFloat(resistanceWater)
+                                mapping[mappingKey].resistance.thunder = parseFloat(resistanceThunder)
+                                mapping[mappingKey].resistance.ice = parseFloat(resistanceIce)
+                                mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
+                            }
                         }
                     }
+                } else {
+                    for (let h2Index = 0; h2Index < armorDom('h2.a-header--2').length; h2Index++) {
+                        let text = armorDom('h2.a-header--2').eq(h2Index).text().trim()
 
-                    if ('防御力' === header) {
-                        for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length - 1; armorIndex++) {
-                            let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
+                        if (-1 !== text.indexOf('スキルとスロット')) {
+                            let hmId = armorDom('h2.a-header--2').eq(h2Index).attr('id')
 
-                            // Get Data
-                            let type = armorNode.find('td').eq(0).find('.align').text().trim()
-                            let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
-                            let minDefense = armorNode.find('td').eq(1).text().trim()
-                            let maxDefense = (3 === armorNode.find('td').length)
-                                ? armorNode.find('td').eq(2).text().trim() : null
+                            for (let trIndex = 1; trIndex < armorDom(`#${hmId} + table tbody tr`).length; trIndex++) {
 
-                            if (2 === seriesList.length) {
-                                name = name.split('/')[seriesIndex]
                             }
-
-                            switch (type) {
-                            case '頭':
-                                type = 'helm'
-
-                                break
-                            case '胴':
-                                type = 'chest'
-
-                                break
-                            case '腕':
-                                type = 'arm'
-
-                                break
-                            case '腰':
-                                type = 'waist'
-
-                                break
-                            case '脚':
-                                type = 'leg'
-
-                                break
-                            }
-
-                            mappingKey = `${series}:${name}`
-
-                            if (Helper.isEmpty(mapping[mappingKey])) {
-                                mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
-                            }
-
-                            mapping[mappingKey].type = type
-                            mapping[mappingKey].minDefense = parseFloat(minDefense)
-                            mapping[mappingKey].maxDefense = Helper.isNotEmpty(maxDefense)
-                                ? parseFloat(maxDefense) : null
                         }
-                    }
 
-                    if ('属性耐性' === header) {
-                        for (let armorIndex = 1; armorIndex < armorDom(`#${hmId} + table tbody tr`).length - 1; armorIndex++) {
-                            let armorNode = armorDom(`#${hmId} + table tbody tr`).eq(armorIndex)
+                        if (-1 !== text.indexOf('ステータスと耐性')) {
+                            let hmId = armorDom('h2.a-header--2').eq(h2Index).attr('id')
 
-                            // Get Data
-                            let type = armorNode.find('td').eq(0).find('.align').text().trim()
-                            let name = normalizeText(specialReplaceName(armorNode.find('td').eq(0).find('.align')[0].next.data.trim()))
-                            let resistanceFire = armorNode.find('td').eq(1).text().trim()
-                            let resistanceWater = armorNode.find('td').eq(2).text().trim()
-                            let resistanceThunder = armorNode.find('td').eq(3).text().trim()
-                            let resistanceIce = armorNode.find('td').eq(4).text().trim()
-                            let resistanceDragon = armorNode.find('td').eq(5).text().trim()
+                            for (let trIndex = 1; trIndex < armorDom(`#${hmId} + table tbody tr`).length; trIndex++) {
 
-                            if (2 === seriesList.length) {
-                                name = name.split('/')[seriesIndex]
                             }
-
-                            switch (type) {
-                            case '頭':
-                                type = 'helm'
-
-                                break
-                            case '胴':
-                                type = 'chest'
-
-                                break
-                            case '腕':
-                                type = 'arm'
-
-                                break
-                            case '腰':
-                                type = 'waist'
-
-                                break
-                            case '脚':
-                                type = 'leg'
-
-                                break
-                            }
-
-                            mappingKey = `${series}:${name}`
-
-                            if (Helper.isEmpty(mapping[mappingKey])) {
-                                mapping[mappingKey] = Helper.deepCopy(defaultArmorItem)
-                            }
-
-                            mapping[mappingKey].type = type
-                            mapping[mappingKey].resistance.fire = parseFloat(resistanceFire)
-                            mapping[mappingKey].resistance.water = parseFloat(resistanceWater)
-                            mapping[mappingKey].resistance.thunder = parseFloat(resistanceThunder)
-                            mapping[mappingKey].resistance.ice = parseFloat(resistanceIce)
-                            mapping[mappingKey].resistance.dragon = parseFloat(resistanceDragon)
                         }
                     }
                 }
@@ -551,12 +622,12 @@ export const fetchDecorationsAction = async () => {
     let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
     if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
+        console.trace(fetchPageUrl, fetchPageName, 'Err')
 
         return
     }
 
-    for (let tableIndex = 1; tableIndex <= 3; tableIndex++) {
+    for (let tableIndex = 1; tableIndex <= 4; tableIndex++) {
         for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
 
@@ -573,7 +644,7 @@ export const fetchDecorationsAction = async () => {
             let decorationDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
             if (Helper.isEmpty(decorationDom)) {
-                console.log(fetchPageUrl, fetchPageName, 'Err')
+                console.trace(fetchPageUrl, fetchPageName, 'Err')
 
                 return
             }
@@ -603,53 +674,6 @@ export const fetchDecorationsAction = async () => {
     Helper.saveJSONAsCSV(`${tempRoot}/decorations.csv`, Object.values(mapping))
 }
 
-export const fetchRampageSkillsAction = async () => {
-    let fetchPageUrl = null
-    let fetchPageName = null
-
-    let mapping = {}
-    let mappingKey = null
-
-    // Fetch List Page
-    fetchPageUrl = urls.rampageSkills
-    fetchPageName = 'rampageSkills'
-
-    console.log(fetchPageUrl, fetchPageName)
-
-    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
-
-    if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
-
-        return
-    }
-
-    for (let tableIndex = 1; tableIndex <= 10; tableIndex++) {
-        for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
-            let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
-
-            // Get Data
-            let name = normalizeText(rowNode.find('td').eq(0).text().trim())
-            let description = normalizeText(rowNode.find('td').eq(1).text().trim())
-
-            mappingKey = name
-
-            if (Helper.isEmpty(mapping[mappingKey])) {
-                mapping[mappingKey] = Helper.deepCopy(defaultRampageSkillItem)
-            }
-
-            mapping[mappingKey].name = {
-                jaJP: name
-            }
-            mapping[mappingKey].description = {
-                jaJP: description
-            }
-        }
-    }
-
-    Helper.saveJSONAsCSV(`${tempRoot}/rampageSkills.csv`, Object.values(mapping))
-}
-
 export const fetchSkillsAction = async () => {
     let fetchPageUrl = null
     let fetchPageName = null
@@ -666,7 +690,7 @@ export const fetchSkillsAction = async () => {
     let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
     if (Helper.isEmpty(listDom)) {
-        console.log(fetchPageUrl, fetchPageName, 'Err')
+        console.trace(fetchPageUrl, fetchPageName, 'Err')
 
         return
     }
@@ -674,6 +698,10 @@ export const fetchSkillsAction = async () => {
     for (let tableIndex = 1; tableIndex <= 10; tableIndex++) {
         for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
             let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
+
+            if (Helper.isEmpty(rowNode.find('td').eq(0).find('a').attr('href'))) {
+                continue
+            }
 
             // Get Data
             let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
@@ -688,7 +716,7 @@ export const fetchSkillsAction = async () => {
             let skillDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
             if (Helper.isEmpty(skillDom)) {
-                console.log(fetchPageUrl, fetchPageName, 'Err')
+                console.trace(fetchPageUrl, fetchPageName, 'Err')
 
                 return
             }
@@ -721,6 +749,119 @@ export const fetchSkillsAction = async () => {
     }
 
     Helper.saveJSONAsCSV(`${tempRoot}/skills.csv`, Object.values(mapping))
+}
+
+export const fetchRampageDecorationsAction = async () => {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
+    let mapping = {}
+    let mappingKey = null
+
+    // Fetch List Page
+    fetchPageUrl = urls.decorations
+    fetchPageName = 'rampageDecorations'
+
+    console.log(fetchPageUrl, fetchPageName)
+
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+    if (Helper.isEmpty(listDom)) {
+        console.trace(fetchPageUrl, fetchPageName, 'Err')
+
+        return
+    }
+
+    for (let tableIndex = 5; tableIndex <= 5; tableIndex++) {
+        for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
+            let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
+
+            // Get Data
+            let name = normalizeText(rowNode.find('td').eq(0).find('a').text().trim())
+            let skillName = normalizeText(rowNode.find('td').eq(1).text().trim())
+
+            // Fetch Detail Page
+            fetchPageUrl = rowNode.find('td').eq(0).find('a').attr('href')
+            fetchPageName = `rampageDecorations:${name}`
+
+            console.log(fetchPageUrl, fetchPageName)
+
+            let decorationDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+            if (Helper.isEmpty(decorationDom)) {
+                console.trace(fetchPageUrl, fetchPageName, 'Err')
+
+                return
+            }
+
+            // Get Data
+            let rare = decorationDom(`#hm_1 + table tbody tr`).eq(1).find('td').eq(0).text().trim()
+            let size = decorationDom(`#hm_1 + table tbody tr`).eq(1).find('td').eq(1).text().trim()
+            let skill = normalizeText(rowNode.find('td').eq(2).text().trim())
+
+            mappingKey = name
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultRampageDecorationItem)
+            }
+
+            mapping[mappingKey].name = {
+                jaJP: name
+            }
+            mapping[mappingKey].rare = parseFloat(rare)
+            mapping[mappingKey].size = parseFloat(size)
+            mapping[mappingKey].skill = skill
+        }
+    }
+
+    Helper.saveJSONAsCSV(`${tempRoot}/rampageDecorations.csv`, Object.values(mapping))
+}
+
+export const fetchRampageSkillsAction = async () => {
+    let fetchPageUrl = null
+    let fetchPageName = null
+
+    let mapping = {}
+    let mappingKey = null
+
+    // Fetch List Page
+    fetchPageUrl = urls.rampageSkills
+    fetchPageName = 'rampageSkills'
+
+    console.log(fetchPageUrl, fetchPageName)
+
+    let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
+
+    if (Helper.isEmpty(listDom)) {
+        console.trace(fetchPageUrl, fetchPageName, 'Err')
+
+        return
+    }
+
+    for (let tableIndex = 1; tableIndex <= 14; tableIndex++) {
+        for (let rowIndex = 1; rowIndex < listDom(`#hm_${tableIndex} + table tbody tr`).length; rowIndex++) {
+            let rowNode = listDom(`#hm_${tableIndex} + table tbody tr`).eq(rowIndex)
+
+            // Get Data
+            let name = normalizeText(rowNode.find('td').eq(0).text().trim())
+            let description = normalizeText(rowNode.find('td').eq(1).text().trim())
+
+            mappingKey = name
+
+            if (Helper.isEmpty(mapping[mappingKey])) {
+                mapping[mappingKey] = Helper.deepCopy(defaultRampageSkillItem)
+            }
+
+            mapping[mappingKey].name = {
+                jaJP: name
+            }
+            mapping[mappingKey].description = {
+                jaJP: description
+            }
+        }
+    }
+
+    Helper.saveJSONAsCSV(`${tempRoot}/rampageSkills.csv`, Object.values(mapping))
 }
 
 export const infoAction = () => {
@@ -787,21 +928,23 @@ export const infoAction = () => {
         }
     }
 
-    // Decorations
-    let decorationList = Helper.loadCSVAsJSON(`${tempRoot}/decorations.csv`)
+    // Decorations & RampageDecorations
+    for (let target of ['decorations', 'rampageDecorations']) {
+        let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
-    if (Helper.isNotEmpty(decorationList)) {
-        result.decorations.all = decorationList.length
+        if (Helper.isNotEmpty(targetList)) {
+            result[target].all = targetList.length
 
-        for (let item of decorationList) {
-            if (Helper.isNotEmpty(item.size)) {
-                result.decorations[`size${item.size}`] += 1
+            for (let item of targetList) {
+                if (Helper.isNotEmpty(item.size)) {
+                    result[target][`size${item.size}`] += 1
+                }
             }
         }
     }
 
-    // RampageSkills & Skills
-    for (let target of ['rampageSkills', 'skills']) {
+    // Skills & RampageDecorations
+    for (let target of ['skills', 'rampageSkills']) {
         let targetList = Helper.loadCSVAsJSON(`${tempRoot}/${target}.csv`)
 
         if (Helper.isNotEmpty(targetList)) {
@@ -818,8 +961,9 @@ export const fetchAllAction = () => {
         fetchWeaponsAction(),
         fetchArmorsAction(),
         fetchDecorationsAction(),
+        fetchSkillsAction(),
+        fetchRampageDecorationsAction(),
         fetchRampageSkillsAction(),
-        fetchSkillsAction()
     ]).then(() => {
         infoAction()
     })
@@ -830,7 +974,8 @@ export default {
     fetchWeaponsAction,
     fetchArmorsAction,
     fetchDecorationsAction,
-    fetchRampageSkillsAction,
     fetchSkillsAction,
+    fetchRampageDecorationsAction,
+    fetchRampageSkillsAction,
     infoAction
 }

@@ -87,7 +87,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
             let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
             if (Helper.isEmpty(listDom)) {
-                console.log(fetchPageUrl, fetchPageName, 'Err')
+                console.trace(fetchPageUrl, fetchPageName, 'Err')
 
                 return
             }
@@ -311,7 +311,7 @@ export const fetchWeaponsAction = async (targetWeaponType = null) => {
                 let weaponDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
                 if (Helper.isEmpty(weaponDom)) {
-                    console.log(fetchPageUrl, fetchPageName, 'Err')
+                    console.trace(fetchPageUrl, fetchPageName, 'Err')
 
                     return
                 }
@@ -370,7 +370,7 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
             let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
             if (Helper.isEmpty(listDom)) {
-                console.log(fetchPageUrl, fetchPageName, 'Err')
+                console.trace(fetchPageUrl, fetchPageName, 'Err')
 
                 return
             }
@@ -475,7 +475,7 @@ export const fetchArmorsAction = async (targetArmorRare = null) => {
                 let armorDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
                 if (Helper.isEmpty(armorDom)) {
-                    console.log(fetchPageUrl, fetchPageName, 'Err')
+                    console.trace(fetchPageUrl, fetchPageName, 'Err')
 
                     return
                 }
@@ -521,7 +521,7 @@ export const fetchDecorationsAction = async () => {
         let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
         if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
+            console.trace(fetchPageUrl, fetchPageName, 'Err')
 
             return
         }
@@ -584,7 +584,7 @@ export const fetchSkillsAction = async () => {
         let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
         if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
+            console.trace(fetchPageUrl, fetchPageName, 'Err')
 
             return
         }
@@ -652,7 +652,7 @@ export const fetchRampageDecorationsAction = async () => {
         let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
         if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
+            console.trace(fetchPageUrl, fetchPageName, 'Err')
 
             return
         }
@@ -713,7 +713,7 @@ export const fetchRampageSkillsAction = async () => {
         let listDom = await Helper.fetchHtmlAsDom(fetchPageUrl)
 
         if (Helper.isEmpty(listDom)) {
-            console.log(fetchPageUrl, fetchPageName, 'Err')
+            console.trace(fetchPageUrl, fetchPageName, 'Err')
 
             return
         }
